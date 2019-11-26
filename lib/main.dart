@@ -28,7 +28,6 @@ class FyxApp extends StatelessWidget {
               '1': Padding(child: Text('Sledovane'), padding: EdgeInsets.symmetric(horizontal: 16),),
             },
           )
-
         ),
         child: CupertinoTabScaffold(
           tabBar: CupertinoTabBar(

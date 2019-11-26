@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:fyx/components/DiscussionListItem.dart';
 import 'package:fyx/model/Discussion.dart';
 
 class HistoryList extends StatefulWidget {
@@ -26,21 +28,6 @@ class _HistoryListState extends State<HistoryList> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(itemBuilder: (context, position) {
-      return Container(
-        color: position % 2 == 0 ? CupertinoColors.activeBlue : null,
-        child: Column(
-          children: <Widget>[
-            SizedBox(height: 2,),
-            Row(
-              children: <Widget>[
-                Text(_list[position].jmeno)
-              ],
-            ),
-            SizedBox(height: 2,),
-          ],
-        ),
-      );
-    }, itemCount: _list.length,);
+    return ListView.builder(itemBuilder: (context, position) => DiscussionListItem(_list[position]), itemCount: _list.length,);
   }
 }
