@@ -9,25 +9,29 @@ void main() {
 }
 
 class FyxApp extends StatelessWidget {
-  // This widget is the root of your application.
+  final PageController _bookmarksController = PageController(initialPage: 0);
+
   @override
   Widget build(BuildContext context) {
     return PlatformApp(
       title: 'Fyx',
       home: CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
-          middle: const Text('Fyx'),
+          middle: CupertinoSegmentedControl(
+            onValueChanged: (value) => _bookmarksController.animateToPage(int.parse(value), duration: Duration(milliseconds: 300), curve: Curves.easeInOut),
+            children: {
+              '0': Padding(child: Text('Historie'), padding: EdgeInsets.symmetric(horizontal: 16),),
+              '1': Padding(child: Text('Sledovane'), padding: EdgeInsets.symmetric(horizontal: 16),),
+            },
+          )
+
         ),
         child: CupertinoTabScaffold(
           tabBar: CupertinoTabBar(
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
-                icon: Icon(CupertinoIcons.loop),
-                title: Text('Historie'),
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(CupertinoIcons.book),
-                title: Text('Sledovane'),
+                icon: Icon(CupertinoIcons.bookmark),
+                title: Text('Sledované'),
               ),
               BottomNavigationBarItem(
                 icon: Icon(CupertinoIcons.mail),
@@ -40,7 +44,14 @@ class FyxApp extends StatelessWidget {
               case 0:
                 return CupertinoTabView(builder: (context) {
                   return CupertinoPageScaffold(
-                    child: Container(),
+                    child: PageView(
+                      controller: _bookmarksController,
+                      pageSnapping: true,
+                      children: <Widget>[
+                        Container(color: Colors.red,),
+                        Container(color: Colors.blue,)
+                      ],
+                    ),
                   );
                 });
               case 1:

@@ -16,7 +16,7 @@ class PlatformApp extends PlatformAwareWidget<MaterialApp, CupertinoApp> {
 
   @override
   CupertinoApp createCupertinoWidget(BuildContext context) {
-    return CupertinoApp(home: this.home, title: this.title,theme: CupertinoThemeData(primaryColor: Colors.red),);
+    return CupertinoApp(home: this.home, title: this.title,theme: CupertinoThemeData(primaryColor: Color(0xFF2fa3e5)),);
   }
 
 
