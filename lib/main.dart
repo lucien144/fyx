@@ -1,7 +1,10 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fyx/PlatformApp.dart';
+import 'package:fyx/components/HistoryList.dart';
+import 'package:fyx/model/Discussion.dart';
 
 void main() {
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
@@ -13,6 +16,7 @@ class FyxApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return PlatformApp(
       title: 'Fyx',
       home: CupertinoPageScaffold(
@@ -48,7 +52,7 @@ class FyxApp extends StatelessWidget {
                       controller: _bookmarksController,
                       pageSnapping: true,
                       children: <Widget>[
-                        Container(color: Colors.red,),
+                        HistoryList(),
                         Container(color: Colors.blue,)
                       ],
                     ),
