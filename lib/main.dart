@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fyx/PlatformApp.dart';
+import 'package:fyx/PlatformThemeData.dart';
 import 'package:fyx/components/HistoryList.dart';
 import 'package:fyx/model/Discussion.dart';
 
@@ -19,6 +20,7 @@ class FyxApp extends StatelessWidget {
 
     return PlatformApp(
       title: 'Fyx',
+      theme: PlatformThemeData(primaryColor: Color(0xFF009D9D)), // Color schema -> https://mycolor.space/?hex=%231AD592&sub=1
       home: CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
           middle: CupertinoSegmentedControl(
