@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/DiscussionListItem.dart';
+import 'package:fyx/model/Category.dart';
 import 'package:fyx/model/Discussion.dart';
 
 class HistoryList extends StatefulWidget {
@@ -10,20 +11,33 @@ class HistoryList extends StatefulWidget {
 }
 
 class _HistoryListState extends State<HistoryList> {
+  List<Category> _headers = [];
   List<Discussion> _list = [];
   bool _isLoading = false;
   bool _showIndicator = false;
   ScrollController _controller = ScrollController();
 
   loadHistory() async {
-    setState(() {
-      _isLoading = true;
-    });
-    var response = await Dio().get('http://localhost/lucien144/fyx/assets/json/bookmarks.history.json');
-    setState(() {
-      _list = (response.data['data']['discussions'] as List).map((discussion) => Discussion.fromJson(discussion)).toList();
-      _isLoading = false;
-    });
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+      var response = await Dio().get('http://localhost/lucien144/fyx/assets/json/bookmarks.all.json');
+      setState(() {
+        _list = (response.data['data']['discussions'] as List).map((discussion) => Discussion.fromJson(discussion)).toList();
+        _headers = [];
+        if ((response.data['data'] as Map).containsKey('categories')) {
+          _headers = (response.data['data']['categories'] as List).map((category) => Category.fromJson(category)).toList();
+        }
+        _isLoading = false;
+      });
+    } catch (error) {
+      // TODO: Show error
+      print(error);
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
