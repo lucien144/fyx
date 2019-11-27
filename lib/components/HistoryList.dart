@@ -11,14 +11,20 @@ class HistoryList extends StatefulWidget {
 
 class _HistoryListState extends State<HistoryList> {
   List<Discussion> _list = [];
+  bool _isLoading = false;
+  bool _showIndicator = false;
+  ScrollController _controller = ScrollController();
 
   loadHistory() async {
+    setState(() {
+      _isLoading = true;
+    });
     var response = await Dio().get('http://localhost/lucien144/fyx/assets/json/bookmarks.history.json');
     setState(() {
       _list = (response.data['data']['discussions'] as List).map((discussion) => Discussion.fromJson(discussion)).toList();
+      _isLoading = false;
     });
   }
-
 
   @override
   void initState() {
@@ -28,6 +34,31 @@ class _HistoryListState extends State<HistoryList> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(itemBuilder: (context, position) => DiscussionListItem(_list[position]), itemCount: _list.length,);
+    _controller.addListener(() {
+      if (_controller.position.pixels < -10) {
+        setState(() {
+          _showIndicator = true;
+        });
+      } else {
+        setState(() {
+          _showIndicator = false;
+        });
+      }
+    });
+
+    return ListView.builder(
+      controller: _controller,
+      itemBuilder: (context, position) {
+        return position == 0
+            ? Visibility(
+                visible: _showIndicator,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: CupertinoActivityIndicator(),
+                ))
+            : DiscussionListItem(_list[position - 1]);
+      },
+      itemCount: _list.length + 1,
+    );
   }
 }
