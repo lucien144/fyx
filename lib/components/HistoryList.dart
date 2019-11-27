@@ -28,37 +28,47 @@ class _HistoryListState extends State<HistoryList> {
 
   @override
   void initState() {
-    loadHistory();
-    super.initState();
-  }
+    const treshold = -10;
 
-  @override
-  Widget build(BuildContext context) {
     _controller.addListener(() {
-      if (_controller.position.pixels < -10) {
+      if (_controller.position.pixels < treshold && !_showIndicator) {
         setState(() {
+          loadHistory();
           _showIndicator = true;
         });
-      } else {
+      }
+
+      if (_controller.position.pixels >= treshold && _showIndicator && !_isLoading) {
         setState(() {
           _showIndicator = false;
         });
       }
     });
 
+    loadHistory();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return ListView.builder(
       controller: _controller,
       itemBuilder: (context, position) {
-        return position == 0
-            ? Visibility(
-                visible: _showIndicator,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: CupertinoActivityIndicator(),
-                ))
-            : DiscussionListItem(_list[position - 1]);
+        if (position == 0) {
+          return Column(
+            children: <Widget>[
+              Visibility(
+                  visible: _showIndicator,
+                  child: CupertinoActivityIndicator(
+                    animating: true,
+                  )),
+              DiscussionListItem(_list[position]),
+            ],
+          );
+        }
+        return DiscussionListItem(_list[position]);
       },
-      itemCount: _list.length + 1,
+      itemCount: _list.length,
     );
   }
 }
