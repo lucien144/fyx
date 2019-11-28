@@ -17,64 +17,71 @@ class FyxApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return PlatformApp(
       title: 'Fyx',
       theme: PlatformThemeData(primaryColor: Color(0xFF009D9D)), // Color schema -> https://mycolor.space/?hex=%231AD592&sub=1
       home: CupertinoTabScaffold(
-          tabBar: CupertinoTabBar(
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                icon: Icon(CupertinoIcons.bookmark),
-                title: Text('Sledované'),
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(CupertinoIcons.mail),
-                title: Text('Posta'),
-              ),
-            ],
-          ),
-          tabBuilder: (context, index) {
-            switch (index) {
-              case 0:
-                return CupertinoTabView(builder: (context) {
-                  return CupertinoPageScaffold(
-                    navigationBar: CupertinoNavigationBar(
-                        middle: CupertinoSegmentedControl(
-                          onValueChanged: (value) => _bookmarksController.animateToPage(int.parse(value), duration: Duration(milliseconds: 300), curve: Curves.easeInOut),
-                          children: {
-                            '0': Padding(child: Text('Historie'), padding: EdgeInsets.symmetric(horizontal: 16),),
-                            '1': Padding(child: Text('Sledovane'), padding: EdgeInsets.symmetric(horizontal: 16),),
-                          },
-                        )
-                    ),
-                    child: PageView(
-                      controller: _bookmarksController,
-                      pageSnapping: true,
-                      children: <Widget>[
-                        HistoryList(),
-                        Container(color: Colors.blue,)
-                      ],
-                    ),
-                  );
-                });
-              case 1:
-                return CupertinoTabView(builder: (context) {
-                  return CupertinoPageScaffold(
-                    child: Container(),
-                  );
-                });
-              case 2:
-                return CupertinoTabView(builder: (context) {
-                  return CupertinoPageScaffold(
-                    child: Container(),
-                  );
-                });
-              default:
-                throw Exception('Selected undefined tab');
-            }
-          },
+        tabBar: CupertinoTabBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.bookmark),
+              title: Text('Sledované'),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.mail),
+              title: Text('Posta'),
+            ),
+          ],
         ),
-      );
+        tabBuilder: (context, index) {
+          switch (index) {
+            case 0:
+              return CupertinoTabView(builder: (context) {
+                return CupertinoPageScaffold(
+                  navigationBar: CupertinoNavigationBar(
+                      backgroundColor: Colors.white,
+                      middle: CupertinoSegmentedControl(
+                        onValueChanged: (value) => _bookmarksController.animateToPage(int.parse(value), duration: Duration(milliseconds: 300), curve: Curves.easeInOut),
+                        children: {
+                          '0': Padding(
+                            child: Text('Historie'),
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                          ),
+                          '1': Padding(
+                            child: Text('Sledovane'),
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                          ),
+                        },
+                      )),
+                  child: PageView(
+                    controller: _bookmarksController,
+                    pageSnapping: true,
+                    children: <Widget>[
+                      HistoryList(),
+                      Container(
+                        color: Colors.blue,
+                      )
+                    ],
+                  ),
+                );
+              });
+            case 1:
+              return CupertinoTabView(builder: (context) {
+                return CupertinoPageScaffold(
+                  child: Container(),
+                );
+              });
+            case 2:
+              return CupertinoTabView(builder: (context) {
+                return CupertinoPageScaffold(
+                  child: Container(),
+                );
+              });
+            default:
+              throw Exception('Selected undefined tab');
+          }
+        },
+      ),
+    );
   }
 }
