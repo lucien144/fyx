@@ -9,6 +9,10 @@ import 'package:fyx/model/Discussion.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
 class HistoryList extends StatefulWidget {
+  String dataUrl;
+
+  HistoryList({@required this.dataUrl});
+
   @override
   _HistoryListState createState() => _HistoryListState();
 }
@@ -26,7 +30,7 @@ class _HistoryListState extends State<HistoryList> {
       setState(() {
         _isLoading = true;
       });
-      var response = await Dio().get('http://localhost/lucien144/fyx/assets/json/bookmarks.all.json');
+      var response = await Dio().get(widget.dataUrl);
       setState(() {
         _list = (response.data['data']['discussions'] as List).map((discussion) => Discussion.fromJson(discussion)).toList();
         _headers = [];
@@ -75,29 +79,28 @@ class _HistoryListState extends State<HistoryList> {
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    print(_indicatorRadius);
     return ListView.builder(
       controller: _controller,
       itemBuilder: (context, position) {
+        if (_headers.length == 0) {
+          if (position == 0) {
+            return refreshHeader(DiscussionListItem(_list[position]));
+          }
+          return DiscussionListItem(_list[position]);
+        }
+
         return StickyHeader(
             header: position == 0
-                ? Column(
-                    children: <Widget>[
-                      Visibility(
-                          visible: _showIndicator,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: CupertinoActivityIndicator(
-                              radius: _indicatorRadius,
-                              animating: true,
-                            ),
-                          )),
-                      ListHeader(
-                        title: _headers[position].jmeno,
-                      ),
-                    ],
-                  )
+                ? refreshHeader(ListHeader(
+                    title: _headers[position].jmeno,
+                  ))
                 : ListHeader(
                     title: _headers[position].jmeno,
                   ),
@@ -106,7 +109,24 @@ class _HistoryListState extends State<HistoryList> {
               child: Column(children: _list.where((discussion) => discussion.idCat == _headers[position].idCat).map((discussion) => DiscussionListItem(discussion)).toList()),
             ));
       },
-      itemCount: _headers.length,
+      itemCount: _headers.length == 0 ? _list.length : _headers.length,
+    );
+  }
+
+  Widget refreshHeader(Widget item) {
+    return Column(
+      children: <Widget>[
+        Visibility(
+            visible: _showIndicator,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: CupertinoActivityIndicator(
+                radius: _indicatorRadius,
+                animating: true,
+              ),
+            )),
+        item,
+      ],
     );
   }
 }

@@ -9,7 +9,7 @@ class Discussion {
 
   Discussion.fromJson(Map<String, dynamic> json) {
     this._id_klub = int.parse(json['id_klub']);
-    this._id_cat = int.parse(json['id_cat'] ?? 0);
+    this._id_cat = int.parse(json['id_cat'] ?? '0');
     this._jmeno = json['jmeno'];
     this._unread = int.parse(json['unread']);
     this._replies = int.parse(json['replies']);

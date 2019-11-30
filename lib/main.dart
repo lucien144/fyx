@@ -57,10 +57,12 @@ class FyxApp extends StatelessWidget {
                     controller: _bookmarksController,
                     pageSnapping: true,
                     children: <Widget>[
-                      HistoryList(),
-                      Container(
-                        color: Colors.blue,
-                      )
+                      HistoryList(
+                        dataUrl: 'http://localhost/lucien144/fyx/assets/json/bookmarks.all.json',
+                      ),
+                      HistoryList(
+                        dataUrl: 'http://localhost/lucien144/fyx/assets/json/bookmarks.history.json',
+                      ),
                     ],
                   ),
                 );
