@@ -1,23 +1,22 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/DiscussionListItem.dart';
 import 'package:fyx/components/ListHeader.dart';
 import 'package:fyx/model/Category.dart';
 import 'package:fyx/model/Discussion.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
-class HistoryList extends StatefulWidget {
-  String dataUrl;
+class BookmarksList extends StatefulWidget {
+  final String dataUrl;
 
-  HistoryList({@required this.dataUrl});
+  BookmarksList({@required this.dataUrl});
 
   @override
-  _HistoryListState createState() => _HistoryListState();
+  _BookmarksListState createState() => _BookmarksListState();
 }
 
-class _HistoryListState extends State<HistoryList> {
+class _BookmarksListState extends State<BookmarksList> {
   List<Category> _headers = [];
   List<Discussion> _list = [];
   double _indicatorRadius = 0.1;

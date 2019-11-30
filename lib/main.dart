@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fyx/PlatformApp.dart';
 import 'package:fyx/PlatformThemeData.dart';
-import 'package:fyx/components/HistoryList.dart';
+import 'package:fyx/components/BookmarksList.dart';
 import 'package:fyx/model/Discussion.dart';
 
 void main() {
@@ -57,10 +57,10 @@ class FyxApp extends StatelessWidget {
                     controller: _bookmarksController,
                     pageSnapping: true,
                     children: <Widget>[
-                      HistoryList(
+                      BookmarksList(
                         dataUrl: 'http://localhost/lucien144/fyx/assets/json/bookmarks.all.json',
                       ),
-                      HistoryList(
+                      BookmarksList(
                         dataUrl: 'http://localhost/lucien144/fyx/assets/json/bookmarks.history.json',
                       ),
                     ],
