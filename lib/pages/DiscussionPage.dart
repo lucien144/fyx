@@ -1,7 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fyx/components/ListHeader.dart';
+import 'package:fyx/components/PostListItem.dart';
+import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/model/Discussion.dart';
+import 'package:fyx/model/Post.dart';
 
 class DiscussionPage extends StatelessWidget {
   @override
@@ -13,7 +17,10 @@ class DiscussionPage extends StatelessWidget {
         middle: Text(discussion.jmeno, overflow: TextOverflow.ellipsis),
         trailing: Icon(CupertinoIcons.create),
       ),
-      child: Container(),
+      child: PullToRefreshList<PostListItem, ListHeader>(
+        itemBuilder: (Response<dynamic> response) => (response.data['data'] as List).map((post) => PostListItem(Post.fromJson(post))).toList(),
+        dataUrl: 'http://localhost/lucien144/fyx/assets/json/discussion.messages.id-20873.json',
+      ),
     );
   }
 }
