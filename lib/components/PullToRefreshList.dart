@@ -2,9 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/DiscussionListItem.dart';
-import 'package:fyx/components/DiscussionListItem.dart';
-import 'package:fyx/components/DiscussionListItem.dart';
-import 'package:fyx/components/ListHeader.dart';
 import 'package:fyx/components/ListHeader.dart';
 import 'package:fyx/model/Category.dart';
 import 'package:fyx/model/Discussion.dart';
@@ -13,8 +10,9 @@ import 'package:sticky_headers/sticky_headers.dart';
 class PullToRefreshList extends StatefulWidget {
   final String dataUrl;
   final Function listBuilder;
+  final Function headerBuilder;
 
-  PullToRefreshList({@required this.dataUrl, @required this.listBuilder});
+  PullToRefreshList({@required this.dataUrl, this.listBuilder, this.headerBuilder});
 
   @override
   _PullToRefreshListState createState() => _PullToRefreshListState();
@@ -35,11 +33,8 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
       });
       var response = await Dio().get(widget.dataUrl);
       setState(() {
-        _list = widget.listBuilder(response);
-        _headers = [];
-        if ((response.data['data'] as Map).containsKey('categories')) {
-          _headers = (response.data['data']['categories'] as List).map((category) => Category.fromJson(category)).toList();
-        }
+        _list = widget.listBuilder == null ? [] : widget.listBuilder(response);
+        _headers = widget.headerBuilder == null ? [] : widget.headerBuilder(response);
         _isLoading = false;
       });
     } on DioError catch (error) {

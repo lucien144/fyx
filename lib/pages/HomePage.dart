@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/components/DiscussionListItem.dart';
 import 'package:fyx/components/ListHeader.dart';
+import 'package:fyx/model/Category.dart';
 import 'package:fyx/model/Discussion.dart';
 
 class HomePage extends StatelessWidget {
@@ -51,6 +52,12 @@ class HomePage extends StatelessWidget {
                   children: <Widget>[
                     PullToRefreshList(
                       listBuilder: (Response<dynamic> response) => (response.data['data']['discussions'] as List).map((discussion) => Discussion.fromJson(discussion)).toList(),
+                      headerBuilder: (Response<dynamic> response) {
+                        if ((response.data['data'] as Map).containsKey('categories')) {
+                          return (response.data['data']['categories'] as List).map((category) => Category.fromJson(category)).toList();
+                        }
+                        return [];
+                      },
                       dataUrl: 'http://localhost/lucien144/fyx/assets/json/bookmarks.all.json',
                     ),
                     PullToRefreshList(
