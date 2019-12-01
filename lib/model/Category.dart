@@ -1,6 +1,8 @@
 class Category {
+  // ignore: non_constant_identifier_names
   int _id_cat;
   String _jmeno;
+  // ignore: non_constant_identifier_names
   int _sort_code;
 
   Category.fromJson(Map<String, dynamic> json) {
