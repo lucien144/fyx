@@ -2,21 +2,25 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/DiscussionListItem.dart';
+import 'package:fyx/components/DiscussionListItem.dart';
+import 'package:fyx/components/DiscussionListItem.dart';
+import 'package:fyx/components/ListHeader.dart';
 import 'package:fyx/components/ListHeader.dart';
 import 'package:fyx/model/Category.dart';
 import 'package:fyx/model/Discussion.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
-class BookmarksList extends StatefulWidget {
+class PullToRefreshList extends StatefulWidget {
   final String dataUrl;
+  final Function listBuilder;
 
-  BookmarksList({@required this.dataUrl});
+  PullToRefreshList({@required this.dataUrl, @required this.listBuilder});
 
   @override
-  _BookmarksListState createState() => _BookmarksListState();
+  _PullToRefreshListState createState() => _PullToRefreshListState();
 }
 
-class _BookmarksListState extends State<BookmarksList> {
+class _PullToRefreshListState extends State<PullToRefreshList> {
   List<Category> _headers = [];
   List<Discussion> _list = [];
   double _indicatorRadius = 0.1;
@@ -31,14 +35,14 @@ class _BookmarksListState extends State<BookmarksList> {
       });
       var response = await Dio().get(widget.dataUrl);
       setState(() {
-        _list = (response.data['data']['discussions'] as List).map((discussion) => Discussion.fromJson(discussion)).toList();
+        _list = widget.listBuilder(response);
         _headers = [];
         if ((response.data['data'] as Map).containsKey('categories')) {
           _headers = (response.data['data']['categories'] as List).map((category) => Category.fromJson(category)).toList();
         }
         _isLoading = false;
       });
-    } catch (error) {
+    } on DioError catch (error) {
       // TODO: Show error
       print(error);
       setState(() {

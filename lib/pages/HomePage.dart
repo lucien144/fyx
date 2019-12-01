@@ -1,7 +1,11 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fyx/components/BookmarksList.dart';
+import 'package:fyx/components/PullToRefreshList.dart';
+import 'package:fyx/components/DiscussionListItem.dart';
+import 'package:fyx/components/ListHeader.dart';
+import 'package:fyx/model/Discussion.dart';
 
 class HomePage extends StatelessWidget {
   final PageController _bookmarksController = PageController(initialPage: 0);
@@ -45,10 +49,12 @@ class HomePage extends StatelessWidget {
                   controller: _bookmarksController,
                   pageSnapping: true,
                   children: <Widget>[
-                    BookmarksList(
+                    PullToRefreshList(
+                      listBuilder: (Response<dynamic> response) => (response.data['data']['discussions'] as List).map((discussion) => Discussion.fromJson(discussion)).toList(),
                       dataUrl: 'http://localhost/lucien144/fyx/assets/json/bookmarks.all.json',
                     ),
-                    BookmarksList(
+                    PullToRefreshList(
+                      listBuilder: (Response<dynamic> response) => (response.data['data']['discussions'] as List).map((discussion) => Discussion.fromJson(discussion)).toList(),
                       dataUrl: 'http://localhost/lucien144/fyx/assets/json/bookmarks.history.json',
                     ),
                   ],
