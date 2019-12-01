@@ -1,24 +1,26 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fyx/components/DiscussionListItem.dart';
 import 'package:fyx/components/ListHeader.dart';
 import 'package:fyx/model/Category.dart';
 import 'package:fyx/model/Discussion.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
-class PullToRefreshList extends StatefulWidget {
+typedef T ListItemType<L, T extends Widget>(L item);
+
+class PullToRefreshList<L, T extends Widget> extends StatefulWidget {
   final String dataUrl;
   final Function listBuilder;
   final Function headerBuilder;
+  final ListItemType<L, T> listItem;
 
-  PullToRefreshList({@required this.dataUrl, this.listBuilder, this.headerBuilder});
+  PullToRefreshList({@required this.dataUrl, this.listBuilder, this.headerBuilder, this.listItem});
 
   @override
-  _PullToRefreshListState createState() => _PullToRefreshListState();
+  _PullToRefreshListState createState() => _PullToRefreshListState<L, T>();
 }
 
-class _PullToRefreshListState extends State<PullToRefreshList> {
+class _PullToRefreshListState<L, T extends Widget> extends State<PullToRefreshList> {
   List<Category> _headers = [];
   List<Discussion> _list = [];
   double _indicatorRadius = 0.1;
@@ -87,11 +89,13 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
     return ListView.builder(
       controller: _controller,
       itemBuilder: (context, position) {
+        // If there are no headers, return list item directly.
         if (_headers.length == 0) {
           if (position == 0) {
-            return refreshHeader(DiscussionListItem(_list[position]));
+            // If we are at the first position, show the refresh indicator.
+            return refreshHeader(widget.listItem(_list[position]));
           }
-          return DiscussionListItem(_list[position]);
+          return widget.listItem(_list[position]);
         }
 
         return StickyHeader(
@@ -104,7 +108,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
                   ),
             content: Padding(
               padding: const EdgeInsets.only(top: 8.0),
-              child: Column(children: _list.where((discussion) => discussion.idCat == _headers[position].idCat).map((discussion) => DiscussionListItem(discussion)).toList()),
+              child: Column(children: _list.where((discussion) => discussion.idCat == _headers[position].idCat).map((discussion) => (widget.listItem(discussion))).toList()),
             ));
       },
       itemCount: _headers.length == 0 ? _list.length : _headers.length,

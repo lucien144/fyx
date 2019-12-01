@@ -50,7 +50,8 @@ class HomePage extends StatelessWidget {
                   controller: _bookmarksController,
                   pageSnapping: true,
                   children: <Widget>[
-                    PullToRefreshList(
+                    PullToRefreshList<Discussion, DiscussionListItem>(
+                      listItem: (Discussion discussion) => DiscussionListItem(discussion),
                       listBuilder: (Response<dynamic> response) => (response.data['data']['discussions'] as List).map((discussion) => Discussion.fromJson(discussion)).toList(),
                       headerBuilder: (Response<dynamic> response) {
                         if ((response.data['data'] as Map).containsKey('categories')) {
@@ -60,7 +61,8 @@ class HomePage extends StatelessWidget {
                       },
                       dataUrl: 'http://localhost/lucien144/fyx/assets/json/bookmarks.all.json',
                     ),
-                    PullToRefreshList(
+                    PullToRefreshList<Discussion, DiscussionListItem>(
+                      listItem: (Discussion discussion) => DiscussionListItem(discussion),
                       listBuilder: (Response<dynamic> response) => (response.data['data']['discussions'] as List).map((discussion) => Discussion.fromJson(discussion)).toList(),
                       dataUrl: 'http://localhost/lucien144/fyx/assets/json/bookmarks.history.json',
                     ),
