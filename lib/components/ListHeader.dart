@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/PlatformTheme.dart';
+import 'package:fyx/components/ListItemWithCategory.dart';
+import 'package:fyx/model/Category.dart';
 
-class ListHeader extends StatelessWidget {
-  final String title;
+class ListHeader extends ListItemWithCategory {
+  final Category header;
 
-  const ListHeader({Key key, this.title}) : super(key: key);
+  ListHeader(this.header);
+
+  @override
+  int get category => header.idCat;
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +19,7 @@ class ListHeader extends StatelessWidget {
       padding: EdgeInsets.all(8),
       alignment: Alignment.centerLeft,
       child: Text(
-        title,
+        header.jmeno,
         style: const TextStyle(color: Colors.white),
       ),
     );

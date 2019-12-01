@@ -1,7 +1,12 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fyx/components/BookmarksList.dart';
+import 'package:fyx/components/PullToRefreshList.dart';
+import 'package:fyx/components/DiscussionListItem.dart';
+import 'package:fyx/components/ListHeader.dart';
+import 'package:fyx/model/Category.dart';
+import 'package:fyx/model/Discussion.dart';
 
 class HomePage extends StatelessWidget {
   final PageController _bookmarksController = PageController(initialPage: 0);
@@ -45,10 +50,20 @@ class HomePage extends StatelessWidget {
                   controller: _bookmarksController,
                   pageSnapping: true,
                   children: <Widget>[
-                    BookmarksList(
+                    PullToRefreshList<DiscussionListItem, ListHeader>(
+                      itemBuilder: (Response<dynamic> response) =>
+                          (response.data['data']['discussions'] as List).map((discussion) => DiscussionListItem(Discussion.fromJson(discussion))).toList(),
+                      headerBuilder: (Response<dynamic> response) {
+                        if ((response.data['data'] as Map).containsKey('categories')) {
+                          return (response.data['data']['categories'] as List).map((category) => ListHeader(Category.fromJson(category))).toList();
+                        }
+                        return [];
+                      },
                       dataUrl: 'http://localhost/lucien144/fyx/assets/json/bookmarks.all.json',
                     ),
-                    BookmarksList(
+                    PullToRefreshList<DiscussionListItem, ListHeader>(
+                      itemBuilder: (Response<dynamic> response) =>
+                          (response.data['data']['discussions'] as List).map((discussion) => DiscussionListItem(Discussion.fromJson(discussion))).toList(),
                       dataUrl: 'http://localhost/lucien144/fyx/assets/json/bookmarks.history.json',
                     ),
                   ],

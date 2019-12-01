@@ -1,24 +1,26 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fyx/components/DiscussionListItem.dart';
-import 'package:fyx/components/ListHeader.dart';
-import 'package:fyx/model/Category.dart';
-import 'package:fyx/model/Discussion.dart';
+import 'package:fyx/components/ListItemWithCategory.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
-class BookmarksList extends StatefulWidget {
-  final String dataUrl;
+typedef List ItemBuilderType<T extends ListItemWithCategory>(Response<dynamic> response);
+typedef List HeaderBuilderType<H extends ListItemWithCategory>(Response<dynamic> response);
 
-  BookmarksList({@required this.dataUrl});
+class PullToRefreshList<T extends ListItemWithCategory, H extends ListItemWithCategory> extends StatefulWidget {
+  final String dataUrl;
+  final HeaderBuilderType<H> headerBuilder;
+  final ItemBuilderType<T> itemBuilder;
+
+  PullToRefreshList({@required this.dataUrl, this.headerBuilder, this.itemBuilder});
 
   @override
-  _BookmarksListState createState() => _BookmarksListState();
+  _PullToRefreshListState createState() => _PullToRefreshListState<T, H>();
 }
 
-class _BookmarksListState extends State<BookmarksList> {
-  List<Category> _headers = [];
-  List<Discussion> _list = [];
+class _PullToRefreshListState<T extends ListItemWithCategory, H extends ListItemWithCategory> extends State<PullToRefreshList> {
+  List<H> _headers = [];
+  List<T> _list = [];
   double _indicatorRadius = 0.1;
   bool _isLoading = false;
   bool _showIndicator = false;
@@ -31,14 +33,11 @@ class _BookmarksListState extends State<BookmarksList> {
       });
       var response = await Dio().get(widget.dataUrl);
       setState(() {
-        _list = (response.data['data']['discussions'] as List).map((discussion) => Discussion.fromJson(discussion)).toList();
-        _headers = [];
-        if ((response.data['data'] as Map).containsKey('categories')) {
-          _headers = (response.data['data']['categories'] as List).map((category) => Category.fromJson(category)).toList();
-        }
+        _list = widget.itemBuilder == null ? [] : widget.itemBuilder(response);
+        _headers = widget.headerBuilder == null ? [] : widget.headerBuilder(response);
         _isLoading = false;
       });
-    } catch (error) {
+    } on DioError catch (error) {
       // TODO: Show error
       print(error);
       setState(() {
@@ -88,24 +87,20 @@ class _BookmarksListState extends State<BookmarksList> {
     return ListView.builder(
       controller: _controller,
       itemBuilder: (context, position) {
+        // If there are no headers, return list item directly.
         if (_headers.length == 0) {
           if (position == 0) {
-            return refreshHeader(DiscussionListItem(_list[position]));
+            // If we are at the first position, show the refresh indicator.
+            return refreshHeader(_list[position]);
           }
-          return DiscussionListItem(_list[position]);
+          return _list[position];
         }
 
         return StickyHeader(
-            header: position == 0
-                ? refreshHeader(ListHeader(
-                    title: _headers[position].jmeno,
-                  ))
-                : ListHeader(
-                    title: _headers[position].jmeno,
-                  ),
+            header: position == 0 ? refreshHeader(_headers[position]) : _headers[position],
             content: Padding(
               padding: const EdgeInsets.only(top: 8.0),
-              child: Column(children: _list.where((discussion) => discussion.idCat == _headers[position].idCat).map((discussion) => DiscussionListItem(discussion)).toList()),
+              child: Column(children: _list.where((T item) => item.category == _headers[position].category).toList()),
             ));
       },
       itemCount: _headers.length == 0 ? _list.length : _headers.length,

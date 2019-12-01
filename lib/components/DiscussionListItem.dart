@@ -1,12 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fyx/components/ListItemWithCategory.dart';
 import 'package:fyx/model/Discussion.dart';
 
-class DiscussionListItem extends StatelessWidget {
+class DiscussionListItem extends ListItemWithCategory {
   final Discussion discussion;
 
-  const DiscussionListItem(this.discussion, {Key key}) : super(key: key);
+  DiscussionListItem(this.discussion);
+
+  @override
+  int get category => this.discussion.idCat;
 
   @override
   Widget build(BuildContext context) {
