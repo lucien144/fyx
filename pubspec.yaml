@@ -25,6 +25,8 @@ dependencies:
   dio: ^3.0.4
   flutter_sticky_header: ^0.3.4
   sticky_headers: ^0.1.8
+  html: ^0.14.0+3
+  flutter_html: ^0.11.0
   flutter:
     sdk: flutter
 

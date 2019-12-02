@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/ListItemWithCategory.dart';
 import 'package:fyx/model/Post.dart';
@@ -42,8 +43,27 @@ class PostListItem extends ListItemWithCategory {
           ),
           Container(
             padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-            child: Text(post.content),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Html(
+                    data: post.content,
+                  ),
+                ),
+                Visibility(
+                  visible: post.images.length == 1,
+                  child: Image.network(
+                    post.images.length > 0 ? post.images[0]['thumb'] : '',
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.cover,
+                  ),
+                )
+              ],
+            ),
           ),
+          Text(post.content),
+          Text(post.images.length > 0 ? post.images[0]['image'] : ''),
           SizedBox(
             height: 8,
           ),
