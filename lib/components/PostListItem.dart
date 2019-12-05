@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:fyx/PlatformTheme.dart';
+import 'package:fyx/PlatformThemeData.dart';
 import 'package:fyx/components/ListItemWithCategory.dart';
 import 'package:fyx/model/Post.dart';
+import 'package:html/dom.dart' as dom;
 
 class PostListItem extends ListItemWithCategory {
   final Post post;
@@ -47,8 +49,25 @@ class PostListItem extends ListItemWithCategory {
               children: <Widget>[
                 Expanded(
                   child: Html(
-                    data: post.content,
-                  ),
+                      data: post.content,
+                      useRichText: false,
+                      customRender: (dom.Node node, List<Widget> children) {
+                        if (node is dom.Element) {
+                          switch (node.localName) {
+                            case 'a':
+                              print(node);
+                              print(node.attributes.containsKey('data-link-topic'));
+                              print(node.attributes['data-link-topic']);
+                              print(node.attributes['data-link-wu']);
+                              return Container(
+                                padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                child: Text(node.innerHtml),
+                                decoration: BoxDecoration(color: Colors.black26, borderRadius: BorderRadius.circular(4)),
+                              );
+                          }
+                        }
+                        return null;
+                      }),
                 ),
                 Visibility(
                   visible: post.images.length == 1,
