@@ -35,11 +35,14 @@ class PlatformApp extends PlatformAwareWidget<MaterialApp, CupertinoApp> {
 
   Route routes(RouteSettings settings) {
     switch (settings.name) {
-      case '/':
+      case '/home':
+        print('[Router] Homepage');
         return CupertinoPageRoute(builder: (_) => HomePage(), settings: settings);
       case '/discussion':
+        print('[Router] Discussion');
         return CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings);
       default:
+        print('[Router] Discussion');
         return CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings);
     }
   }
