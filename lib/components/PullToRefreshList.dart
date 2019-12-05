@@ -4,15 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:fyx/components/ListItemWithCategory.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
-typedef List ItemBuilderType<T extends ListItemWithCategory>(Response<dynamic> response);
-typedef List HeaderBuilderType<H extends ListItemWithCategory>(Response<dynamic> response);
+typedef Future<Response> LoadDataCallbackType();
+typedef List<T> ItemBuilderType<T extends ListItemWithCategory>(Response<dynamic> response);
+typedef List<H> HeaderBuilderType<H extends ListItemWithCategory>(Response<dynamic> response);
 
 class PullToRefreshList<T extends ListItemWithCategory, H extends ListItemWithCategory> extends StatefulWidget {
-  final String dataUrl;
+  final LoadDataCallbackType loadData;
   final HeaderBuilderType<H> headerBuilder;
   final ItemBuilderType<T> itemBuilder;
 
-  PullToRefreshList({@required this.dataUrl, this.headerBuilder, this.itemBuilder});
+  PullToRefreshList({@required this.loadData, this.headerBuilder, this.itemBuilder});
 
   @override
   _PullToRefreshListState createState() => _PullToRefreshListState<T, H>();
@@ -31,7 +32,7 @@ class _PullToRefreshListState<T extends ListItemWithCategory, H extends ListItem
       setState(() {
         _isLoading = true;
       });
-      var response = await Dio().get(widget.dataUrl);
+      var response = await widget.loadData();
       setState(() {
         _list = widget.itemBuilder == null ? [] : widget.itemBuilder(response);
         _headers = widget.headerBuilder == null ? [] : widget.headerBuilder(response);
@@ -84,6 +85,12 @@ class _PullToRefreshListState<T extends ListItemWithCategory, H extends ListItem
 
   @override
   Widget build(BuildContext context) {
+    if (_list.length == 0) {
+      return CupertinoActivityIndicator(
+        radius: 16,
+      );
+    }
+
     return ListView.builder(
       controller: _controller,
       itemBuilder: (context, position) {
