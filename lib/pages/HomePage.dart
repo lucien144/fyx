@@ -1,12 +1,16 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/components/DiscussionListItem.dart';
 import 'package:fyx/components/ListHeader.dart';
+import 'package:fyx/components/PullToRefreshList.dart';
+import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Category.dart';
 import 'package:fyx/model/Discussion.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatelessWidget {
   final PageController _bookmarksController = PageController(initialPage: 0);
@@ -33,6 +37,13 @@ class HomePage extends StatelessWidget {
               return CupertinoPageScaffold(
                 navigationBar: CupertinoNavigationBar(
                     backgroundColor: Colors.white,
+                    trailing: CupertinoButton(
+                      child: Icon(CupertinoIcons.padlock_solid),
+                      onPressed: () {
+                        SharedPreferences.getInstance().then((prefs) => prefs.clear());
+                        Navigator.of(context, rootNavigator: true).pushNamed('/');
+                      },
+                    ),
                     middle: CupertinoSegmentedControl(
                       onValueChanged: (value) => _bookmarksController.animateToPage(int.parse(value), duration: Duration(milliseconds: 300), curve: Curves.easeInOut),
                       children: {
@@ -52,19 +63,20 @@ class HomePage extends StatelessWidget {
                   children: <Widget>[
                     PullToRefreshList<DiscussionListItem, ListHeader>(
                       itemBuilder: (Response<dynamic> response) =>
-                          (response.data['data']['discussions'] as List).map((discussion) => DiscussionListItem(Discussion.fromJson(discussion))).toList(),
+                          (jsonDecode(response.data)['data']['discussions'] as List).map((discussion) => DiscussionListItem(Discussion.fromJson(discussion))).toList(),
                       headerBuilder: (Response<dynamic> response) {
-                        if ((response.data['data'] as Map).containsKey('categories')) {
-                          return (response.data['data']['categories'] as List).map((category) => ListHeader(Category.fromJson(category))).toList();
+                        if ((jsonDecode(response.data)['data'] as Map).containsKey('categories')) {
+                          return (jsonDecode(response.data)['data']['categories'] as List).map((category) => ListHeader(Category.fromJson(category))).toList();
                         }
                         return [];
                       },
-                      dataUrl: 'http://localhost/lucien144/fyx/assets/json/bookmarks.all.json',
+                      loadData: () => ApiController.loadBookmarks(),
                     ),
                     PullToRefreshList<DiscussionListItem, ListHeader>(
-                      itemBuilder: (Response<dynamic> response) =>
-                          (response.data['data']['discussions'] as List).map((discussion) => DiscussionListItem(Discussion.fromJson(discussion))).toList(),
-                      dataUrl: 'http://localhost/lucien144/fyx/assets/json/bookmarks.history.json',
+                      itemBuilder: (Response<dynamic> response) {
+                        return (jsonDecode(response.data)['data']['discussions'] as List).map((discussion) => DiscussionListItem(Discussion.fromJson(discussion))).toList();
+                      },
+                      loadData: () => ApiController.loadHistory(),
                     ),
                   ],
                 ),
