@@ -42,14 +42,14 @@ packages:
       name: cupertino_icons
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.2"
+    version: "0.1.3"
   dio:
     dependency: "direct main"
     description:
       name: dio
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.6"
+    version: "3.0.7"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -75,7 +75,7 @@ packages:
       name: flutter_spinkit
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.0"
+    version: "4.1.0"
   flutter_sticky_header:
     dependency: "direct main"
     description:
@@ -151,6 +151,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.2.1"
+  shared_preferences:
+    dependency: "direct main"
+    description:
+      name: shared_preferences
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.5.4+6"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -220,5 +227,5 @@ packages:
     source: hosted
     version: "2.0.8"
 sdks:
-  dart: ">2.4.0 <3.0.0"
-  flutter: ">=0.5.0 <2.0.0"
+  dart: ">=2.5.0 <3.0.0"
+  flutter: ">=1.6.7 <2.0.0"

@@ -27,6 +27,7 @@ dependencies:
   sticky_headers: ^0.1.8
   html: ^0.14.0+3
   flutter_html: ^0.11.0
+  shared_preferences: ^0.5.4+6
   flutter:
     sdk: flutter
 
