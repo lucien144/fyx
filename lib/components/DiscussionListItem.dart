@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/ListItemWithCategory.dart';
 import 'package:fyx/model/Discussion.dart';
 
@@ -24,15 +25,22 @@ class DiscussionListItem extends ListItemWithCategory {
                 SizedBox(
                   width: 8,
                 ),
-                Container(
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(4), color: discussion.replies > 0 ? Colors.red : Colors.blue),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                      child: Text(
-                        discussion.replies.toString(),
-                        style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
-                      ),
-                    )),
+                discussion.unread == 0
+                    ? Container(
+                        width: 24,
+                      )
+                    : Container(
+                        width: 24,
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(4), color: discussion.replies > 0 ? Colors.red : PlatformTheme.of(context).primaryColor),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                          child: Center(
+                            child: Text(
+                              discussion.unread > 99 ? '∞' : discussion.unread.toString(),
+                              style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        )),
                 SizedBox(
                   width: 8,
                 ),
