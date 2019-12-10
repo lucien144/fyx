@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:fyx/components/ListItemWithCategory.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
-typedef Future<Response> LoadDataCallbackType();
-typedef List<T> ItemBuilderType<T extends ListItemWithCategory>(Response<dynamic> response);
-typedef List<H> HeaderBuilderType<H extends ListItemWithCategory>(Response<dynamic> response);
+typedef Future<dynamic> LoadDataCallbackType();
+typedef List<T> ItemBuilderType<T extends ListItemWithCategory>(dynamic data);
+typedef List<H> HeaderBuilderType<H extends ListItemWithCategory>(dynamic data);
 
 class PullToRefreshList<T extends ListItemWithCategory, H extends ListItemWithCategory> extends StatefulWidget {
   final LoadDataCallbackType loadData;
@@ -32,10 +32,10 @@ class _PullToRefreshListState<T extends ListItemWithCategory, H extends ListItem
       setState(() {
         _isLoading = true;
       });
-      var response = await widget.loadData();
+      var data = await widget.loadData();
       setState(() {
-        _list = widget.itemBuilder == null ? [] : widget.itemBuilder(response);
-        _headers = widget.headerBuilder == null ? [] : widget.headerBuilder(response);
+        _list = widget.itemBuilder == null ? [] : widget.itemBuilder(data);
+        _headers = widget.headerBuilder == null ? [] : widget.headerBuilder(data);
         _isLoading = false;
       });
     } on DioError catch (error) {

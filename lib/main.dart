@@ -10,7 +10,7 @@ import 'package:fyx/pages/LoginPage.dart';
 
 void main() async {
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-  return runApp(FyxApp(await ApiController.getCredentials()));
+  return runApp(FyxApp(await ApiController().provider.getCredentials()));
 }
 
 class FyxApp extends StatelessWidget {

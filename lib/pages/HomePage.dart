@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -62,21 +59,20 @@ class HomePage extends StatelessWidget {
                   pageSnapping: true,
                   children: <Widget>[
                     PullToRefreshList<DiscussionListItem, ListHeader>(
-                      itemBuilder: (Response<dynamic> response) =>
-                          (jsonDecode(response.data)['data']['discussions'] as List).map((discussion) => DiscussionListItem(Discussion.fromJson(discussion))).toList(),
-                      headerBuilder: (Response<dynamic> response) {
-                        if ((jsonDecode(response.data)['data'] as Map).containsKey('categories')) {
-                          return (jsonDecode(response.data)['data']['categories'] as List).map((category) => ListHeader(Category.fromJson(category))).toList();
+                      itemBuilder: (dynamic data) => (data['discussions'] as List).map((discussion) => DiscussionListItem(Discussion.fromJson(discussion))).toList(),
+                      headerBuilder: (dynamic data) {
+                        if ((data as Map).containsKey('categories')) {
+                          return (data['categories'] as List).map((category) => ListHeader(Category.fromJson(category))).toList();
                         }
                         return [];
                       },
-                      loadData: () => ApiController.loadBookmarks(),
+                      loadData: () => ApiController().loadBookmarks(),
                     ),
                     PullToRefreshList<DiscussionListItem, ListHeader>(
-                      itemBuilder: (Response<dynamic> response) {
-                        return (jsonDecode(response.data)['data']['discussions'] as List).map((discussion) => DiscussionListItem(Discussion.fromJson(discussion))).toList();
+                      itemBuilder: (dynamic data) {
+                        return (data['discussions'] as List).map((discussion) => DiscussionListItem(Discussion.fromJson(discussion))).toList();
                       },
-                      loadData: () => ApiController.loadHistory(),
+                      loadData: () => ApiController().loadHistory(),
                     ),
                   ],
                 ),

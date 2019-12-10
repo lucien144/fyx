@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/controllers/ApiController.dart';
 
 class LoginPage extends StatefulWidget {
@@ -19,7 +20,7 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xff1AD592), Color(0xff2F4858)])),
-      child: _tokenController.text.isNotEmpty ? tokenFactory(context) : formFactory(),
+      child: _tokenController.text.isNotEmpty ? tokenFactory(context) : formFactory(context),
     );
   }
 
@@ -65,10 +66,23 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget formFactory() {
+  Widget formFactory(context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
+        Container(
+          width: 120,
+          padding: EdgeInsets.all(16),
+          child: Image.asset(
+            'assets/logo.png',
+            color: Color(0xff007F90),
+          ),
+          decoration:
+              BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(32), boxShadow: [BoxShadow(color: Colors.black, offset: Offset(0, 0), blurRadius: 16)]),
+        ),
+        SizedBox(
+          height: 128,
+        ),
         CupertinoTextField(
           placeholder: 'NICKNAME',
           controller: _loginController,
@@ -83,10 +97,12 @@ class _LoginPageState extends State<LoginPage> {
             style: TextStyle(color: Color(0xff007F90)),
           ),
           onPressed: () async {
-            ApiController.login(_loginController.text).then((response) {
+            ApiController().login(_loginController.text).then((response) {
               setState(() {
                 _tokenController.text = response.authCode;
               });
+            }).catchError((error) {
+              PlatformTheme.error(error.toString());
             });
           },
           color: Colors.white,

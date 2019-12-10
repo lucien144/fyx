@@ -1,47 +1,76 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:fyx/controllers/ApiProvider.dart';
+import 'package:fyx/controllers/IApiProvider.dart';
+import 'package:fyx/exceptions/AuthException.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/LoginResponse.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+enum AUTH_STATES { AUTH_INVALID_USERNAME, AUTH_NEW, AUTH_EXISTING }
+
 class ApiController {
-  static const URL = 'https://www.nyx.cz/api.php';
-  static final OPTIONS = Options(headers: {'User-Agent': 'Fyx'});
-  static Credentials _credentials;
+  static ApiController _instance = ApiController._init();
 
-  static Future<LoginResponse> login(String nickname) async {
-    FormData formData = new FormData.fromMap({
-      'auth_nick': nickname,
-    });
-    Response response = await Dio().post(URL, data: formData, options: OPTIONS);
+  IApiProvider provider;
+
+  factory ApiController() {
+    return _instance;
+  }
+
+  ApiController._init() {
+    provider = ApiProvider();
+  }
+
+  Future<LoginResponse> login(String nickname) async {
+    Response response = await provider.login(nickname);
     var loginResponse = LoginResponse.fromJson(jsonDecode(response.data));
-    print(jsonDecode(response.data));
-    var prefs = await SharedPreferences.getInstance();
-    await Future.wait([prefs.setString('token', loginResponse.authToken), prefs.setString('nickname', nickname)]);
-    _credentials = Credentials(nickname, loginResponse.authToken);
-
-    return loginResponse;
-  }
-
-  static Future<Response> loadHistory() async {
-    Credentials credentials = await ApiController.getCredentials();
-    FormData formData = new FormData.fromMap({'auth_nick': credentials.nickname, 'auth_token': credentials.token, 'l': 'bookmarks', 'l2': 'history'});
-    return await Dio().post(URL, data: formData, options: OPTIONS);
-  }
-
-  static Future<Response> loadBookmarks() async {
-    Credentials credentials = await ApiController.getCredentials();
-    FormData formData = new FormData.fromMap({'auth_nick': credentials.nickname, 'auth_token': credentials.token, 'l': 'bookmarks', 'l2': 'all'});
-    return await Dio().post(URL, data: formData, options: OPTIONS);
-  }
-
-  static getCredentials() async {
-    if (_credentials is Credentials && _credentials.isValid) {
-      return Future(() => _credentials);
+    if (!loginResponse.isAuthorized) {
+      throwException(loginResponse, message: 'Cannot authorize user.');
     }
 
     var prefs = await SharedPreferences.getInstance();
-    return Future(() => Credentials(prefs.getString('nickname'), prefs.getString('token')));
+    await Future.wait([prefs.setString('token', loginResponse.authToken), prefs.setString('nickname', nickname)]);
+    var credentials = Credentials(nickname, loginResponse.authToken);
+    provider.setCredentials(credentials);
+    return loginResponse;
+  }
+
+  Future<dynamic> loadHistory() async {
+    var response = await provider.fetchHistory();
+    return jsonDecode(response.data)['data'];
+  }
+
+  Future<dynamic> loadBookmarks() async {
+    var response = await provider.fetchBookmarks();
+    return jsonDecode(response.data)['data'];
+  }
+
+  throwException(LoginResponse loginResponse, {String message: ''}) {
+    var state = AUTH_STATES.values.firstWhere((state) => state.toString() == 'AUTH_STATES.${loginResponse.authState}', orElse: () => null);
+    if (state != null) {
+      switch (state) {
+        case AUTH_STATES.AUTH_EXISTING:
+          throw AuthException('Je mi líto, ale autorizace se nezdařila. Zkuste si vyresetovat autorizaci v nastavení nyxu.');
+          break;
+        case AUTH_STATES.AUTH_INVALID_USERNAME:
+          throw AuthException('Špatné uživatelské jméno nebo heslo.');
+          break;
+        case AUTH_STATES.AUTH_NEW:
+          // This is valid!
+          break;
+      }
+    }
+
+    if (loginResponse.authDevComment.isNotEmpty) {
+      throw AuthException(loginResponse.authDevComment);
+    }
+
+    if (loginResponse.error.isNotEmpty) {
+      throw AuthException(loginResponse.error);
+    }
+
+    throw AuthException(message);
   }
 }
