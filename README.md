@@ -6,4 +6,4 @@
 - Vycistit pubspec.yaml
 - Login > Prihlasit loading
 - Login > Step by step vysvetleni autorizace
-- Pull2Refresh.onError callback? 
+- ~~Pull2Refresh.onError callback?~~ 

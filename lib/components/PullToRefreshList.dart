@@ -1,6 +1,6 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/ListItemWithCategory.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
@@ -23,13 +23,15 @@ class _PullToRefreshListState<T extends ListItemWithCategory, H extends ListItem
   List<H> _headers = [];
   List<T> _list = [];
   double _indicatorRadius = 0.1;
+  bool _hasError = false;
   bool _isLoading = false;
   bool _showIndicator = false;
   ScrollController _controller = ScrollController();
 
-  loadHistory() async {
+  loadData() async {
     try {
       setState(() {
+        _hasError = false;
         _isLoading = true;
       });
       var data = await widget.loadData();
@@ -38,10 +40,10 @@ class _PullToRefreshListState<T extends ListItemWithCategory, H extends ListItem
         _headers = widget.headerBuilder == null ? [] : widget.headerBuilder(data);
         _isLoading = false;
       });
-    } on DioError catch (error) {
-      // TODO: Show error
-      print(error);
+    } catch (error) {
+      PlatformTheme.error(error.toString());
       setState(() {
+        _hasError = true;
         _isLoading = false;
       });
     }
@@ -61,7 +63,7 @@ class _PullToRefreshListState<T extends ListItemWithCategory, H extends ListItem
 
       if (_controller.position.pixels < treshold && !_showIndicator) {
         setState(() {
-          loadHistory();
+          loadData();
           _showIndicator = true;
         });
       }
@@ -73,7 +75,7 @@ class _PullToRefreshListState<T extends ListItemWithCategory, H extends ListItem
       }
     });
 
-    loadHistory();
+    loadData();
     super.initState();
   }
 
@@ -86,8 +88,26 @@ class _PullToRefreshListState<T extends ListItemWithCategory, H extends ListItem
   @override
   Widget build(BuildContext context) {
     if (_list.length == 0) {
-      return CupertinoActivityIndicator(
-        radius: 16,
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Visibility(
+            visible: !_hasError,
+            child: CupertinoActivityIndicator(
+              radius: 16,
+            ),
+          ),
+          Visibility(
+            visible: _hasError,
+            child: CupertinoButton(
+              color: Colors.black26,
+              child: Text('Načíst znovu...'),
+              onPressed: () {
+                loadData();
+              },
+            ),
+          )
+        ],
       );
     }
 
