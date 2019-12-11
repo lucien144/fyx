@@ -29,22 +29,29 @@ class _PullToRefreshListState<T extends ListItemWithCategory, H extends ListItem
   ScrollController _controller = ScrollController();
 
   loadData() async {
+    print('loaddata $_isLoading');
+
     try {
       setState(() {
         _hasError = false;
         _isLoading = true;
+        _showIndicator = true;
       });
       var data = await widget.loadData();
       setState(() {
         _list = widget.itemBuilder == null ? [] : widget.itemBuilder(data);
         _headers = widget.headerBuilder == null ? [] : widget.headerBuilder(data);
         _isLoading = false;
+        _showIndicator = false;
+        _indicatorRadius = 0.1;
       });
     } catch (error) {
       PlatformTheme.error(error.toString());
       setState(() {
         _hasError = true;
         _isLoading = false;
+        _showIndicator = false;
+        _indicatorRadius = 0.1;
       });
     }
   }
@@ -52,26 +59,22 @@ class _PullToRefreshListState<T extends ListItemWithCategory, H extends ListItem
   @override
   void initState() {
     const treshold = -1;
+    const indicatorMaxRadius = 16.0;
 
     _controller.addListener(() {
-      setState(() {
-        var radius = _controller.position.pixels.abs();
-        radius = radius == 0 ? 0.1 : radius;
-        radius = radius > 20 ? 20 : radius;
-        _indicatorRadius = radius;
-      });
+      var radius = _controller.position.pixels.abs();
+      radius = radius == 0 ? 0.1 : radius;
+      radius = radius > indicatorMaxRadius ? indicatorMaxRadius : radius;
+      radius = _indicatorRadius > radius ? indicatorMaxRadius : radius;
 
-      if (_controller.position.pixels < treshold && !_showIndicator) {
+      if (_indicatorRadius != radius) {
         setState(() {
-          loadData();
-          _showIndicator = true;
+          _indicatorRadius = radius;
         });
       }
 
-      if (_controller.position.pixels >= treshold && _showIndicator && !_isLoading) {
-        setState(() {
-          _showIndicator = false;
-        });
+      if (_controller.position.pixels < treshold && !_showIndicator && !_isLoading) {
+        loadData();
       }
     });
 
