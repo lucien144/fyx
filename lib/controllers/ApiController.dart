@@ -27,7 +27,7 @@ class ApiController {
     Response response = await provider.login(nickname);
     var loginResponse = LoginResponse.fromJson(jsonDecode(response.data));
     if (!loginResponse.isAuthorized) {
-      throwException(loginResponse, message: 'Cannot authorize user.');
+      throwAuthException(loginResponse, message: 'Cannot authorize user.');
     }
 
     var prefs = await SharedPreferences.getInstance();
@@ -47,7 +47,7 @@ class ApiController {
     return jsonDecode(response.data)['data'];
   }
 
-  throwException(LoginResponse loginResponse, {String message: ''}) {
+  throwAuthException(LoginResponse loginResponse, {String message: ''}) {
     var state = AUTH_STATES.values.firstWhere((state) => state.toString() == 'AUTH_STATES.${loginResponse.authState}', orElse: () => null);
     if (state != null) {
       switch (state) {

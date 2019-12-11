@@ -29,8 +29,6 @@ class _PullToRefreshListState<T extends ListItemWithCategory, H extends ListItem
   ScrollController _controller = ScrollController();
 
   loadData() async {
-    print('loaddata $_isLoading');
-
     try {
       setState(() {
         _hasError = false;
