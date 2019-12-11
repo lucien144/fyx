@@ -4,6 +4,7 @@ import 'package:fyx/model/Credentials.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiProvider implements IApiProvider {
+  final Dio dio = Dio();
   final URL = 'https://www.nyx.cz/api.php';
   final OPTIONS = Options(headers: {'User-Agent': 'Fyx'});
   Credentials _credentials;
@@ -23,25 +24,32 @@ class ApiProvider implements IApiProvider {
     SharedPreferences.getInstance().then((prefs) {
       _credentials = Credentials(prefs.getString('nickname'), prefs.getString('token'));
     });
+
+    dio.interceptors.add(InterceptorsWrapper(onRequest: (RequestOptions options) async {
+      print('[API] ${options.method.toUpperCase()}: ${options.uri}');
+      print('[API] -> query: ${options.queryParameters}');
+      print('[API] -> query: ${(options.data as FormData).fields}');
+      return options;
+    }));
   }
 
   Future<Response> login(String username) async {
     FormData formData = new FormData.fromMap({'auth_nick': username});
-    return await Dio().post(URL, data: formData, options: OPTIONS);
+    return await dio.post(URL, data: formData, options: OPTIONS);
   }
 
   Future<Response> fetchBookmarks() async {
     FormData formData = new FormData.fromMap({'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'bookmarks', 'l2': 'all'});
-    return await Dio().post(URL, data: formData, options: OPTIONS);
+    return await dio.post(URL, data: formData, options: OPTIONS);
   }
 
   Future<Response> fetchHistory() async {
     FormData formData = new FormData.fromMap({'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'bookmarks', 'l2': 'history'});
-    return await Dio().post(URL, data: formData, options: OPTIONS);
+    return await dio.post(URL, data: formData, options: OPTIONS);
   }
 
   Future<Response> fetchDiscussion(int id) async {
     FormData formData = new FormData.fromMap({'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'discussion', 'l2': 'messages', 'id': id});
-    return await Dio().post(URL, data: formData, options: OPTIONS);
+    return await dio.post(URL, data: formData, options: OPTIONS);
   }
 }
