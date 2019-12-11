@@ -38,20 +38,28 @@ class ApiMock implements IApiProvider {
   }
 
   @override
+  // TODO
   Future<Response> fetchBookmarks() {
     return Future(() => Response<String>(data: ''));
   }
 
   @override
+  // TODO
   Future<Response> fetchHistory() {
     return Future(() => Response<String>(data: ''));
   }
 
   @override
+  // TODO
   setCredentials(Credentials val) {}
 
   @override
+  // TODO
   getCredentials() {}
+
+  @override
+  // TODO
+  Future<Response> fetchDiscussion(int id) {}
 }
 
 void main() {
