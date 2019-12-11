@@ -47,6 +47,11 @@ class ApiController {
     return jsonDecode(response.data)['data'];
   }
 
+  Future<dynamic> loadDiscussion(int id) async {
+    var response = await provider.fetchDiscussion(id);
+    return jsonDecode(response.data)['data'];
+  }
+
   throwAuthException(LoginResponse loginResponse, {String message: ''}) {
     var state = AUTH_STATES.values.firstWhere((state) => state.toString() == 'AUTH_STATES.${loginResponse.authState}', orElse: () => null);
     if (state != null) {

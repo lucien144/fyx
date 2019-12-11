@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:fyx/PlatformTheme.dart';
-import 'package:fyx/PlatformThemeData.dart';
 import 'package:fyx/components/ListItemWithCategory.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:html/dom.dart' as dom;

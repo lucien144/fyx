@@ -39,4 +39,9 @@ class ApiProvider implements IApiProvider {
     FormData formData = new FormData.fromMap({'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'bookmarks', 'l2': 'history'});
     return await Dio().post(URL, data: formData, options: OPTIONS);
   }
+
+  Future<Response> fetchDiscussion(int id) async {
+    FormData formData = new FormData.fromMap({'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'discussion', 'l2': 'messages', 'id': id});
+    return await Dio().post(URL, data: formData, options: OPTIONS);
+  }
 }

@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/components/ListHeader.dart';
@@ -19,8 +18,8 @@ class DiscussionPage extends StatelessWidget {
         trailing: Icon(CupertinoIcons.create),
       ),
       child: PullToRefreshList<PostListItem, ListHeader>(
-        itemBuilder: (Response<dynamic> response) => (response.data['data'] as List).map((post) => PostListItem(Post.fromJson(post))).toList(),
-        loadData: () => ApiController.loadHistory(),
+        itemBuilder: (dynamic data) => (data as List).map((post) => PostListItem(Post.fromJson(post))).toList(),
+        loadData: () => ApiController().loadDiscussion(discussion.idKlub),
       ),
     );
   }
