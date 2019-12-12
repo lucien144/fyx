@@ -51,12 +51,6 @@ void main() {
     <!-- http,img,attachment --><a href="http://i.nyx.cz/files/00/00/20/77/2077557_48d4a18f67ad53d7572e.jpg?name=dbk2.jpg"><img src="http://www.nyx.cz/i/t/6a6f8dae07571ecfb1510c18e6dd6d0a.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F77%2F2077557_48d4a18f67ad53d7572e.jpg%3Fname%3Ddbk2.jpg" class="thumb"></a><br><br>
     <!-- http,img,attachment --><a href="http://i.nyx.cz/files/00/00/20/77/2077556_45259e39b491933bb483.jpg?name=dbk.jpg"><img src="http://www.nyx.cz/i/t/8697a44511a1664f7adc53b39821ce7c.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F77%2F2077556_45259e39b491933bb483.jpg%3Fname%3Ddbk.jpg" class="thumb"></a>
     """;
-    var contentAfter = """
-    sem ned\u00e1vno \u0161el ve\u010der kolem DBK, v\u017edycky m\u011b ta budova fascinovala sv\u00fdm brutalismem, jen mn\u011b na n\u00ed v\u017edycky serou ty reklamy, \u00fapln\u011b to kaz\u00ed ten \u00fa\u017easnej potenci\u00e1l minimalistick\u00fd dekorace... 
-    tak sem to narychlo umazal, vypadalo by to super! Jak n\u011bjakej bar\u00e1k z Bladerunnera :)<br><br>
-    <!-- http,img,attachment --><br><br>
-    <!-- http,img,attachment -->
-    """;
 
     var json = Map<String, dynamic>.from(_json);
     json.putIfAbsent("content", () => content);
@@ -70,7 +64,7 @@ void main() {
     expect(post.images[1].thumb,
         'http://www.nyx.cz/i/t/8697a44511a1664f7adc53b39821ce7c.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F77%2F2077556_45259e39b491933bb483.jpg%3Fname%3Ddbk.jpg');
     expect(post.links.length, 0);
-    // expect(post.content, contentAfter);
+    expect(0, parse(post.content).querySelectorAll('a > img').length);
   });
 
   test('Post is mixed vide Youtube, links and images', () {
@@ -99,9 +93,6 @@ void main() {
         <br \/>\n\r<br \/>\n\r<br \/>\n
         Na tom videu je nav\u00edc moc p\u011bkn\u011b vid\u011bt, jak d\u016fle\u017eit\u00fd je \u00fahel pohledu.
         """;
-    var contentAfter = """
-    
-    """;
 
     var json = Map<String, dynamic>.from(_json);
     json.putIfAbsent("content", () => content);

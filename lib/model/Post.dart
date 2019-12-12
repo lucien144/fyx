@@ -34,7 +34,7 @@ class Post {
     this._wu_type = int.parse(json['wu_type']);
 
     this._parseEmbeds();
-    this._parseImages();
+    this._parseAttachedImages();
     this._parseLinks();
   }
 
@@ -63,7 +63,11 @@ class Post {
     }
   }
 
-  void _parseImages() {
+  /**
+   * Parse attached images
+   * TODO: Parse other attachments
+   */
+  void _parseAttachedImages() {
     var document = parse(_content);
     document.querySelectorAll('a > img[src]').forEach((Element el) {
       var thumb = el.attributes['src'];
@@ -74,6 +78,9 @@ class Post {
     _content = document.body.innerHtml;
   }
 
+  /**
+   * Parse any link that's not internal link.
+   */
   void _parseLinks() {
     var document = parse(_content);
     _links = document.querySelectorAll('a:not([data-link-wu])').map((Element el) => el.attributes['href']).toList();
