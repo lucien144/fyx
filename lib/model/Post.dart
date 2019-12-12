@@ -39,10 +39,8 @@ class Post {
     this._parseLinks();
   }
 
-  /**
-   * Parse emebeded videos.
-   * TODO: Others than YouTube. Vimeo?
-   */
+  /// Parse emebeded videos.
+  /// TODO: Others than YouTube. Vimeo? Soundcloud?
   void _parseEmbeds() {
     try {
       var document = parse(_content);
@@ -64,10 +62,8 @@ class Post {
     }
   }
 
-  /**
-   * Parse attached images
-   * TODO: Parse other attachments
-   */
+  /// Parse attached images
+  /// TODO: Parse other attachments
   void _parseAttachedImages() {
     var document = parse(_content);
     document.querySelectorAll('a > img[src]').forEach((Element el) {
@@ -79,9 +75,9 @@ class Post {
     _content = document.body.innerHtml;
   }
 
-  /**
-   * Parse any link that's not internal link.
-   */
+  ///
+  ///Parse any link that's not internal link.
+  ///
   void _parseLinks() {
     var document = parse(_content);
 

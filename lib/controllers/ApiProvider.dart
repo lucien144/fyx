@@ -5,7 +5,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiProvider implements IApiProvider {
   final Dio dio = Dio();
+  // ignore: non_constant_identifier_names
   final URL = 'https://www.nyx.cz/api.php';
+  // ignore: non_constant_identifier_names
   final OPTIONS = Options(headers: {'User-Agent': 'Fyx'});
   Credentials _credentials;
 
