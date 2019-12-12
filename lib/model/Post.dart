@@ -1,5 +1,6 @@
 import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/model/post/Image.dart';
+import 'package:fyx/model/post/Link.dart';
 import 'package:fyx/model/post/Video.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
@@ -18,7 +19,7 @@ class Post {
 
   String _content;
   List<Image> _images = [];
-  List<String> _links = [];
+  List<Link> _links = [];
   List<Video> _videos = [];
 
   Post.fromJson(Map<String, dynamic> json) {
@@ -83,7 +84,17 @@ class Post {
    */
   void _parseLinks() {
     var document = parse(_content);
-    _links = document.querySelectorAll('a:not([data-link-wu])').map((Element el) => el.attributes['href']).toList();
+
+    // Find all links with scraped title.
+    _links = document.querySelectorAll('b + br + a:not([data-link-wu])').map((Element el) {
+      var link = Link(el.attributes['href'], title: el.previousElementSibling.previousElementSibling.text);
+      el.remove();
+      return link;
+    }).toList();
+
+    // Find all other links.
+    document = parse(document.body.innerHtml);
+    _links.addAll(document.querySelectorAll('a:not([data-link-wu])').map((Element el) => Link(el.attributes['href'], title: el.text)));
   }
 
   String get content => _content;
@@ -104,7 +115,9 @@ class Post {
 
   List<Image> get images => _images;
 
-  List<String> get links => _links;
+  List<Link> get links => _links;
 
   List<Video> get videos => _videos;
+
+  int get countAttachments => _images.length + _links.length + _videos.length;
 }

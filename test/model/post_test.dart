@@ -92,12 +92,15 @@ void main() {
         <\/div>
         <br \/>\n\r<br \/>\n\r<br \/>\n
         Na tom videu je nav\u00edc moc p\u011bkn\u011b vid\u011bt, jak d\u016fle\u017eit\u00fd je \u00fahel pohledu.
+        <a target="_blank" href="http://nyx.cz">Tohle je link bez title</a>
         """;
 
     var json = Map<String, dynamic>.from(_json);
     json.putIfAbsent("content", () => content);
 
     var post = Post.fromJson(json);
+
+    // Testing videos
     expect(post.videos.length, 1);
     expect(post.videos[0].id, 'B1_gcCu0-oI');
     expect(post.videos[0].type, VIDEO_TYPE.youtube);
@@ -105,5 +108,19 @@ void main() {
     expect(post.videos[0].thumb, 'http://www.nyx.cz/i/t/e8464b77ee2b7a726f174be309201ade.png?url=http%3A%2F%2Fimg.youtube.com%2Fvi%2FB1_gcCu0-oI%2F0.jpg');
     expect(post.videos[0].link, 'https://www.youtube.com/watch?v=B1_gcCu0-oI');
     expect(0, parse(post.content).querySelectorAll('div[data-embed-value="B1_gcCu0-oI"]').length);
+
+    // Test images
+    expect(post.images.length, 1);
+
+    // Test links
+    expect(post.links.length, 3);
+    expect(post.links[0].title, 'Victoria Falls has not dried up - here\u2019s the proof - Africa Geographic');
+    expect(post.links[0].url, 'https://web.archive.org/web/20170331170530/https://africageographic.com/blog/victoria-falls-not-dried-heres-proof/');
+    expect(post.links[1].title, '\u65c5\u3059\u308b\u9234\u6728436:Victoria Falls in Dry season @Zimbabwe');
+    expect(post.links[1].url, 'http://www.youtube.com/watch?v=B1_gcCu0-oI');
+    expect(post.links[2].title, 'Tohle je link bez title');
+    expect(post.links[2].url, 'http://nyx.cz');
+
+    expect(post.countAttachments, 5);
   });
 }
