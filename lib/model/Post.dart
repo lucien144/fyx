@@ -21,9 +21,6 @@ class Post {
   List<String> _links = [];
   List<Video> _videos = [];
 
-  final RegExp _regexpImages =
-      RegExp(r'<a([^>]*?)href="(?<image>([^"]*?)\.(jpg|png|gif))"([^>]*)>(.*?)<img(.*?)src="(?<thumb>([^"]*?)\.(jpg|png|gif))"(.*?)<\/a>', multiLine: true, dotAll: true);
-
   Post.fromJson(Map<String, dynamic> json) {
     var unescape = HtmlUnescape();
     var content = unescape.convert(json['content']);
@@ -41,20 +38,24 @@ class Post {
     this._parseLinks();
   }
 
+  /**
+   * Parse emebeded videos.
+   * TODO: Others than YouTube. Vimeo?
+   */
   void _parseEmbeds() {
     try {
       var document = parse(_content);
       var youtubes = document.querySelectorAll('div[data-embed-type="youtube"]');
-      youtubes.forEach((element) {
+      youtubes.forEach((el) {
         var video = Video(
-            id: element.attributes['data-embed-value'],
-            type: Video.findVideoType(element.attributes['data-embed-type']),
-            image: element.querySelector('a').attributes['href'],
-            thumb: element.querySelector('img').attributes['src']);
+            id: el.attributes['data-embed-value'],
+            type: Video.findVideoType(el.attributes['data-embed-type']),
+            image: el.querySelector('a').attributes['href'],
+            thumb: el.querySelector('img').attributes['src']);
 
         // Remove the video element from the content.
         this._videos.add(video);
-        element.remove();
+        el.remove();
       });
       _content = document.body.innerHtml;
     } catch (error) {
@@ -63,8 +64,14 @@ class Post {
   }
 
   void _parseImages() {
-    _images = _regexpImages.allMatches(_rawContent).map((f) => Image(f.namedGroup('image'), f.namedGroup('thumb'))).toList();
-    _content = _content.replaceAll(_regexpImages, '');
+    var document = parse(_content);
+    document.querySelectorAll('a > img[src]').forEach((Element el) {
+      var thumb = el.attributes['src'];
+      var image = el.parent.attributes['href'];
+      _images.add(Image(image, thumb));
+      el.parent.remove();
+    });
+    _content = document.body.innerHtml;
   }
 
   void _parseLinks() {
