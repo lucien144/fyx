@@ -1,6 +1,9 @@
+import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/model/post/Image.dart';
+import 'package:fyx/model/post/Video.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
+import 'package:html_unescape/html_unescape.dart';
 
 class Post {
   // ignore: non_constant_identifier_names
@@ -14,25 +17,49 @@ class Post {
   int _wu_type;
 
   String _content;
-  List<Image> _images;
-  List<String> _links;
+  List<Image> _images = [];
+  List<String> _links = [];
+  List<Video> _videos = [];
 
-  final RegExp _regexpImages = RegExp(r'(<a(.*?)href="(?<image>([^"]*?)\.(jpg|png|gif))"(.*?)src="(?<thumb>([^"]*?)\.(jpg|png|gif))"(.*?)<\/a>)', multiLine: true);
+  final RegExp _regexpImages =
+      RegExp(r'<a([^>]*?)href="(?<image>([^"]*?)\.(jpg|png|gif))"([^>]*)>(.*?)<img(.*?)src="(?<thumb>([^"]*?)\.(jpg|png|gif))"(.*?)<\/a>', multiLine: true, dotAll: true);
 
   Post.fromJson(Map<String, dynamic> json) {
+    var unescape = HtmlUnescape();
+    var content = unescape.convert(json['content']);
+
     this._id_wu = int.parse(json['id_wu']);
-    this._rawContent = json['content'];
-    this._content = json['content'];
+    this._rawContent = content;
+    this._content = content;
     this._nick = json['nick'];
     this._time = int.parse(json['time']);
     this._wu_rating = int.parse(json['wu_rating']);
     this._wu_type = int.parse(json['wu_type']);
 
-    // Parse images first
+    this._parseEmbeds();
     this._parseImages();
-
-    // Then links
     this._parseLinks();
+  }
+
+  void _parseEmbeds() {
+    try {
+      var document = parse(_content);
+      var youtubes = document.querySelectorAll('div[data-embed-type="youtube"]');
+      youtubes.forEach((element) {
+        var video = Video(
+            id: element.attributes['data-embed-value'],
+            type: Video.findVideoType(element.attributes['data-embed-type']),
+            image: element.querySelector('a').attributes['href'],
+            thumb: element.querySelector('img').attributes['src']);
+
+        // Remove the video element from the content.
+        this._videos.add(video);
+        element.remove();
+      });
+      _content = document.body.innerHtml;
+    } catch (error) {
+      PlatformTheme.error(error);
+    }
   }
 
   void _parseImages() {
@@ -42,7 +69,7 @@ class Post {
 
   void _parseLinks() {
     var document = parse(_content);
-    _links = document.querySelectorAll('a').map((Element el) => el.attributes['href']).toList();
+    _links = document.querySelectorAll('a:not([data-link-wu])').map((Element el) => el.attributes['href']).toList();
   }
 
   String get content => _content;
@@ -64,4 +91,6 @@ class Post {
   List<Image> get images => _images;
 
   List<String> get links => _links;
+
+  List<Video> get videos => _videos;
 }
