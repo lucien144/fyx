@@ -54,6 +54,10 @@ class Post {
 
         // Remove the video element from the content.
         this._videos.add(video);
+
+        while (el.nextElementSibling?.localName == 'br') {
+          el.nextElementSibling.remove();
+        }
         el.remove();
       });
       _content = document.body.innerHtml;
@@ -63,7 +67,7 @@ class Post {
   }
 
   /// Parse attached images
-  /// TODO: Parse other attachments
+  /// TODO: Parse other attachments and standalone <img/>
   void _parseAttachedImages() {
     var document = parse(_content);
     document.querySelectorAll('a > img[src]').forEach((Element el) {
