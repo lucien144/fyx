@@ -76,7 +76,7 @@ class Post {
   }
 
   ///
-  ///Parse any link that's not internal link.
+  /// Parse any link that's not internal link.
   ///
   void _parseLinks() {
     var document = parse(_content);
