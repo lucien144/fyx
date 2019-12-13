@@ -93,6 +93,8 @@ class Post {
     _links.addAll(document.querySelectorAll('a:not([data-link-wu])').map((Element el) => Link(el.attributes['href'], title: el.text)));
   }
 
+  String get strippedContent => parse(parse(_content).body.text).documentElement.text;
+
   String get content => _content;
 
   String get rawContent => _rawContent;
