@@ -70,6 +70,10 @@ class Post {
       var thumb = el.attributes['src'];
       var image = el.parent.attributes['href'];
       _images.add(Image(image, thumb));
+
+      while (el.parent.nextElementSibling?.localName == 'br') {
+        el.parent.nextElementSibling.remove();
+      }
       el.parent.remove();
     });
     _content = document.body.innerHtml;
@@ -93,7 +97,7 @@ class Post {
     _links.addAll(document.querySelectorAll('a:not([data-link-wu])').map((Element el) => Link(el.attributes['href'], title: el.text)));
   }
 
-  String get strippedContent => parse(parse(_content).body.text).documentElement.text;
+  String get strippedContent => parse(parse(_content).body.text).documentElement.text.trim();
 
   String get content => _content;
 

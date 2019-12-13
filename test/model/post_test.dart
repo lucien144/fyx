@@ -121,6 +121,32 @@ void main() {
     expect(post.links[2].title, 'Tohle je link bez title');
     expect(post.links[2].url, 'http://nyx.cz');
 
-    expect(post.countAttachments, 5);
+    // Test attachments
+    expect(post.attachments.length, 5);
+
+    // Test featured attachments
+    expect(post.attachmentsWithFeatured['featured'] is Image, true);
+    expect(post.attachmentsWithFeatured['attachments'].length, 4);
+  });
+
+  test('Content is stripped for unnecessary <br> tags and comments', () {
+    var content = """
+    Lorem ipsum dolor... sit amet :)<br><br>
+    <!-- http,img,attachment --><a href="http://i.nyx.cz/files/00/00/20/77/2077557_48d4a18f67ad53d7572e.jpg?name=dbk2.jpg"><img src="http://www.nyx.cz/i/t/6a6f8dae07571ecfb1510c18e6dd6d0a.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F77%2F2077557_48d4a18f67ad53d7572e.jpg%3Fname%3Ddbk2.jpg" class="thumb"></a><br><br>
+    <!-- http,img,attachment --><a href="http://i.nyx.cz/files/00/00/20/77/2077556_45259e39b491933bb483.jpg?name=dbk.jpg"><img src="http://www.nyx.cz/i/t/8697a44511a1664f7adc53b39821ce7c.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F77%2F2077556_45259e39b491933bb483.jpg%3Fname%3Ddbk.jpg" class="thumb"></a>
+    """;
+
+    var expectedContent = """
+    Lorem ipsum dolor... sit amet :)<br><br>
+    <!-- http,img,attachment -->
+    <!-- http,img,attachment -->
+    """;
+
+    var json = Map<String, dynamic>.from(_json);
+    json.putIfAbsent("content", () => content);
+
+    var post = Post.fromJson(json);
+    expect(post.content.trim(), expectedContent.trim());
+    expect(post.strippedContent, 'Lorem ipsum dolor... sit amet :)');
   });
 }
