@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/components/ListHeader.dart';
-import 'package:fyx/components/PostListItem.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
+import 'package:fyx/components/post/PostListItem.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Discussion.dart';
 import 'package:fyx/model/Post.dart';

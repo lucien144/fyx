@@ -115,5 +115,45 @@ class Post {
 
   List<Video> get videos => _videos;
 
-  int get countAttachments => _images.length + _links.length + _videos.length;
+  List<dynamic> get attachments {
+    var list = [];
+    list.addAll(_images);
+    list.addAll(_links);
+    list.addAll(_videos);
+    return list;
+  }
+
+  Map<String, dynamic> get attachmentsWithFeatured {
+    var cloneImages = List.from(_images);
+    var cloneLinks = List.from(_links);
+    var cloneVideos = List.from(_videos);
+
+    dynamic getFeatured = () {
+      if (cloneImages.length > 0) {
+        final featured = cloneImages[0];
+        cloneImages.removeAt(0);
+        return featured;
+      }
+
+      if (cloneVideos.length > 0) {
+        final featured = cloneVideos[0];
+        cloneVideos.removeAt(0);
+        return featured;
+      }
+
+      if (cloneLinks.length > 0) {
+        final featured = cloneLinks[0];
+        cloneLinks.removeAt(0);
+        return featured;
+      }
+    };
+
+    var featured = getFeatured();
+
+    var attachments = [];
+    attachments.addAll(cloneImages);
+    attachments.addAll(cloneImages);
+    attachments.addAll(cloneImages);
+    return {'featured': featured, 'attachments': attachments};
+  }
 }
