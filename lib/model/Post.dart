@@ -154,8 +154,8 @@ class Post {
 
     var attachments = [];
     attachments.addAll(cloneImages);
-    attachments.addAll(cloneImages);
-    attachments.addAll(cloneImages);
+    attachments.addAll(cloneLinks);
+    attachments.addAll(cloneVideos);
     return {'featured': featured, 'attachments': attachments};
   }
 }
