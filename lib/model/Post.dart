@@ -23,11 +23,12 @@ class Post {
   List<Video> _videos = [];
 
   Post.fromJson(Map<String, dynamic> json) {
+    this._rawContent = json['content'];
+
     var unescape = HtmlUnescape();
     var content = unescape.convert(json['content']);
 
     this._id_wu = int.parse(json['id_wu']);
-    this._rawContent = content;
     this._content = content;
     this._nick = json['nick'];
     this._time = int.parse(json['time']);
