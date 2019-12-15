@@ -104,8 +104,42 @@ class PostListItem extends ListItemWithCategory {
             height: 8,
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 8, left: 16),
-            child: PostAvatar(post.avatar, post.nick),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                PostAvatar(post.avatar, post.nick),
+                Row(
+                  children: <Widget>[
+                    Icon(
+                      Icons.thumb_up,
+                      color: Colors.black38,
+                    ),
+                    SizedBox(
+                      width: 4,
+                    ),
+                    Text(
+                      post.rating.toString(),
+                      style: TextStyle(color: Colors.black38),
+                    ),
+                    SizedBox(
+                      width: 4,
+                    ),
+                    Icon(
+                      Icons.thumb_down,
+                      color: Colors.black38,
+                    ),
+                    SizedBox(
+                      width: 16,
+                    ),
+                    Icon(
+                      Icons.bookmark_border,
+                      color: Colors.black38,
+                    )
+                  ],
+                )
+              ],
+            ),
           ),
           Container(
             padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
