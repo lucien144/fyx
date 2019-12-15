@@ -4,11 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/components/ListItemWithCategory.dart';
 import 'package:fyx/components/post/PostAvatar.dart';
+import 'package:fyx/components/post/PostFooterImage.dart';
+import 'package:fyx/components/post/PostFooterLink.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/components/post/PostHtml.dart';
 import 'package:fyx/model/Post.dart';
+import 'package:fyx/model/post/Image.dart' as model;
+import 'package:fyx/model/post/Link.dart';
 
-enum LAYOUT_TYPES { textOnly, oneImageOnly, attachmentsAndText }
+enum LAYOUT_TYPES { textOnly, oneImageOnly, attachmentsOnly, attachmentsAndText }
 typedef Widget TLayout();
 
 class PostListItem extends ListItemWithCategory {
@@ -20,7 +24,7 @@ class PostListItem extends ListItemWithCategory {
     _layoutMap.putIfAbsent(
         LAYOUT_TYPES.textOnly,
         () => () {
-              if (this.post.content.isNotEmpty && this.post.attachments.isEmpty) {
+              if (this.post.strippedContent.isNotEmpty && this.post.attachments.isEmpty) {
                 return PostHtml(this.post);
               }
               return null;
@@ -29,7 +33,7 @@ class PostListItem extends ListItemWithCategory {
     _layoutMap.putIfAbsent(
         LAYOUT_TYPES.oneImageOnly,
         () => () {
-              if (!(this.post.content.isEmpty && this.post.attachments.length == 1 && this.post.images.length == 1)) {
+              if (!(this.post.strippedContent.isEmpty && this.post.attachments.length == 1 && this.post.images.length == 1)) {
                 return null;
               }
 
@@ -42,18 +46,48 @@ class PostListItem extends ListItemWithCategory {
             });
 
     _layoutMap.putIfAbsent(
-        LAYOUT_TYPES.attachmentsAndText,
+        LAYOUT_TYPES.attachmentsOnly,
         () => () {
-              if (!(this.post.attachments.length > 1 && this.post.content.isNotEmpty)) {
+              if (!(this.post.strippedContent.length == 0 && this.post.attachments.length > 1)) {
                 return null;
               }
+
+              var children = <Widget>[];
+              this.post.attachments.forEach((attachment) {
+                children.add(PostHeroAttachment(attachment));
+              });
+
+              return Wrap(children: children);
+            });
+
+    _layoutMap.putIfAbsent(
+        LAYOUT_TYPES.attachmentsAndText,
+        () => () {
+              if (!(this.post.attachments.length >= 1 && this.post.strippedContent.isNotEmpty)) {
+                return null;
+              }
+
+              var children = <Widget>[];
+              children.add(Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[Expanded(child: PostHtml(post)), PostHeroAttachment(post.attachmentsWithFeatured['featured'])],
+              ));
+
+              if ((post.attachmentsWithFeatured['attachments'] as List).whereType<model.Image>().length > 0) {
+                children.add(() {
+                  var children = (post.attachmentsWithFeatured['attachments'] as List).whereType<model.Image>().map((attachment) {
+                    return PostFooterImage(attachment);
+                  }).toList();
+                  return Row(children: children, mainAxisAlignment: MainAxisAlignment.start);
+                }());
+              }
+
+              children.addAll((post.attachmentsWithFeatured['attachments'] as List).whereType<Link>().map((attachment) {
+                return PostFooterLink(attachment);
+              }));
+
               return Column(
-                children: <Widget>[
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[Expanded(child: PostHtml(post)), PostHeroAttachment(post.attachmentsWithFeatured['featured'])],
-                  )
-                ],
+                children: children,
               );
             });
   }
@@ -83,7 +117,7 @@ class PostListItem extends ListItemWithCategory {
                 'I: ${post.images.length} / '
                 'L: ${post.links.length} / '
                 'V: ${post.videos.length} / '
-                'T: ${post.content.length}'),
+                'Html: ${post.content.length} (${post.strippedContent.length})'),
           ),
           Container(
             decoration: BoxDecoration(color: Colors.green),
@@ -102,7 +136,7 @@ class PostListItem extends ListItemWithCategory {
       }
     }
 
-    // TODO: Doplnit text.
+    // TODO: Doplnit text a odkaz.
     return Column(children: <Widget>[
       Icon(Icons.warning),
       Text(
