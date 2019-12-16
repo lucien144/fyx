@@ -34,9 +34,18 @@ class Post {
     this._wu_rating = int.parse(json['wu_rating']);
     this._wu_type = int.parse(json['wu_type']);
 
+    this._removeTrailingBr();
     this._parseEmbeds();
     this._parseAttachedImages();
     this._parseLinks();
+  }
+
+  void _removeTrailingBr() {
+    var startBr = RegExp(r'^(((\s*)<\s*br\s*\/?\s*>(\s*))*)', caseSensitive: false);
+    _content = _content.replaceAll(startBr, '');
+
+    var trailingBr = RegExp(r'(((\s*)<\s*br\s*\/?\s*>(\s*))*)$', caseSensitive: false);
+    _content = _content.replaceAll(trailingBr, '');
   }
 
   /// Parse emebeded videos.

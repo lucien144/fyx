@@ -167,4 +167,18 @@ void main() {
     var post = Post.fromJson(json);
     expect(post.content.trim(), 'lorem ipsum');
   });
+
+  test('Content is stripped for trailing <br>', () {
+    var content = """
+    <br/><br><BR> <Br  />
+    lorem ipsum
+    <br \/>\n\r<br \/>\n\r<br \/>\n
+    """;
+
+    var json = Map<String, dynamic>.from(_json);
+    json.putIfAbsent("content", () => content);
+
+    var post = Post.fromJson(json);
+    expect(post.content, 'lorem ipsum');
+  });
 }
