@@ -1,12 +1,10 @@
 class Link {
-  final String _url;
+  final String url;
   final String _title;
 
-  Link(String url, {String title})
-      : _url = url,
-        _title = title;
+  Link(this.url, {String title}) : _title = title;
 
-  String get title => _title;
+  String get title => _title == null ? fancyUrl : _title;
 
-  String get url => _url;
+  String get fancyUrl => url.replaceAll(RegExp(r'^https?:\/\/(www\.)?'), '');
 }
