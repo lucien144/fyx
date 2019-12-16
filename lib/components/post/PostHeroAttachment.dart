@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/model/post/Image.dart' as model;
+import 'package:fyx/model/post/Link.dart';
+import 'package:fyx/theme/T.dart';
 
 class PostHeroAttachment extends StatelessWidget {
   final dynamic attachment;
@@ -22,6 +24,39 @@ class PostHeroAttachment extends StatelessWidget {
           fit: BoxFit.cover,
           width: 100,
           height: 100,
+        ),
+      );
+    }
+
+    if (attachment is Link) {
+      return Container(
+        width: 100,
+        height: 100,
+        decoration: BoxDecoration(
+          color: T.COLOR_PRIMARY,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          children: <Widget>[
+            Expanded(
+              child: Icon(
+                Icons.link,
+                color: Colors.white,
+                size: 40,
+              ),
+            ),
+            Container(
+              color: Color.fromRGBO(255, 255, 255, 0.6),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                child: Text(
+                  attachment.fancyUrl,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 14),
+                ),
+              ),
+            )
+          ],
         ),
       );
     }
