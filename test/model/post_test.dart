@@ -106,7 +106,9 @@ void main() {
     expect(post.videos[0].type, VIDEO_TYPE.youtube);
     expect(post.videos[0].image, 'http://img.youtube.com/vi/B1_gcCu0-oI/0.jpg');
     expect(post.videos[0].thumb, 'http://www.nyx.cz/i/t/e8464b77ee2b7a726f174be309201ade.png?url=http%3A%2F%2Fimg.youtube.com%2Fvi%2FB1_gcCu0-oI%2F0.jpg');
-    expect(post.videos[0].link, 'https://www.youtube.com/watch?v=B1_gcCu0-oI');
+    expect(post.videos[0].link.url, 'https://www.youtube.com/watch?v=B1_gcCu0-oI');
+    expect(post.videos[0].link.fancyUrl, 'youtube.com/watch?v=B1_gcCu0-oI');
+    expect(post.videos[0].link.title, 'youtube.com/watch?v=B1_gcCu0-oI');
     expect(0, parse(post.content).querySelectorAll('div[data-embed-value="B1_gcCu0-oI"]').length);
 
     // Test images
