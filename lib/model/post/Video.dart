@@ -1,3 +1,5 @@
+import 'package:fyx/model/post/Link.dart';
+
 enum VIDEO_TYPE { youtube }
 
 class Video {
@@ -5,21 +7,21 @@ class Video {
   final String id;
   final String image;
   final String thumb;
-  final String _link;
+  final Link _link;
 
   Video({this.type, this.id, this.image, this.thumb, String link})
-      : _link = link,
+      : _link = link != null && link != '' ? Link(link) : null,
         assert(type != null),
         assert(image != null);
 
-  String get link {
-    if (_link != null && _link != '') {
+  Link get link {
+    if (_link != null) {
       return _link;
     }
 
     switch (this.type) {
       case VIDEO_TYPE.youtube:
-        return 'https://www.youtube.com/watch?v=${this.id}';
+        return Link('https://www.youtube.com/watch?v=${this.id}');
       default:
         throw Exception('Cannot get video link, unknown video.');
     }

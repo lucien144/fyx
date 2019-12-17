@@ -4,7 +4,9 @@ class Link {
 
   Link(this.url, {String title}) : _title = title;
 
-  String get title => _title == null || _title == '' ? fancyUrl : _title;
+  String get title => _title == null || _title == '' ? fancyUrl : _trimUrl(_title);
 
-  String get fancyUrl => url.replaceAll(RegExp(r'^https?:\/\/(www\.)?'), '');
+  String get fancyUrl => _trimUrl(url);
+
+  String _trimUrl(String url) => url.replaceAll(RegExp(r'^https?:\/\/(www\.)?'), '');
 }
