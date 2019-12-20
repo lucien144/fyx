@@ -57,7 +57,7 @@ class PostListItem extends ListItemWithCategory {
                 children.add(PostHeroAttachment(attachment));
               });
 
-              return Wrap(children: children);
+              return Wrap(children: children, spacing: 8, alignment: WrapAlignment.start);
             });
 
     _layoutMap.putIfAbsent(
