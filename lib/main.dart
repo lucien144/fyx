@@ -7,6 +7,7 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/pages/HomePage.dart';
 import 'package:fyx/pages/LoginPage.dart';
+import 'package:fyx/theme/T.dart';
 
 void main() async {
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
@@ -22,7 +23,7 @@ class FyxApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return PlatformApp(
       title: 'Fyx',
-      theme: PlatformThemeData(primaryColor: Color(0xFF009D9D)), // Color schema -> https://mycolor.space/?hex=%231AD592&sub=1
+      theme: PlatformThemeData(primaryColor: T.COLOR_PRIMARY), // Color schema -> https://mycolor.space/?hex=%231AD592&sub=1
       home: _credentials is Credentials && _credentials.isValid ? HomePage() : LoginPage(),
     );
   }

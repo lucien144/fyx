@@ -106,7 +106,9 @@ void main() {
     expect(post.videos[0].type, VIDEO_TYPE.youtube);
     expect(post.videos[0].image, 'http://img.youtube.com/vi/B1_gcCu0-oI/0.jpg');
     expect(post.videos[0].thumb, 'http://www.nyx.cz/i/t/e8464b77ee2b7a726f174be309201ade.png?url=http%3A%2F%2Fimg.youtube.com%2Fvi%2FB1_gcCu0-oI%2F0.jpg');
-    expect(post.videos[0].link, 'https://www.youtube.com/watch?v=B1_gcCu0-oI');
+    expect(post.videos[0].link.url, 'https://www.youtube.com/watch?v=B1_gcCu0-oI');
+    expect(post.videos[0].link.fancyUrl, 'youtube.com/watch?v=B1_gcCu0-oI');
+    expect(post.videos[0].link.title, 'youtube.com/watch?v=B1_gcCu0-oI');
     expect(0, parse(post.content).querySelectorAll('div[data-embed-value="B1_gcCu0-oI"]').length);
 
     // Test images
@@ -121,6 +123,64 @@ void main() {
     expect(post.links[2].title, 'Tohle je link bez title');
     expect(post.links[2].url, 'http://nyx.cz');
 
-    expect(post.countAttachments, 5);
+    // Test attachments
+    expect(post.attachments.length, 5);
+
+    // Test featured attachments
+    expect(post.attachmentsWithFeatured['featured'] is Image, true);
+    expect(post.attachmentsWithFeatured['attachments'].length, 4);
+  });
+
+  test('Content is stripped for unnecessary <br> tags and comments from attached images', () {
+    var content = """
+    Lorem ipsum dolor... sit amet :)<br><br>
+    <!-- http,img,attachment --><a href="http://i.nyx.cz/files/00/00/20/77/2077557_48d4a18f67ad53d7572e.jpg?name=dbk2.jpg"><img src="http://www.nyx.cz/i/t/6a6f8dae07571ecfb1510c18e6dd6d0a.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F77%2F2077557_48d4a18f67ad53d7572e.jpg%3Fname%3Ddbk2.jpg" class="thumb"></a><br><br>
+    <!-- http,img,attachment --><a href="http://i.nyx.cz/files/00/00/20/77/2077556_45259e39b491933bb483.jpg?name=dbk.jpg"><img src="http://www.nyx.cz/i/t/8697a44511a1664f7adc53b39821ce7c.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F77%2F2077556_45259e39b491933bb483.jpg%3Fname%3Ddbk.jpg" class="thumb"></a><br>
+    """;
+
+    var expectedContent = """
+    Lorem ipsum dolor... sit amet :)<br><br>
+    <!-- http,img,attachment -->
+    <!-- http,img,attachment -->
+    """;
+
+    var json = Map<String, dynamic>.from(_json);
+    json.putIfAbsent("content", () => content);
+
+    var post = Post.fromJson(json);
+    expect(post.content.trim(), expectedContent.trim());
+    expect(post.strippedContent, 'Lorem ipsum dolor... sit amet :)');
+  });
+
+  test('Content is stripped for unnecessary <br> tags and comments from attached embeds', () {
+    var content = """
+    <div class=\"embed-wrapper\" data-embed-type=\"youtube\" data-embed-value=\"B1_gcCu0-oI\" data-embed-hd=\"1\">
+      <a href=\"http:\/\/img.youtube.com\/vi\/B1_gcCu0-oI\/0.jpg\">
+        <img src=\"http:\/\/www.nyx.cz\/i\/t\/e8464b77ee2b7a726f174be309201ade.png?url=http%3A%2F%2Fimg.youtube.com%2Fvi%2FB1_gcCu0-oI%2F0.jpg\" class=\"thumb\">
+      <\/a>
+    <\/div>
+    <br \/>\n\r<br \/>\n\r<br \/>\n
+    lorem ipsum
+    """;
+
+    var json = Map<String, dynamic>.from(_json);
+    json.putIfAbsent("content", () => content);
+
+    var post = Post.fromJson(json);
+    expect(post.content.trim(), 'lorem ipsum');
+  });
+
+  test('Content is stripped for trailing <br>', () {
+    var content = """
+    <br/><br><BR> <Br  />
+    lorem ipsum
+    <br \/>\n\r<br \/>\n\r<br \/>\n
+    """;
+
+    var json = Map<String, dynamic>.from(_json);
+    json.putIfAbsent("content", () => content);
+
+    var post = Post.fromJson(json);
+    expect(post.content, 'lorem ipsum');
   });
 }

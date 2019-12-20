@@ -34,9 +34,18 @@ class Post {
     this._wu_rating = int.parse(json['wu_rating']);
     this._wu_type = int.parse(json['wu_type']);
 
+    this._removeTrailingBr();
     this._parseEmbeds();
     this._parseAttachedImages();
     this._parseLinks();
+  }
+
+  void _removeTrailingBr() {
+    var startBr = RegExp(r'^(((\s*)<\s*br\s*\/?\s*>(\s*))*)', caseSensitive: false);
+    _content = _content.replaceAll(startBr, '');
+
+    var trailingBr = RegExp(r'(((\s*)<\s*br\s*\/?\s*>(\s*))*)$', caseSensitive: false);
+    _content = _content.replaceAll(trailingBr, '');
   }
 
   /// Parse emebeded videos.
@@ -54,6 +63,10 @@ class Post {
 
         // Remove the video element from the content.
         this._videos.add(video);
+
+        while (el.nextElementSibling?.localName == 'br') {
+          el.nextElementSibling.remove();
+        }
         el.remove();
       });
       _content = document.body.innerHtml;
@@ -63,20 +76,24 @@ class Post {
   }
 
   /// Parse attached images
-  /// TODO: Parse other attachments
+  /// TODO: Parse other attachments and standalone <img/>
   void _parseAttachedImages() {
     var document = parse(_content);
     document.querySelectorAll('a > img[src]').forEach((Element el) {
       var thumb = el.attributes['src'];
       var image = el.parent.attributes['href'];
       _images.add(Image(image, thumb));
+
+      while (el.parent.nextElementSibling?.localName == 'br') {
+        el.parent.nextElementSibling.remove();
+      }
       el.parent.remove();
     });
     _content = document.body.innerHtml;
   }
 
   ///
-  ///Parse any link that's not internal link.
+  /// Parse any link that's not internal link.
   ///
   void _parseLinks() {
     var document = parse(_content);
@@ -92,6 +109,8 @@ class Post {
     document = parse(document.body.innerHtml);
     _links.addAll(document.querySelectorAll('a:not([data-link-wu])').map((Element el) => Link(el.attributes['href'], title: el.text)));
   }
+
+  String get strippedContent => parse(parse(_content).body.text).documentElement.text.trim();
 
   String get content => _content;
 
@@ -115,5 +134,45 @@ class Post {
 
   List<Video> get videos => _videos;
 
-  int get countAttachments => _images.length + _links.length + _videos.length;
+  List<dynamic> get attachments {
+    var list = [];
+    list.addAll(_images);
+    list.addAll(_links);
+    list.addAll(_videos);
+    return list;
+  }
+
+  Map<String, dynamic> get attachmentsWithFeatured {
+    var cloneImages = List.from(_images);
+    var cloneLinks = List.from(_links);
+    var cloneVideos = List.from(_videos);
+
+    dynamic getFeatured = () {
+      if (cloneImages.length > 0) {
+        final featured = cloneImages[0];
+        cloneImages.removeAt(0);
+        return featured;
+      }
+
+      if (cloneVideos.length > 0) {
+        final featured = cloneVideos[0];
+        cloneVideos.removeAt(0);
+        return featured;
+      }
+
+      if (cloneLinks.length > 0) {
+        final featured = cloneLinks[0];
+        cloneLinks.removeAt(0);
+        return featured;
+      }
+    };
+
+    var featured = getFeatured();
+
+    var attachments = [];
+    attachments.addAll(cloneImages);
+    attachments.addAll(cloneLinks);
+    attachments.addAll(cloneVideos);
+    return {'featured': featured, 'attachments': attachments};
+  }
 }
