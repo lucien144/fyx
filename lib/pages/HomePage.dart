@@ -1,21 +1,75 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:fyx/components/DiscussionListItem.dart';
 import 'package:fyx/components/ListHeader.dart';
-import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Category.dart';
 import 'package:fyx/model/Discussion.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   final PageController _bookmarksController = PageController(initialPage: 0);
+
+  var bookmarksSliver = <Widget>[];
+  var history = <DiscussionListItem>[];
+
+  @override
+  void initState() {
+    bookmarksSliver.add(CupertinoSliverRefreshControl(
+      onRefresh: () => this.loadBookmarks(),
+    ));
+
+    loadBookmarks();
+    loadHistory();
+    super.initState();
+  }
+
+  loadBookmarks() async {
+    var _items = <Widget>[];
+    var data = await ApiController().loadBookmarks();
+    if ((data as Map).containsKey('categories')) {
+      _items = (data['categories'] as List).map((_category) {
+        var category = Category.fromJson(_category);
+        var discussion = (data['discussions'] as List)
+            .map((discussion) => DiscussionListItem(Discussion.fromJson(discussion)))
+            .where((discussion) => discussion.category == category.idCat)
+            .toList();
+        return SliverStickyHeaderBuilder(
+          builder: (context, state) => ListHeader(category),
+          sliver: SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, i) => discussion[i],
+              childCount: discussion.length,
+            ),
+          ),
+        );
+      }).toList();
+      setState(() {
+        bookmarksSliver.addAll(_items);
+      });
+    }
+  }
+
+  loadHistory() async {
+    var data = await ApiController().loadHistory();
+    var _history = (data['discussions'] as List).map((discussion) => DiscussionListItem(Discussion.fromJson(discussion))).toList();
+    setState(() {
+      history = _history;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return CupertinoTabScaffold(
       tabBar: CupertinoTabBar(
+        backgroundColor: Colors.white,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.bookmark),
@@ -58,21 +112,36 @@ class HomePage extends StatelessWidget {
                   controller: _bookmarksController,
                   pageSnapping: true,
                   children: <Widget>[
-                    PullToRefreshList<DiscussionListItem, ListHeader>(
-                      itemBuilder: (dynamic data) => (data['discussions'] as List).map((discussion) => DiscussionListItem(Discussion.fromJson(discussion))).toList(),
-                      headerBuilder: (dynamic data) {
-                        if ((data as Map).containsKey('categories')) {
-                          return (data['categories'] as List).map((category) => ListHeader(Category.fromJson(category))).toList();
-                        }
-                        return [];
-                      },
-                      loadData: () => ApiController().loadBookmarks(),
+                    CustomScrollView(
+                      slivers: <Widget>[
+                        CupertinoSliverRefreshControl(
+                          onRefresh: () => this.loadHistory(),
+                        ),
+                        history.length > 0
+                            ? SliverList(
+                                delegate: SliverChildBuilderDelegate(
+                                  (context, i) => history[i],
+                                  childCount: history.length,
+                                ),
+                              )
+                            : SliverFillRemaining(
+                                child: Container(
+                                  height: double.infinity,
+                                  child: CupertinoButton(
+                                    color: Colors.black26,
+                                    child: Text('Načíst znovu...'),
+                                    onPressed: () {
+                                      this.loadHistory();
+                                    },
+                                  ),
+                                  color: Colors.white,
+                                  alignment: Alignment.center,
+                                ),
+                              )
+                      ],
                     ),
-                    PullToRefreshList<DiscussionListItem, ListHeader>(
-                      itemBuilder: (dynamic data) {
-                        return (data['discussions'] as List).map((discussion) => DiscussionListItem(Discussion.fromJson(discussion))).toList();
-                      },
-                      loadData: () => ApiController().loadHistory(),
+                    CustomScrollView(
+                      slivers: bookmarksSliver,
                     ),
                   ],
                 ),

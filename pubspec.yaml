@@ -23,7 +23,7 @@ dependencies:
   redux_thunk: ^0.2.1
   flutter_spinkit: ^4.0.0
   dio: ^3.0.4
-  flutter_sticky_header: ^0.3.4
+  flutter_sticky_header: ^0.4.0
   sticky_headers: ^0.1.8
   html: ^0.14.0+3
   flutter_html: ^0.11.0
