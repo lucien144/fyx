@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:fyx/components/DiscussionListItem.dart';
 import 'package:fyx/components/ListHeader.dart';
+import 'package:fyx/components/PullToRefreshNew.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Category.dart';
 import 'package:fyx/model/Discussion.dart';
@@ -112,34 +113,10 @@ class _HomePageState extends State<HomePage> {
                   controller: _bookmarksController,
                   pageSnapping: true,
                   children: <Widget>[
-                    CustomScrollView(
-                      slivers: <Widget>[
-                        CupertinoSliverRefreshControl(
-                          onRefresh: () => this.loadHistory(),
-                        ),
-                        history.length > 0
-                            ? SliverList(
-                                delegate: SliverChildBuilderDelegate(
-                                  (context, i) => history[i],
-                                  childCount: history.length,
-                                ),
-                              )
-                            : SliverFillRemaining(
-                                child: Container(
-                                  height: double.infinity,
-                                  child: CupertinoButton(
-                                    color: Colors.black26,
-                                    child: Text('Načíst znovu...'),
-                                    onPressed: () {
-                                      this.loadHistory();
-                                    },
-                                  ),
-                                  color: Colors.white,
-                                  alignment: Alignment.center,
-                                ),
-                              )
-                      ],
-                    ),
+                    PullToRefreshNew(dataProvider: () async {
+                      var data = await ApiController().loadHistory();
+                      return (data['discussions'] as List).map((discussion) => DiscussionListItem(Discussion.fromJson(discussion))).toList();
+                    }),
                     CustomScrollView(
                       slivers: bookmarksSliver,
                     ),
