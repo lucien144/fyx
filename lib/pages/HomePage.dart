@@ -9,6 +9,8 @@ import 'package:fyx/model/Category.dart';
 import 'package:fyx/model/Discussion.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+enum tabs { history, bookmarks }
+
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
@@ -16,6 +18,30 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final PageController _bookmarksController = PageController(initialPage: 0);
+
+  tabs activeTab;
+
+  @override
+  void initState() {
+    activeTab = tabs.history;
+
+    _bookmarksController.addListener(() {
+      // If the CupertinoTabView is sliding and the animation is finished, change the active tab
+      if (_bookmarksController.page % 1 == 0 && activeTab != tabs.values[_bookmarksController.page.toInt()]) {
+        setState(() {
+          activeTab = tabs.values[_bookmarksController.page.toInt()];
+        });
+      }
+    });
+
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _bookmarksController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,14 +74,17 @@ class _HomePageState extends State<HomePage> {
                       },
                     ),
                     middle: CupertinoSegmentedControl(
-                      onValueChanged: (value) => _bookmarksController.animateToPage(int.parse(value), duration: Duration(milliseconds: 300), curve: Curves.easeInOut),
+                      groupValue: activeTab,
+                      onValueChanged: (value) {
+                        _bookmarksController.animateToPage(tabs.values.indexOf(value), duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+                      },
                       children: {
-                        '0': Padding(
+                        tabs.history: Padding(
                           child: Text('Historie'),
                           padding: EdgeInsets.symmetric(horizontal: 16),
                         ),
-                        '1': Padding(
-                          child: Text('Sledovane'),
+                        tabs.bookmarks: Padding(
+                          child: Text('Sledované'),
                           padding: EdgeInsets.symmetric(horizontal: 16),
                         ),
                       },
