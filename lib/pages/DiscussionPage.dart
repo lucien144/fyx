@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fyx/components/ListHeader.dart';
-import 'package:fyx/components/PullToRefreshList.dart';
+import 'package:fyx/components/PullToRefreshNew.dart';
 import 'package:fyx/components/post/PostListItem.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Discussion.dart';
@@ -14,12 +14,15 @@ class DiscussionPage extends StatelessWidget {
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
+        backgroundColor: Colors.white,
         middle: Text(discussion.jmeno, overflow: TextOverflow.ellipsis),
         trailing: Icon(CupertinoIcons.create),
       ),
-      child: PullToRefreshList<PostListItem, ListHeader>(
-        itemBuilder: (dynamic data) => (data as List).map((post) => PostListItem(Post.fromJson(post))).toList(),
-        loadData: () => ApiController().loadDiscussion(discussion.idKlub),
+      child: PullToRefreshNew(
+        dataProvider: () async {
+          var data = await ApiController().loadDiscussion(discussion.idKlub);
+          return (data as List).map((post) => PostListItem(Post.fromJson(post))).toList();
+        },
       ),
     );
   }
