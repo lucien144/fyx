@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:fyx/components/DiscussionListItem.dart';
 import 'package:fyx/components/ListHeader.dart';
 import 'package:fyx/components/PullToRefreshNew.dart';
@@ -17,54 +16,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final PageController _bookmarksController = PageController(initialPage: 0);
-
-  var bookmarksSliver = <Widget>[];
-  var history = <DiscussionListItem>[];
-
-  @override
-  void initState() {
-    bookmarksSliver.add(CupertinoSliverRefreshControl(
-      onRefresh: () => this.loadBookmarks(),
-    ));
-
-    loadBookmarks();
-    loadHistory();
-    super.initState();
-  }
-
-  loadBookmarks() async {
-    var _items = <Widget>[];
-    var data = await ApiController().loadBookmarks();
-    if ((data as Map).containsKey('categories')) {
-      _items = (data['categories'] as List).map((_category) {
-        var category = Category.fromJson(_category);
-        var discussion = (data['discussions'] as List)
-            .map((discussion) => DiscussionListItem(Discussion.fromJson(discussion)))
-            .where((discussion) => discussion.category == category.idCat)
-            .toList();
-        return SliverStickyHeaderBuilder(
-          builder: (context, state) => ListHeader(category),
-          sliver: SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, i) => discussion[i],
-              childCount: discussion.length,
-            ),
-          ),
-        );
-      }).toList();
-      setState(() {
-        bookmarksSliver.addAll(_items);
-      });
-    }
-  }
-
-  loadHistory() async {
-    var data = await ApiController().loadHistory();
-    var _history = (data['discussions'] as List).map((discussion) => DiscussionListItem(Discussion.fromJson(discussion))).toList();
-    setState(() {
-      history = _history;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,9 +68,22 @@ class _HomePageState extends State<HomePage> {
                       var data = await ApiController().loadHistory();
                       return (data['discussions'] as List).map((discussion) => DiscussionListItem(Discussion.fromJson(discussion))).toList();
                     }),
-                    CustomScrollView(
-                      slivers: bookmarksSliver,
-                    ),
+                    PullToRefreshNew(dataProvider: () async {
+                      var categories = [];
+                      var data = await ApiController().loadBookmarks();
+                      if ((data as Map).containsKey('categories')) {
+                        (data['categories'] as List).forEach((_category) {
+                          var category = Category.fromJson(_category);
+                          var discussion = (data['discussions'] as List)
+                              .map((discussion) => DiscussionListItem(Discussion.fromJson(discussion)))
+                              .where((discussion) => discussion.category == category.idCat)
+                              .toList();
+                          categories.add({'header': ListHeader(category), 'items': discussion});
+                        });
+                        return categories;
+                      }
+                      return [];
+                    }),
                   ],
                 ),
               );
