@@ -10,6 +10,7 @@ import 'package:fyx/pages/LoginPage.dart';
 import 'package:fyx/theme/T.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   return runApp(FyxApp(await ApiController().provider.getCredentials()));
 }
