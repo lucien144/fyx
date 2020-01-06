@@ -12,7 +12,12 @@ import 'package:fyx/theme/T.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-  return runApp(FyxApp(await ApiController().provider.getCredentials()));
+  try {
+    var credentials = await ApiController().provider.getCredentials();
+    return runApp(FyxApp(credentials));
+  } catch (error) {
+    return runApp(FyxApp(null));
+  }
 }
 
 class FyxApp extends StatelessWidget {
