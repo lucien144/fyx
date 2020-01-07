@@ -67,6 +67,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget formFactory(context) {
+    var offset = (MediaQuery.of(context).viewInsets.bottom / 3);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -80,32 +81,40 @@ class _LoginPageState extends State<LoginPage> {
           decoration:
               BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(32), boxShadow: [BoxShadow(color: Colors.black, offset: Offset(0, 0), blurRadius: 16)]),
         ),
-        SizedBox(
-          height: 128,
-        ),
-        CupertinoTextField(
-          placeholder: 'NICKNAME',
-          controller: _loginController,
-          decoration: _boxDecoration,
-        ),
-        SizedBox(
-          height: 8,
-        ),
-        CupertinoButton(
-          child: Text(
-            'Přihlásit',
-            style: TextStyle(color: Color(0xff007F90)),
+        AnimatedPadding(
+          padding: EdgeInsets.only(top: 128 - offset),
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          child: Container(
+            child: CupertinoTextField(
+              placeholder: 'NICKNAME',
+              controller: _loginController,
+              decoration: _boxDecoration,
+            ),
           ),
-          onPressed: () async {
-            ApiController().login(_loginController.text).then((response) {
-              setState(() {
-                _tokenController.text = response.authCode;
-              });
-            }).catchError((error) {
-              PlatformTheme.error(error.toString());
-            });
-          },
-          color: Colors.white,
+        ),
+        AnimatedPadding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom, top: 8),
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          child: Container(
+            child: CupertinoButton(
+              child: Text(
+                'Přihlásit',
+                style: TextStyle(color: Color(0xff007F90)),
+              ),
+              onPressed: () async {
+                ApiController().login(_loginController.text).then((response) {
+                  setState(() {
+                    _tokenController.text = response.authCode;
+                  });
+                }).catchError((error) {
+                  PlatformTheme.error(error.toString());
+                });
+              },
+              color: Colors.white,
+            ),
+          ),
         )
       ],
     );
