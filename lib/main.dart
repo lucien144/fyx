@@ -27,10 +27,19 @@ class FyxApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformApp(
-      title: 'Fyx',
-      theme: PlatformThemeData(primaryColor: T.COLOR_PRIMARY), // Color schema -> https://mycolor.space/?hex=%231AD592&sub=1
-      home: _credentials is Credentials && _credentials.isValid ? HomePage() : LoginPage(),
+    return GestureDetector(
+      onTap: () {
+        // Hide the keyboard on tap
+        FocusScopeNode currentFocus = FocusScope.of(context);
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
+        }
+      },
+      child: PlatformApp(
+        title: 'Fyx',
+        theme: PlatformThemeData(primaryColor: T.COLOR_PRIMARY), // Color schema -> https://mycolor.space/?hex=%231AD592&sub=1
+        home: _credentials is Credentials && _credentials.isValid ? HomePage() : LoginPage(),
+      ),
     );
   }
 }
