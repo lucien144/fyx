@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fyx/theme/T.dart';
 
 class TokenPage extends StatefulWidget {
   @override
@@ -8,7 +9,6 @@ class TokenPage extends StatefulWidget {
 }
 
 class _TokenPageState extends State<TokenPage> {
-  final BoxDecoration _boxDecoration = BoxDecoration(borderRadius: BorderRadius.circular(4), color: Colors.white, border: Border.all(color: Color(0xff007F90)));
   final TextEditingController _tokenController = TextEditingController();
 
   @override
@@ -44,7 +44,7 @@ class _TokenPageState extends State<TokenPage> {
           children: <Widget>[
             Expanded(
                 child: CupertinoTextField(
-              decoration: _boxDecoration,
+              decoration: T.BOX_DECORATION,
               controller: _tokenController,
               enabled: false,
             )),

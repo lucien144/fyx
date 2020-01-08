@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/theme/T.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -10,7 +11,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final BoxDecoration _boxDecoration = BoxDecoration(borderRadius: BorderRadius.circular(4), color: Colors.white, border: Border.all(color: Color(0xff007F90)));
   final TextEditingController _loginController = TextEditingController();
 
   @override
@@ -51,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
             child: CupertinoTextField(
               placeholder: 'NICKNAME',
               controller: _loginController,
-              decoration: _boxDecoration,
+              decoration: T.BOX_DECORATION,
             ),
           ),
         ),
