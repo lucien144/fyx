@@ -12,6 +12,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _loginController = TextEditingController();
+  bool isRunning = false;
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +50,7 @@ class _LoginPageState extends State<LoginPage> {
           curve: Curves.easeInOut,
           child: Container(
             child: CupertinoTextField(
+              enabled: !isRunning,
               placeholder: 'NICKNAME',
               controller: _loginController,
               decoration: T.BOX_DECORATION,
@@ -60,25 +62,40 @@ class _LoginPageState extends State<LoginPage> {
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
           child: Container(
-            child: CupertinoButton(
-              child: Text(
-                'Přihlásit',
-                style: TextStyle(color: Color(0xff007F90)),
-              ),
-              onPressed: () async {
-                ApiController().login(_loginController.text).then((response) {
-                  setState(() {
-                    Navigator.of(context).pushNamed('/token', arguments: response.authCode);
-                  });
-                }).catchError((error) {
-                  PlatformTheme.error(error.toString());
-                });
-              },
-              color: Colors.white,
-            ),
+            child: this._buildButton(context),
           ),
         )
       ],
+    );
+  }
+
+  Widget _buildButton(context) {
+    return Container(
+      width: 200,
+      child: CupertinoButton(
+        child: isRunning
+            ? CupertinoActivityIndicator()
+            : Text(
+                'Přihlásit',
+                style: TextStyle(color: Color(0xff007F90)),
+              ),
+        onPressed: () {
+          if (isRunning) {
+            return;
+          }
+
+          setState(() => isRunning = true);
+
+          ApiController().login(_loginController.text).then((response) {
+            setState(() {
+              Navigator.of(context).pushNamed('/token', arguments: response.authCode);
+            });
+          }).catchError((error) {
+            PlatformTheme.error(error.toString());
+          }).whenComplete(() => setState(() => isRunning = false));
+        },
+        color: Colors.white,
+      ),
     );
   }
 }
