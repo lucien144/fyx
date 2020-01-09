@@ -7,7 +7,6 @@ import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Category.dart';
 import 'package:fyx/model/Discussion.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 enum tabs { history, bookmarks }
 
@@ -69,7 +68,7 @@ class _HomePageState extends State<HomePage> {
                     trailing: CupertinoButton(
                       child: Icon(CupertinoIcons.padlock_solid),
                       onPressed: () {
-                        SharedPreferences.getInstance().then((prefs) => prefs.clear());
+                        ApiController().logout();
                         Navigator.of(context, rootNavigator: true).pushNamed('/');
                       },
                     ),

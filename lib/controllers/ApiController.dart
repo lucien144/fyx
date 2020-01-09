@@ -52,6 +52,10 @@ class ApiController {
     return jsonDecode(response.data)['data'];
   }
 
+  void logout() {
+    SharedPreferences.getInstance().then((prefs) => prefs.clear());
+  }
+
   throwAuthException(LoginResponse loginResponse, {String message: ''}) {
     var state = AUTH_STATES.values.firstWhere((state) => state.toString() == 'AUTH_STATES.${loginResponse.authState}', orElse: () => null);
     if (state != null) {
