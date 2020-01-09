@@ -1,7 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:fyx/model/Credentials.dart';
 
+typedef TOnError = void Function(String);
+typedef TOnAuthError = void Function();
+
 abstract class IApiProvider {
+  TOnError onError;
+  TOnAuthError onAuthError;
+
   Future<Credentials> getCredentials();
   void setCredentials(Credentials val);
   Future<Response> login(String username);

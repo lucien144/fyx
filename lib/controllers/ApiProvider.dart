@@ -1,15 +1,24 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/Credentials.dart';
+import 'package:fyx/theme/L.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiProvider implements IApiProvider {
   final Dio dio = Dio();
+
   // ignore: non_constant_identifier_names
   final URL = 'https://www.nyx.cz/api.php';
+
   // ignore: non_constant_identifier_names
   final OPTIONS = Options(headers: {'User-Agent': 'Fyx'});
+
   Credentials _credentials;
+
+  TOnError onError;
+  TOnAuthError onAuthError;
 
   getCredentials() async {
     if (_credentials != null && _credentials.isValid) {
@@ -32,6 +41,31 @@ class ApiProvider implements IApiProvider {
       print('[API] -> query: ${options.queryParameters}');
       print('[API] -> query: ${(options.data as FormData).fields}');
       return options;
+    }, onResponse: (Response response) async {
+      Map data = jsonDecode(response.data);
+
+      // All seems ok.
+      if (data.containsKey('data')) {
+        return response;
+      }
+
+      // Not Authorized
+      if (data['result'] == 'error' && data['code'] == '401') {
+        onAuthError();
+        return response;
+      }
+
+      // Other problem
+      if (data['result'] == 'error') {
+        onError(data['error']);
+        return response;
+      }
+
+      // Malformed response
+      onError(L.API_ERROR);
+      return response;
+    }, onError: (DioError e) async {
+      onError(e.message);
     }));
   }
 

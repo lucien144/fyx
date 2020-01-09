@@ -4,12 +4,14 @@ import 'package:fyx/PlatformAwareWidget.dart';
 import 'package:fyx/PlatformThemeData.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/pages/HomePage.dart';
+import 'package:fyx/pages/LoginPage.dart';
 import 'package:fyx/pages/TokenPage.dart';
 
 class PlatformApp extends PlatformAwareWidget<MaterialApp, CupertinoApp> {
   final Widget home;
   final String title;
   final PlatformThemeData theme;
+  static GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
 
   PlatformApp({this.home, this.title, this.theme});
 
@@ -20,6 +22,7 @@ class PlatformApp extends PlatformAwareWidget<MaterialApp, CupertinoApp> {
       title: this.title,
       theme: this.theme?.material(),
       onGenerateRoute: routes,
+      navigatorKey: navigatorKey,
     );
   }
 
@@ -31,6 +34,7 @@ class PlatformApp extends PlatformAwareWidget<MaterialApp, CupertinoApp> {
       theme: this.theme?.cupertino(),
       onGenerateRoute: routes,
       onUnknownRoute: (RouteSettings settings) => CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings),
+      navigatorKey: navigatorKey,
     );
   }
 
@@ -42,6 +46,9 @@ class PlatformApp extends PlatformAwareWidget<MaterialApp, CupertinoApp> {
       case '/home':
         print('[Router] Homepage');
         return CupertinoPageRoute(builder: (_) => HomePage(), settings: settings);
+      case '/login':
+        print('[Router] Login');
+        return CupertinoPageRoute(builder: (_) => LoginPage(), settings: settings);
       case '/discussion':
         print('[Router] Discussion');
         return CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings);

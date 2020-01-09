@@ -20,6 +20,13 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
   var data = [];
 
   @override
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     var slivers = <Widget>[];
 

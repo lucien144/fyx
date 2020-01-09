@@ -1,19 +1,22 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:fyx/PlatformApp.dart';
+import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/controllers/ApiProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/exceptions/AuthException.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/LoginResponse.dart';
+import 'package:fyx/theme/L.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum AUTH_STATES { AUTH_INVALID_USERNAME, AUTH_NEW, AUTH_EXISTING }
 
 class ApiController {
   static ApiController _instance = ApiController._init();
-
   IApiProvider provider;
+  bool isLoggingIn = false;
 
   factory ApiController() {
     return _instance;
@@ -21,9 +24,21 @@ class ApiController {
 
   ApiController._init() {
     provider = ApiProvider();
+    provider.onAuthError = () {
+      // API returns the same error on authorization as well as on normal data request. Therefore this "workaround".
+      if (isLoggingIn) {
+        return;
+      }
+
+      this.logout();
+      PlatformTheme.error(L.AUTH_ERROR);
+      PlatformApp.navigatorKey.currentState.pushNamed('/login');
+    };
+    provider.onError = (message) => PlatformTheme.error(message);
   }
 
   Future<LoginResponse> login(String nickname) async {
+    isLoggingIn = true;
     Response response = await provider.login(nickname);
     var loginResponse = LoginResponse.fromJson(jsonDecode(response.data));
     if (!loginResponse.isAuthorized) {
@@ -34,6 +49,7 @@ class ApiController {
     await Future.wait([prefs.setString('token', loginResponse.authToken), prefs.setString('nickname', nickname)]);
     var credentials = Credentials(nickname, loginResponse.authToken);
     provider.setCredentials(credentials);
+    isLoggingIn = false;
     return loginResponse;
   }
 

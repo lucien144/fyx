@@ -17,6 +17,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiMock implements IApiProvider {
   final String loginJsonResponse;
+  TOnError onError;
+  TOnAuthError onAuthError;
 
   ApiMock(this.loginJsonResponse);
 
