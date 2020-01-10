@@ -39,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
           padding: EdgeInsets.all(16),
           child: Image.asset(
             'assets/logo.png',
-            color: Color(0xff007F90),
+            color: T.COLOR_SECONDARY,
           ),
           decoration:
               BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(32), boxShadow: [BoxShadow(color: Colors.black, offset: Offset(0, 0), blurRadius: 16)]),
@@ -53,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
               enabled: !isRunning,
               placeholder: 'NICKNAME',
               controller: _loginController,
-              decoration: T.BOX_DECORATION,
+              decoration: T.TEXTFIELD_DECORATION,
             ),
           ),
         ),
@@ -77,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
             ? CupertinoActivityIndicator()
             : Text(
                 'Přihlásit',
-                style: TextStyle(color: Color(0xff007F90)),
+                style: TextStyle(color: T.COLOR_SECONDARY),
               ),
         onPressed: () {
           if (isRunning) {

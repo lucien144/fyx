@@ -37,7 +37,7 @@ class FyxApp extends StatelessWidget {
       },
       child: PlatformApp(
         title: 'Fyx',
-        theme: PlatformThemeData(primaryColor: T.COLOR_PRIMARY), // Color schema -> https://mycolor.space/?hex=%231AD592&sub=1
+        theme: PlatformThemeData(primaryColor: T.COLOR_PRIMARY),
         home: _credentials is Credentials && _credentials.isValid ? HomePage() : LoginPage(),
       ),
     );
