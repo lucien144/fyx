@@ -9,6 +9,8 @@ class T {
   static final Color COLOR_BLACK = Color(0xFF282828);
 
   // Others
+  static final BoxShadow BOX_SHADOW = BoxShadow(color: Color.fromRGBO(0, 0, 0, 0.5), offset: Offset(0, 0), blurRadius: 16);
   static final BoxDecoration TEXTFIELD_DECORATION = BoxDecoration(borderRadius: BorderRadius.circular(4), color: Colors.white, border: Border.all(color: COLOR_SECONDARY));
   static final BoxDecoration CART_DECORATION = BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white, border: Border.all(color: COLOR_SECONDARY));
+  static final BoxDecoration CART_SHADOW_DECORATION = BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white, border: Border.all(color: COLOR_SECONDARY), boxShadow: [BOX_SHADOW]);
 }
