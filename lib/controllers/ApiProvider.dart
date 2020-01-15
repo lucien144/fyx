@@ -1,9 +1,11 @@
 import 'dart:convert';
 
+import 'package:device_info/device_info.dart';
 import 'package:dio/dio.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/theme/L.dart';
+import 'package:package_info/package_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiProvider implements IApiProvider {
@@ -12,8 +14,7 @@ class ApiProvider implements IApiProvider {
   // ignore: non_constant_identifier_names
   final URL = 'https://www.nyx.cz/api.php';
 
-  // ignore: non_constant_identifier_names
-  final OPTIONS = Options(headers: {'User-Agent': 'Fyx'});
+  Options _options = Options(headers: {'user-agent': 'Fyx'});
 
   Credentials _credentials;
 
@@ -32,6 +33,15 @@ class ApiProvider implements IApiProvider {
   setCredentials(Credentials val) => _credentials = val.isValid ? val : throw Exception('Invalid credentials');
 
   ApiProvider() {
+    try {
+      DeviceInfoPlugin()
+        ..iosInfo.then((iosInfo) {
+          PackageInfo.fromPlatform().then((info) {
+            _options.headers['user-agent'] = '${_options.headers['user-agent']} | ${iosInfo.systemName} | ${info.version} (${info.buildNumber}) | ${iosInfo.name}';
+          });
+        });
+    } catch (e) {}
+    
     SharedPreferences.getInstance().then((prefs) {
       _credentials = Credentials(prefs.getString('nickname'), prefs.getString('token'));
     });
@@ -71,21 +81,21 @@ class ApiProvider implements IApiProvider {
 
   Future<Response> login(String username) async {
     FormData formData = new FormData.fromMap({'auth_nick': username});
-    return await dio.post(URL, data: formData, options: OPTIONS);
+    return await dio.post(URL, data: formData, options: _options);
   }
 
   Future<Response> fetchBookmarks() async {
     FormData formData = new FormData.fromMap({'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'bookmarks', 'l2': 'all'});
-    return await dio.post(URL, data: formData, options: OPTIONS);
+    return await dio.post(URL, data: formData, options: _options);
   }
 
   Future<Response> fetchHistory() async {
     FormData formData = new FormData.fromMap({'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'bookmarks', 'l2': 'history'});
-    return await dio.post(URL, data: formData, options: OPTIONS);
+    return await dio.post(URL, data: formData, options: _options);
   }
 
   Future<Response> fetchDiscussion(int id) async {
     FormData formData = new FormData.fromMap({'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'discussion', 'l2': 'messages', 'id': id});
-    return await dio.post(URL, data: formData, options: OPTIONS);
+    return await dio.post(URL, data: formData, options: _options);
   }
 }
