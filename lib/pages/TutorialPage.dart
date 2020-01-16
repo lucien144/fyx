@@ -6,12 +6,12 @@ import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class TokenPage extends StatefulWidget {
+class TutorialPage extends StatefulWidget {
   @override
-  _TokenPageState createState() => _TokenPageState();
+  _TutorialPageState createState() => _TutorialPageState();
 }
 
-class _TokenPageState extends State<TokenPage> {
+class _TutorialPageState extends State<TutorialPage> {
   CarouselSlider _slider;
 
   @override
