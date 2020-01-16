@@ -5,7 +5,7 @@ import 'package:fyx/PlatformThemeData.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/pages/HomePage.dart';
 import 'package:fyx/pages/LoginPage.dart';
-import 'package:fyx/pages/TokenPage.dart';
+import 'package:fyx/pages/TutorialPage.dart';
 
 class PlatformApp extends PlatformAwareWidget<MaterialApp, CupertinoApp> {
   final Widget home;
@@ -42,7 +42,7 @@ class PlatformApp extends PlatformAwareWidget<MaterialApp, CupertinoApp> {
     switch (settings.name) {
       case '/token':
         print('[Router] Token');
-        return CupertinoPageRoute(builder: (_) => TokenPage(), settings: settings);
+        return CupertinoPageRoute(builder: (_) => TutorialPage(), settings: settings);
       case '/home':
         print('[Router] Homepage');
         return CupertinoPageRoute(builder: (_) => HomePage(), settings: settings);
