@@ -2,7 +2,9 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TokenPage extends StatefulWidget {
   @override
@@ -58,7 +60,14 @@ class _TokenPageState extends State<TokenPage> {
                     children: <Widget>[
                       CupertinoButton(
                         child: Text('Otevřít nyx.cz'),
-                        onPressed: () => print(''),
+                        onPressed: () async {
+                          const url = 'https://www.nyx.cz/index.php?l=user;l2=2;section=authorizations;n=1ba4';
+                          if (await canLaunch(url)) {
+                            await launch(url);
+                          } else {
+                            PlatformTheme.error('Nepodařilo se otevřít prohlížeč.');
+                          }
+                        },
                       ),
                       Icon(
                         Icons.launch,
