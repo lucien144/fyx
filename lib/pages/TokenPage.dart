@@ -57,7 +57,7 @@ class _TokenPageState extends State<TokenPage> {
 
     return CarouselSlider.builder(
       enableInfiniteScroll: false,
-      enlargeCenterPage: true,
+      enlargeCenterPage: false,
       itemCount: slides.length,
       itemBuilder: (BuildContext context, int i) => Padding(
         padding: const EdgeInsets.all(16.0),
@@ -79,7 +79,7 @@ class _TokenPageState extends State<TokenPage> {
   }
 
   Widget slideCard(Widget child) {
-    return Container(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16), decoration: T.CART_SHADOW_DECORATION, child: child);
+    return Container(height: 230, padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16), decoration: T.CART_SHADOW_DECORATION, child: child);
   }
 
   Widget slide(String title, String copy, Widget footer) {
@@ -118,14 +118,18 @@ class _TokenPageState extends State<TokenPage> {
                 'Začneme tím, že si zkopíruješ potřebný klíč do schránky:',
                 textAlign: TextAlign.center,
               ),
-              SizedBox(
-                height: 8,
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    SelectableText(
+                      token,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                    ),
+                  ],
+                ),
               ),
-              SelectableText(
-                token,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              )
             ],
           ),
         ),
@@ -134,7 +138,14 @@ class _TokenPageState extends State<TokenPage> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Icon(Icons.content_copy, color: T.COLOR_SECONDARY),
+              Icon(
+                Icons.content_copy,
+                color: T.COLOR_SECONDARY,
+                size: 16,
+              ),
+              SizedBox(
+                width: 4,
+              ),
               Text(
                 'Zkopírovat',
                 style: TextStyle(color: T.COLOR_SECONDARY),
@@ -163,6 +174,7 @@ class _TokenPageState extends State<TokenPage> {
         ),
         SizedBox(height: 16),
         this.slideCard(Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Text(copy, textAlign: TextAlign.center),
             Image.asset(
