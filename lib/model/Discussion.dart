@@ -14,9 +14,9 @@ class Discussion {
     this._id_cat = int.parse(json['id_cat'] ?? '0');
     this._jmeno = json['jmeno'];
     this._unread = int.parse(json['unread']);
-    this._replies = int.parse(json['replies']);
-    this._images = int.parse(json['images']);
-    this._links = int.parse(json['links']);
+    this._replies = int.parse(json['replies'] ?? '0'); // Premium
+    this._images = int.parse(json['images'] ?? '0'); // Premium
+    this._links = int.parse(json['links'] ?? '0'); // Premium
   }
 
   int get links => _links;
