@@ -45,19 +45,36 @@ class _TokenPageState extends State<TokenPage> {
       this.slideTutorial('5/6', 4, '... a klíč vlož do prázdného pole na řádku s nápisem "Fyx".'),
       this.slide(
           '6/6',
-          'Nyní zbývá otevřít Nyx, uložit kód podle návodu a přihlásit se!',
-          Column(children: <Widget>[
-            slideButton('Otevřít nyx.cz', null),
-            SizedBox(
-              height: 8,
-            ),
-            slideButton('Přihlásit se', () => Navigator.of(context).pushNamed('/home'))
-          ]))
+          Column(
+            children: <Widget>[
+              Text(
+                'Nyní zbývá otevřít Nyx, uložit kód podle návodu a přihlásit se! Pokud jsi kód již uložil, můžeš se rovnou přihlásit.',
+                textAlign: TextAlign.center,
+              ),
+              Expanded(
+                child: Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      CupertinoButton(
+                        child: Text('Otevřít nyx.cz'),
+                        onPressed: () => print(''),
+                      ),
+                      Icon(
+                        Icons.launch,
+                        size: 16,
+                      )
+                    ],
+                  )
+                ]),
+              ),
+            ],
+          ),
+          slideButton('Přihlásit se', () => Navigator.of(context).pushNamed('/home')))
     ];
 
     return CarouselSlider.builder(
       enableInfiniteScroll: false,
-      enlargeCenterPage: false,
       itemCount: slides.length,
       itemBuilder: (BuildContext context, int i) => Padding(
         padding: const EdgeInsets.all(16.0),
@@ -82,7 +99,21 @@ class _TokenPageState extends State<TokenPage> {
     return Container(height: 230, padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16), decoration: T.CART_SHADOW_DECORATION, child: child);
   }
 
-  Widget slide(String title, String copy, Widget footer) {
+  Widget slide(String title, dynamic middle, Widget footer) {
+    Widget body;
+
+    if (middle is String) {
+      body = Text(middle, textAlign: TextAlign.center);
+    }
+
+    if (middle is Widget) {
+      body = middle;
+    }
+
+    if (body == null) {
+      throw Exception('Middle section can be String or Widget only!');
+    }
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -91,11 +122,7 @@ class _TokenPageState extends State<TokenPage> {
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         SizedBox(height: 16),
-        this.slideCard(
-          Column(
-            children: <Widget>[Text(copy, textAlign: TextAlign.center)],
-          ),
-        ),
+        this.slideCard(body),
         SizedBox(height: 16),
         footer != null ? footer : slideButton('Začít', null)
       ],
