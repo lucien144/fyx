@@ -51,7 +51,7 @@ class _TokenPageState extends State<TokenPage> {
             SizedBox(
               height: 8,
             ),
-            slideButton('Přihlásit se', null)
+            slideButton('Přihlásit se', () => Navigator.of(context).pushNamed('/home'))
           ]))
     ];
 
