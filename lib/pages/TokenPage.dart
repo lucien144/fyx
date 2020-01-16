@@ -11,7 +11,6 @@ class TokenPage extends StatefulWidget {
 
 class _TokenPageState extends State<TokenPage> {
   CarouselSlider _slider;
-  int _slidesCounter = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +33,27 @@ class _TokenPageState extends State<TokenPage> {
 
   Widget carouselFactory(BuildContext context) {
     String token = ModalRoute.of(context).settings.arguments;
-    List<Widget> slides = [this.slideOne(), this.slideTwo(token), this.slideThree()];
+    List<Widget> slides = [
+      this.slide(
+          'Paráda 🤘',
+          'První část autorizace se zdařila.\n\nNyní je potřeba uložit speciální klíč (něco jako heslo) pod tvůj účet na nyxu.\n\nTím se autorizace dokončí a budeš moci začít používat Fyx.',
+          null),
+      this.slideToken('1/6', token),
+      this.slideTutorial('2/6', 1, 'Klíč bude nyní potřeba uložit do sekce Osobní...'),
+      this.slideTutorial('3/6', 2, '... dále přejdi do Nastavení ...'),
+      this.slideTutorial('4/6', 3, '... v podmenu klikni na Autorizace ...'),
+      this.slideTutorial('5/6', 4, '... a klíč vlož do prázdného pole na řádku s nápisem "Fyx".'),
+      this.slide(
+          '6/6',
+          'Nyní zbývá otevřít Nyx, uložit kód podle návodu a přihlásit se!',
+          Column(children: <Widget>[
+            slideButton('Otevřít nyx.cz', null),
+            SizedBox(
+              height: 8,
+            ),
+            slideButton('Přihlásit se', null)
+          ]))
+    ];
 
     return CarouselSlider.builder(
       enableInfiniteScroll: false,
@@ -48,61 +67,63 @@ class _TokenPageState extends State<TokenPage> {
     );
   }
 
-  Widget slideCard(Widget child) {
-    return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
-        decoration: T.CART_SHADOW_DECORATION,
-        child: child);
+  Widget slideButton(String label, Function onTap) {
+    return CupertinoButton(
+      child: Text(
+        label,
+        style: TextStyle(color: T.COLOR_SECONDARY),
+      ),
+      color: Colors.white,
+      onPressed: () => onTap is Function ? onTap() : _slider.nextPage(duration: Duration(milliseconds: 800), curve: Curves.fastOutSlowIn),
+    );
   }
 
-  Widget slideOne() {
+  Widget slideCard(Widget child) {
+    return Container(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16), decoration: T.CART_SHADOW_DECORATION, child: child);
+  }
+
+  Widget slide(String title, String copy, Widget footer) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Text(
-          'Paráda 🤘',
+          title,
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         SizedBox(height: 16),
-        this.slideCard(Column(
-            children: <Widget>[
-              Text(
-                  'První krok autorizace se zdařil.\n\nNyní je potřeba uložit speciální autorizační klíč pod tvůj\núčet na nyxu.\nTím se autorizace dokončí a budeš moci začít používat Fyx.', textAlign: TextAlign.center)
-            ],
+        this.slideCard(
+          Column(
+            children: <Widget>[Text(copy, textAlign: TextAlign.center)],
           ),
         ),
         SizedBox(height: 16),
-        CupertinoButton(
-          child: Text(
-            'Začít',
-            style: TextStyle(color: T.COLOR_SECONDARY),
-          ),
-          color: Colors.white,
-          onPressed: () => _slider.nextPage(duration: Duration(milliseconds: 800), curve: Curves.fastOutSlowIn),
-        )
+        footer != null ? footer : slideButton('Začít', null)
       ],
     );
   }
 
-  Widget slideTwo(String token) {
-    _slidesCounter++;
-
+  Widget slideToken(String title, String token) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Text(
-          '1/$_slidesCounter',
+          title,
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         SizedBox(height: 16),
-        this.slideCard(Column(
+        this.slideCard(
+          Column(
             children: <Widget>[
-              Text('Začneme tím, že si zkopíruješ potřebný klíč do schránky:', textAlign: TextAlign.center,),
+              Text(
+                'Začneme tím, že si zkopíruješ potřebný klíč do schránky:',
+                textAlign: TextAlign.center,
+              ),
               SizedBox(
                 height: 8,
               ),
               SelectableText(
-                token, textAlign: TextAlign.center,
+                token,
+                textAlign: TextAlign.center,
                 style: TextStyle(fontWeight: FontWeight.bold),
               )
             ],
@@ -132,32 +153,26 @@ class _TokenPageState extends State<TokenPage> {
     );
   }
 
-  Widget slideThree() {
-    _slidesCounter++;
-
+  Widget slideTutorial(String title, int step, String copy) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Text(
-          '2/$_slidesCounter',
+          title,
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         SizedBox(height: 16),
         this.slideCard(Column(
           children: <Widget>[
-            Text('Klíč bude nyní potřeba uložit do sekce Osobní...', textAlign: TextAlign.center),
-            Image.asset('assets/tutorial-1.png', width: 300,)
+            Text(copy, textAlign: TextAlign.center),
+            Image.asset(
+              'assets/tutorial-$step.png',
+              width: 300,
+            )
           ],
         )),
         SizedBox(height: 16),
-        CupertinoButton(
-          child: Text(
-            'Další krok',
-            style: TextStyle(color: T.COLOR_SECONDARY),
-          ),
-          onPressed: () {},
-          color: Colors.white,
-        )
+        slideButton('Další krok', null)
       ],
     );
   }
