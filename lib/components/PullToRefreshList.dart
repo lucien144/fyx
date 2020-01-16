@@ -106,6 +106,8 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
     try {
       data = await widget.dataProvider();
     } catch (error) {
+      print(error);
+      print(StackTrace.current);
       setState(() => hasError = true);
     } finally {
       setState(() => isLoading = false);
