@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/theme/T.dart';
@@ -13,16 +14,87 @@ class TutorialPage extends StatefulWidget {
 
 class _TutorialPageState extends State<TutorialPage> {
   CarouselSlider _slider;
+  List<Widget> _slides;
+
+  bool hasOpenedNyx = false;
+  String token = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _slider = initCarousel();
+  }
+
+  Widget initCarousel() {
+    _slides = [
+      this.slide(
+          'Paráda 🤘',
+          'První část autorizace se zdařila.\n\nNyní je potřeba uložit speciální klíč (něco jako heslo) pod tvůj účet na nyxu.\n\nTím se autorizace dokončí a budeš moci začít používat Fyx.',
+          null),
+      this.slideToken('1/6'),
+      this.slideTutorial('2/6', 1, 'Klíč bude nyní potřeba uložit do sekce Osobní...'),
+      this.slideTutorial('3/6', 2, '... dále přejdi do Nastavení ...'),
+      this.slideTutorial('4/6', 3, '... v podmenu klikni na Autorizace ...'),
+      this.slideTutorial('5/6', 4, '... a klíč vlož do prázdného pole na řádku s nápisem "Fyx".'),
+      this.slide(
+          '6/6',
+          'Nyní zbývá otevřít Nyx, uložit kód podle návodu a přihlásit se!',
+          hasOpenedNyx
+              ? slideButton('Přihlásit se',
+                  icon: Icon(
+                    Icons.lock,
+                    color: T.COLOR_SECONDARY,
+                    size: 16,
+                  ),
+                  onTap: () => Navigator.of(context).pushNamed('/home'))
+              : slideButton('Otevřít nyx.cz',
+                  icon: Icon(
+                    Icons.launch,
+                    color: T.COLOR_SECONDARY,
+                    size: 16,
+                  ), onTap: () async {
+                  const url = 'https://www.nyx.cz/index.php?l=user;l2=2;section=authorizations;n=1ba4';
+                  try {
+                    if (await canLaunch(url)) {
+                      await launch(url);
+                    } else {
+                      PlatformTheme.error('Nepodařilo se otevřít prohlížeč.');
+                    }
+                  } finally {
+                    setState(() => hasOpenedNyx = true);
+                  }
+                }))
+    ];
+
+    return CarouselSlider.builder(
+      enableInfiniteScroll: false,
+      itemCount: _slides.length,
+      itemBuilder: (BuildContext context, int i) => Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: _slides[i],
+      ),
+      height: 500,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    _slider = carouselFactory(context);
+    if (token == '') {
+      token = ModalRoute.of(context).settings.arguments;
+      this.initCarousel();
+    }
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
+        previousPageTitle: 'Přihlášení',
         backgroundColor: Colors.transparent,
         actionsForegroundColor: Colors.white,
-        border: Border.all(color: Colors.transparent, width: 0.0, style: BorderStyle.none),
+        border: Border.all(color: Colors.transparent, width: 0, style: BorderStyle.none),
+        trailing: CupertinoButton(
+          padding: EdgeInsets.all(0),
+          child: Text('Přeskočit'),
+          onPressed: () => _slider.jumpToPage(_slides.length - 1),
+        ),
       ),
       child: Container(
         padding: EdgeInsets.all(16),
@@ -33,96 +105,31 @@ class _TutorialPageState extends State<TutorialPage> {
     );
   }
 
-  Widget carouselFactory(BuildContext context) {
-    String token = ModalRoute.of(context).settings.arguments;
-    List<Widget> slides = [
-      this.slide(
-          'Paráda 🤘',
-          'První část autorizace se zdařila.\n\nNyní je potřeba uložit speciální klíč (něco jako heslo) pod tvůj účet na nyxu.\n\nTím se autorizace dokončí a budeš moci začít používat Fyx.',
-          null),
-      this.slideToken('1/6', token),
-      this.slideTutorial('2/6', 1, 'Klíč bude nyní potřeba uložit do sekce Osobní...'),
-      this.slideTutorial('3/6', 2, '... dále přejdi do Nastavení ...'),
-      this.slideTutorial('4/6', 3, '... v podmenu klikni na Autorizace ...'),
-      this.slideTutorial('5/6', 4, '... a klíč vlož do prázdného pole na řádku s nápisem "Fyx".'),
-      this.slide(
-          '6/6',
-          Column(
-            children: <Widget>[
-              Text(
-                'Nyní zbývá otevřít Nyx, uložit kód podle návodu a přihlásit se! Pokud jsi kód již uložil, můžeš se rovnou přihlásit.',
-                textAlign: TextAlign.center,
-              ),
-              Expanded(
-                child: Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      CupertinoButton(
-                        child: Text('Otevřít nyx.cz'),
-                        onPressed: () async {
-                          const url = 'https://www.nyx.cz/index.php?l=user;l2=2;section=authorizations;n=1ba4';
-                          if (await canLaunch(url)) {
-                            await launch(url);
-                          } else {
-                            PlatformTheme.error('Nepodařilo se otevřít prohlížeč.');
-                          }
-                        },
-                      ),
-                      Icon(
-                        Icons.launch,
-                        size: 16,
-                      )
-                    ],
-                  )
-                ]),
-              ),
-            ],
-          ),
-          slideButton('Přihlásit se', () => Navigator.of(context).pushNamed('/home')))
-    ];
-
-    return CarouselSlider.builder(
-      enableInfiniteScroll: false,
-      itemCount: slides.length,
-      itemBuilder: (BuildContext context, int i) => Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: slides[i],
-      ),
-      height: 500,
+  Widget slideButton(String label, {Widget icon, Function onTap}) {
+    Widget body;
+    Text text = Text(
+      label,
+      style: TextStyle(color: T.COLOR_SECONDARY),
     );
-  }
 
-  Widget slideButton(String label, Function onTap) {
+    if (icon is Widget) {
+      body = Row(mainAxisSize: MainAxisSize.min, children: <Widget>[
+        icon,
+        SizedBox(
+          width: 4,
+        ),
+        text
+      ]);
+    }
+
     return CupertinoButton(
-      child: Text(
-        label,
-        style: TextStyle(color: T.COLOR_SECONDARY),
-      ),
+      child: body is Widget ? body : text,
       color: Colors.white,
       onPressed: () => onTap is Function ? onTap() : _slider.nextPage(duration: Duration(milliseconds: 800), curve: Curves.fastOutSlowIn),
     );
   }
 
-  Widget slideCard(Widget child) {
-    return Container(height: 230, padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16), decoration: T.CART_SHADOW_DECORATION, child: child);
-  }
-
-  Widget slide(String title, dynamic middle, Widget footer) {
-    Widget body;
-
-    if (middle is String) {
-      body = Text(middle, textAlign: TextAlign.center);
-    }
-
-    if (middle is Widget) {
-      body = middle;
-    }
-
-    if (body == null) {
-      throw Exception('Middle section can be String or Widget only!');
-    }
-
+  Widget slide(String title, String copy, Widget footer) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -131,14 +138,18 @@ class _TutorialPageState extends State<TutorialPage> {
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         SizedBox(height: 16),
-        this.slideCard(body),
+        this.slideCard(Text(copy, textAlign: TextAlign.center)),
         SizedBox(height: 16),
-        footer != null ? footer : slideButton('Začít', null)
+        footer != null ? footer : slideButton('Začít')
       ],
     );
   }
 
-  Widget slideToken(String title, String token) {
+  Widget slideCard(Widget child) {
+    return Container(height: 250, padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16), decoration: T.CART_SHADOW_DECORATION, child: child);
+  }
+
+  Widget slideToken(String title) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -170,32 +181,17 @@ class _TutorialPageState extends State<TutorialPage> {
           ),
         ),
         SizedBox(height: 16),
-        CupertinoButton(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Icon(
-                Icons.content_copy,
-                color: T.COLOR_SECONDARY,
-                size: 16,
-              ),
-              SizedBox(
-                width: 4,
-              ),
-              Text(
-                'Zkopírovat',
-                style: TextStyle(color: T.COLOR_SECONDARY),
-              ),
-            ],
-          ),
-          onPressed: () {
-            var data = ClipboardData(text: token);
-            Clipboard.setData(data).then((_) {
-              _slider.nextPage(duration: Duration(milliseconds: 800), curve: Curves.fastOutSlowIn);
-            });
-          },
-          color: Colors.white,
-        )
+        slideButton('Zkopírovat',
+            icon: Icon(
+              Icons.content_copy,
+              color: T.COLOR_SECONDARY,
+              size: 16,
+            ), onTap: () {
+          var data = ClipboardData(text: token);
+          Clipboard.setData(data).then((_) {
+            _slider.nextPage(duration: Duration(milliseconds: 800), curve: Curves.fastOutSlowIn);
+          });
+        })
       ],
     );
   }
@@ -220,7 +216,7 @@ class _TutorialPageState extends State<TutorialPage> {
           ],
         )),
         SizedBox(height: 16),
-        slideButton('Další krok', null)
+        slideButton('Další krok')
       ],
     );
   }
