@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -37,12 +36,7 @@ class PostListItem extends ListItemWithCategory {
                 return null;
               }
 
-              return CachedNetworkImage(
-                alignment: Alignment.topLeft,
-                imageUrl: this.post.images[0].thumb,
-                placeholder: (context, url) => CupertinoActivityIndicator(),
-                errorWidget: (context, url, error) => Icon(Icons.error),
-              );
+              return PostHeroAttachment(this.post.images[0], crop: false);
             });
 
     _layoutMap.putIfAbsent(

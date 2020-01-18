@@ -9,8 +9,9 @@ import 'package:fyx/model/post/Video.dart';
 
 class PostHeroAttachment extends StatelessWidget {
   final dynamic attachment;
+  final bool _crop;
 
-  PostHeroAttachment(this.attachment);
+  PostHeroAttachment(this.attachment, {crop = true}) : this._crop = crop;
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +24,8 @@ class PostHeroAttachment extends StatelessWidget {
           placeholder: (context, url) => CupertinoActivityIndicator(),
           errorWidget: (context, url, error) => Icon(Icons.error),
           fit: BoxFit.cover,
-          width: 100,
-          height: 100,
+          width: _crop ? 100 : null,
+          height: _crop ? 100 : null,
         ),
       );
     }
