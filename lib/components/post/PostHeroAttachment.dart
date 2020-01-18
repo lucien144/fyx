@@ -16,16 +16,22 @@ class PostHeroAttachment extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (attachment is model.Image) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: CachedNetworkImage(
-          alignment: Alignment.topLeft,
-          imageUrl: attachment.thumb,
-          placeholder: (context, url) => CupertinoActivityIndicator(),
-          errorWidget: (context, url, error) => Icon(Icons.error),
-          fit: BoxFit.cover,
-          width: _crop ? 100 : null,
-          height: _crop ? 100 : null,
+      return GestureDetector(
+        onTap: () => Navigator.of(context).pushNamed('/gallery', arguments: attachment),
+        child: Hero(
+          tag: attachment.hashCode,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: CachedNetworkImage(
+              alignment: Alignment.topLeft,
+              imageUrl: attachment.thumb,
+              placeholder: (context, url) => CupertinoActivityIndicator(),
+              errorWidget: (context, url, error) => Icon(Icons.error),
+              fit: BoxFit.cover,
+              width: _crop ? 100 : null,
+              height: _crop ? 100 : null,
+            ),
+          ),
         ),
       );
     }
