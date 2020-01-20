@@ -16,73 +16,88 @@ class _TutorialPageState extends State<TutorialPage> {
   CarouselSlider _slider;
   List<Widget> _slides;
 
-  bool hasOpenedNyx = false;
-  String token = '';
+  bool _hasOpenedNyx = false;
+  bool _isLastSlide = false;
+  String _token = '';
 
   @override
   void initState() {
     super.initState();
-    _slider = initCarousel();
+    buildSlider();
   }
 
-  Widget initCarousel() {
-    _slides = [
-      this.slide(
-          'Paráda 🤘',
-          'První část autorizace se zdařila.\n\nNyní je potřeba uložit speciální klíč (něco jako heslo) pod tvůj účet na nyxu.\n\nTím se autorizace dokončí a budeš moci začít používat Fyx.',
-          null),
-      this.slideToken('1/6'),
-      this.slideTutorial('2/6', 1, 'Klíč bude nyní potřeba uložit do sekce Osobní...'),
-      this.slideTutorial('3/6', 2, '... dále přejdi do Nastavení ...'),
-      this.slideTutorial('4/6', 3, '... v podmenu klikni na Autorizace ...'),
-      this.slideTutorial('5/6', 4, '... a klíč vlož do prázdného pole na řádku s nápisem "Fyx".'),
-      this.slide(
-          '6/6',
-          'Nyní zbývá otevřít Nyx, uložit kód podle návodu a přihlásit se!',
-          hasOpenedNyx
-              ? slideButton('Přihlásit se',
-                  icon: Icon(
-                    Icons.lock,
-                    color: T.COLOR_SECONDARY,
-                    size: 16,
-                  ),
-                  onTap: () => Navigator.of(context).pushNamed('/home'))
-              : slideButton('Otevřít nyx.cz',
-                  icon: Icon(
-                    Icons.launch,
-                    color: T.COLOR_SECONDARY,
-                    size: 16,
-                  ), onTap: () async {
-                  const url = 'https://www.nyx.cz/index.php?l=user;l2=2;section=authorizations;n=1ba4';
-                  try {
-                    if (await canLaunch(url)) {
-                      await launch(url);
-                    } else {
+  void buildSlider() {
+    setState(() {
+      _slides = [
+        this.slide(
+            'Paráda 🤘',
+            'První část autorizace se zdařila.\n\nNyní je potřeba uložit speciální klíč (něco jako heslo) pod tvůj účet na nyxu.\n\nTím se autorizace dokončí a budeš moci začít používat Fyx.',
+            null),
+        this.slideToken('1/6'),
+        this.slideTutorial('2/6', 1, 'Klíč bude nyní potřeba uložit do sekce Osobní...'),
+        this.slideTutorial('3/6', 2, '... dále přejdi do Nastavení ...'),
+        this.slideTutorial('4/6', 3, '... v podmenu klikni na Autorizace ...'),
+        this.slideTutorial('5/6', 4, '... a klíč vlož do prázdného pole na řádku s nápisem "Fyx".'),
+        this.slide(
+            '6/6',
+            'Nyní zbývá otevřít Nyx, uložit kód podle návodu a přihlásit se!',
+            _hasOpenedNyx
+                ? slideButton('Přihlásit se',
+                    icon: Icon(
+                      Icons.lock,
+                      color: T.COLOR_SECONDARY,
+                      size: 16,
+                    ),
+                    onTap: () => Navigator.of(context).pushNamed('/home'))
+                : slideButton('Otevřít nyx.cz',
+                    icon: Icon(
+                      Icons.launch,
+                      color: T.COLOR_SECONDARY,
+                      size: 16,
+                    ), onTap: () async {
+                    setState(() => _hasOpenedNyx = true);
+                    const url = 'https://www.nyx.cz/index.php?l=user;l2=2;section=authorizations;n=1ba4';
+                    try {
+                      if (await canLaunch(url)) {
+                        await launch(url);
+                      } else {
+                        PlatformTheme.error('Nepodařilo se otevřít prohlížeč.');
+                      }
+                    } catch (e) {
                       PlatformTheme.error('Nepodařilo se otevřít prohlížeč.');
                     }
-                  } finally {
-                    setState(() => hasOpenedNyx = true);
-                  }
-                }))
-    ];
-
-    return CarouselSlider.builder(
-      enableInfiniteScroll: false,
-      itemCount: _slides.length,
-      itemBuilder: (BuildContext context, int i) => Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: _slides[i],
-      ),
-      height: 500,
-    );
+                  }))
+      ];
+      _slider = CarouselSlider.builder(
+        enableInfiniteScroll: false,
+        itemCount: _slides.length,
+        itemBuilder: (BuildContext context, int i) => Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: _slides[i],
+        ),
+        height: 500,
+        onPageChanged: (i) {
+          print(i);
+          print(_slides.length);
+          if (i == _slides.length - 1) {
+            setState(() => _isLastSlide = true);
+          } else {
+            if (_isLastSlide) {
+              setState(() => _isLastSlide = false);
+            }
+          }
+        },
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (token == '') {
-      token = ModalRoute.of(context).settings.arguments;
-      this.initCarousel();
+    if (_token == '') {
+      _token = ModalRoute.of(context).settings.arguments;
     }
+
+    buildSlider();
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
@@ -90,11 +105,13 @@ class _TutorialPageState extends State<TutorialPage> {
         backgroundColor: Colors.transparent,
         actionsForegroundColor: Colors.white,
         border: Border.all(color: Colors.transparent, width: 0, style: BorderStyle.none),
-        trailing: CupertinoButton(
-          padding: EdgeInsets.all(0),
-          child: Text('Přeskočit'),
-          onPressed: () => _slider.jumpToPage(_slides.length - 1),
-        ),
+        trailing: _isLastSlide
+            ? null
+            : CupertinoButton(
+                padding: EdgeInsets.all(0),
+                child: Text('Přeskočit'),
+                onPressed: () => _slider.jumpToPage(_slides.length - 1),
+              ),
       ),
       child: Container(
         padding: EdgeInsets.all(16),
@@ -170,7 +187,7 @@ class _TutorialPageState extends State<TutorialPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
                     SelectableText(
-                      token,
+                      _token,
                       textAlign: TextAlign.center,
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
                     ),
@@ -187,7 +204,7 @@ class _TutorialPageState extends State<TutorialPage> {
               color: T.COLOR_SECONDARY,
               size: 16,
             ), onTap: () {
-          var data = ClipboardData(text: token);
+          var data = ClipboardData(text: _token);
           Clipboard.setData(data).then((_) {
             _slider.nextPage(duration: Duration(milliseconds: 800), curve: Curves.fastOutSlowIn);
           });
