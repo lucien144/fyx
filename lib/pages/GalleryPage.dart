@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:fyx/model/post/Image.dart' as model;
 import 'package:photo_view/photo_view.dart';
 
@@ -18,12 +19,19 @@ class _GalleryPageState extends State<GalleryPage> {
     }
 
     return Container(
+      decoration: BoxDecoration(color: Colors.black.withOpacity(0.90)),
       constraints: BoxConstraints.expand(
         height: MediaQuery.of(context).size.height,
       ),
-      child: PhotoView(
-        heroAttributes: PhotoViewHeroAttributes(tag: image.hashCode),
-        imageProvider: CachedNetworkImageProvider(image.image),
+      child: Dismissible(
+        key: UniqueKey(),
+        direction: DismissDirection.vertical,
+        onDismissed: (int) => Navigator.of(context).pop(),
+        child: PhotoView(
+          backgroundDecoration: BoxDecoration(color: Colors.transparent),
+          heroAttributes: PhotoViewHeroAttributes(tag: image.hashCode),
+          imageProvider: CachedNetworkImageProvider(image.image),
+        ),
       ),
     );
   }
