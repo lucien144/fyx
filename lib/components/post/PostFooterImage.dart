@@ -26,6 +26,5 @@ class PostFooterImage extends StatelessWidget {
         ),
       ),
     );
-    ;
   }
 }

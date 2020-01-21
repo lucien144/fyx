@@ -12,6 +12,6 @@ class PlatformThemeData {
   }
 
   cupertino() {
-    return CupertinoThemeData(primaryColor: primaryColor, textTheme: CupertinoTextThemeData(textStyle: TextStyle(color: T.COLOR_BLACK, fontSize: 16)));
+    return CupertinoThemeData(primaryColor: primaryColor, textTheme: CupertinoTextThemeData(primaryColor: Colors.white, textStyle: TextStyle(color: T.COLOR_BLACK, fontSize: 16)));
   }
 }
