@@ -16,7 +16,7 @@ typedef Widget TLayout();
 
 class PostListItem extends ListItemWithCategory {
   final Post post;
-  Map<LAYOUT_TYPES, TLayout> _layoutMap = {};
+  final Map<LAYOUT_TYPES, TLayout> _layoutMap = {};
 
   PostListItem(this.post) {
     // The order here is important!
