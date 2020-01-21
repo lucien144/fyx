@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:fyx/PlatformTheme.dart';
+import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -29,18 +30,15 @@ class _TutorialPageState extends State<TutorialPage> {
   void buildSlider() {
     setState(() {
       _slides = [
-        this.slide(
-            'Paráda 🤘',
-            'První část autorizace se zdařila.\n\nNyní je potřeba uložit speciální klíč (něco jako heslo) pod tvůj účet na nyxu.\n\nTím se autorizace dokončí a budeš moci začít používat Fyx.',
-            null),
+        this.slide(L.TUTORIAL_SUCCESS, L.TUTORIAL_WELCOME, null),
         this.slideToken('1/6'),
-        this.slideTutorial('2/6', 1, 'Klíč bude nyní potřeba uložit do sekce Osobní...'),
-        this.slideTutorial('3/6', 2, '... dále přejdi do Nastavení ...'),
-        this.slideTutorial('4/6', 3, '... v podmenu klikni na Autorizace ...'),
-        this.slideTutorial('5/6', 4, '... a klíč vlož do prázdného pole na řádku s nápisem "Fyx".'),
+        this.slideTutorial('2/6', 1, L.TUTORIAL_TOKEN),
+        this.slideTutorial('3/6', 2, L.TUTORIAL_SETTINGS),
+        this.slideTutorial('4/6', 3, L.TUTORIAL_AUTH),
+        this.slideTutorial('5/6', 4, L.TUTORIAL_INPUT),
         this.slide(
             '6/6',
-            'Nyní zbývá otevřít Nyx, uložit kód podle návodu a přihlásit se!',
+            L.TUTORIAL_FINAL,
             _hasOpenedNyx
                 ? slideButton('Přihlásit se',
                     icon: Icon(
@@ -49,7 +47,7 @@ class _TutorialPageState extends State<TutorialPage> {
                       size: 16,
                     ),
                     onTap: () => Navigator.of(context).pushNamed('/home'))
-                : slideButton('Otevřít nyx.cz',
+                : slideButton(L.TUTORIAL_NYX,
                     icon: Icon(
                       Icons.launch,
                       color: T.COLOR_SECONDARY,
@@ -61,10 +59,10 @@ class _TutorialPageState extends State<TutorialPage> {
                       if (await canLaunch(url)) {
                         await launch(url);
                       } else {
-                        PlatformTheme.error('Nepodařilo se otevřít prohlížeč.');
+                        PlatformTheme.error(L.INAPPBROWSER_ERROR);
                       }
                     } catch (e) {
-                      PlatformTheme.error('Nepodařilo se otevřít prohlížeč.');
+                      PlatformTheme.error(L.INAPPBROWSER_ERROR);
                     }
                   }))
       ];
@@ -101,7 +99,7 @@ class _TutorialPageState extends State<TutorialPage> {
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        previousPageTitle: 'Přihlášení',
+        previousPageTitle: L.GENERAL_LOGIN,
         backgroundColor: Colors.transparent,
         actionsForegroundColor: Colors.white,
         border: Border.all(color: Colors.transparent, width: 0, style: BorderStyle.none),
@@ -109,13 +107,13 @@ class _TutorialPageState extends State<TutorialPage> {
             ? null
             : CupertinoButton(
                 padding: EdgeInsets.all(0),
-                child: Text('Přeskočit'),
+                child: Text(L.GENERAL_SKIP),
                 onPressed: () => _slider.jumpToPage(_slides.length - 1),
               ),
       ),
       child: Container(
         padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xff1AD592), Color(0xff2F4858)])),
+        decoration: BoxDecoration(gradient: T.GRADIENT),
         child: _slider,
         height: double.infinity,
       ),
@@ -157,7 +155,7 @@ class _TutorialPageState extends State<TutorialPage> {
         SizedBox(height: 16),
         this.slideCard(Text(copy, textAlign: TextAlign.center)),
         SizedBox(height: 16),
-        footer != null ? footer : slideButton('Začít')
+        footer != null ? footer : slideButton(L.GENERAL_BEGIN)
       ],
     );
   }
@@ -179,7 +177,7 @@ class _TutorialPageState extends State<TutorialPage> {
           Column(
             children: <Widget>[
               Text(
-                'Začneme tím, že si zkopíruješ potřebný klíč do schránky:',
+                L.TUTORIAL_TOKEN_COPY,
                 textAlign: TextAlign.center,
               ),
               Expanded(
@@ -198,7 +196,7 @@ class _TutorialPageState extends State<TutorialPage> {
           ),
         ),
         SizedBox(height: 16),
-        slideButton('Zkopírovat',
+        slideButton(L.GENERAL_COPY,
             icon: Icon(
               Icons.content_copy,
               color: T.COLOR_SECONDARY,
@@ -233,7 +231,7 @@ class _TutorialPageState extends State<TutorialPage> {
           ],
         )),
         SizedBox(height: 16),
-        slideButton('Další krok')
+        slideButton(L.GENERAL_NEXT_STEP)
       ],
     );
   }
