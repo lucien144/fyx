@@ -37,11 +37,11 @@ class ApiProvider implements IApiProvider {
       DeviceInfoPlugin()
         ..iosInfo.then((iosInfo) {
           PackageInfo.fromPlatform().then((info) {
-            _options.headers['user-agent'] = '${_options.headers['user-agent']} | ${iosInfo.systemName} | ${info.version} (${info.buildNumber}) | ${iosInfo.name}';
+            _options.headers['user-agent'] = '${_options.headers['user-agent']} | ${iosInfo.systemName} | ${info.version} (${info.buildNumber}) | ${iosInfo.localizedModel}';
           });
         });
     } catch (e) {}
-    
+
     SharedPreferences.getInstance().then((prefs) {
       _credentials = Credentials(prefs.getString('nickname'), prefs.getString('token'));
     });

@@ -20,7 +20,7 @@ class _LoginPageState extends State<LoginPage> {
       onWillPop: () async => false,
       child: Container(
         padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xff1AD592), Color(0xff2F4858)])),
+        decoration: BoxDecoration(gradient: T.GRADIENT),
         child: formFactory(context),
       ),
     );
