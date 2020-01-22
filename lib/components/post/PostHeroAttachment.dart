@@ -3,21 +3,30 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/components/post/PostHeroAttachmentBox.dart';
+import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/model/post/Link.dart';
 import 'package:fyx/model/post/Video.dart';
 
+class GalleryArguments {
+  final model.Image image;
+  final Post post;
+
+  GalleryArguments(this.image, {this.post});
+}
+
 class PostHeroAttachment extends StatelessWidget {
   final dynamic attachment;
+  final Post post;
   final bool _crop;
 
-  PostHeroAttachment(this.attachment, {crop = true}) : this._crop = crop;
+  PostHeroAttachment(this.attachment, {crop = true, this.post}) : this._crop = crop;
 
   @override
   Widget build(BuildContext context) {
     if (attachment is model.Image) {
       return GestureDetector(
-        onTap: () => Navigator.of(context).pushNamed('/gallery', arguments: attachment),
+        onTap: () => Navigator.of(context).pushNamed('/gallery', arguments: GalleryArguments(attachment, post: this.post)),
         child: Hero(
           tag: attachment.hashCode,
           child: ClipRRect(

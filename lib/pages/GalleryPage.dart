@@ -1,8 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fyx/model/post/Image.dart' as model;
+import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
 
 class GalleryPage extends StatefulWidget {
   @override
@@ -10,12 +10,12 @@ class GalleryPage extends StatefulWidget {
 }
 
 class _GalleryPageState extends State<GalleryPage> {
-  model.Image image;
+  GalleryArguments _arguments;
 
   @override
   Widget build(BuildContext context) {
-    if (image == null) {
-      image = ModalRoute.of(context).settings.arguments;
+    if (_arguments == null) {
+      _arguments = ModalRoute.of(context).settings.arguments;
     }
 
     return Container(
@@ -27,10 +27,17 @@ class _GalleryPageState extends State<GalleryPage> {
         key: UniqueKey(),
         direction: DismissDirection.vertical,
         onDismissed: (int) => Navigator.of(context).pop(),
-        child: PhotoView(
-          backgroundDecoration: BoxDecoration(color: Colors.transparent),
-          heroAttributes: PhotoViewHeroAttributes(tag: image.hashCode),
-          imageProvider: CachedNetworkImageProvider(image.image),
+        child: PhotoViewGallery.builder(
+          scrollPhysics: const BouncingScrollPhysics(),
+          builder: (BuildContext context, int index) {
+            return PhotoViewGalleryPageOptions(
+              imageProvider: NetworkImage(_arguments.post.images[index].image),
+              initialScale: PhotoViewComputedScale.contained * 0.8,
+              heroAttributes: PhotoViewHeroAttributes(tag: _arguments.post.images[index].hashCode),
+            );
+          },
+          itemCount: _arguments.post.images.length,
+          loadingChild: CupertinoActivityIndicator(),
         ),
       ),
     );
