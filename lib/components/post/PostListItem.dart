@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fyx/FyxApp.dart';
 import 'package:fyx/components/ListItemWithCategory.dart';
 import 'package:fyx/components/post/PostAvatar.dart';
 import 'package:fyx/components/post/PostFooterImage.dart';
@@ -143,17 +144,23 @@ class PostListItem extends ListItemWithCategory {
             padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
             child: getContentWidget(context),
           ),
-          Container(
-            decoration: BoxDecoration(color: Colors.red),
-            child: Text('A: ${post.attachments.length} / '
-                'I: ${post.images.length} / '
-                'L: ${post.links.length} / '
-                'V: ${post.videos.length} / '
-                'Html: ${post.content.length} (${post.strippedContent.length})'),
+          Visibility(
+            visible: FyxApp.isDev,
+            child: Container(
+              decoration: BoxDecoration(color: Colors.red),
+              child: Text('A: ${post.attachments.length} / '
+                  'I: ${post.images.length} / '
+                  'L: ${post.links.length} / '
+                  'V: ${post.videos.length} / '
+                  'Html: ${post.content.length} (${post.strippedContent.length})'),
+            ),
           ),
-          Container(
-            decoration: BoxDecoration(color: Colors.green),
-            child: Text(post.content),
+          Visibility(
+            visible: FyxApp.isDev,
+            child: Container(
+              decoration: BoxDecoration(color: Colors.green),
+              child: Text(post.content),
+            ),
           )
         ],
       ),

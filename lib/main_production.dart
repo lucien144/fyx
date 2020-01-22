@@ -6,8 +6,8 @@ void main() async {
   FyxApp.init();
   try {
     var credentials = await ApiController().provider.getCredentials();
-    return runApp(FyxApp(credentials)..setEnv(Environment.dev));
+    return runApp(FyxApp(credentials)..setEnv(Environment.production));
   } catch (error) {
-    return runApp(FyxApp(null)..setEnv(Environment.dev));
+    return runApp(FyxApp(null)..setEnv(Environment.production));
   }
 }
