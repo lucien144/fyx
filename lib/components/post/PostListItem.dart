@@ -36,7 +36,11 @@ class PostListItem extends ListItemWithCategory {
                 return null;
               }
 
-              return PostHeroAttachment(this.post.images[0], crop: false);
+              return PostHeroAttachment(
+                this.post.images[0],
+                crop: false,
+                post: this.post,
+              );
             });
 
     _layoutMap.putIfAbsent(
@@ -48,7 +52,7 @@ class PostListItem extends ListItemWithCategory {
 
               var children = <Widget>[];
               this.post.attachments.forEach((attachment) {
-                children.add(PostHeroAttachment(attachment));
+                children.add(PostHeroAttachment(attachment, post: this.post));
               });
 
               return Wrap(children: children, spacing: 8, alignment: WrapAlignment.start);
@@ -64,7 +68,7 @@ class PostListItem extends ListItemWithCategory {
               var children = <Widget>[];
               children.add(Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[Expanded(child: PostHtml(post)), PostHeroAttachment(post.attachmentsWithFeatured['featured'])],
+                children: <Widget>[Expanded(child: PostHtml(post)), PostHeroAttachment(post.attachmentsWithFeatured['featured'], post: this.post)],
               ));
 
               if ((post.attachmentsWithFeatured['attachments'] as List).whereType<model.Image>().length > 0) {
