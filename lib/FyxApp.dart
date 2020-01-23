@@ -44,10 +44,10 @@ class FyxApp extends StatelessWidget {
         }
       },
       child: PlatformApp(
-        title: 'Fyx',
-        theme: PlatformThemeData(primaryColor: T.COLOR_PRIMARY),
-        home: _credentials is Credentials && _credentials.isValid ? HomePage() : LoginPage(),
-      ),
+          title: 'Fyx',
+          theme: PlatformThemeData(primaryColor: T.COLOR_PRIMARY),
+          home: _credentials is Credentials && _credentials.isValid ? HomePage() : LoginPage(),
+          debugShowCheckedModeBanner: FyxApp.isDev),
     );
   }
 }

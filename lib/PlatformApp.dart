@@ -12,9 +12,10 @@ class PlatformApp extends PlatformAwareWidget<MaterialApp, CupertinoApp> {
   final Widget home;
   final String title;
   final PlatformThemeData theme;
+  final bool debugShowCheckedModeBanner;
   static GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
 
-  PlatformApp({this.home, this.title, this.theme});
+  PlatformApp({this.home, this.title, this.theme, this.debugShowCheckedModeBanner});
 
   @override
   MaterialApp createAndroidWidget(BuildContext context) {
@@ -22,6 +23,7 @@ class PlatformApp extends PlatformAwareWidget<MaterialApp, CupertinoApp> {
       home: this.home,
       title: this.title,
       theme: this.theme?.material(),
+      debugShowCheckedModeBanner: this.debugShowCheckedModeBanner,
       onGenerateRoute: routes,
       navigatorKey: navigatorKey,
     );
@@ -33,6 +35,7 @@ class PlatformApp extends PlatformAwareWidget<MaterialApp, CupertinoApp> {
       home: this.home,
       title: this.title,
       theme: this.theme?.cupertino(),
+      debugShowCheckedModeBanner: this.debugShowCheckedModeBanner,
       onGenerateRoute: routes,
       onUnknownRoute: (RouteSettings settings) => CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings),
       navigatorKey: navigatorKey,
