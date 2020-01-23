@@ -18,9 +18,12 @@ class GalleryArguments {
 class PostHeroAttachment extends StatelessWidget {
   final dynamic attachment;
   final Post post;
+  final double _size;
   final bool _crop;
 
-  PostHeroAttachment(this.attachment, {crop = true, this.post}) : this._crop = crop;
+  PostHeroAttachment(this.attachment, this.post, {crop = true, size = 100.0})
+      : this._crop = crop,
+        this._size = size;
 
   @override
   Widget build(BuildContext context) {
@@ -35,8 +38,8 @@ class PostHeroAttachment extends StatelessWidget {
             placeholder: (context, url) => CupertinoActivityIndicator(),
             errorWidget: (context, url, error) => Icon(Icons.error),
             fit: BoxFit.cover,
-            width: _crop ? 100 : null,
-            height: _crop ? 100 : null,
+            width: _crop ? _size : null,
+            height: _crop ? _size : null,
           ),
         ),
       );

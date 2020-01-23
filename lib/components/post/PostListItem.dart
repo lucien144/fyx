@@ -4,7 +4,6 @@ import 'package:flutter/widgets.dart';
 import 'package:fyx/FyxApp.dart';
 import 'package:fyx/components/ListItemWithCategory.dart';
 import 'package:fyx/components/post/PostAvatar.dart';
-import 'package:fyx/components/post/PostFooterImage.dart';
 import 'package:fyx/components/post/PostFooterLink.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/components/post/PostHtml.dart';
@@ -39,8 +38,8 @@ class PostListItem extends ListItemWithCategory {
 
               return PostHeroAttachment(
                 this.post.images[0],
+                this.post,
                 crop: false,
-                post: this.post,
               );
             });
 
@@ -53,7 +52,7 @@ class PostListItem extends ListItemWithCategory {
 
               var children = <Widget>[];
               this.post.attachments.forEach((attachment) {
-                children.add(PostHeroAttachment(attachment, post: this.post));
+                children.add(PostHeroAttachment(attachment, this.post));
               });
 
               return Wrap(children: children, spacing: 8, alignment: WrapAlignment.start);
@@ -69,13 +68,19 @@ class PostListItem extends ListItemWithCategory {
               var children = <Widget>[];
               children.add(Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[Expanded(child: PostHtml(post)), PostHeroAttachment(post.attachmentsWithFeatured['featured'], post: this.post)],
+                children: <Widget>[Expanded(child: PostHtml(post)), PostHeroAttachment(post.attachmentsWithFeatured['featured'], this.post)],
               ));
 
               if ((post.attachmentsWithFeatured['attachments'] as List).whereType<model.Image>().length > 0) {
                 children.add(() {
                   var children = (post.attachmentsWithFeatured['attachments'] as List).whereType<model.Image>().map((attachment) {
-                    return PostFooterImage(attachment);
+                    return Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: PostHeroAttachment(
+                          attachment,
+                          post,
+                          size: 50.0,
+                        ));
                   }).toList();
                   return Row(children: children, mainAxisAlignment: MainAxisAlignment.start);
                 }());
