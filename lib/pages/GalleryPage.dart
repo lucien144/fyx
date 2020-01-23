@@ -12,9 +12,26 @@ class GalleryPage extends StatefulWidget {
 class _GalleryPageState extends State<GalleryPage> {
   GalleryArguments _arguments;
   int _page = 1;
+  final _controller = PageController();
 
-  void close(BuildContext context) {
-    Navigator.of(context).pop();
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_arguments.post.images.length > 1) {
+        _arguments.post.images.asMap().forEach((key, image) {
+          if (image.image == _arguments.image.image) {
+            _controller.jumpToPage(key);
+          }
+        });
+      }
+    });
   }
 
   @override
@@ -31,6 +48,7 @@ class _GalleryPageState extends State<GalleryPage> {
             height: MediaQuery.of(context).size.height,
           ),
           child: PhotoViewGallery.builder(
+            pageController: _controller,
             backgroundDecoration: BoxDecoration(color: Colors.transparent),
             scrollPhysics: const BouncingScrollPhysics(),
             builder: (BuildContext context, int index) {
@@ -64,5 +82,9 @@ class _GalleryPageState extends State<GalleryPage> {
             left: 0)
       ],
     );
+  }
+
+  void close(BuildContext context) {
+    Navigator.of(context).pop();
   }
 }
