@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -32,8 +33,9 @@ class DiscussionListItem extends ListItemWithCategory {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                       child: Center(
-                        child: Text(
-                          discussion.unread > 99 ? '∞' : discussion.unread.toString(),
+                        child: AutoSizeText(
+                          discussion.unread.toString(),
+                          maxLines: 1,
                           style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
                         ),
                       ),
