@@ -19,9 +19,13 @@ class DiscussionPage extends StatelessWidget {
         trailing: Icon(CupertinoIcons.create),
       ),
       child: PullToRefreshList(
-        dataProvider: () async {
-          var data = await ApiController().loadDiscussion(discussion.idKlub);
-          return (data as List).map((post) => PostListItem(Post.fromJson(post))).toList();
+        isInfinite: true,
+        dataProvider: (lastId) async {
+          print(lastId);
+          var result = await ApiController().loadDiscussion(discussion.idKlub, lastId: lastId);
+          var data = (result as List).map((post) => PostListItem(Post.fromJson(post))).toList();
+          var id = Post.fromJson((result as List).last).id;
+          return DataProviderResult(data, lastId: id);
         },
       ),
     );

@@ -63,8 +63,8 @@ class ApiController {
     return jsonDecode(response.data)['data'];
   }
 
-  Future<dynamic> loadDiscussion(int id) async {
-    var response = await provider.fetchDiscussion(id);
+  Future<dynamic> loadDiscussion(int id, {int lastId}) async {
+    var response = await provider.fetchDiscussion(id, lastId: lastId);
     return jsonDecode(response.data)['data'];
   }
 

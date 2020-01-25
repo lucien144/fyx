@@ -4,7 +4,14 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 
-typedef Future<List> TDataProvider();
+class DataProviderResult {
+  final List data;
+  final dynamic lastId;
+
+  DataProviderResult(this.data, {this.lastId});
+}
+
+typedef Future<DataProviderResult> TDataProvider(dynamic id);
 
 class PullToRefreshList extends StatefulWidget {
   final TDataProvider dataProvider;
@@ -22,7 +29,8 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
   ScrollController _controller = ScrollController();
   bool _isLoading = true;
   bool _hasError = false;
-  List _data = [];
+  DataProviderResult _result;
+  int _lastId;
   var _slivers = <Widget>[];
 
   @override
@@ -42,6 +50,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
         if (_controller.position.userScrollDirection == ScrollDirection.reverse && _controller.position.outOfRange) {
           if (_slivers.last is! SliverPadding) {
             setState(() => _slivers.add(SliverPadding(padding: EdgeInsets.symmetric(vertical: 16), sliver: SliverToBoxAdapter(child: CupertinoActivityIndicator()))));
+            this.appendData();
           }
         }
       });
@@ -130,11 +139,34 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
     setState(() => _isLoading = true);
 
     try {
-      _data = await widget.dataProvider();
-      if (_data.length > 0) {
+      _result = await widget.dataProvider(null);
+      if (_result.data.length > 0) {
         _slivers.removeRange(1, _slivers.length);
-        _slivers.addAll(this.buildTheList(_data));
+        _slivers.addAll(this.buildTheList(_result.data));
         setState(() => _hasError = false);
+        setState(() => _lastId = _result.lastId);
+      } else {
+        setState(() => _hasError = true);
+      }
+    } catch (error) {
+      print(error);
+      print(StackTrace.current);
+      setState(() => _hasError = true);
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  appendData() async {
+    setState(() => _isLoading = true);
+
+    try {
+      _result = await widget.dataProvider(_lastId);
+      if (_result.data.length > 0) {
+        _slivers.removeLast(); // Remove the loading indicator
+        _slivers.addAll(this.buildTheList(_result.data));
+        setState(() => _hasError = false);
+        setState(() => _lastId = _result.lastId);
       } else {
         setState(() => _hasError = true);
       }
