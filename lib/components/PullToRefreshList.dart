@@ -13,6 +13,7 @@ class DataProviderResult {
 
 typedef Future<DataProviderResult> TDataProvider(int id);
 
+// ignore: must_be_immutable
 class PullToRefreshList extends StatefulWidget {
   final TDataProvider dataProvider;
   bool _isInfinite;
