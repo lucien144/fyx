@@ -13,5 +13,5 @@ abstract class IApiProvider {
   Future<Response> login(String username);
   Future<Response> fetchBookmarks();
   Future<Response> fetchHistory();
-  Future<Response> fetchDiscussion(int id);
+  Future<Response> fetchDiscussion(int id, {int lastId});
 }

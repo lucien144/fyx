@@ -92,25 +92,26 @@ class _HomePageState extends State<HomePage> {
                   controller: _bookmarksController,
                   pageSnapping: true,
                   children: <Widget>[
-                    PullToRefreshList(dataProvider: () async {
-                      var data = await ApiController().loadHistory();
-                      return (data['discussions'] as List).map((discussion) => DiscussionListItem(Discussion.fromJson(discussion))).toList();
+                    PullToRefreshList(dataProvider: (lastId) async {
+                      var result = await ApiController().loadHistory();
+                      var data = (result['discussions'] as List).map((discussion) => DiscussionListItem(Discussion.fromJson(discussion))).toList();
+                      return DataProviderResult(data);
                     }),
-                    PullToRefreshList(dataProvider: () async {
+                    PullToRefreshList(dataProvider: (lastId) async {
                       var categories = [];
-                      var data = await ApiController().loadBookmarks();
-                      if ((data as Map).containsKey('categories')) {
-                        (data['categories'] as List).forEach((_category) {
+                      var result = await ApiController().loadBookmarks();
+                      if ((result as Map).containsKey('categories')) {
+                        (result['categories'] as List).forEach((_category) {
                           var category = Category.fromJson(_category);
-                          var discussion = (data['discussions'] as List)
+                          var discussion = (result['discussions'] as List)
                               .map((discussion) => DiscussionListItem(Discussion.fromJson(discussion)))
                               .where((discussion) => discussion.category == category.idCat)
                               .toList();
                           categories.add({'header': ListHeader(category), 'items': discussion});
                         });
-                        return categories;
+                        return DataProviderResult(categories);
                       }
-                      return [];
+                      return DataProviderResult([]);
                     }),
                   ],
                 ),

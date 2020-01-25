@@ -1,23 +1,38 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 
-typedef Future<List> TDataProvider();
+class DataProviderResult {
+  final List data;
+  final dynamic lastId;
 
+  DataProviderResult(this.data, {this.lastId});
+}
+
+typedef Future<DataProviderResult> TDataProvider(int id);
+
+// ignore: must_be_immutable
 class PullToRefreshList extends StatefulWidget {
   final TDataProvider dataProvider;
+  bool _isInfinite;
 
-  PullToRefreshList({@required this.dataProvider});
+  PullToRefreshList({@required this.dataProvider, isInfinite = false})
+      : _isInfinite = isInfinite,
+        assert(dataProvider != null);
 
   @override
   _PullToRefreshListState createState() => _PullToRefreshListState();
 }
 
 class _PullToRefreshListState extends State<PullToRefreshList> {
-  var isLoading = true;
-  var hasError = false;
-  var data = [];
+  ScrollController _controller = ScrollController();
+  bool _isLoading = true;
+  bool _hasError = false;
+  DataProviderResult _result;
+  int _lastId;
+  var _slivers = <Widget>[];
 
   @override
   void setState(fn) {
@@ -27,63 +42,61 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    var slivers = <Widget>[];
+  void initState() {
+    super.initState();
+
+    if (widget._isInfinite) {
+      _controller.addListener(() {
+        // Display loading and load next page if we are at the end of the list
+        if (_controller.position.userScrollDirection == ScrollDirection.reverse && _controller.position.outOfRange) {
+          if (_slivers.last is! SliverPadding) {
+            setState(() => _slivers.add(SliverPadding(padding: EdgeInsets.symmetric(vertical: 16), sliver: SliverToBoxAdapter(child: CupertinoActivityIndicator()))));
+            this.loadData(append: true);
+          }
+        }
+      });
+    }
 
     // Add the refresh control on first position
-    slivers.add(CupertinoSliverRefreshControl(
+    _slivers.add(CupertinoSliverRefreshControl(
       onRefresh: () => this.loadData(),
     ));
 
-    if (data.length > 0) {
-      slivers.addAll(this.buildTheList(data));
-    } else {
-      slivers.add(SliverFillRemaining(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Visibility(
-              visible: !hasError,
-              child: CupertinoActivityIndicator(
-                radius: 16,
-              ),
-            ),
-            Visibility(
-              visible: hasError,
-              child: CupertinoButton(
-                color: Colors.black26,
-                child: Text('Načíst znovu...'),
-                onPressed: () {
-                  loadData();
-                },
-              ),
-            )
-          ],
-        ),
-      ));
-    }
-
-    return CustomScrollView(
-      slivers: slivers,
-    );
+    this.loadData();
   }
 
-  List<Widget> buildTheList(List data) {
-    if (data.first is Widget) {
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _hasError || _slivers.length == 1
+        ? errorScreen()
+        : CustomScrollView(
+            slivers: _slivers,
+            controller: _controller,
+          );
+  }
+
+  List<Widget> buildTheList(List _data) {
+    if (_data.first is Widget) {
       return [
         SliverList(
           delegate: SliverChildBuilderDelegate(
-            (context, i) => data[i],
-            childCount: data.length,
+            (context, i) => _data[i],
+            childCount: _data.length,
           ),
         )
       ];
     }
 
-    if (data.first is Map && (data.first as Map).containsKey('header')) {
+    if (_data.first is Map && (_data.first as Map).containsKey('header')) {
       List<Widget> _list = [];
 
-      data.cast<Map>().forEach((block) {
+      _data.cast<Map>().forEach((block) {
         _list.add(SliverStickyHeaderBuilder(
           builder: (context, state) => block['header'],
           sliver: SliverList(
@@ -101,29 +114,54 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
     throw Exception('Data in the PullToRefresh must be instance of Widget or Map{header, items}');
   }
 
-  loadData() async {
-    this.resetState();
+  Widget errorScreen() {
+    return Container(
+      width: double.infinity,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Visibility(
+            visible: _isLoading,
+            child: CupertinoActivityIndicator(
+              radius: 16,
+            ),
+          ),
+          Visibility(
+            visible: !_isLoading,
+            child: CupertinoButton(
+              color: Colors.black26,
+              child: Text('Načíst znovu...'),
+              onPressed: () => loadData(),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  loadData({bool append = false}) async {
+    setState(() => _isLoading = true);
+
     try {
-      data = await widget.dataProvider();
+      _result = await widget.dataProvider(append ? _lastId : null);
+      if (_result.data.length > 0) {
+        if (append) {
+          _slivers.removeLast(); // Remove the loading indicator
+        } else {
+          _slivers.removeRange(1, _slivers.length);
+        }
+        _slivers.addAll(this.buildTheList(_result.data));
+        setState(() => _hasError = false);
+        setState(() => _lastId = _result.lastId);
+      } else {
+        setState(() => _hasError = true);
+      }
     } catch (error) {
       print(error);
       print(StackTrace.current);
-      setState(() => hasError = true);
+      setState(() => _hasError = true);
     } finally {
-      setState(() => isLoading = false);
+      setState(() => _isLoading = false);
     }
-  }
-
-  resetState() {
-    setState(() {
-      isLoading = true;
-      hasError = false;
-    });
-  }
-
-  @override
-  void initState() {
-    this.loadData();
-    super.initState();
   }
 }

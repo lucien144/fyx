@@ -37,7 +37,7 @@ class ApiProvider implements IApiProvider {
       DeviceInfoPlugin()
         ..iosInfo.then((iosInfo) {
           PackageInfo.fromPlatform().then((info) {
-            _options.headers['user-agent'] = '${_options.headers['user-agent']} | ${iosInfo.systemName} | ${info.version} (${info.buildNumber}) | ${iosInfo.localizedModel}';
+            _options.headers['user-agent'] = '${_options.headers['user-agent']} | ${iosInfo.systemName} | ${info.version} (${info.buildNumber}) | ${iosInfo.name}';
           });
         });
     } catch (e) {}
@@ -94,8 +94,16 @@ class ApiProvider implements IApiProvider {
     return await dio.post(URL, data: formData, options: _options);
   }
 
-  Future<Response> fetchDiscussion(int id) async {
-    FormData formData = new FormData.fromMap({'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'discussion', 'l2': 'messages', 'id': id});
+  Future<Response> fetchDiscussion(int id, {int lastId}) async {
+    FormData formData = new FormData.fromMap({
+      'auth_nick': _credentials.nickname,
+      'auth_token': _credentials.token,
+      'l': 'discussion',
+      'l2': 'messages',
+      'id': id,
+      'id_wu': lastId,
+      'direction': lastId == null ? 'newest' : 'older'
+    });
     return await dio.post(URL, data: formData, options: _options);
   }
 }
