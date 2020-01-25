@@ -50,7 +50,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
         if (_controller.position.userScrollDirection == ScrollDirection.reverse && _controller.position.outOfRange) {
           if (_slivers.last is! SliverPadding) {
             setState(() => _slivers.add(SliverPadding(padding: EdgeInsets.symmetric(vertical: 16), sliver: SliverToBoxAdapter(child: CupertinoActivityIndicator()))));
-            this.appendData();
+            this.loadData(append: true);
           }
         }
       });
@@ -58,10 +58,10 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
 
     // Add the refresh control on first position
     _slivers.add(CupertinoSliverRefreshControl(
-      onRefresh: () => this.initData(),
+      onRefresh: () => this.loadData(),
     ));
 
-    this.initData();
+    this.loadData();
   }
 
   @override
@@ -128,42 +128,24 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
           child: CupertinoButton(
             color: Colors.black26,
             child: Text('Načíst znovu...'),
-            onPressed: () => initData(),
+            onPressed: () => loadData(),
           ),
         )
       ],
     );
   }
 
-  initData() async {
+  loadData({bool append = false}) async {
     setState(() => _isLoading = true);
 
     try {
-      _result = await widget.dataProvider(null);
+      _result = await widget.dataProvider(append ? _lastId : null);
       if (_result.data.length > 0) {
-        _slivers.removeRange(1, _slivers.length);
-        _slivers.addAll(this.buildTheList(_result.data));
-        setState(() => _hasError = false);
-        setState(() => _lastId = _result.lastId);
-      } else {
-        setState(() => _hasError = true);
-      }
-    } catch (error) {
-      print(error);
-      print(StackTrace.current);
-      setState(() => _hasError = true);
-    } finally {
-      setState(() => _isLoading = false);
-    }
-  }
-
-  appendData() async {
-    setState(() => _isLoading = true);
-
-    try {
-      _result = await widget.dataProvider(_lastId);
-      if (_result.data.length > 0) {
-        _slivers.removeLast(); // Remove the loading indicator
+        if (append) {
+          _slivers.removeLast(); // Remove the loading indicator
+        } else {
+          _slivers.removeRange(1, _slivers.length);
+        }
         _slivers.addAll(this.buildTheList(_result.data));
         setState(() => _hasError = false);
         setState(() => _lastId = _result.lastId);
