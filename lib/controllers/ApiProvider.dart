@@ -37,7 +37,7 @@ class ApiProvider implements IApiProvider {
       DeviceInfoPlugin()
         ..iosInfo.then((iosInfo) {
           PackageInfo.fromPlatform().then((info) {
-            _options.headers['user-agent'] = '${_options.headers['user-agent']} | ${iosInfo.systemName} | ${info.version} (${info.buildNumber}) | ${iosInfo.localizedModel}';
+            _options.headers['user-agent'] = '${_options.headers['user-agent']} | ${iosInfo.systemName} | ${info.version} (${info.buildNumber}) | ${iosInfo.name}';
           });
         });
     } catch (e) {}
