@@ -11,7 +11,7 @@ class DataProviderResult {
   DataProviderResult(this.data, {this.lastId});
 }
 
-typedef Future<DataProviderResult> TDataProvider(dynamic id);
+typedef Future<DataProviderResult> TDataProvider(int id);
 
 class PullToRefreshList extends StatefulWidget {
   final TDataProvider dataProvider;
@@ -72,7 +72,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
 
   @override
   Widget build(BuildContext context) {
-    return _hasError
+    return _hasError || _slivers.length == 1
         ? errorScreen()
         : CustomScrollView(
             slivers: _slivers,
@@ -114,24 +114,27 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
   }
 
   Widget errorScreen() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Visibility(
-          visible: _isLoading,
-          child: CupertinoActivityIndicator(
-            radius: 16,
+    return Container(
+      width: double.infinity,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Visibility(
+            visible: _isLoading,
+            child: CupertinoActivityIndicator(
+              radius: 16,
+            ),
           ),
-        ),
-        Visibility(
-          visible: !_isLoading,
-          child: CupertinoButton(
-            color: Colors.black26,
-            child: Text('Načíst znovu...'),
-            onPressed: () => loadData(),
-          ),
-        )
-      ],
+          Visibility(
+            visible: !_isLoading,
+            child: CupertinoButton(
+              color: Colors.black26,
+              child: Text('Načíst znovu...'),
+              onPressed: () => loadData(),
+            ),
+          )
+        ],
+      ),
     );
   }
 
