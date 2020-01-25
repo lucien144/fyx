@@ -21,7 +21,6 @@ class DiscussionPage extends StatelessWidget {
       child: PullToRefreshList(
         isInfinite: true,
         dataProvider: (lastId) async {
-          print(lastId);
           var result = await ApiController().loadDiscussion(discussion.idKlub, lastId: lastId);
           var data = (result as List).map((post) => PostListItem(Post.fromJson(post))).toList();
           var id = Post.fromJson((result as List).last).id;
