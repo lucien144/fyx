@@ -6,6 +6,7 @@ import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/pages/GalleryPage.dart';
 import 'package:fyx/pages/HomePage.dart';
 import 'package:fyx/pages/LoginPage.dart';
+import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/pages/TutorialPage.dart';
 
 class PlatformApp extends PlatformAwareWidget<MaterialApp, CupertinoApp> {
@@ -56,6 +57,9 @@ class PlatformApp extends PlatformAwareWidget<MaterialApp, CupertinoApp> {
       case '/discussion':
         print('[Router] Discussion');
         return CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings);
+      case '/discussion/new-message':
+        print('[Router] Discussion / New Message');
+        return CupertinoPageRoute(builder: (_) => NewMessagePage(), settings: settings, fullscreenDialog: true);
       case '/gallery':
         print('[Router] Gallery');
         return PageRouteBuilder(opaque: false, pageBuilder: (_, __, ___) => GalleryPage(), settings: settings, fullscreenDialog: true);
