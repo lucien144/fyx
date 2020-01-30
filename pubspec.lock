@@ -198,6 +198,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.4"
+  image_picker_modern:
+    dependency: "direct main"
+    description:
+      name: image_picker_modern
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.12+3"
   matcher:
     dependency: transitive
     description:
