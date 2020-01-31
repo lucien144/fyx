@@ -39,6 +39,8 @@ dependencies:
   photo_view: ^0.9.1
   auto_size_text: ^2.1.0
   image_picker_modern: ^0.4.12+3
+  path: ^1.6.4
+  image: 2.1.4
   flutter:
     sdk: flutter
 

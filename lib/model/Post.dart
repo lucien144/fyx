@@ -34,6 +34,8 @@ class Post {
     this._wu_rating = int.parse(json['wu_rating']);
     this._wu_type = int.parse(json['wu_type']);
 
+    // TODO: Handle spoilers
+    // TODO: Handle <code/> tags
     this._removeTrailingBr();
     this._parseEmbeds();
     this._parseAttachedImages();
@@ -55,6 +57,11 @@ class Post {
       var document = parse(_content);
       var youtubes = document.querySelectorAll('div[data-embed-type="youtube"]');
       youtubes.forEach((el) {
+        // If the video does not have preview, it's invalid Nyx attachment, therefore we skip it and handle it as a normal post.
+        if (el.querySelector('img') == null) {
+          return;
+        }
+
         var video = Video(
             id: el.attributes['data-embed-value'],
             type: Video.findVideoType(el.attributes['data-embed-type']),
@@ -71,7 +78,7 @@ class Post {
       });
       _content = document.body.innerHtml;
     } catch (error) {
-      PlatformTheme.error(error);
+      PlatformTheme.error(error.toString());
     }
   }
 

@@ -35,7 +35,7 @@ class DiscussionPage extends StatelessWidget {
             child: SafeArea(
               child: FloatingActionButton(
                 child: Icon(Icons.add),
-                onPressed: () => Navigator.of(context).pushNamed('/discussion/new-message'),
+                onPressed: () => Navigator.of(context).pushNamed('/discussion/new-message', arguments: discussion.idKlub),
               ),
             ),
           ),

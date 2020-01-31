@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:fyx/PlatformApp.dart';
@@ -66,6 +67,10 @@ class ApiController {
   Future<dynamic> loadDiscussion(int id, {int lastId}) async {
     var response = await provider.fetchDiscussion(id, lastId: lastId);
     return jsonDecode(response.data)['data'];
+  }
+
+  Future<Response> postDiscussionMessage(int id, String message, {List<Map<String, dynamic>> attachments}) {
+    return provider.postDiscussionMessage(id, message, attachments: attachments);
   }
 
   void logout() {

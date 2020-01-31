@@ -110,4 +110,17 @@ class ApiProvider implements IApiProvider {
     });
     return await dio.post(URL, data: formData, options: _options);
   }
+
+  Future<Response> postDiscussionMessage(int id, String message, {List<Map<String, dynamic>> attachments}) async {
+    FormData formData = new FormData.fromMap({
+      'auth_nick': _credentials.nickname,
+      'auth_token': _credentials.token,
+      'l': 'discussion',
+      'l2': 'send',
+      'id': id,
+      'message': message,
+      'attachment': attachments.map((attachment) => MultipartFile.fromBytes(attachment['bytes'], filename: attachment['filename'])).toList()
+    });
+    return await dio.post(URL, data: formData, options: _options);
+  }
 }

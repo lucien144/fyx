@@ -14,4 +14,5 @@ abstract class IApiProvider {
   Future<Response> fetchBookmarks();
   Future<Response> fetchHistory();
   Future<Response> fetchDiscussion(int id, {int lastId});
+  Future<Response> postDiscussionMessage(int id, String message, {List<Map<String, dynamic>> attachments});
 }
