@@ -23,16 +23,21 @@ class _NewMessagePageState extends State<NewMessagePage> {
     var image = img.decodeImage(file.readAsBytesSync());
     var big = img.copyResize(image, width: 1024);
     var thumb = img.copyResize(image, width: 50);
-    var bigJpg = img.encodeJpg(big);
-    var thumbJpg = img.encodeJpg(thumb);
+    var bigJpg = img.encodeJpg(big, quality: 75);
+    var thumbJpg = img.encodeJpg(thumb, quality: 40);
 
     if (image != null) {
       setState(() {
-        _images.add({'bytes': bigJpg, 'filename': '${basename(file.path)}.jpg'});
-        _thumbs.add(thumbJpg);
+        _images.insert(0, {'bytes': bigJpg, 'filename': '${basename(file.path)}.jpg'});
+        _thumbs.insert(0, thumbJpg);
       });
     }
+  }
+
+  @override
+  void initState() {
     _controller.addListener(() => setState(() => _text = _controller.text));
+    super.initState();
   }
 
   @override
@@ -65,10 +70,10 @@ class _NewMessagePageState extends State<NewMessagePage> {
                   CupertinoButton(
                     padding: EdgeInsets.all(0),
                     child: Text('Odeslat'),
-                    onPressed: _text.length == 0
+                    onPressed: (_text.length + _images.length) == 0
                         ? null
                         : () async {
-                            var result = await ApiController().postDiscussionMessage(_discussionId, _controller.text, attachments: _images);
+                            var result = await ApiController().postDiscussionMessage(_discussionId, _controller.text, attachment: _images.length > 0 ? _images[0] : null);
                             print(result);
                           },
                   )
@@ -104,7 +109,22 @@ class _NewMessagePageState extends State<NewMessagePage> {
                     ),
                     SizedBox(width: 12),
                     Row(
-                      children: _thumbs.map((List<int> file) => _buildPreviewWidget(file)).toList(),
+                      // children: _thumbs.map((List<int> file) => _buildPreviewWidget(file)).toList(),
+                      children: _thumbs.length > 0
+                          ? [
+                              _buildPreviewWidget(_thumbs[0]),
+                              CupertinoButton(
+                                padding: EdgeInsets.all(0),
+                                child: Text('Smazat'),
+                                onPressed: () {
+                                  setState(() {
+                                    _thumbs.clear();
+                                    _images.clear();
+                                  });
+                                },
+                              )
+                            ]
+                          : [],
                     )
                   ],
                 ),

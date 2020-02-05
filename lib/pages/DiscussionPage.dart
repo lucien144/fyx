@@ -6,6 +6,7 @@ import 'package:fyx/components/post/PostListItem.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Discussion.dart';
 import 'package:fyx/model/Post.dart';
+import 'package:fyx/theme/T.dart';
 
 class DiscussionPage extends StatelessWidget {
   @override
@@ -31,9 +32,10 @@ class DiscussionPage extends StatelessWidget {
           ),
           Positioned(
             right: 20,
-            bottom: 0,
+            bottom: 20,
             child: SafeArea(
               child: FloatingActionButton(
+                backgroundColor: T.COLOR_PRIMARY,
                 child: Icon(Icons.add),
                 onPressed: () => Navigator.of(context).pushNamed('/discussion/new-message', arguments: discussion.idKlub),
               ),

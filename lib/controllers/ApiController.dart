@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:fyx/PlatformApp.dart';
@@ -69,8 +68,8 @@ class ApiController {
     return jsonDecode(response.data)['data'];
   }
 
-  Future<Response> postDiscussionMessage(int id, String message, {List<Map<String, dynamic>> attachments}) {
-    return provider.postDiscussionMessage(id, message, attachments: attachments);
+  Future<Response> postDiscussionMessage(int id, String message, {Map<String, dynamic> attachment}) {
+    return provider.postDiscussionMessage(id, message, attachment: attachment);
   }
 
   void logout() {
