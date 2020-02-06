@@ -8,7 +8,14 @@ import 'package:fyx/model/Discussion.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/theme/T.dart';
 
-class DiscussionPage extends StatelessWidget {
+class DiscussionPage extends StatefulWidget {
+  @override
+  _DiscussionPageState createState() => _DiscussionPageState();
+}
+
+class _DiscussionPageState extends State<DiscussionPage> {
+  bool _refreshList = false;
+
   @override
   Widget build(BuildContext context) {
     final Discussion discussion = ModalRoute.of(context).settings.arguments;
@@ -17,10 +24,15 @@ class DiscussionPage extends StatelessWidget {
       navigationBar: CupertinoNavigationBar(
         backgroundColor: Colors.white,
         middle: Text(discussion.jmeno, overflow: TextOverflow.ellipsis),
+        trailing: CupertinoButton(
+          child: Text('Refresh'),
+          onPressed: () => setState(() => _refreshList = true),
+        ),
       ),
       child: Stack(
         children: [
           PullToRefreshList(
+            rebuild: _refreshList,
             isInfinite: true,
             dataProvider: (lastId) async {
               var result = await ApiController().loadDiscussion(discussion.idKlub, lastId: lastId);
