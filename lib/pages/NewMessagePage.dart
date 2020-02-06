@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/model/Discussion.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker_modern/image_picker_modern.dart';
 import 'package:path/path.dart';
@@ -15,8 +16,9 @@ class _NewMessagePageState extends State<NewMessagePage> {
   TextEditingController _controller = TextEditingController();
   List<List<int>> _thumbs = [];
   List<Map<String, dynamic>> _images = [];
-  int _discussionId;
+  Discussion _discussion;
   String _text = '';
+  bool _sending = false;
 
   Future getImage(ImageSource source) async {
     var file = await ImagePicker.pickImage(source: source);
@@ -48,8 +50,8 @@ class _NewMessagePageState extends State<NewMessagePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_discussionId == null) {
-      _discussionId = ModalRoute.of(context).settings.arguments;
+    if (_discussion == null) {
+      _discussion = ModalRoute.of(context).settings.arguments;
     }
 
     return Container(
@@ -62,19 +64,17 @@ class _NewMessagePageState extends State<NewMessagePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
+                  CupertinoButton(padding: EdgeInsets.all(0), child: Text('Zavřít'), onPressed: () => Navigator.of(context).pop()),
                   CupertinoButton(
                     padding: EdgeInsets.all(0),
-                    child: Text('Zavřít'),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                  CupertinoButton(
-                    padding: EdgeInsets.all(0),
-                    child: Text('Odeslat'),
-                    onPressed: (_text.length + _images.length) == 0
+                    child: _sending ? CupertinoActivityIndicator() : Text('Odeslat'),
+                    onPressed: (_text.length + _images.length) == 0 || _sending
                         ? null
                         : () async {
-                            var result = await ApiController().postDiscussionMessage(_discussionId, _controller.text, attachment: _images.length > 0 ? _images[0] : null);
-                            print(result);
+                            setState(() => _sending = true);
+                            await ApiController().postDiscussionMessage(_discussion.idKlub, _controller.text, attachment: _images.length > 0 ? _images[0] : null);
+                            setState(() => _sending = false);
+                            Navigator.of(context).pop();
                           },
                   )
                 ],

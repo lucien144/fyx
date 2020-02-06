@@ -59,7 +59,14 @@ class ApiProvider implements IApiProvider {
       Map data = jsonDecode(response.data);
 
       // All seems ok.
+      // Endpoints: Auth + pulling data
       if (data.containsKey('data')) {
+        return response;
+      }
+
+      // All seems ok.
+      // Endpoints: Send new message.
+      if (data.containsKey('result') && data['result'] == 'ok') {
         return response;
       }
 

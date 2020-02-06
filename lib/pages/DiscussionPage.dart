@@ -17,7 +17,6 @@ class DiscussionPage extends StatelessWidget {
       navigationBar: CupertinoNavigationBar(
         backgroundColor: Colors.white,
         middle: Text(discussion.jmeno, overflow: TextOverflow.ellipsis),
-        trailing: Icon(CupertinoIcons.create),
       ),
       child: Stack(
         children: [
@@ -37,7 +36,7 @@ class DiscussionPage extends StatelessWidget {
               child: FloatingActionButton(
                 backgroundColor: T.COLOR_PRIMARY,
                 child: Icon(Icons.add),
-                onPressed: () => Navigator.of(context).pushNamed('/discussion/new-message', arguments: discussion.idKlub),
+                onPressed: () => Navigator.of(context).pushNamed('/discussion/new-message', arguments: discussion),
               ),
             ),
           ),
