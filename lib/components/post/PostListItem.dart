@@ -117,21 +117,21 @@ class PostListItem extends ListItemWithCategory {
                   children: <Widget>[
                     Icon(
                       Icons.thumb_up,
-                      color: Colors.black38,
+                      color: post.rating > 0 ? Colors.green : Colors.black38,
                     ),
                     SizedBox(
                       width: 4,
                     ),
                     Text(
                       post.rating.toString(),
-                      style: TextStyle(color: Colors.black38),
+                      style: TextStyle(color: post.rating > 0 ? Colors.green : (post.rating < 0 ? Colors.redAccent : Colors.black38)),
                     ),
                     SizedBox(
                       width: 4,
                     ),
                     Icon(
                       Icons.thumb_down,
-                      color: Colors.black38,
+                      color: post.rating < 0 ? Colors.redAccent : Colors.black38,
                     ),
                     SizedBox(
                       width: 16,
