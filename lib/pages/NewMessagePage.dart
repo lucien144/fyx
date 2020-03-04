@@ -1,11 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fyx/components/post/PostListItem.dart';
 import 'package:fyx/controllers/ApiController.dart';
-import 'package:fyx/model/Discussion.dart';
+import 'package:fyx/model/Post.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker_modern/image_picker_modern.dart';
 import 'package:path/path.dart';
+
+class NewMessageSettings {
+  int idKlub;
+  Post post;
+  Function onClose;
+
+  NewMessageSettings(this.idKlub, {this.post, this.onClose});
+}
 
 class NewMessagePage extends StatefulWidget {
   @override
@@ -16,7 +25,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
   TextEditingController _controller = TextEditingController();
   List<List<int>> _thumbs = [];
   List<Map<String, dynamic>> _images = [];
-  Discussion _discussion;
+  NewMessageSettings _settings;
   String _text = '';
   bool _sending = false;
 
@@ -50,8 +59,8 @@ class _NewMessagePageState extends State<NewMessagePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_discussion == null) {
-      _discussion = ModalRoute.of(context).settings.arguments;
+    if (_settings == null) {
+      _settings = ModalRoute.of(context).settings.arguments;
     }
 
     return Container(
@@ -61,73 +70,85 @@ class _NewMessagePageState extends State<NewMessagePage> {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Column(
                 children: <Widget>[
-                  CupertinoButton(padding: EdgeInsets.all(0), child: Text('Zavřít'), onPressed: () => Navigator.of(context).pop()),
-                  CupertinoButton(
-                    padding: EdgeInsets.all(0),
-                    child: _sending ? CupertinoActivityIndicator() : Text('Odeslat'),
-                    onPressed: (_text.length + _images.length) == 0 || _sending
-                        ? null
-                        : () async {
-                            setState(() => _sending = true);
-                            await ApiController().postDiscussionMessage(_discussion.idKlub, _controller.text, attachment: _images.length > 0 ? _images[0] : null);
-                            setState(() => _sending = false);
-                            Navigator.of(context).pop();
-                          },
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      CupertinoButton(padding: EdgeInsets.all(0), child: Text('Zavřít'), onPressed: () => Navigator.of(context).pop()),
+                      CupertinoButton(
+                        padding: EdgeInsets.all(0),
+                        child: _sending ? CupertinoActivityIndicator() : Text('Odeslat'),
+                        onPressed: (_text.length + _images.length) == 0 || _sending
+                            ? null
+                            : () async {
+                                setState(() => _sending = true);
+                                await ApiController().postDiscussionMessage(_settings.idKlub, _controller.text,
+                                    attachment: _images.length > 0 ? _images[0] : null, replyPost: _settings.post != null ? _settings.post : null);
+                                setState(() => _sending = false);
+                                if (_settings.onClose is Function) {
+                                  _settings.onClose();
+                                }
+                                Navigator.of(context).pop();
+                              },
+                      )
+                    ],
+                  ),
+                  CupertinoTextField(
+                    controller: _controller,
+                    maxLines: 10,
+                    autofocus: true,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        CupertinoButton(
+                          padding: EdgeInsets.all(0),
+                          child: Icon(Icons.camera_alt),
+                          onPressed: () => getImage(ImageSource.camera),
+                        ),
+                        CupertinoButton(
+                          padding: EdgeInsets.all(0),
+                          child: Icon(Icons.image),
+                          onPressed: () => getImage(ImageSource.gallery),
+                        ),
+                        Visibility(
+                          visible: _images.length > 0,
+                          child: Container(
+                            width: 16,
+                            height: 1,
+                            color: Colors.black38,
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Row(
+                          // children: _thumbs.map((List<int> file) => _buildPreviewWidget(file)).toList(),
+                          children: _thumbs.length > 0
+                              ? [
+                                  _buildPreviewWidget(_thumbs[0]),
+                                  CupertinoButton(
+                                    padding: EdgeInsets.all(0),
+                                    child: Text('Smazat'),
+                                    onPressed: () {
+                                      setState(() {
+                                        _thumbs.clear();
+                                        _images.clear();
+                                      });
+                                    },
+                                  )
+                                ]
+                              : [],
+                        )
+                      ],
+                    ),
                   )
                 ],
               ),
-              CupertinoTextField(
-                controller: _controller,
-                maxLines: 10,
-                autofocus: true,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    CupertinoButton(
-                      padding: EdgeInsets.all(0),
-                      child: Icon(Icons.camera_alt),
-                      onPressed: () => getImage(ImageSource.camera),
-                    ),
-                    CupertinoButton(
-                      padding: EdgeInsets.all(0),
-                      child: Icon(Icons.image),
-                      onPressed: () => getImage(ImageSource.gallery),
-                    ),
-                    Visibility(
-                      visible: _images.length > 0,
-                      child: Container(
-                        width: 16,
-                        height: 1,
-                        color: Colors.black38,
-                      ),
-                    ),
-                    SizedBox(width: 12),
-                    Row(
-                      // children: _thumbs.map((List<int> file) => _buildPreviewWidget(file)).toList(),
-                      children: _thumbs.length > 0
-                          ? [
-                              _buildPreviewWidget(_thumbs[0]),
-                              CupertinoButton(
-                                padding: EdgeInsets.all(0),
-                                child: Text('Smazat'),
-                                onPressed: () {
-                                  setState(() {
-                                    _thumbs.clear();
-                                    _images.clear();
-                                  });
-                                },
-                              )
-                            ]
-                          : [],
-                    )
-                  ],
-                ),
+              Visibility(
+                child: PostListItem(_settings.post),
+                visible: _settings.post != null,
               )
             ],
           ),

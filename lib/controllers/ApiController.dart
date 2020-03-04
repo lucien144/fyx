@@ -8,6 +8,7 @@ import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/exceptions/AuthException.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/LoginResponse.dart';
+import 'package:fyx/model/Post.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -68,7 +69,11 @@ class ApiController {
     return jsonDecode(response.data)['data'];
   }
 
-  Future<Response> postDiscussionMessage(int id, String message, {Map<String, dynamic> attachment}) {
+  Future<Response> postDiscussionMessage(int id, String message, {Map<String, dynamic> attachment, Post replyPost}) {
+    if (replyPost != null) {
+      message = '{reply ${replyPost.nick}|${replyPost.id}}: ${message}';
+    }
+    print(message);
     return provider.postDiscussionMessage(id, message, attachment: attachment);
   }
 

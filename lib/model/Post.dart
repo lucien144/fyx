@@ -7,6 +7,7 @@ import 'package:html/parser.dart';
 import 'package:html_unescape/html_unescape.dart';
 
 class Post {
+  int idKlub;
   // ignore: non_constant_identifier_names
   int _id_wu;
   String _rawContent;
@@ -22,7 +23,7 @@ class Post {
   List<Link> _links = [];
   List<Video> _videos = [];
 
-  Post.fromJson(Map<String, dynamic> json) {
+  Post.fromJson(Map<String, dynamic> json, this.idKlub) {
     var unescape = HtmlUnescape();
     var content = unescape.convert(json['content']);
 

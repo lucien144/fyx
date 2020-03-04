@@ -10,6 +10,7 @@ import 'package:fyx/components/post/PostHtml.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/model/post/Link.dart';
+import 'package:fyx/pages/NewMessagePage.dart';
 
 enum LAYOUT_TYPES { textOnly, oneImageOnly, attachmentsOnly, attachmentsAndText }
 typedef Widget TLayout();
@@ -18,7 +19,10 @@ class PostListItem extends ListItemWithCategory {
   final Post post;
   final Map<LAYOUT_TYPES, TLayout> _layoutMap = {};
 
-  PostListItem(this.post) {
+  // Callback when the content might have changed...
+  Function onUpdate;
+
+  PostListItem(this.post, {this.onUpdate}) {
     // The order here is important!
     _layoutMap.putIfAbsent(
         LAYOUT_TYPES.textOnly,
@@ -139,7 +143,16 @@ class PostListItem extends ListItemWithCategory {
                     Icon(
                       Icons.bookmark_border,
                       color: Colors.black38,
-                    )
+                    ),
+                    SizedBox(
+                      width: 16,
+                    ),
+                    GestureDetector(
+                        onTap: () => Navigator.of(context).pushNamed('/discussion/new-message', arguments: NewMessageSettings(post.idKlub, post: post, onClose: this.onUpdate)),
+                        child: Icon(
+                          Icons.reply,
+                          color: Colors.black38,
+                        ))
                   ],
                 )
               ],

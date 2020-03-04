@@ -6,6 +6,7 @@ import 'package:fyx/components/post/PostListItem.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Discussion.dart';
 import 'package:fyx/model/Post.dart';
+import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/T.dart';
 
 class DiscussionPage extends StatefulWidget {
@@ -15,6 +16,10 @@ class DiscussionPage extends StatefulWidget {
 
 class _DiscussionPageState extends State<DiscussionPage> {
   bool _refreshList = false;
+
+  refresh() {
+    setState(() => _refreshList = !_refreshList);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +31,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
         middle: Text(discussion.jmeno, overflow: TextOverflow.ellipsis),
         trailing: CupertinoButton(
           child: Text('Refresh'),
-          onPressed: () => setState(() => _refreshList = true),
+          onPressed: () => this.refresh(),
         ),
       ),
       child: Stack(
@@ -36,8 +41,8 @@ class _DiscussionPageState extends State<DiscussionPage> {
             isInfinite: true,
             dataProvider: (lastId) async {
               var result = await ApiController().loadDiscussion(discussion.idKlub, lastId: lastId);
-              var data = (result as List).map((post) => PostListItem(Post.fromJson(post))).toList();
-              var id = Post.fromJson((result as List).last).id;
+              var data = (result as List).map((post) => PostListItem(Post.fromJson(post, discussion.idKlub), onUpdate: this.refresh)).toList();
+              var id = Post.fromJson((result as List).last, discussion.idKlub).id;
               return DataProviderResult(data, lastId: id);
             },
           ),
@@ -48,7 +53,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
               child: FloatingActionButton(
                 backgroundColor: T.COLOR_PRIMARY,
                 child: Icon(Icons.add),
-                onPressed: () => Navigator.of(context).pushNamed('/discussion/new-message', arguments: discussion),
+                onPressed: () => Navigator.of(context).pushNamed('/discussion/new-message', arguments: NewMessageSettings(discussion.idKlub, onClose: this.refresh)),
               ),
             ),
           ),
