@@ -18,9 +18,20 @@ class FyxApp extends StatelessWidget {
   static set env(val) => FyxApp._env = val;
 
   static get env => FyxApp._env;
+
   static get isDev => FyxApp.env == Environment.dev;
+
   static get isStaging => FyxApp.env == Environment.staging;
+
   static get isProduction => FyxApp.env == Environment.production;
+
+  static RouteObserver<PageRoute> _routeObserver;
+  static get routeObserver {
+    if (_routeObserver == null) {
+      _routeObserver = RouteObserver<PageRoute>();
+    }
+    return _routeObserver;
+  }
 
   const FyxApp(this._credentials, {Key key}) : super(key: key);
 
@@ -44,10 +55,12 @@ class FyxApp extends StatelessWidget {
         }
       },
       child: PlatformApp(
-          title: 'Fyx',
-          theme: PlatformThemeData(primaryColor: T.COLOR_PRIMARY),
-          home: _credentials is Credentials && _credentials.isValid ? HomePage() : LoginPage(),
-          debugShowCheckedModeBanner: FyxApp.isDev),
+        title: 'Fyx',
+        theme: PlatformThemeData(primaryColor: T.COLOR_PRIMARY),
+        home: _credentials is Credentials && _credentials.isValid ? HomePage() : LoginPage(),
+        debugShowCheckedModeBanner: FyxApp.isDev,
+        listNavigatorObservers: [FyxApp.routeObserver],
+      ),
     );
   }
 }
