@@ -179,7 +179,10 @@ class PostListItem extends ListItemWithCategory {
               decoration: BoxDecoration(color: Colors.green),
               child: Text(post.content),
             ),
-          )
+          ),
+          SizedBox(
+            height: 8,
+          ),
         ],
       ),
     );
