@@ -20,7 +20,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
   final PageController _bookmarksController = PageController(initialPage: 0);
 
   tabs activeTab;
-  bool _refreshData = false;
+  int _refreshData = 0;
 
   @override
   void initState() {
@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
 
   void refreshData() {
     setState(() {
-      _refreshData = true;
+      _refreshData = DateTime.now().millisecondsSinceEpoch;
     });
   }
 
@@ -107,6 +107,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
                     middle: CupertinoSegmentedControl(
                       groupValue: activeTab,
                       onValueChanged: (value) {
+                        setState(() => _refreshData = 0);
                         _bookmarksController.animateToPage(tabs.values.indexOf(value), duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
                       },
                       children: {

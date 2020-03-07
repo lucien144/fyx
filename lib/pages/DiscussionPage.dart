@@ -15,10 +15,10 @@ class DiscussionPage extends StatefulWidget {
 }
 
 class _DiscussionPageState extends State<DiscussionPage> {
-  bool _refreshList = false;
+  int _refreshList = 0;
 
   refresh() {
-    setState(() => _refreshList = !_refreshList);
+    setState(() => _refreshList = DateTime.now().millisecondsSinceEpoch);
   }
 
   @override
