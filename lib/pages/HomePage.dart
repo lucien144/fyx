@@ -24,6 +24,7 @@ class _HomePageState extends State<HomePage> with RouteAware {
 
   @override
   void initState() {
+    super.initState();
     activeTab = tabs.history;
 
     _bookmarksController.addListener(() {
@@ -34,8 +35,6 @@ class _HomePageState extends State<HomePage> with RouteAware {
         });
       }
     });
-
-    super.initState();
   }
 
   @override
