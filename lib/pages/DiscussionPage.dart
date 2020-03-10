@@ -14,11 +14,30 @@ class DiscussionPage extends StatefulWidget {
   _DiscussionPageState createState() => _DiscussionPageState();
 }
 
-class _DiscussionPageState extends State<DiscussionPage> {
+class _DiscussionPageState extends State<DiscussionPage> with WidgetsBindingObserver {
   int _refreshList = 0;
 
   refresh() {
     setState(() => _refreshList = DateTime.now().millisecondsSinceEpoch);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      this.refresh();
+    }
   }
 
   @override
