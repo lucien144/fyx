@@ -28,11 +28,11 @@ class _DiscussionPageState extends State<DiscussionPage> {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         backgroundColor: Colors.white,
-        middle: Text(discussion.jmeno, overflow: TextOverflow.ellipsis),
-        trailing: CupertinoButton(
-          child: Text('Refresh'),
-          onPressed: () => this.refresh(),
+        previousPageTitle: 'as',
+        leading: CupertinoNavigationBarBackButton(
+          color: T.COLOR_PRIMARY,
         ),
+        middle: Text(discussion.jmeno, overflow: TextOverflow.ellipsis),
       ),
       child: Stack(
         children: [
