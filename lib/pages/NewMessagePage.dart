@@ -147,7 +147,10 @@ class _NewMessagePageState extends State<NewMessagePage> {
                 ],
               ),
               Visibility(
-                child: PostListItem(_settings.post),
+                child: PostListItem(
+                  _settings.post,
+                  isPreview: true,
+                ),
                 visible: _settings.post != null,
               )
             ],
