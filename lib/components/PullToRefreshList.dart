@@ -17,8 +17,9 @@ typedef Future<DataProviderResult> TDataProvider(int id);
 class PullToRefreshList extends StatefulWidget {
   final TDataProvider dataProvider;
   bool _isInfinite;
+  int rebuild = 0;
 
-  PullToRefreshList({@required this.dataProvider, isInfinite = false})
+  PullToRefreshList({@required this.dataProvider, isInfinite = false, this.rebuild})
       : _isInfinite = isInfinite,
         assert(dataProvider != null);
 
@@ -33,6 +34,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
   DataProviderResult _result;
   int _lastId;
   var _slivers = <Widget>[];
+  int _lastRebuild = 0;
 
   @override
   void setState(fn) {
@@ -73,6 +75,11 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.rebuild > _lastRebuild && !_isLoading) {
+      setState(() => _lastRebuild = widget.rebuild);
+      this.loadData();
+    }
+
     return _hasError || _slivers.length == 1
         ? errorScreen()
         : CustomScrollView(

@@ -37,7 +37,11 @@ class ApiProvider implements IApiProvider {
       DeviceInfoPlugin()
         ..iosInfo.then((iosInfo) {
           PackageInfo.fromPlatform().then((info) {
-            _options.headers['user-agent'] = '${_options.headers['user-agent']} | ${iosInfo.systemName} | ${info.version} (${info.buildNumber}) | ${iosInfo.name}';
+            // Basic sanitize due to the Xr unicode character and others...
+            // TODO: Perhaps, solve Czech characters too...
+            var deviceName = iosInfo.name.replaceAll(RegExp(r'[ʀ]', caseSensitive: false), 'r');
+            deviceName = deviceName.replaceAll(RegExp(r'[^\w _\-]', caseSensitive: false), '_');
+            _options.headers['user-agent'] = '${_options.headers['user-agent']} | ${iosInfo.systemName} | ${info.version} (${info.buildNumber}) | $deviceName';
           });
         });
     } catch (e) {}
@@ -55,7 +59,14 @@ class ApiProvider implements IApiProvider {
       Map data = jsonDecode(response.data);
 
       // All seems ok.
+      // Endpoints: Auth + pulling data
       if (data.containsKey('data')) {
+        return response;
+      }
+
+      // All seems ok.
+      // Endpoints: Send new message.
+      if (data.containsKey('result') && data['result'] == 'ok') {
         return response;
       }
 
@@ -104,6 +115,20 @@ class ApiProvider implements IApiProvider {
       'id_wu': lastId,
       'direction': lastId == null ? 'newest' : 'older'
     });
+    return await dio.post(URL, data: formData, options: _options);
+  }
+
+  Future<Response> postDiscussionMessage(int id, String message, {Map<String, dynamic> attachment}) async {
+    FormData formData = new FormData.fromMap({
+      'auth_nick': _credentials.nickname,
+      'auth_token': _credentials.token,
+      'l': 'discussion',
+      'l2': 'send',
+      'id': id,
+      'message': message,
+      'attachment': attachment is Map ? MultipartFile.fromBytes(attachment['bytes'], filename: attachment['filename']) : null
+    });
+
     return await dio.post(URL, data: formData, options: _options);
   }
 }

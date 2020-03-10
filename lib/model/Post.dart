@@ -7,6 +7,7 @@ import 'package:html/parser.dart';
 import 'package:html_unescape/html_unescape.dart';
 
 class Post {
+  int idKlub;
   // ignore: non_constant_identifier_names
   int _id_wu;
   String _rawContent;
@@ -22,7 +23,7 @@ class Post {
   List<Link> _links = [];
   List<Video> _videos = [];
 
-  Post.fromJson(Map<String, dynamic> json) {
+  Post.fromJson(Map<String, dynamic> json, this.idKlub) {
     var unescape = HtmlUnescape();
     var content = unescape.convert(json['content']);
 
@@ -34,6 +35,8 @@ class Post {
     this._wu_rating = int.parse(json['wu_rating']);
     this._wu_type = int.parse(json['wu_type']);
 
+    // TODO: Handle spoilers
+    // TODO: Handle <code/> tags
     this._removeTrailingBr();
     this._parseEmbeds();
     this._parseAttachedImages();
@@ -55,6 +58,11 @@ class Post {
       var document = parse(_content);
       var youtubes = document.querySelectorAll('div[data-embed-type="youtube"]');
       youtubes.forEach((el) {
+        // If the video does not have preview, it's invalid Nyx attachment, therefore we skip it and handle it as a normal post.
+        if (el.querySelector('img') == null) {
+          return;
+        }
+
         var video = Video(
             id: el.attributes['data-embed-value'],
             type: Video.findVideoType(el.attributes['data-embed-type']),
@@ -71,7 +79,7 @@ class Post {
       });
       _content = document.body.innerHtml;
     } catch (error) {
-      PlatformTheme.error(error);
+      PlatformTheme.error(error.toString());
     }
   }
 

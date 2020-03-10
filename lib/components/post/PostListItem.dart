@@ -10,15 +10,21 @@ import 'package:fyx/components/post/PostHtml.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/model/post/Link.dart';
+import 'package:fyx/pages/NewMessagePage.dart';
+import 'package:fyx/theme/T.dart';
 
 enum LAYOUT_TYPES { textOnly, oneImageOnly, attachmentsOnly, attachmentsAndText }
 typedef Widget TLayout();
 
 class PostListItem extends ListItemWithCategory {
   final Post post;
+  final bool _isPreview;
   final Map<LAYOUT_TYPES, TLayout> _layoutMap = {};
 
-  PostListItem(this.post) {
+  // Callback when the content might have changed...
+  Function onUpdate;
+
+  PostListItem(this.post, {this.onUpdate, isPreview = false}) : _isPreview = isPreview {
     // The order here is important!
     _layoutMap.putIfAbsent(
         LAYOUT_TYPES.textOnly,
@@ -99,10 +105,14 @@ class PostListItem extends ListItemWithCategory {
   @override
   Widget build(BuildContext context) {
     return Container(
+      decoration: _isPreview ? T.CARD_SHADOW_DECORATION : null,
       child: Column(
         children: <Widget>[
-          Divider(
-            thickness: 8,
+          Visibility(
+            visible: _isPreview != true,
+            child: Divider(
+              thickness: 8,
+            ),
           ),
           SizedBox(
             height: 8,
@@ -117,21 +127,21 @@ class PostListItem extends ListItemWithCategory {
                   children: <Widget>[
                     Icon(
                       Icons.thumb_up,
-                      color: Colors.black38,
+                      color: post.rating > 0 ? Colors.green : Colors.black38,
                     ),
                     SizedBox(
                       width: 4,
                     ),
                     Text(
                       post.rating.toString(),
-                      style: TextStyle(color: Colors.black38),
+                      style: TextStyle(color: post.rating > 0 ? Colors.green : (post.rating < 0 ? Colors.redAccent : Colors.black38)),
                     ),
                     SizedBox(
                       width: 4,
                     ),
                     Icon(
                       Icons.thumb_down,
-                      color: Colors.black38,
+                      color: post.rating < 0 ? Colors.redAccent : Colors.black38,
                     ),
                     SizedBox(
                       width: 16,
@@ -139,6 +149,21 @@ class PostListItem extends ListItemWithCategory {
                     Icon(
                       Icons.bookmark_border,
                       color: Colors.black38,
+                    ),
+                    Visibility(
+                      visible: _isPreview != true,
+                      child: SizedBox(
+                        width: 16,
+                      ),
+                    ),
+                    Visibility(
+                      visible: _isPreview != true,
+                      child: GestureDetector(
+                          onTap: () => Navigator.of(context).pushNamed('/discussion/new-message', arguments: NewMessageSettings(post.idKlub, post: post, onClose: this.onUpdate)),
+                          child: Icon(
+                            Icons.reply,
+                            color: Colors.black38,
+                          )),
                     )
                   ],
                 )
@@ -166,7 +191,10 @@ class PostListItem extends ListItemWithCategory {
               decoration: BoxDecoration(color: Colors.green),
               child: Text(post.content),
             ),
-          )
+          ),
+          SizedBox(
+            height: 8,
+          ),
         ],
       ),
     );

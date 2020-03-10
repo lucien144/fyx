@@ -62,6 +62,10 @@ class ApiMock implements IApiProvider {
   @override
   // TODO
   Future<Response> fetchDiscussion(int id, {lastId}) {}
+
+  @override
+  // TODO
+  Future<Response> postDiscussionMessage(int id, String message, {Map<String, dynamic> attachment}) {}
 }
 
 void main() {
