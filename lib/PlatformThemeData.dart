@@ -8,10 +8,13 @@ class PlatformThemeData {
   PlatformThemeData({this.primaryColor});
 
   material() {
-    return ThemeData(primaryColor: primaryColor);
+    return ThemeData(primaryColor: primaryColor, brightness: Brightness.light);
   }
 
   cupertino() {
-    return CupertinoThemeData(primaryColor: primaryColor, textTheme: CupertinoTextThemeData(primaryColor: Colors.white, textStyle: TextStyle(color: T.COLOR_BLACK, fontSize: 16)));
+    return CupertinoThemeData(
+        primaryColor: primaryColor,
+        brightness: Brightness.light,
+        textTheme: CupertinoTextThemeData(primaryColor: Colors.white, textStyle: TextStyle(color: T.COLOR_BLACK, fontSize: 16)));
   }
 }
