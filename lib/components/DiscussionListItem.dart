@@ -17,7 +17,7 @@ class DiscussionListItem extends ListItemWithCategory {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/discussion', arguments: discussion),
+      onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/discussion', arguments: discussion.idKlub),
       child: Container(
         decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.black12))),
         padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),

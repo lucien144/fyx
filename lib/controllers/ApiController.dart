@@ -7,6 +7,7 @@ import 'package:fyx/controllers/ApiProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/exceptions/AuthException.dart';
 import 'package:fyx/model/Credentials.dart';
+import 'package:fyx/model/DiscussionResponse.dart';
 import 'package:fyx/model/LoginResponse.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/theme/L.dart';
@@ -64,9 +65,9 @@ class ApiController {
     return jsonDecode(response.data)['data'];
   }
 
-  Future<dynamic> loadDiscussion(int id, {int lastId}) async {
+  Future<DiscussionResponse> loadDiscussion(int id, {int lastId}) async {
     var response = await provider.fetchDiscussion(id, lastId: lastId);
-    return jsonDecode(response.data)['data'];
+    return DiscussionResponse.fromJson(jsonDecode(response.data));
   }
 
   Future<Response> postDiscussionMessage(int id, String message, {Map<String, dynamic> attachment, Post replyPost}) {
