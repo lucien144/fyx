@@ -161,7 +161,7 @@ class _TutorialPageState extends State<TutorialPage> {
   }
 
   Widget slideCard(Widget child) {
-    return Container(height: 250, padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16), decoration: T.CART_SHADOW_DECORATION, child: child);
+    return Container(height: 250, padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16), decoration: T.CARD_SHADOW_DECORATION, child: child);
   }
 
   Widget slideToken(String title) {

@@ -105,7 +105,7 @@ class PostListItem extends ListItemWithCategory {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: _isPreview ? T.CART_SHADOW_DECORATION : null,
+      decoration: _isPreview ? T.CARD_SHADOW_DECORATION : null,
       child: Column(
         children: <Widget>[
           Visibility(
