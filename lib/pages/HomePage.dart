@@ -16,7 +16,7 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with RouteAware {
+class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObserver {
   final PageController _bookmarksController = PageController(initialPage: 0);
 
   tabs activeTab;
@@ -26,6 +26,8 @@ class _HomePageState extends State<HomePage> with RouteAware {
   void initState() {
     super.initState();
     activeTab = tabs.history;
+
+    WidgetsBinding.instance.addObserver(this);
 
     _bookmarksController.addListener(() {
       // If the CupertinoTabView is sliding and the animation is finished, change the active tab
@@ -41,7 +43,15 @@ class _HomePageState extends State<HomePage> with RouteAware {
   void dispose() {
     _bookmarksController.dispose();
     FyxApp.routeObserver.unsubscribe(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      this.refreshData();
+    }
   }
 
   @override
