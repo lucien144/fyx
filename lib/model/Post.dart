@@ -115,7 +115,7 @@ class Post {
 
     // Find all other links.
     document = parse(document.body.innerHtml);
-    _links.addAll(document.querySelectorAll('a:not([data-link-wu])').map((Element el) => Link(el.attributes['href'], title: el.text)));
+    _links.addAll(document.querySelectorAll('a:not([data-link-wu]):not([href^=\\?])').map((Element el) => Link(el.attributes['href'], title: el.text)));
   }
 
   String get strippedContent => parse(parse(_content).body.text).documentElement.text.trim();
