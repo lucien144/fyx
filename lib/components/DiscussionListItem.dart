@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/ListItemWithCategory.dart';
 import 'package:fyx/model/Discussion.dart';
+import 'package:fyx/pages/DiscussionPage.dart';
 
 class DiscussionListItem extends ListItemWithCategory {
   final Discussion discussion;
@@ -17,7 +18,7 @@ class DiscussionListItem extends ListItemWithCategory {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/discussion', arguments: discussion.idKlub),
+      onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/discussion', arguments: DiscussionPageArguments(discussion.idKlub)),
       child: Container(
         decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.black12))),
         padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),

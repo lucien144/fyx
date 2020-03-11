@@ -1,3 +1,4 @@
+import 'package:async/async.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -9,13 +10,27 @@ import 'package:fyx/model/Post.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/T.dart';
 
+class DiscussionPageArguments {
+  final int discussionId;
+  final int postId;
+
+  DiscussionPageArguments(this.discussionId, {this.postId});
+}
+
 class DiscussionPage extends StatefulWidget {
   @override
   _DiscussionPageState createState() => _DiscussionPageState();
 }
 
 class _DiscussionPageState extends State<DiscussionPage> with WidgetsBindingObserver {
+  final AsyncMemoizer _memoizer = AsyncMemoizer<DiscussionResponse>();
   int _refreshList = 0;
+
+  Future<DiscussionResponse> _fetchData(discussionId, postId) {
+    return this._memoizer.runOnce(() {
+      return ApiController().loadDiscussion(discussionId, lastId: postId);
+    });
+  }
 
   refresh() {
     setState(() => _refreshList = DateTime.now().millisecondsSinceEpoch);
@@ -42,10 +57,10 @@ class _DiscussionPageState extends State<DiscussionPage> with WidgetsBindingObse
 
   @override
   Widget build(BuildContext context) {
-    final int discussionId = ModalRoute.of(context).settings.arguments;
+    DiscussionPageArguments pageArguments = ModalRoute.of(context).settings.arguments;
 
     return FutureBuilder<DiscussionResponse>(
-        future: ApiController().loadDiscussion(discussionId),
+        future: _fetchData(pageArguments.discussionId, pageArguments.postId),
         builder: (BuildContext context, AsyncSnapshot<DiscussionResponse> snapshot) {
           if (snapshot.hasData) {
             return CupertinoPageScaffold(
@@ -65,13 +80,13 @@ class _DiscussionPageState extends State<DiscussionPage> with WidgetsBindingObse
                     dataProvider: (lastId) async {
                       var result;
                       if (lastId != null) {
-                        var response = await ApiController().loadDiscussion(discussionId, lastId: lastId);
+                        var response = await ApiController().loadDiscussion(pageArguments.discussionId, lastId: lastId);
                         result = response.data;
                       } else {
                         result = snapshot.data.data;
                       }
-                      var data = (result as List).map((post) => PostListItem(Post.fromJson(post, discussionId), onUpdate: this.refresh)).toList();
-                      var id = Post.fromJson((result as List).last, discussionId).id;
+                      var data = (result as List).map((post) => PostListItem(Post.fromJson(post, pageArguments.discussionId), onUpdate: this.refresh)).toList();
+                      var id = Post.fromJson((result as List).last, pageArguments.discussionId).id;
                       return DataProviderResult(data, lastId: id);
                     },
                   ),
@@ -82,7 +97,8 @@ class _DiscussionPageState extends State<DiscussionPage> with WidgetsBindingObse
                       child: FloatingActionButton(
                         backgroundColor: T.COLOR_PRIMARY,
                         child: Icon(Icons.add),
-                        onPressed: () => Navigator.of(context).pushNamed('/discussion/new-message', arguments: NewMessageSettings(discussionId, onClose: this.refresh)),
+                        onPressed: () =>
+                            Navigator.of(context).pushNamed('/discussion/new-message', arguments: NewMessageSettings(pageArguments.discussionId, onClose: this.refresh)),
                       ),
                     ),
                   ),
