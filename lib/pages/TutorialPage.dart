@@ -55,15 +55,7 @@ class _TutorialPageState extends State<TutorialPage> {
                     ), onTap: () async {
                     setState(() => _hasOpenedNyx = true);
                     const url = 'https://www.nyx.cz/index.php?l=user;l2=2;section=authorizations;n=1ba4';
-                    try {
-                      if (await canLaunch(url)) {
-                        await launch(url);
-                      } else {
-                        PlatformTheme.error(L.INAPPBROWSER_ERROR);
-                      }
-                    } catch (e) {
-                      PlatformTheme.error(L.INAPPBROWSER_ERROR);
-                    }
+                    PlatformTheme.openLink(url);
                   }))
       ];
       _slider = CarouselSlider.builder(

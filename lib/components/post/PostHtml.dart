@@ -3,8 +3,6 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
-import 'package:fyx/theme/L.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class PostHtml extends StatelessWidget {
   final Post post;
@@ -36,15 +34,7 @@ class PostHtml extends StatelessWidget {
           return;
         }
 
-        try {
-          if (await canLaunch(link)) {
-            await launch(link);
-          } else {
-            PlatformTheme.error(L.INAPPBROWSER_ERROR);
-          }
-        } catch (e) {
-          PlatformTheme.error(L.INAPPBROWSER_ERROR);
-        }
+        PlatformTheme.openLink(link);
       },
     );
   }
