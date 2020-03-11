@@ -20,7 +20,9 @@ class PostHtml extends StatelessWidget {
         RegExp topicTest = new RegExp(r"^\?l=topic;id=([0-9]+)$");
         Iterable<RegExpMatch> topicMatches = topicTest.allMatches(link);
         if (topicMatches.length == 1) {
-          var arguments = DiscussionPageArguments(int.parse(topicMatches.elementAt(0).group(1)));
+          var id = int.parse(topicMatches.elementAt(0).group(1));
+          var arguments = DiscussionPageArguments(id);
+          DiscussionPage.deeplinkDepth++;
           Navigator.of(context, rootNavigator: true).pushNamed('/discussion', arguments: arguments);
           return;
         }
@@ -29,7 +31,10 @@ class PostHtml extends StatelessWidget {
         RegExp topicDeeplinkTest = new RegExp(r"^\?l=topic;id=([0-9]+);wu=([0-9]+)$");
         Iterable<RegExpMatch> topicDeeplinkMatches = topicDeeplinkTest.allMatches(link);
         if (topicDeeplinkMatches.length == 1) {
-          var arguments = DiscussionPageArguments(int.parse(topicDeeplinkMatches.elementAt(0).group(1)), postId: int.parse(topicDeeplinkMatches.elementAt(0).group(2)) + 1);
+          var id = int.parse(topicDeeplinkMatches.elementAt(0).group(1));
+          var wu = int.parse(topicDeeplinkMatches.elementAt(0).group(2)) + 1;
+          var arguments = DiscussionPageArguments(id, postId: wu);
+          DiscussionPage.deeplinkDepth++;
           Navigator.of(context, rootNavigator: true).pushNamed('/discussion', arguments: arguments);
           return;
         }

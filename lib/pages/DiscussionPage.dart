@@ -12,6 +12,8 @@ import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 
+import '../FyxApp.dart';
+
 class DiscussionPageArguments {
   final int discussionId;
   final int postId;
@@ -20,13 +22,16 @@ class DiscussionPageArguments {
 }
 
 class DiscussionPage extends StatefulWidget {
+  static int deeplinkDepth = 0;
+
   @override
   _DiscussionPageState createState() => _DiscussionPageState();
 }
 
-class _DiscussionPageState extends State<DiscussionPage> with WidgetsBindingObserver {
+class _DiscussionPageState extends State<DiscussionPage> with RouteAware, WidgetsBindingObserver {
   final AsyncMemoizer _memoizer = AsyncMemoizer<DiscussionResponse>();
   int _refreshList = 0;
+  bool _hasBackToRootButton = false;
 
   Future<DiscussionResponse> _fetchData(discussionId, postId) {
     return this._memoizer.runOnce(() {
@@ -47,6 +52,7 @@ class _DiscussionPageState extends State<DiscussionPage> with WidgetsBindingObse
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    FyxApp.routeObserver.unsubscribe(this);
     super.dispose();
   }
 
@@ -55,6 +61,27 @@ class _DiscussionPageState extends State<DiscussionPage> with WidgetsBindingObse
     if (state == AppLifecycleState.resumed) {
       this.refresh();
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    FyxApp.routeObserver.subscribe(this, ModalRoute.of(context));
+  }
+
+  void didPush() {
+    if (DiscussionPage.deeplinkDepth < 0) {
+      DiscussionPage.deeplinkDepth = 0;
+    }
+    setState(() => _hasBackToRootButton = DiscussionPage.deeplinkDepth > 0);
+  }
+
+  void didPop() {
+    DiscussionPage.deeplinkDepth--;
+    if (DiscussionPage.deeplinkDepth < 0) {
+      DiscussionPage.deeplinkDepth = 0;
+    }
+    setState(() => _hasBackToRootButton = DiscussionPage.deeplinkDepth > 0);
   }
 
   @override
@@ -77,13 +104,45 @@ class _DiscussionPageState extends State<DiscussionPage> with WidgetsBindingObse
   Widget _createDiscussionPage(DiscussionResponse discussionResponse, DiscussionPageArguments pageArguments) {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        backgroundColor: Colors.white,
-        leading: CupertinoNavigationBarBackButton(
-          color: T.COLOR_PRIMARY,
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        middle: Text(discussionResponse.discussion['name'], overflow: TextOverflow.ellipsis),
-      ),
+          backgroundColor: Colors.white,
+          leading: CupertinoNavigationBarBackButton(
+            color: T.COLOR_PRIMARY,
+            onPressed: () {
+              DiscussionPage.deeplinkDepth = 0;
+              Navigator.of(context).pop();
+            },
+          ),
+          middle: Text(discussionResponse.discussion['name'], overflow: TextOverflow.ellipsis),
+          trailing: Visibility(
+            visible: _hasBackToRootButton,
+            child: CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: () {
+                Navigator.of(context).popUntil((route) {
+                  if (DiscussionPage.deeplinkDepth <= 0) {
+                    return true;
+                  }
+                  return false;
+                });
+              },
+              child: Transform(
+                transform: Matrix4.rotationZ(1.57079633),
+                alignment: Alignment.center,
+                child: Text.rich(
+                  TextSpan(
+                    text: String.fromCharCode(CupertinoIcons.back.codePoint),
+                    style: TextStyle(
+                      inherit: false,
+                      color: T.COLOR_PRIMARY,
+                      fontSize: 34.0,
+                      fontFamily: CupertinoIcons.back.fontFamily,
+                      package: CupertinoIcons.back.fontPackage,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          )),
       child: Stack(
         children: [
           PullToRefreshList(
