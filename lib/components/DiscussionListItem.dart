@@ -35,8 +35,9 @@ class DiscussionListItem extends ListItemWithCategory {
                       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                       child: Center(
                         child: AutoSizeText(
-                          discussion.unread.toString(),
+                          discussion.unread > 199 ? '∞' : discussion.unread.toString(), //discussion.unread.toString(),
                           maxLines: 1,
+                          minFontSize: 1,
                           style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
                         ),
                       ),
