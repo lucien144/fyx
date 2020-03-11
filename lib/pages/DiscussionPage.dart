@@ -2,12 +2,14 @@ import 'package:async/async.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/components/post/PostListItem.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/DiscussionResponse.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
+import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 
 class DiscussionPageArguments {
@@ -63,57 +65,56 @@ class _DiscussionPageState extends State<DiscussionPage> with WidgetsBindingObse
         future: _fetchData(pageArguments.discussionId, pageArguments.postId),
         builder: (BuildContext context, AsyncSnapshot<DiscussionResponse> snapshot) {
           if (snapshot.hasData) {
-            return CupertinoPageScaffold(
-              navigationBar: CupertinoNavigationBar(
-                backgroundColor: Colors.white,
-                leading: CupertinoNavigationBarBackButton(
-                  color: T.COLOR_PRIMARY,
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-                middle: Text(snapshot.data.discussion['name'], overflow: TextOverflow.ellipsis),
-              ),
-              child: Stack(
-                children: [
-                  PullToRefreshList(
-                    rebuild: _refreshList,
-                    isInfinite: true,
-                    dataProvider: (lastId) async {
-                      var result;
-                      if (lastId != null) {
-                        var response = await ApiController().loadDiscussion(pageArguments.discussionId, lastId: lastId);
-                        result = response.data;
-                      } else {
-                        result = snapshot.data.data;
-                      }
-                      var data = (result as List).map((post) => PostListItem(Post.fromJson(post, pageArguments.discussionId), onUpdate: this.refresh)).toList();
-                      var id = Post.fromJson((result as List).last, pageArguments.discussionId).id;
-                      return DataProviderResult(data, lastId: id);
-                    },
-                  ),
-                  Positioned(
-                    right: 20,
-                    bottom: 20,
-                    child: SafeArea(
-                      child: FloatingActionButton(
-                        backgroundColor: T.COLOR_PRIMARY,
-                        child: Icon(Icons.add),
-                        onPressed: () =>
-                            Navigator.of(context).pushNamed('/discussion/new-message', arguments: NewMessageSettings(pageArguments.discussionId, onClose: this.refresh)),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
+            return this._createDiscussionPage(snapshot.data, pageArguments);
           } else if (snapshot.hasError) {
-            // TODO
-            return Container(child: Text('error ${snapshot.error.toString()}'), color: Colors.white);
+            return PlatformTheme.feedbackScreen(isWarning: true, title: snapshot.error.toString(), label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
           } else {
-            return Container(
-              child: Text('loading'),
-              color: Colors.white,
-            );
+            return PlatformTheme.feedbackScreen(isLoading: true);
           }
         });
+  }
+
+  Widget _createDiscussionPage(DiscussionResponse discussionResponse, DiscussionPageArguments pageArguments) {
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        backgroundColor: Colors.white,
+        leading: CupertinoNavigationBarBackButton(
+          color: T.COLOR_PRIMARY,
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        middle: Text(discussionResponse.discussion['name'], overflow: TextOverflow.ellipsis),
+      ),
+      child: Stack(
+        children: [
+          PullToRefreshList(
+            rebuild: _refreshList,
+            isInfinite: true,
+            dataProvider: (lastId) async {
+              var result;
+              if (lastId != null) {
+                var response = await ApiController().loadDiscussion(pageArguments.discussionId, lastId: lastId);
+                result = response.data;
+              } else {
+                result = discussionResponse.data;
+              }
+              var data = (result as List).map((post) => PostListItem(Post.fromJson(post, pageArguments.discussionId), onUpdate: this.refresh)).toList();
+              var id = Post.fromJson((result as List).last, pageArguments.discussionId).id;
+              return DataProviderResult(data, lastId: id);
+            },
+          ),
+          Positioned(
+            right: 20,
+            bottom: 20,
+            child: SafeArea(
+              child: FloatingActionButton(
+                backgroundColor: T.COLOR_PRIMARY,
+                child: Icon(Icons.add),
+                onPressed: () => Navigator.of(context).pushNamed('/discussion/new-message', arguments: NewMessageSettings(pageArguments.discussionId, onClose: this.refresh)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

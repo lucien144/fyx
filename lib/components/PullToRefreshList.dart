@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'package:fyx/PlatformTheme.dart';
+import 'package:fyx/theme/L.dart';
 
 class DataProviderResult {
   final List data;
@@ -81,7 +83,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
     }
 
     return _hasError || _slivers.length == 1
-        ? errorScreen()
+        ? PlatformTheme.feedbackScreen(isLoading: _isLoading, onPress: loadData, label: L.GENERAL_REFRESH)
         : CustomScrollView(
             slivers: _slivers,
             controller: _controller,
@@ -119,31 +121,6 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
     }
 
     throw Exception('Data in the PullToRefresh must be instance of Widget or Map{header, items}');
-  }
-
-  Widget errorScreen() {
-    return Container(
-      width: double.infinity,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Visibility(
-            visible: _isLoading,
-            child: CupertinoActivityIndicator(
-              radius: 16,
-            ),
-          ),
-          Visibility(
-            visible: !_isLoading,
-            child: CupertinoButton(
-              color: Colors.black26,
-              child: Text('Načíst znovu...'),
-              onPressed: () => loadData(),
-            ),
-          )
-        ],
-      ),
-    );
   }
 
   loadData({bool append = false}) async {

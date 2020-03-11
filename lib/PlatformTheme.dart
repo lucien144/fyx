@@ -35,4 +35,44 @@ class PlatformTheme {
       PlatformTheme.error(L.INAPPBROWSER_ERROR);
     }
   }
+
+  static Widget feedbackScreen({bool isLoading = false, bool isWarning = false, String label = '', String title = '', Function onPress}) {
+    return Container(
+      width: double.infinity,
+      color: Colors.white,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Visibility(
+            visible: isLoading && !isWarning,
+            child: CupertinoActivityIndicator(
+              radius: 16,
+            ),
+          ),
+          Visibility(
+            visible: !isLoading && isWarning,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Icon(Icons.warning),
+            ),
+          ),
+          Visibility(
+            visible: title.isNotEmpty,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(title),
+            ),
+          ),
+          Visibility(
+            visible: !isLoading && onPress is Function,
+            child: CupertinoButton(
+              color: Colors.black26,
+              child: Text(label),
+              onPressed: onPress,
+            ),
+          )
+        ],
+      ),
+    );
+  }
 }
