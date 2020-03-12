@@ -74,8 +74,11 @@ class ApiController {
     if (replyPost != null) {
       message = '{reply ${replyPost.nick}|${replyPost.id}}: ${message}';
     }
-    print(message);
     return provider.postDiscussionMessage(id, message, attachment: attachment);
+  }
+
+  Future<Response> setPostReminder(int discussionId, int postId, bool setReminder) {
+    return provider.setPostReminder(discussionId, postId, setReminder);
   }
 
   void logout() {
