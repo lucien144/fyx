@@ -32,6 +32,7 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
   final AsyncMemoizer _memoizer = AsyncMemoizer<DiscussionResponse>();
   int _refreshList = 0;
   bool _hasBackToRootButton = false;
+  bool _hasInitData = false;
 
   Future<DiscussionResponse> _fetchData(discussionId, postId) {
     return this._memoizer.runOnce(() {
@@ -151,10 +152,20 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
             dataProvider: (lastId) async {
               var result;
               if (lastId != null) {
+                // If we load next page(s)
                 var response = await ApiController().loadDiscussion(pageArguments.discussionId, lastId: lastId);
                 result = response.data;
               } else {
-                result = discussionResponse.data;
+                // If we load init data or we refresh data on pull
+                if (!this._hasInitData) {
+                  // If we load init data, use the data from FutureBuilder
+                  result = discussionResponse.data;
+                  this._hasInitData = true;
+                } else {
+                  // If we just pull to refresh, load a fresh data
+                  var response = await ApiController().loadDiscussion(pageArguments.discussionId);
+                  result = response.data;
+                }
               }
               var data = (result as List).map((post) => PostListItem(Post.fromJson(post, pageArguments.discussionId), onUpdate: this.refresh)).toList();
               var id = Post.fromJson((result as List).last, pageArguments.discussionId).id;
