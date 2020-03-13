@@ -17,6 +17,7 @@ class Post {
   int _wu_rating;
   // ignore: non_constant_identifier_names
   int _wu_type;
+  bool _reminder;
 
   String _content;
   List<Image> _images = [];
@@ -34,6 +35,7 @@ class Post {
     this._time = int.parse(json['time']);
     this._wu_rating = int.parse(json['wu_rating']);
     this._wu_type = int.parse(json['wu_type']);
+    this._reminder = (json['reminder'] ?? 'no') == 'yes';
 
     // TODO: Handle spoilers
     // TODO: Handle <code/> tags
@@ -115,7 +117,7 @@ class Post {
 
     // Find all other links.
     document = parse(document.body.innerHtml);
-    _links.addAll(document.querySelectorAll('a:not([data-link-wu])').map((Element el) => Link(el.attributes['href'], title: el.text)));
+    _links.addAll(document.querySelectorAll('a:not([data-link-wu]):not([href^=\\?])').map((Element el) => Link(el.attributes['href'], title: el.text)));
   }
 
   String get strippedContent => parse(parse(_content).body.text).documentElement.text.trim();
@@ -141,6 +143,14 @@ class Post {
   List<Link> get links => _links;
 
   List<Video> get videos => _videos;
+
+  // ignore: unnecessary_getters_setters
+  bool get hasReminder => _reminder;
+
+  // ignore: unnecessary_getters_setters
+  set hasReminder(bool value) {
+    _reminder = value;
+  }
 
   List<dynamic> get attachments {
     var list = [];

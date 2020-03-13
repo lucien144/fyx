@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/post/PostHeroAttachmentBox.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/post/Image.dart' as model;
@@ -49,6 +50,7 @@ class PostHeroAttachment extends StatelessWidget {
       return PostHeroAttachmentBox(
         title: (attachment as Link).title,
         icon: Icons.link,
+        onTap: () => PlatformTheme.openLink((attachment as Link).url),
       );
     }
 
@@ -57,9 +59,11 @@ class PostHeroAttachment extends StatelessWidget {
         title: (attachment as Video).link.title,
         icon: Icons.play_circle_filled,
         image: (attachment as Video).thumb,
+        onTap: () => PlatformTheme.openLink((attachment as Video).link.url),
       );
     }
 
+    // TODO: Show an error message and open a github issue.
     return Container(
       width: 100,
       height: 100,

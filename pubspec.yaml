@@ -41,6 +41,7 @@ dependencies:
   image_picker_modern: ^0.4.12+3
   path: ^1.6.4
   image: 2.1.4
+  async: ^2.4.0
   flutter:
     sdk: flutter
 

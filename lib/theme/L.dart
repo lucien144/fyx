@@ -5,6 +5,7 @@ class L {
   static String AUTH_ERROR = 'Problém s přihlášením, přihlašte se znovu.';
   static String API_ERROR = 'Pardon, nastal problém v komunikaci se serverem.';
   static String INAPPBROWSER_ERROR = 'Nepodařilo se otevřít prohlížeč.';
+  static String REMINDER_ERROR = 'Příspěvek se nepodařilo uložit do upomínek.';
 
   // General
   static String GENERAL_SKIP = 'Přeskočit';
@@ -12,6 +13,9 @@ class L {
   static String GENERAL_BEGIN = 'Začít';
   static String GENERAL_COPY = 'Zkopírovat';
   static String GENERAL_NEXT_STEP = 'Další krok';
+  static String GENERAL_GO_BACK = 'Zpět';
+  static String GENERAL_CLOSE = 'Zavřít';
+  static String GENERAL_REFRESH = 'Načíst znovu...';
 
   // Tutorial page
   static String TUTORIAL_SUCCESS = 'Paráda 🤘';

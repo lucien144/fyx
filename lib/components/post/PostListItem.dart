@@ -2,27 +2,27 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/FyxApp.dart';
-import 'package:fyx/components/ListItemWithCategory.dart';
+import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/post/PostAvatar.dart';
 import 'package:fyx/components/post/PostFooterLink.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/components/post/PostHtml.dart';
+import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/model/post/Link.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
+import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 
 enum LAYOUT_TYPES { textOnly, oneImageOnly, attachmentsOnly, attachmentsAndText }
 typedef Widget TLayout();
 
-class PostListItem extends ListItemWithCategory {
+class PostListItem extends StatefulWidget {
   final Post post;
   final bool _isPreview;
   final Map<LAYOUT_TYPES, TLayout> _layoutMap = {};
-
-  // Callback when the content might have changed...
-  Function onUpdate;
+  final Function onUpdate;
 
   PostListItem(this.post, {this.onUpdate, isPreview = false}) : _isPreview = isPreview {
     // The order here is important!
@@ -103,13 +103,26 @@ class PostListItem extends ListItemWithCategory {
   }
 
   @override
+  _PostListItemState createState() => _PostListItemState();
+}
+
+class _PostListItemState extends State<PostListItem> {
+  Post _post;
+
+  @override
+  void initState() {
+    super.initState();
+    _post = widget.post;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: _isPreview ? T.CARD_SHADOW_DECORATION : null,
+      decoration: widget._isPreview ? T.CARD_SHADOW_DECORATION : null,
       child: Column(
         children: <Widget>[
           Visibility(
-            visible: _isPreview != true,
+            visible: widget._isPreview != true,
             child: Divider(
               thickness: 8,
             ),
@@ -122,44 +135,54 @@ class PostListItem extends ListItemWithCategory {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                PostAvatar(post.avatar, post.nick),
+                PostAvatar(_post.avatar, _post.nick),
                 Row(
                   children: <Widget>[
                     Icon(
                       Icons.thumb_up,
-                      color: post.rating > 0 ? Colors.green : Colors.black38,
+                      color: _post.rating > 0 ? Colors.green : Colors.black38,
                     ),
                     SizedBox(
                       width: 4,
                     ),
                     Text(
-                      post.rating.toString(),
-                      style: TextStyle(color: post.rating > 0 ? Colors.green : (post.rating < 0 ? Colors.redAccent : Colors.black38)),
+                      _post.rating.toString(),
+                      style: TextStyle(color: _post.rating > 0 ? Colors.green : (_post.rating < 0 ? Colors.redAccent : Colors.black38)),
                     ),
                     SizedBox(
                       width: 4,
                     ),
                     Icon(
                       Icons.thumb_down,
-                      color: post.rating < 0 ? Colors.redAccent : Colors.black38,
+                      color: _post.rating < 0 ? Colors.redAccent : Colors.black38,
                     ),
                     SizedBox(
                       width: 16,
                     ),
-                    Icon(
-                      Icons.bookmark_border,
-                      color: Colors.black38,
+                    GestureDetector(
+                      child: Icon(
+                        _post.hasReminder ? Icons.bookmark : Icons.bookmark_border,
+                        color: Colors.black38,
+                      ),
+                      onTap: () {
+                        setState(() => _post.hasReminder = !_post.hasReminder);
+                        ApiController().setPostReminder(this._post.idKlub, this._post.id, !_post.hasReminder).catchError((error) {
+                          PlatformTheme.error(L.REMINDER_ERROR);
+                          setState(() => _post.hasReminder = !_post.hasReminder);
+                        });
+                      },
                     ),
                     Visibility(
-                      visible: _isPreview != true,
+                      visible: widget._isPreview != true,
                       child: SizedBox(
                         width: 16,
                       ),
                     ),
                     Visibility(
-                      visible: _isPreview != true,
+                      visible: widget._isPreview != true,
                       child: GestureDetector(
-                          onTap: () => Navigator.of(context).pushNamed('/discussion/new-message', arguments: NewMessageSettings(post.idKlub, post: post, onClose: this.onUpdate)),
+                          onTap: () =>
+                              Navigator.of(context).pushNamed('/discussion/new-message', arguments: NewMessageSettings(_post.idKlub, post: _post, onClose: this.widget.onUpdate)),
                           child: Icon(
                             Icons.reply,
                             color: Colors.black38,
@@ -178,18 +201,18 @@ class PostListItem extends ListItemWithCategory {
             visible: FyxApp.isDev,
             child: Container(
               decoration: BoxDecoration(color: Colors.red),
-              child: Text('A: ${post.attachments.length} / '
-                  'I: ${post.images.length} / '
-                  'L: ${post.links.length} / '
-                  'V: ${post.videos.length} / '
-                  'Html: ${post.content.length} (${post.strippedContent.length})'),
+              child: Text('A: ${_post.attachments.length} / '
+                  'I: ${_post.images.length} / '
+                  'L: ${_post.links.length} / '
+                  'V: ${_post.videos.length} / '
+                  'Html: ${_post.content.length} (${_post.strippedContent.length})'),
             ),
           ),
           Visibility(
             visible: FyxApp.isDev,
             child: Container(
               decoration: BoxDecoration(color: Colors.green),
-              child: Text(post.content),
+              child: Text(_post.content),
             ),
           ),
           SizedBox(
@@ -202,7 +225,7 @@ class PostListItem extends ListItemWithCategory {
 
   Widget getContentWidget(BuildContext context) {
     for (final layout in LAYOUT_TYPES.values) {
-      var result = _layoutMap[layout]();
+      var result = widget._layoutMap[layout]();
       if (result != null) {
         return result;
       }
@@ -219,5 +242,10 @@ class PostListItem extends ListItemWithCategory {
   }
 
   @override
-  int get category => null;
+  void didUpdateWidget(PostListItem oldWidget) {
+    if (oldWidget.post != widget.post) {
+      setState(() => _post = widget.post);
+    }
+    super.didUpdateWidget(oldWidget);
+  }
 }
