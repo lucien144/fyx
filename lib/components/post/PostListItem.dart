@@ -193,7 +193,7 @@ class _PostListItemState extends State<PostListItem> {
                       ),
                       onTap: () {
                         setState(() => _post.hasReminder = !_post.hasReminder);
-                        ApiController().setPostReminder(this._post.idKlub, this._post.id, !_post.hasReminder).catchError((error) {
+                        ApiController().setPostReminder(this._post.idKlub, this._post.id, _post.hasReminder).catchError((error) {
                           PlatformTheme.error(L.REMINDER_ERROR);
                           setState(() => _post.hasReminder = !_post.hasReminder);
                         });
