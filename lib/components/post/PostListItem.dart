@@ -22,10 +22,13 @@ typedef Widget TLayout();
 class PostListItem extends StatefulWidget {
   final Post post;
   final bool _isPreview;
+  final bool _isHighlighted;
   final Map<LAYOUT_TYPES, TLayout> _layoutMap = {};
   final Function onUpdate;
 
-  PostListItem(this.post, {this.onUpdate, isPreview = false}) : _isPreview = isPreview {
+  PostListItem(this.post, {this.onUpdate, isPreview = false, isHighlighted = false})
+      : _isPreview = isPreview,
+        _isHighlighted = isHighlighted {
     // The order here is important!
     _layoutMap.putIfAbsent(
         LAYOUT_TYPES.textOnly,
@@ -136,7 +139,12 @@ class _PostListItemState extends State<PostListItem> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                PostAvatar(_post.avatar, _post.nick),
+                PostAvatar(
+                  _post.avatar,
+                  _post.nick,
+                  isHighlighted: widget._isHighlighted,
+                  description: getPostTime(),
+                ),
                 Row(
                   children: <Widget>[
                     GestureDetector(
@@ -258,6 +266,30 @@ class _PostListItemState extends State<PostListItem> {
         textAlign: TextAlign.center,
       )
     ]);
+  }
+
+  String getPostTime() {
+    var duration = Duration(seconds: ((DateTime.now().millisecondsSinceEpoch / 1000).floor() - _post.time));
+    if (duration.inSeconds < 60) {
+      return '${duration.inSeconds}s';
+    }
+    if (duration.inMinutes < 60) {
+      return '${duration.inMinutes}m';
+    }
+    if (duration.inHours < 24) {
+      return '${duration.inHours}H';
+    }
+    if (duration.inDays < 30) {
+      return '${duration.inDays}D';
+    }
+
+    var months = (duration.inDays / 30).round(); // Approx
+    if (months < 12) {
+      return '${months}M';
+    }
+
+    var years = (months / 12).round();
+    return '${years}Y';
   }
 
   @override
