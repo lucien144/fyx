@@ -81,6 +81,10 @@ class ApiController {
     return provider.setPostReminder(discussionId, postId, setReminder);
   }
 
+  Future<Response> giveRating(int discussionId, int postId, {bool positive = true}) {
+    return provider.giveRating(discussionId, postId, positive);
+  }
+
   void logout() {
     SharedPreferences.getInstance().then((prefs) => prefs.clear());
   }

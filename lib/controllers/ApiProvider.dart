@@ -145,4 +145,19 @@ class ApiProvider implements IApiProvider {
 
     return await dio.post(URL, data: formData, options: _options);
   }
+
+  Future<Response> giveRating(int discussionId, int postId, bool positive) async {
+    FormData formData = new FormData.fromMap({
+      'auth_nick': _credentials.nickname,
+      'auth_token': _credentials.token,
+      'l': 'discussion',
+      'l2': 'rating_give',
+      'id_klub': discussionId,
+      'id_wu': postId,
+      'rating': positive ? 'positive' : 'negative',
+      'toggle': 1
+    });
+
+    return await dio.post(URL, data: formData, options: _options);
+  }
 }

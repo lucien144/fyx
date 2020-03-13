@@ -130,6 +130,8 @@ class Post {
 
   int get rating => _wu_rating;
 
+  set rating(val) => _wu_rating = val;
+
   int get time => _time;
 
   String get avatar => 'https://i.nyx.cz/${this.nick.substring(0, 1)}/${this.nick}.gif';
@@ -148,9 +150,7 @@ class Post {
   bool get hasReminder => _reminder;
 
   // ignore: unnecessary_getters_setters
-  set hasReminder(bool value) {
-    _reminder = value;
-  }
+  set hasReminder(bool value) => _reminder = value;
 
   List<dynamic> get attachments {
     var list = [];

@@ -6,6 +6,7 @@ class L {
   static String API_ERROR = 'Pardon, nastal problém v komunikaci se serverem.';
   static String INAPPBROWSER_ERROR = 'Nepodařilo se otevřít prohlížeč.';
   static String REMINDER_ERROR = 'Příspěvek se nepodařilo uložit do upomínek.';
+  static String RATING_ERROR = 'Příspěvek se nepodařilo lajknout.';
 
   // General
   static String GENERAL_SKIP = 'Přeskočit';

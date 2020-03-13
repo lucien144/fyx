@@ -16,6 +16,7 @@ import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 
 enum LAYOUT_TYPES { textOnly, oneImageOnly, attachmentsOnly, attachmentsAndText }
+
 typedef Widget TLayout();
 
 class PostListItem extends StatefulWidget {
@@ -138,9 +139,18 @@ class _PostListItemState extends State<PostListItem> {
                 PostAvatar(_post.avatar, _post.nick),
                 Row(
                   children: <Widget>[
-                    Icon(
-                      Icons.thumb_up,
-                      color: _post.rating > 0 ? Colors.green : Colors.black38,
+                    GestureDetector(
+                      child: Icon(
+                        Icons.thumb_up,
+                        color: _post.rating > 0 ? Colors.green : Colors.black38,
+                      ),
+                      onTap: () {
+                        setState(() => _post.rating++);
+                        ApiController().giveRating(_post.idKlub, _post.id).catchError((error) {
+                          setState(() => _post.rating--);
+                          PlatformTheme.error(L.RATING_ERROR);
+                        });
+                      },
                     ),
                     SizedBox(
                       width: 4,
@@ -152,9 +162,18 @@ class _PostListItemState extends State<PostListItem> {
                     SizedBox(
                       width: 4,
                     ),
-                    Icon(
-                      Icons.thumb_down,
-                      color: _post.rating < 0 ? Colors.redAccent : Colors.black38,
+                    GestureDetector(
+                      child: Icon(
+                        Icons.thumb_down,
+                        color: _post.rating < 0 ? Colors.redAccent : Colors.black38,
+                      ),
+                      onTap: () {
+                        setState(() => _post.rating--);
+                        ApiController().giveRating(_post.idKlub, _post.id, positive: false).catchError((error) {
+                          setState(() => _post.rating++);
+                          PlatformTheme.error(L.RATING_ERROR);
+                        });
+                      },
                     ),
                     SizedBox(
                       width: 16,
