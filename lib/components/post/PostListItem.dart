@@ -107,12 +107,12 @@ class PostListItem extends StatefulWidget {
 }
 
 class _PostListItemState extends State<PostListItem> {
-  bool hasReminder;
+  Post _post;
 
   @override
   void initState() {
     super.initState();
-    hasReminder = widget.post.hasReminder;
+    _post = widget.post;
   }
 
   @override
@@ -135,41 +135,41 @@ class _PostListItemState extends State<PostListItem> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                PostAvatar(widget.post.avatar, widget.post.nick),
+                PostAvatar(_post.avatar, _post.nick),
                 Row(
                   children: <Widget>[
                     Icon(
                       Icons.thumb_up,
-                      color: widget.post.rating > 0 ? Colors.green : Colors.black38,
+                      color: _post.rating > 0 ? Colors.green : Colors.black38,
                     ),
                     SizedBox(
                       width: 4,
                     ),
                     Text(
-                      widget.post.rating.toString(),
-                      style: TextStyle(color: widget.post.rating > 0 ? Colors.green : (widget.post.rating < 0 ? Colors.redAccent : Colors.black38)),
+                      _post.rating.toString(),
+                      style: TextStyle(color: _post.rating > 0 ? Colors.green : (_post.rating < 0 ? Colors.redAccent : Colors.black38)),
                     ),
                     SizedBox(
                       width: 4,
                     ),
                     Icon(
                       Icons.thumb_down,
-                      color: widget.post.rating < 0 ? Colors.redAccent : Colors.black38,
+                      color: _post.rating < 0 ? Colors.redAccent : Colors.black38,
                     ),
                     SizedBox(
                       width: 16,
                     ),
                     GestureDetector(
                       child: Icon(
-                        hasReminder ? Icons.bookmark : Icons.bookmark_border,
+                        _post.hasReminder ? Icons.bookmark : Icons.bookmark_border,
                         color: Colors.black38,
                       ),
                       onTap: () {
-                        ApiController().setPostReminder(this.widget.post.idKlub, this.widget.post.id, !hasReminder).catchError((error) {
+                        setState(() => _post.hasReminder = !_post.hasReminder);
+                        ApiController().setPostReminder(this._post.idKlub, this._post.id, !_post.hasReminder).catchError((error) {
                           PlatformTheme.error(L.REMINDER_ERROR);
-                          setState(() => hasReminder = !hasReminder);
+                          setState(() => _post.hasReminder = !_post.hasReminder);
                         });
-                        setState(() => hasReminder = !hasReminder);
                       },
                     ),
                     Visibility(
@@ -181,8 +181,8 @@ class _PostListItemState extends State<PostListItem> {
                     Visibility(
                       visible: widget._isPreview != true,
                       child: GestureDetector(
-                          onTap: () => Navigator.of(context)
-                              .pushNamed('/discussion/new-message', arguments: NewMessageSettings(widget.post.idKlub, post: widget.post, onClose: this.widget.onUpdate)),
+                          onTap: () =>
+                              Navigator.of(context).pushNamed('/discussion/new-message', arguments: NewMessageSettings(_post.idKlub, post: _post, onClose: this.widget.onUpdate)),
                           child: Icon(
                             Icons.reply,
                             color: Colors.black38,
@@ -201,18 +201,18 @@ class _PostListItemState extends State<PostListItem> {
             visible: FyxApp.isDev,
             child: Container(
               decoration: BoxDecoration(color: Colors.red),
-              child: Text('A: ${widget.post.attachments.length} / '
-                  'I: ${widget.post.images.length} / '
-                  'L: ${widget.post.links.length} / '
-                  'V: ${widget.post.videos.length} / '
-                  'Html: ${widget.post.content.length} (${widget.post.strippedContent.length})'),
+              child: Text('A: ${_post.attachments.length} / '
+                  'I: ${_post.images.length} / '
+                  'L: ${_post.links.length} / '
+                  'V: ${_post.videos.length} / '
+                  'Html: ${_post.content.length} (${_post.strippedContent.length})'),
             ),
           ),
           Visibility(
             visible: FyxApp.isDev,
             child: Container(
               decoration: BoxDecoration(color: Colors.green),
-              child: Text(widget.post.content),
+              child: Text(_post.content),
             ),
           ),
           SizedBox(
@@ -239,5 +239,13 @@ class _PostListItemState extends State<PostListItem> {
         textAlign: TextAlign.center,
       )
     ]);
+  }
+
+  @override
+  void didUpdateWidget(PostListItem oldWidget) {
+    if (oldWidget.post != widget.post) {
+      setState(() => _post = widget.post);
+    }
+    super.didUpdateWidget(oldWidget);
   }
 }
