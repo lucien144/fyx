@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:fyx/PlatformApp.dart';
 import 'package:fyx/PlatformThemeData.dart';
 import 'package:fyx/model/Credentials.dart';
+import 'package:fyx/model/LoggedUser.dart';
 import 'package:fyx/pages/HomePage.dart';
 import 'package:fyx/pages/LoginPage.dart';
 import 'package:fyx/theme/T.dart';
@@ -33,7 +34,9 @@ class FyxApp extends StatelessWidget {
     return _routeObserver;
   }
 
-  const FyxApp(this._credentials, {Key key}) : super(key: key);
+  FyxApp(this._credentials, {Key key}) : super(key: key) {
+    LoggedUser().nickname = this._credentials.nickname;
+  }
 
   setEnv(env) {
     FyxApp.env = env;

@@ -66,7 +66,8 @@ class ApiProvider implements IApiProvider {
 
       // All seems ok.
       // Endpoints: Send new message.
-      if (data.containsKey('result') && data['result'] == 'ok') {
+      // Endpoints: Rating given/removed.
+      if (data.containsKey('result') && ['ok', 'RATING_GIVEN', 'RATING_REMOVED', 'RATING_NEEDS_CONFIRMATION'].indexOf(data['result']) > -1) {
         return response;
       }
 
