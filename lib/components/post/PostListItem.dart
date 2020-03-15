@@ -171,7 +171,7 @@ class _PostListItemState extends State<PostListItem> {
                     Visibility(
                       visible: _post.rating != 0 || LoggedUser().nickname != _post.nick,
                       child: Text(
-                        _post.rating > 0 ? '+${_post.rating}' : (_post.rating < 0 ? '-${_post.rating}' : '${_post.rating}'),
+                        _post.rating >= 0 ? '+${_post.rating}' : _post.rating.toString(),
                         style: TextStyle(color: _post.rating > 0 ? Colors.green : (_post.rating < 0 ? Colors.redAccent : Colors.black38)),
                       ),
                     ),
@@ -191,12 +191,25 @@ class _PostListItemState extends State<PostListItem> {
                               showCupertinoDialog(
                                 context: context,
                                 builder: (BuildContext context) => new CupertinoAlertDialog(
-                                  title: new Text("Pozor..."),
-                                  content: new Text(
-                                      'Tento uživatel si nepřeje, aby bylo možné jeho příspěvky hodnotit negativně anonymně. Pokud si přejete hodnotit příspěvek neanonymně, klikněte na "Hodnotit".'),
+                                  title: new Text(L.GENERAL_WARNING),
+                                  content: new Text(L.RATING_CONFIRMATION),
                                   actions: [
-                                    CupertinoDialogAction(isDefaultAction: true, isDestructiveAction: true, child: new Text("Zrušit")),
-                                    CupertinoDialogAction(isDefaultAction: false, child: new Text("Hodnotit"))
+                                    CupertinoDialogAction(
+                                      child: new Text(L.GENERAL_CANCEL),
+                                      onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+                                    ),
+                                    CupertinoDialogAction(
+                                        isDefaultAction: true,
+                                        isDestructiveAction: true,
+                                        child: new Text("Hodnotit"),
+                                        onPressed: () {
+                                          ApiController().giveRating(_post.idKlub, _post.id, positive: false, confirm: true).then((response) {
+                                            setState(() => _post.rating = response.currentRating);
+                                          }).catchError((error) {
+                                            print(error);
+                                            PlatformTheme.error(L.RATING_ERROR);
+                                          }).whenComplete(() => Navigator.of(context, rootNavigator: true).pop());
+                                        })
                                   ],
                                 ),
                               );
