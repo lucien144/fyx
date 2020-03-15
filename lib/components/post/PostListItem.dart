@@ -8,6 +8,7 @@ import 'package:fyx/components/post/PostFooterLink.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/components/post/PostHtml.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/model/LoggedUser.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/model/post/Link.dart';
@@ -147,41 +148,80 @@ class _PostListItemState extends State<PostListItem> {
                 ),
                 Row(
                   children: <Widget>[
-                    GestureDetector(
-                      child: Icon(
-                        Icons.thumb_up,
-                        color: _post.rating > 0 ? Colors.green : Colors.black38,
+                    Visibility(
+                      visible: LoggedUser().nickname != _post.nick,
+                      child: GestureDetector(
+                        child: Icon(
+                          Icons.thumb_up,
+                          color: _post.rating > 0 ? Colors.green : Colors.black38,
+                        ),
+                        onTap: () {
+                          ApiController().giveRating(_post.idKlub, _post.id).then((response) {
+                            setState(() => _post.rating = response.currentRating);
+                          }).catchError((error) {
+                            print(error);
+                            PlatformTheme.error(L.RATING_ERROR);
+                          });
+                        },
                       ),
-                      onTap: () {
-                        setState(() => _post.rating++);
-                        ApiController().giveRating(_post.idKlub, _post.id).catchError((error) {
-                          setState(() => _post.rating--);
-                          PlatformTheme.error(L.RATING_ERROR);
-                        });
-                      },
                     ),
                     SizedBox(
                       width: 4,
                     ),
-                    Text(
-                      _post.rating.toString(),
-                      style: TextStyle(color: _post.rating > 0 ? Colors.green : (_post.rating < 0 ? Colors.redAccent : Colors.black38)),
+                    Visibility(
+                      visible: _post.rating != 0 || LoggedUser().nickname != _post.nick,
+                      child: Text(
+                        _post.rating >= 0 ? '+${_post.rating}' : _post.rating.toString(),
+                        style: TextStyle(color: _post.rating > 0 ? Colors.green : (_post.rating < 0 ? Colors.redAccent : Colors.black38)),
+                      ),
                     ),
                     SizedBox(
                       width: 4,
                     ),
-                    GestureDetector(
-                      child: Icon(
-                        Icons.thumb_down,
-                        color: _post.rating < 0 ? Colors.redAccent : Colors.black38,
+                    Visibility(
+                      visible: LoggedUser().nickname != _post.nick,
+                      child: GestureDetector(
+                        child: Icon(
+                          Icons.thumb_down,
+                          color: _post.rating < 0 ? Colors.redAccent : Colors.black38,
+                        ),
+                        onTap: () {
+                          ApiController().giveRating(_post.idKlub, _post.id, positive: false).then((response) {
+                            if (response.needsConfirmation) {
+                              showCupertinoDialog(
+                                context: context,
+                                builder: (BuildContext context) => new CupertinoAlertDialog(
+                                  title: new Text(L.GENERAL_WARNING),
+                                  content: new Text(L.RATING_CONFIRMATION),
+                                  actions: [
+                                    CupertinoDialogAction(
+                                      child: new Text(L.GENERAL_CANCEL),
+                                      onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+                                    ),
+                                    CupertinoDialogAction(
+                                        isDefaultAction: true,
+                                        isDestructiveAction: true,
+                                        child: new Text("Hodnotit"),
+                                        onPressed: () {
+                                          ApiController().giveRating(_post.idKlub, _post.id, positive: false, confirm: true).then((response) {
+                                            setState(() => _post.rating = response.currentRating);
+                                          }).catchError((error) {
+                                            print(error);
+                                            PlatformTheme.error(L.RATING_ERROR);
+                                          }).whenComplete(() => Navigator.of(context, rootNavigator: true).pop());
+                                        })
+                                  ],
+                                ),
+                              );
+                            } else {
+                              setState(() => _post.rating = response.currentRating);
+                            }
+                          }).catchError((error) {
+                            print(error);
+                            PlatformTheme.error(L.RATING_ERROR);
+                          });
+                        },
                       ),
-                      onTap: () {
-                        setState(() => _post.rating--);
-                        ApiController().giveRating(_post.idKlub, _post.id, positive: false).catchError((error) {
-                          setState(() => _post.rating++);
-                          PlatformTheme.error(L.RATING_ERROR);
-                        });
-                      },
                     ),
                     SizedBox(
                       width: 16,

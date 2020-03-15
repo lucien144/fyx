@@ -66,7 +66,8 @@ class ApiProvider implements IApiProvider {
 
       // All seems ok.
       // Endpoints: Send new message.
-      if (data.containsKey('result') && data['result'] == 'ok') {
+      // Endpoints: Rating given/removed.
+      if (data.containsKey('result') && ['ok', 'RATING_GIVEN', 'RATING_REMOVED', 'RATING_NEEDS_CONFIRMATION', 'RATING_CHANGED'].indexOf(data['result']) > -1) {
         return response;
       }
 
@@ -146,7 +147,7 @@ class ApiProvider implements IApiProvider {
     return await dio.post(URL, data: formData, options: _options);
   }
 
-  Future<Response> giveRating(int discussionId, int postId, bool positive) async {
+  Future<Response> giveRating(int discussionId, int postId, bool positive, bool confirm) async {
     FormData formData = new FormData.fromMap({
       'auth_nick': _credentials.nickname,
       'auth_token': _credentials.token,
@@ -155,7 +156,8 @@ class ApiProvider implements IApiProvider {
       'id_klub': discussionId,
       'id_wu': postId,
       'rating': positive ? 'positive' : 'negative',
-      'toggle': 1
+      'toggle': 1,
+      'neg_confirmation': confirm ? 1 : 0
     });
 
     return await dio.post(URL, data: formData, options: _options);

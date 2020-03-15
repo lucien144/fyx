@@ -17,6 +17,8 @@ class L {
   static String GENERAL_GO_BACK = 'Zpět';
   static String GENERAL_CLOSE = 'Zavřít';
   static String GENERAL_REFRESH = 'Načíst znovu...';
+  static String GENERAL_CANCEL = 'Zrušit';
+  static String GENERAL_WARNING = 'Pozor';
 
   // Tutorial page
   static String TUTORIAL_SUCCESS = 'Paráda 🤘';
@@ -30,4 +32,7 @@ class L {
       'Nyní zbývá otevřít Nyx, uložit kód podle návodu a přihlásit se! Abychom ti práci ulehčili, otevřeme rovnou stránku kam se po přihlášení vkládá kód.';
   static String TUTORIAL_NYX = 'Otevřít nyx.cz';
   static String TUTORIAL_TOKEN_COPY = 'Začneme tím, že si zkopíruješ potřebný klíč do schránky:';
+
+  static String RATING_CONFIRMATION =
+      'Tento uživatel si nepřeje, aby bylo možné jeho příspěvky hodnotit negativně anonymně. Pokud si přejete hodnotit příspěvek neanonymně, klikněte na "Hodnotit".';
 }

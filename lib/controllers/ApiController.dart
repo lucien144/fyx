@@ -10,6 +10,7 @@ import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/DiscussionResponse.dart';
 import 'package:fyx/model/LoginResponse.dart';
 import 'package:fyx/model/Post.dart';
+import 'package:fyx/model/RatingResponse.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -81,8 +82,15 @@ class ApiController {
     return provider.setPostReminder(discussionId, postId, setReminder);
   }
 
-  Future<Response> giveRating(int discussionId, int postId, {bool positive = true}) {
-    return provider.giveRating(discussionId, postId, positive);
+  Future<RatingResponse> giveRating(int discussionId, int postId, {bool positive = true, bool confirm = false}) async {
+    Response response = await provider.giveRating(discussionId, postId, positive, confirm);
+    print(response.data);
+    var data = jsonDecode(response.data);
+    return RatingResponse(
+        isGiven: data['result'] == 'RATING_GIVEN',
+        needsConfirmation: data['result'] == 'RATING_NEEDS_CONFIRMATION',
+        currentRating: int.parse(data['current_rating']),
+        currentRatingStep: int.parse(data['current_rating_step']));
   }
 
   void logout() {
