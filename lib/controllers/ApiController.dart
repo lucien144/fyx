@@ -6,6 +6,7 @@ import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/controllers/ApiProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/exceptions/AuthException.dart';
+import 'package:fyx/model/BookmarksResponse.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/DiscussionResponse.dart';
 import 'package:fyx/model/LoginResponse.dart';
@@ -56,14 +57,14 @@ class ApiController {
     return loginResponse;
   }
 
-  Future<dynamic> loadHistory() async {
+  Future<BookmarksResponse> loadHistory() async {
     var response = await provider.fetchHistory();
-    return jsonDecode(response.data)['data'];
+    return BookmarksResponse.fromJson(jsonDecode(response.data));
   }
 
-  Future<dynamic> loadBookmarks() async {
+  Future<BookmarksResponse> loadBookmarks() async {
     var response = await provider.fetchBookmarks();
-    return jsonDecode(response.data)['data'];
+    return BookmarksResponse.fromJson(jsonDecode(response.data));
   }
 
   Future<DiscussionResponse> loadDiscussion(int id, {int lastId}) async {

@@ -176,9 +176,10 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                   children: <Widget>[
                     PullToRefreshList(
                         rebuild: _refreshData,
+                        isInfinite: true,
                         dataProvider: (lastId) async {
                           var result = await ApiController().loadHistory();
-                          var data = (result['discussions'] as List).map((discussion) => DiscussionListItem(Discussion.fromJson(discussion))).toList();
+                          var data = result.discussions.map((discussion) => DiscussionListItem(Discussion.fromJson(discussion))).toList();
                           return DataProviderResult(data);
                         }),
                     PullToRefreshList(
@@ -186,17 +187,17 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                         dataProvider: (lastId) async {
                           var categories = [];
                           var result = await ApiController().loadBookmarks();
-                          if ((result as Map).containsKey('categories')) {
-                            (result['categories'] as List).forEach((_category) {
-                              var category = Category.fromJson(_category);
-                              var discussion = (result['discussions'] as List)
-                                  .map((discussion) => DiscussionListItem(Discussion.fromJson(discussion)))
-                                  .where((discussion) => discussion.category == category.idCat)
-                                  .toList();
-                              categories.add({'header': ListHeader(category), 'items': discussion});
-                            });
-                            return DataProviderResult(categories);
-                          }
+
+                          result.categories.forEach((_category) {
+                            var category = Category.fromJson(_category);
+                            var discussion = result.discussions
+                                .map((discussion) => DiscussionListItem(Discussion.fromJson(discussion)))
+                                .where((discussion) => discussion.category == category.idCat)
+                                .toList();
+                            categories.add({'header': ListHeader(category), 'items': discussion});
+                          });
+                          return DataProviderResult(categories);
+
                           return DataProviderResult([]);
                         }),
                   ],
