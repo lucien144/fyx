@@ -176,7 +176,6 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                   children: <Widget>[
                     PullToRefreshList(
                         rebuild: _refreshData,
-                        isInfinite: true,
                         dataProvider: (lastId) async {
                           var result = await ApiController().loadHistory();
                           var data = result.discussions.map((discussion) => DiscussionListItem(Discussion.fromJson(discussion))).toList();
