@@ -2,12 +2,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/FyxApp.dart';
+import 'package:fyx/components/CircleAvatar.dart' as ca;
 import 'package:fyx/components/DiscussionListItem.dart';
 import 'package:fyx/components/ListHeader.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Category.dart';
 import 'package:fyx/model/Discussion.dart';
+import 'package:fyx/model/LoggedUser.dart';
+import 'package:fyx/theme/L.dart';
+import 'package:package_info/package_info.dart';
 
 enum tabs { history, bookmarks }
 
@@ -84,6 +88,39 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     });
   }
 
+  CupertinoActionSheet actionSheet() {
+    return CupertinoActionSheet(
+        title: Text('Přihlášen jako: ${LoggedUser().nickname}'),
+        message: FutureBuilder<PackageInfo>(
+            future: PackageInfo.fromPlatform(),
+            builder: (BuildContext context, AsyncSnapshot<PackageInfo> snapshot) {
+              if (snapshot.hasData) {
+                return Text('Verze: ${snapshot.data.version} (${snapshot.data.buildNumber})');
+              } else if (snapshot.hasError) {
+                return Text('Verze: ¯\_(ツ)_/¯');
+              } else {
+                return Text('Verze: načítám...');
+              }
+            }),
+        actions: <Widget>[
+          CupertinoActionSheetAction(
+            isDestructiveAction: true,
+            child: Text(L.GENERAL_LOGOUT),
+            onPressed: () {
+              ApiController().logout();
+              Navigator.of(context, rootNavigator: true).pushNamed('/');
+            },
+          )
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          isDefaultAction: true,
+          child: Text(L.GENERAL_CANCEL),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return CupertinoTabScaffold(
@@ -107,11 +144,13 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
               return CupertinoPageScaffold(
                 navigationBar: CupertinoNavigationBar(
                     backgroundColor: Colors.white,
-                    trailing: CupertinoButton(
-                      child: Icon(CupertinoIcons.padlock_solid),
-                      onPressed: () {
-                        ApiController().logout();
-                        Navigator.of(context, rootNavigator: true).pushNamed('/');
+                    trailing: GestureDetector(
+                      child: ca.CircleAvatar(
+                        LoggedUser().avatar,
+                        size: 30,
+                      ),
+                      onTap: () {
+                        showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet());
                       },
                     ),
                     middle: CupertinoSegmentedControl(

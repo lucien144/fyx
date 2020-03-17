@@ -11,6 +11,7 @@ class L {
   // General
   static String GENERAL_SKIP = 'Přeskočit';
   static String GENERAL_LOGIN = 'Přihlášení';
+  static String GENERAL_LOGOUT = 'Odhlásit';
   static String GENERAL_BEGIN = 'Začít';
   static String GENERAL_COPY = 'Zkopírovat';
   static String GENERAL_NEXT_STEP = 'Další krok';

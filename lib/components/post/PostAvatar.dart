@@ -1,35 +1,21 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as material;
 import 'package:flutter/widgets.dart';
+import 'package:fyx/components/CircleAvatar.dart';
 import 'package:fyx/theme/T.dart';
 
 class PostAvatar extends StatelessWidget {
-  final String image;
   final String nick;
   final String description;
   final bool isHighlighted;
 
-  PostAvatar(this.image, this.nick, {this.isHighlighted = false, this.description = ''});
+  String get image => 'https://i.nyx.cz/${nick.substring(0, 1)}/$nick.gif';
+
+  PostAvatar(this.nick, {this.isHighlighted = false, this.description = ''});
 
   @override
   Widget build(BuildContext context) {
     return Row(children: <Widget>[
-      Container(
-        padding: EdgeInsets.all(1),
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(22), color: isHighlighted ? T.COLOR_PRIMARY : Colors.black),
-        child: Container(
-          padding: EdgeInsets.all(2),
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(22), color: isHighlighted ? T.COLOR_PRIMARY : Colors.white),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: Image.network(
-              image,
-              fit: BoxFit.cover,
-              width: 40,
-              height: 40,
-            ),
-          ),
-        ),
-      ),
+      CircleAvatar(image, isHighlighted: isHighlighted),
       SizedBox(
         width: 4,
       ),
@@ -38,11 +24,11 @@ class PostAvatar extends StatelessWidget {
         children: <Widget>[
           Text(
             nick,
-            style: TextStyle(color: isHighlighted ? T.COLOR_PRIMARY : Colors.black),
+            style: TextStyle(color: isHighlighted ? T.COLOR_PRIMARY : material.Colors.black),
           ),
           Text(
             description,
-            style: TextStyle(color: Colors.black38, fontSize: 10),
+            style: TextStyle(color: material.Colors.black38, fontSize: 10),
           )
         ],
       )

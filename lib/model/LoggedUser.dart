@@ -2,6 +2,8 @@ class LoggedUser {
   static final LoggedUser _singleton = LoggedUser._internal();
   String _nickname;
 
+  String get avatar => 'https://i.nyx.cz/${_nickname.substring(0, 1)}/$_nickname.gif';
+
   factory LoggedUser() {
     return _singleton;
   }

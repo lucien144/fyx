@@ -141,7 +141,6 @@ class _PostListItemState extends State<PostListItem> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 PostAvatar(
-                  _post.avatar,
                   _post.nick,
                   isHighlighted: widget._isHighlighted,
                   description: getPostTime(),
