@@ -108,7 +108,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
             child: Text(L.GENERAL_LOGOUT),
             onPressed: () {
               ApiController().logout();
-              Navigator.of(context, rootNavigator: true).pushNamed('/');
+              Navigator.of(context, rootNavigator: true).pushNamed('/login');
             },
           )
         ],
