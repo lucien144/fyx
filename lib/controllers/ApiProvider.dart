@@ -162,4 +162,15 @@ class ApiProvider implements IApiProvider {
 
     return await dio.post(URL, data: formData, options: _options);
   }
+
+  Future<Response> logout() async {
+    FormData formData = new FormData.fromMap({
+      'auth_nick': _credentials.nickname,
+      'auth_token': _credentials.token,
+      'l': 'util',
+      'l2': 'remove_authorization',
+    });
+
+    return await dio.post(URL, data: formData, options: _options);
+  }
 }

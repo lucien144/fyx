@@ -93,8 +93,9 @@ class ApiController {
         currentRatingStep: int.parse(data['current_rating_step']));
   }
 
-  void logout() {
+  Future<Response> logout() {
     SharedPreferences.getInstance().then((prefs) => prefs.clear());
+    return provider.logout();
   }
 
   throwAuthException(LoginResponse loginResponse, {String message: ''}) {
