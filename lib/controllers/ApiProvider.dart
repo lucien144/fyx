@@ -102,7 +102,7 @@ class ApiProvider implements IApiProvider {
   }
 
   Future<Response> fetchHistory() async {
-    FormData formData = new FormData.fromMap({'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'bookmarks', 'l2': 'history'});
+    FormData formData = new FormData.fromMap({'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'bookmarks', 'l2': 'history', 'more_results': 1});
     return await dio.post(URL, data: formData, options: _options);
   }
 
