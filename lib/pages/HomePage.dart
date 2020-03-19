@@ -123,102 +123,105 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoTabScaffold(
-      tabBar: CupertinoTabBar(
-        backgroundColor: Colors.white,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.bookmark),
-            title: Text('Sledované'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.mail),
-            title: Text('Posta'),
-          ),
-        ],
-      ),
-      tabBuilder: (context, index) {
-        switch (index) {
-          case 0:
-            return CupertinoTabView(builder: (context) {
-              return CupertinoPageScaffold(
-                navigationBar: CupertinoNavigationBar(
-                    backgroundColor: Colors.white,
-                    trailing: GestureDetector(
-                      child: ca.CircleAvatar(
-                        MainRepository().credentials.avatar,
-                        size: 30,
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: CupertinoTabScaffold(
+        tabBar: CupertinoTabBar(
+          backgroundColor: Colors.white,
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.bookmark),
+              title: Text('Sledované'),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(CupertinoIcons.mail),
+              title: Text('Posta'),
+            ),
+          ],
+        ),
+        tabBuilder: (context, index) {
+          switch (index) {
+            case 0:
+              return CupertinoTabView(builder: (context) {
+                return CupertinoPageScaffold(
+                  navigationBar: CupertinoNavigationBar(
+                      backgroundColor: Colors.white,
+                      trailing: GestureDetector(
+                        child: ca.CircleAvatar(
+                          MainRepository().credentials.avatar,
+                          size: 30,
+                        ),
+                        onTap: () {
+                          showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet());
+                        },
                       ),
-                      onTap: () {
-                        showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet());
-                      },
-                    ),
-                    middle: CupertinoSegmentedControl(
-                      groupValue: activeTab,
-                      onValueChanged: (value) {
-                        setState(() => _refreshData = 0);
-                        _bookmarksController.animateToPage(tabs.values.indexOf(value), duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
-                      },
-                      children: {
-                        tabs.history: Padding(
-                          child: Text('Historie'),
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                        ),
-                        tabs.bookmarks: Padding(
-                          child: Text('Sledované'),
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                        ),
-                      },
-                    )),
-                child: PageView(
-                  controller: _bookmarksController,
-                  pageSnapping: true,
-                  children: <Widget>[
-                    PullToRefreshList(
-                        rebuild: _refreshData,
-                        dataProvider: (lastId) async {
-                          var result = await ApiController().loadHistory();
-                          var data = result.discussions.map((discussion) => DiscussionListItem(Discussion.fromJson(discussion))).toList();
-                          return DataProviderResult(data);
-                        }),
-                    PullToRefreshList(
-                        rebuild: _refreshData,
-                        dataProvider: (lastId) async {
-                          var categories = [];
-                          var result = await ApiController().loadBookmarks();
+                      middle: CupertinoSegmentedControl(
+                        groupValue: activeTab,
+                        onValueChanged: (value) {
+                          setState(() => _refreshData = 0);
+                          _bookmarksController.animateToPage(tabs.values.indexOf(value), duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+                        },
+                        children: {
+                          tabs.history: Padding(
+                            child: Text('Historie'),
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                          ),
+                          tabs.bookmarks: Padding(
+                            child: Text('Sledované'),
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                          ),
+                        },
+                      )),
+                  child: PageView(
+                    controller: _bookmarksController,
+                    pageSnapping: true,
+                    children: <Widget>[
+                      PullToRefreshList(
+                          rebuild: _refreshData,
+                          dataProvider: (lastId) async {
+                            var result = await ApiController().loadHistory();
+                            var data = result.discussions.map((discussion) => DiscussionListItem(Discussion.fromJson(discussion))).toList();
+                            return DataProviderResult(data);
+                          }),
+                      PullToRefreshList(
+                          rebuild: _refreshData,
+                          dataProvider: (lastId) async {
+                            var categories = [];
+                            var result = await ApiController().loadBookmarks();
 
-                          result.categories.forEach((_category) {
-                            var category = Category.fromJson(_category);
-                            var discussion = result.discussions
-                                .map((discussion) => DiscussionListItem(Discussion.fromJson(discussion)))
-                                .where((discussion) => discussion.category == category.idCat)
-                                .toList();
-                            categories.add({'header': ListHeader(category), 'items': discussion});
-                          });
-                          return DataProviderResult(categories);
+                            result.categories.forEach((_category) {
+                              var category = Category.fromJson(_category);
+                              var discussion = result.discussions
+                                  .map((discussion) => DiscussionListItem(Discussion.fromJson(discussion)))
+                                  .where((discussion) => discussion.category == category.idCat)
+                                  .toList();
+                              categories.add({'header': ListHeader(category), 'items': discussion});
+                            });
+                            return DataProviderResult(categories);
 
-                          return DataProviderResult([]);
-                        }),
-                  ],
-                ),
-              );
-            });
-          case 1:
-            return CupertinoTabView(builder: (context) {
-              return CupertinoPageScaffold(
-                child: Container(),
-              );
-            });
-          case 2:
-            return CupertinoTabView(builder: (context) {
-              return CupertinoPageScaffold(
-                child: Container(),
-              );
-            });
-          default:
-            throw Exception('Selected undefined tab');
-        }
-      },
+                            return DataProviderResult([]);
+                          }),
+                    ],
+                  ),
+                );
+              });
+            case 1:
+              return CupertinoTabView(builder: (context) {
+                return CupertinoPageScaffold(
+                  child: Container(),
+                );
+              });
+            case 2:
+              return CupertinoTabView(builder: (context) {
+                return CupertinoPageScaffold(
+                  child: Container(),
+                );
+              });
+            default:
+              throw Exception('Selected undefined tab');
+          }
+        },
+      ),
     );
   }
 }
