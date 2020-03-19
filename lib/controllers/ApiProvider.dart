@@ -30,7 +30,7 @@ class ApiProvider implements IApiProvider {
     return Future(() => _credentials);
   }
 
-  setCredentials(Credentials val) => _credentials = val.isValid ? val : throw Exception('Invalid credentials');
+  setCredentials(Credentials val) => _credentials = val.isValid ? val : null;
 
   ApiProvider() {
     try {
@@ -93,6 +93,16 @@ class ApiProvider implements IApiProvider {
 
   Future<Response> login(String username) async {
     FormData formData = new FormData.fromMap({'auth_nick': username});
+    return await dio.post(URL, data: formData, options: _options);
+  }
+
+  Future<Response> testAuth() async {
+    FormData formData = new FormData.fromMap({
+      'auth_nick': _credentials.nickname,
+      'auth_token': _credentials.token,
+      'l': 'help',
+      'l2': 'test',
+    });
     return await dio.post(URL, data: formData, options: _options);
   }
 

@@ -8,7 +8,7 @@ import 'package:fyx/components/post/PostFooterLink.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/components/post/PostHtml.dart';
 import 'package:fyx/controllers/ApiController.dart';
-import 'package:fyx/model/LoggedUser.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/model/post/Link.dart';
@@ -148,7 +148,7 @@ class _PostListItemState extends State<PostListItem> {
                 Row(
                   children: <Widget>[
                     Visibility(
-                      visible: LoggedUser().nickname != _post.nick,
+                      visible: MainRepository().credentials.nickname != _post.nick,
                       child: GestureDetector(
                         child: Icon(
                           Icons.thumb_up,
@@ -168,7 +168,7 @@ class _PostListItemState extends State<PostListItem> {
                       width: 4,
                     ),
                     Visibility(
-                      visible: _post.rating != 0 || LoggedUser().nickname != _post.nick,
+                      visible: _post.rating != 0 || MainRepository().credentials.nickname != _post.nick,
                       child: Text(
                         _post.rating >= 0 ? '+${_post.rating}' : _post.rating.toString(),
                         style: TextStyle(color: _post.rating > 0 ? Colors.green : (_post.rating < 0 ? Colors.redAccent : Colors.black38)),
@@ -178,7 +178,7 @@ class _PostListItemState extends State<PostListItem> {
                       width: 4,
                     ),
                     Visibility(
-                      visible: LoggedUser().nickname != _post.nick,
+                      visible: MainRepository().credentials.nickname != _post.nick,
                       child: GestureDetector(
                         child: Icon(
                           Icons.thumb_down,

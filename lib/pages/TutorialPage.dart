@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:fyx/PlatformTheme.dart';
+import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class TutorialPage extends StatefulWidget {
   @override
@@ -17,6 +18,7 @@ class _TutorialPageState extends State<TutorialPage> {
   CarouselSlider _slider;
   List<Widget> _slides;
 
+  bool _loggingIn = false;
   bool _hasOpenedNyx = false;
   bool _isLastSlide = false;
   String _token = '';
@@ -40,13 +42,28 @@ class _TutorialPageState extends State<TutorialPage> {
             '6/6',
             L.TUTORIAL_FINAL,
             _hasOpenedNyx
-                ? slideButton('Přihlásit se',
-                    icon: Icon(
-                      Icons.lock,
-                      color: T.COLOR_SECONDARY,
-                      size: 16,
-                    ),
-                    onTap: () => Navigator.of(context).pushNamed('/home'))
+                ? slideButton(_loggingIn ? 'Přihlašuji...' : 'Přihlásit se',
+                    icon: _loggingIn
+                        ? CupertinoActivityIndicator()
+                        : Icon(
+                            Icons.lock,
+                            color: T.COLOR_SECONDARY,
+                            size: 16,
+                          ), onTap: () {
+                    var onError = (error) => setState(() {
+                          PlatformTheme.error('Přihlášení se nezdařilo. Chyba: $error');
+                          _hasOpenedNyx = false;
+                          _loggingIn = false;
+                        });
+
+                    setState(() => _loggingIn = true);
+                    ApiController().provider.getCredentials().then((credentials) {
+                      // Save the credentials for later use.
+                      MainRepository().credentials = credentials;
+                      // Test the authorization. If all is OK, go to /home screen...
+                      ApiController().testAuth().then((isOk) => isOk ? Navigator.of(context).pushNamed('/home') : null).catchError((error) => onError(error));
+                    }).catchError((error) => onError(error));
+                  })
                 : slideButton(L.TUTORIAL_NYX,
                     icon: Icon(
                       Icons.launch,
@@ -67,8 +84,6 @@ class _TutorialPageState extends State<TutorialPage> {
         ),
         height: 500,
         onPageChanged: (i) {
-          print(i);
-          print(_slides.length);
           if (i == _slides.length - 1) {
             setState(() => _isLastSlide = true);
           } else {

@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fyx/PlatformApp.dart';
 import 'package:fyx/PlatformThemeData.dart';
+import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Credentials.dart';
-import 'package:fyx/model/LoggedUser.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/pages/HomePage.dart';
 import 'package:fyx/pages/LoginPage.dart';
 import 'package:fyx/theme/T.dart';
@@ -12,8 +13,6 @@ import 'package:fyx/theme/T.dart';
 enum Environment { dev, staging, production }
 
 class FyxApp extends StatelessWidget {
-  final Credentials _credentials;
-
   static Environment _env;
 
   static set env(val) => FyxApp._env = val;
@@ -34,10 +33,6 @@ class FyxApp extends StatelessWidget {
     return _routeObserver;
   }
 
-  FyxApp(this._credentials, {Key key}) : super(key: key) {
-    LoggedUser().nickname = this._credentials.nickname;
-  }
-
   setEnv(env) {
     FyxApp.env = env;
   }
@@ -45,6 +40,7 @@ class FyxApp extends StatelessWidget {
   static init() async {
     WidgetsFlutterBinding.ensureInitialized();
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+    MainRepository().credentials = await ApiController().provider.getCredentials();
   }
 
   @override
@@ -60,7 +56,7 @@ class FyxApp extends StatelessWidget {
       child: PlatformApp(
         title: 'Fyx',
         theme: PlatformThemeData(primaryColor: T.COLOR_PRIMARY),
-        home: _credentials is Credentials && _credentials.isValid ? HomePage() : LoginPage(),
+        home: MainRepository().credentials is Credentials && MainRepository().credentials.isValid ? HomePage() : LoginPage(),
         debugShowCheckedModeBanner: FyxApp.isDev,
         listNavigatorObservers: [FyxApp.routeObserver],
       ),
