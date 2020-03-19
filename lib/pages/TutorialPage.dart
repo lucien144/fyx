@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:fyx/PlatformTheme.dart';
+import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class TutorialPage extends StatefulWidget {
   @override
@@ -45,8 +46,12 @@ class _TutorialPageState extends State<TutorialPage> {
                       Icons.lock,
                       color: T.COLOR_SECONDARY,
                       size: 16,
-                    ),
-                    onTap: () => Navigator.of(context).pushNamed('/home'))
+                    ), onTap: () {
+                    ApiController().provider.getCredentials().then((credentials) {
+                      MainRepository().credentials = credentials;
+                      Navigator.of(context).pushNamed('/home');
+                    });
+                  })
                 : slideButton(L.TUTORIAL_NYX,
                     icon: Icon(
                       Icons.launch,

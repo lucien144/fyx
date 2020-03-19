@@ -30,7 +30,7 @@ class ApiProvider implements IApiProvider {
     return Future(() => _credentials);
   }
 
-  setCredentials(Credentials val) => _credentials = val.isValid ? val : throw Exception('Invalid credentials');
+  setCredentials(Credentials val) => _credentials = val.isValid ? val : null;
 
   ApiProvider() {
     try {

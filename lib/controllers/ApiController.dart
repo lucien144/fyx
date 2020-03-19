@@ -34,7 +34,7 @@ class ApiController {
         return;
       }
 
-      this.logout();
+      this.logout(removeAuthrorization: false);
       PlatformTheme.error(L.AUTH_ERROR);
       PlatformApp.navigatorKey.currentState.pushNamed('/login');
     };
@@ -94,9 +94,11 @@ class ApiController {
         currentRatingStep: int.parse(data['current_rating_step']));
   }
 
-  Future<Response> logout() {
+  void logout({bool removeAuthrorization = true}) {
     SharedPreferences.getInstance().then((prefs) => prefs.clear());
-    return provider.logout();
+    if (removeAuthrorization) {
+      provider.logout();
+    }
   }
 
   throwAuthException(LoginResponse loginResponse, {String message: ''}) {

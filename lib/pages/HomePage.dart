@@ -9,7 +9,7 @@ import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Category.dart';
 import 'package:fyx/model/Discussion.dart';
-import 'package:fyx/model/LoggedUser.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:package_info/package_info.dart';
 
@@ -90,7 +90,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   CupertinoActionSheet actionSheet() {
     return CupertinoActionSheet(
-        title: Text('Přihlášen jako: ${LoggedUser().nickname}'),
+        title: Text('Přihlášen jako: ${MainRepository().credentials.nickname}'),
         message: FutureBuilder<PackageInfo>(
             future: PackageInfo.fromPlatform(),
             builder: (BuildContext context, AsyncSnapshot<PackageInfo> snapshot) {
@@ -146,7 +146,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                     backgroundColor: Colors.white,
                     trailing: GestureDetector(
                       child: ca.CircleAvatar(
-                        LoggedUser().avatar,
+                        MainRepository().credentials.avatar,
                         size: 30,
                       ),
                       onTap: () {
