@@ -57,6 +57,12 @@ class ApiController {
     return loginResponse;
   }
 
+  Future<bool> testAuth() async {
+    var response = await provider.testAuth();
+    var json = jsonDecode(response.data);
+    return json['result'] == 'ok';
+  }
+
   Future<BookmarksResponse> loadHistory() async {
     var response = await provider.fetchHistory();
     return BookmarksResponse.fromJson(jsonDecode(response.data));
