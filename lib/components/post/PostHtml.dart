@@ -1,18 +1,17 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:fyx/PlatformTheme.dart';
-import 'package:fyx/model/Post.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 
 class PostHtml extends StatelessWidget {
-  final Post post;
+  final String html;
 
-  PostHtml(this.post);
+  PostHtml(this.html);
 
   @override
   Widget build(BuildContext context) {
     return Html(
-      data: post.content.body,
+      data: html,
       onLinkTap: (String link) async {
         print(link);
 

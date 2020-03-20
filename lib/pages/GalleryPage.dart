@@ -24,8 +24,8 @@ class _GalleryPageState extends State<GalleryPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_arguments.post.content.images.length > 1) {
-        _arguments.post.content.images.asMap().forEach((key, image) {
+      if (_arguments.images.length > 1) {
+        _arguments.images.asMap().forEach((key, image) {
           if (image.image == _arguments.image.image) {
             _controller.jumpToPage(key);
           }
@@ -52,9 +52,9 @@ class _GalleryPageState extends State<GalleryPage> {
             backgroundDecoration: BoxDecoration(color: Colors.transparent),
             scrollPhysics: const BouncingScrollPhysics(),
             builder: (BuildContext context, int index) {
-              return PhotoViewGalleryPageOptions(imageProvider: CachedNetworkImageProvider(_arguments.post.content.images[index].image), onTapDown: (_, __, ___) => close(context));
+              return PhotoViewGalleryPageOptions(imageProvider: CachedNetworkImageProvider(_arguments.images[index].image), onTapDown: (_, __, ___) => close(context));
             },
-            itemCount: _arguments.post.content.images.length,
+            itemCount: _arguments.images.length,
             loadingChild: CupertinoActivityIndicator(),
             onPageChanged: (i) => setState(() => _page = i + 1),
           ),
@@ -74,7 +74,7 @@ class _GalleryPageState extends State<GalleryPage> {
         Positioned(
             width: MediaQuery.of(context).size.width,
             child: Text(
-              '$_page / ${_arguments.post.content.images.length}',
+              '$_page / ${_arguments.images.length}',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.white),
             ),
