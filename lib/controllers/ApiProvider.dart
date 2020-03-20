@@ -183,4 +183,10 @@ class ApiProvider implements IApiProvider {
 
     return await dio.post(URL, data: formData, options: _options);
   }
+
+  Future<Response> fetchMail({int lastId}) async {
+    FormData formData = new FormData.fromMap(
+        {'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'mail', 'l2': 'messages', 'id_mail': lastId, 'direction': lastId == null ? 'newest' : 'older'});
+    return await dio.post(URL, data: formData, options: _options);
+  }
 }

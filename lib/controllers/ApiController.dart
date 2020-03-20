@@ -10,6 +10,7 @@ import 'package:fyx/model/BookmarksResponse.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/DiscussionResponse.dart';
 import 'package:fyx/model/LoginResponse.dart';
+import 'package:fyx/model/MailResponse.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/RatingResponse.dart';
 import 'package:fyx/theme/L.dart';
@@ -105,6 +106,11 @@ class ApiController {
     if (removeAuthrorization) {
       provider.logout();
     }
+  }
+
+  Future<MailResponse> loadMail({int lastId}) async {
+    var response = await provider.fetchMail(lastId: lastId);
+    return MailResponse.fromJson(jsonDecode(response.data));
   }
 
   throwAuthException(LoginResponse loginResponse, {String message: ''}) {
