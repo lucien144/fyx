@@ -198,8 +198,6 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                               categories.add({'header': ListHeader(category), 'items': discussion});
                             });
                             return DataProviderResult(categories);
-
-                            return DataProviderResult([]);
                           }),
                     ],
                   ),
