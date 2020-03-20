@@ -34,7 +34,7 @@ class PostListItem extends StatefulWidget {
     _layoutMap.putIfAbsent(
         LAYOUT_TYPES.textOnly,
         () => () {
-              if (this.post.strippedContent.isNotEmpty && this.post.attachments.isEmpty) {
+              if (this.post.content.strippedContent.isNotEmpty && this.post.content.attachments.isEmpty) {
                 return PostHtml(this.post);
               }
               return null;
@@ -43,12 +43,12 @@ class PostListItem extends StatefulWidget {
     _layoutMap.putIfAbsent(
         LAYOUT_TYPES.oneImageOnly,
         () => () {
-              if (!(this.post.strippedContent.isEmpty && this.post.attachments.length == 1 && this.post.images.length == 1)) {
+              if (!(this.post.content.strippedContent.isEmpty && this.post.content.attachments.length == 1 && this.post.content.images.length == 1)) {
                 return null;
               }
 
               return PostHeroAttachment(
-                this.post.images[0],
+                this.post.content.images[0],
                 this.post,
                 crop: false,
               );
@@ -57,12 +57,12 @@ class PostListItem extends StatefulWidget {
     _layoutMap.putIfAbsent(
         LAYOUT_TYPES.attachmentsOnly,
         () => () {
-              if (!(this.post.strippedContent.length == 0 && this.post.attachments.length > 1)) {
+              if (!(this.post.content.strippedContent.length == 0 && this.post.content.attachments.length > 1)) {
                 return null;
               }
 
               var children = <Widget>[];
-              this.post.attachments.forEach((attachment) {
+              this.post.content.attachments.forEach((attachment) {
                 children.add(PostHeroAttachment(attachment, this.post));
               });
 
@@ -72,19 +72,19 @@ class PostListItem extends StatefulWidget {
     _layoutMap.putIfAbsent(
         LAYOUT_TYPES.attachmentsAndText,
         () => () {
-              if (!(this.post.attachments.length >= 1 && this.post.strippedContent.isNotEmpty)) {
+              if (!(this.post.content.attachments.length >= 1 && this.post.content.strippedContent.isNotEmpty)) {
                 return null;
               }
 
               var children = <Widget>[];
               children.add(Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[Expanded(child: PostHtml(post)), PostHeroAttachment(post.attachmentsWithFeatured['featured'], this.post)],
+                children: <Widget>[Expanded(child: PostHtml(post)), PostHeroAttachment(post.content.attachmentsWithFeatured['featured'], this.post)],
               ));
 
-              if ((post.attachmentsWithFeatured['attachments'] as List).whereType<model.Image>().length > 0) {
+              if ((post.content.attachmentsWithFeatured['attachments'] as List).whereType<model.Image>().length > 0) {
                 children.add(() {
-                  var children = (post.attachmentsWithFeatured['attachments'] as List).whereType<model.Image>().map((attachment) {
+                  var children = (post.content.attachmentsWithFeatured['attachments'] as List).whereType<model.Image>().map((attachment) {
                     return Padding(
                         padding: const EdgeInsets.only(right: 8),
                         child: PostHeroAttachment(
@@ -97,7 +97,7 @@ class PostListItem extends StatefulWidget {
                 }());
               }
 
-              children.addAll((post.attachmentsWithFeatured['attachments'] as List).whereType<Link>().map((attachment) {
+              children.addAll((post.content.attachmentsWithFeatured['attachments'] as List).whereType<Link>().map((attachment) {
                 return PostFooterLink(attachment);
               }));
 
@@ -267,18 +267,18 @@ class _PostListItemState extends State<PostListItem> {
             visible: FyxApp.isDev,
             child: Container(
               decoration: BoxDecoration(color: Colors.red),
-              child: Text('A: ${_post.attachments.length} / '
-                  'I: ${_post.images.length} / '
-                  'L: ${_post.links.length} / '
-                  'V: ${_post.videos.length} / '
-                  'Html: ${_post.content.length} (${_post.strippedContent.length})'),
+              child: Text('A: ${_post.content.attachments.length} / '
+                  'I: ${_post.content.images.length} / '
+                  'L: ${_post.content.links.length} / '
+                  'V: ${_post.content.videos.length} / '
+                  'Html: ${_post.content.body.length} (${_post.content.strippedContent.length})'),
             ),
           ),
           Visibility(
             visible: FyxApp.isDev,
             child: Container(
               decoration: BoxDecoration(color: Colors.green),
-              child: Text(_post.content),
+              child: Text(_post.content.body),
             ),
           ),
           SizedBox(

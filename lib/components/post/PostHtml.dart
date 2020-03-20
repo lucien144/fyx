@@ -12,7 +12,7 @@ class PostHtml extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Html(
-      data: post.content,
+      data: post.content.body,
       onLinkTap: (String link) async {
         print(link);
 
