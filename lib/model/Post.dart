@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/model/post/Image.dart';
 import 'package:fyx/model/post/Link.dart';
@@ -8,14 +10,11 @@ import 'package:html_unescape/html_unescape.dart';
 
 class Post {
   int idKlub;
-  // ignore: non_constant_identifier_names
   int _id_wu;
   String _rawContent;
   String _nick;
   int _time;
-  // ignore: non_constant_identifier_names
   int _wu_rating;
-  // ignore: non_constant_identifier_names
   int _wu_type;
   bool _reminder;
 

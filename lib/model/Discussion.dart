@@ -1,7 +1,7 @@
+// ignore_for_file: non_constant_identifier_names
+
 class Discussion {
-  // ignore: non_constant_identifier_names
   int _id_klub;
-  // ignore: non_constant_identifier_names
   int _id_cat;
   String _jmeno;
   int _unread;
