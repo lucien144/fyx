@@ -9,8 +9,8 @@ import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Category.dart';
 import 'package:fyx/model/Discussion.dart';
-import 'package:fyx/model/Mail.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/pages/MailboxPage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:package_info/package_info.dart';
 
@@ -207,25 +207,21 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
             case 0:
               return CupertinoTabView(builder: (context) {
                 return CupertinoPageScaffold(
-                  navigationBar: CupertinoNavigationBar(
-                      backgroundColor: Colors.white,
-                      trailing: GestureDetector(
-                        child: ca.CircleAvatar(
-                          MainRepository().credentials.avatar,
-                          size: 30,
+                    navigationBar: CupertinoNavigationBar(
+                        backgroundColor: Colors.white,
+                        trailing: GestureDetector(
+                          child: ca.CircleAvatar(
+                            MainRepository().credentials.avatar,
+                            size: 30,
+                          ),
+                          onTap: () {
+                            showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet());
+                          },
                         ),
-                        onTap: () {
-                          showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet());
-                        },
-                      ),
-                      middle: Text('Pošta')),
-                  child: PullToRefreshList(
-                      rebuild: _refreshData,
-                      dataProvider: (lastId) async {
-                        var result = await ApiController().loadMail();
-                        var mails = result.data.map((_mail) => Mail.fromJson(_mail)).toList();
-                      }),
-                );
+                        middle: Text('Pošta')),
+                    child: MailboxPage(
+                      refreshData: _refreshData,
+                    ));
               });
             default:
               throw Exception('Selected undefined tab');
