@@ -2,18 +2,19 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/components/post/PostListItem.dart';
-import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker_modern/image_picker_modern.dart';
 import 'package:path/path.dart';
 
+typedef F = Function(String inputField, String message, Map<String, dynamic> attachment);
+
 class NewMessageSettings {
-  int idKlub;
   Post post;
   Function onClose;
+  F onSubmit;
 
-  NewMessageSettings(this.idKlub, {this.post, this.onClose});
+  NewMessageSettings({@required this.post, this.onClose, this.onSubmit});
 }
 
 class NewMessagePage extends StatefulWidget {
@@ -83,8 +84,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                             ? null
                             : () async {
                                 setState(() => _sending = true);
-                                await ApiController().postDiscussionMessage(_settings.idKlub, _controller.text,
-                                    attachment: _images.length > 0 ? _images[0] : null, replyPost: _settings.post != null ? _settings.post : null);
+                                await _settings.onSubmit(null, _controller.text, _images.length > 0 ? _images[0] : null);
                                 setState(() => _sending = false);
                                 if (_settings.onClose is Function) {
                                   _settings.onClose();

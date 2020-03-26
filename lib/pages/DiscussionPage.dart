@@ -182,7 +182,12 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
               child: FloatingActionButton(
                 backgroundColor: T.COLOR_PRIMARY,
                 child: Icon(Icons.add),
-                onPressed: () => Navigator.of(context).pushNamed('/discussion/new-message', arguments: NewMessageSettings(pageArguments.discussionId, onClose: this.refresh)),
+                onPressed: () => Navigator.of(context).pushNamed('/new-message',
+                    arguments: NewMessageSettings(
+                        onClose: this.refresh,
+                        onSubmit: (String inputField, String message, Map<String, dynamic> attachment) async {
+                          await ApiController().postDiscussionMessage(pageArguments.discussionId, message, attachment: attachment);
+                        })),
               ),
             ),
           ),

@@ -144,7 +144,13 @@ class _PostListItemState extends State<PostListItem> {
           Visibility(
             visible: widget._isPreview != true,
             child: GestureDetector(
-                onTap: () => Navigator.of(context).pushNamed('/discussion/new-message', arguments: NewMessageSettings(_post.idKlub, post: _post, onClose: this.widget.onUpdate)),
+                onTap: () => Navigator.of(context).pushNamed('/new-message',
+                    arguments: NewMessageSettings(
+                        post: _post,
+                        onClose: this.widget.onUpdate,
+                        onSubmit: (String inputField, String message, Map<String, dynamic> attachment) async {
+                          await ApiController().postDiscussionMessage(_post.idKlub, message, attachment: attachment, replyPost: _post);
+                        })),
                 child: Icon(
                   Icons.reply,
                   color: Colors.black38,
