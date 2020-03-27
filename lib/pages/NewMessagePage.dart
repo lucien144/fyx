@@ -1,8 +1,9 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fyx/components/post/PostListItem.dart';
-import 'package:fyx/model/Post.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker_modern/image_picker_modern.dart';
 import 'package:path/path.dart';
@@ -10,11 +11,12 @@ import 'package:path/path.dart';
 typedef F = Function(String inputField, String message, Map<String, dynamic> attachment);
 
 class NewMessageSettings {
-  Post post;
+  bool hasInputField;
+  Widget replyWidget;
   Function onClose;
   F onSubmit;
 
-  NewMessageSettings({@required this.post, this.onClose, this.onSubmit});
+  NewMessageSettings({this.replyWidget, this.onClose, this.onSubmit, this.hasInputField});
 }
 
 class NewMessagePage extends StatefulWidget {
@@ -23,11 +25,13 @@ class NewMessagePage extends StatefulWidget {
 }
 
 class _NewMessagePageState extends State<NewMessagePage> {
-  TextEditingController _controller = TextEditingController();
+  TextEditingController _recipientController = TextEditingController();
+  TextEditingController _messageController = TextEditingController();
   List<List<int>> _thumbs = [];
   List<Map<String, dynamic>> _images = [];
   NewMessageSettings _settings;
-  String _text = '';
+  String _message = '';
+  String _recipient = '';
   bool _sending = false;
 
   Future getImage(ImageSource source) async {
@@ -48,14 +52,24 @@ class _NewMessagePageState extends State<NewMessagePage> {
 
   @override
   void initState() {
-    _controller.addListener(() => setState(() => _text = _controller.text));
+    _messageController.addListener(() => setState(() => _message = _messageController.text));
+    _recipientController.addListener(() => setState(() => _recipient = _recipientController.text));
     super.initState();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _recipientController.dispose();
+    _messageController.dispose();
     super.dispose();
+  }
+
+  _isSendDisabled() {
+    if (_sending) {
+      return true;
+    }
+
+    return ((_settings.hasInputField == true ? _recipient.length : 1) * (_message.length + _images.length)) == 0;
   }
 
   @override
@@ -80,11 +94,11 @@ class _NewMessagePageState extends State<NewMessagePage> {
                       CupertinoButton(
                         padding: EdgeInsets.all(0),
                         child: _sending ? CupertinoActivityIndicator() : Text('Odeslat'),
-                        onPressed: (_text.length + _images.length) == 0 || _sending
+                        onPressed: _isSendDisabled()
                             ? null
                             : () async {
                                 setState(() => _sending = true);
-                                await _settings.onSubmit(null, _controller.text, _images.length > 0 ? _images[0] : null);
+                                await _settings.onSubmit(null, _messageController.text, _images.length > 0 ? _images[0] : null);
                                 setState(() => _sending = false);
                                 if (_settings.onClose is Function) {
                                   _settings.onClose();
@@ -94,8 +108,19 @@ class _NewMessagePageState extends State<NewMessagePage> {
                       )
                     ],
                   ),
+                  Visibility(
+                      visible: _settings.hasInputField == true,
+                      child: CupertinoTextField(
+                        controller: _recipientController,
+                        inputFormatters: [WhitelistingTextInputFormatter(RegExp('[a-zA-Z0-9_]'))],
+                        textCapitalization: TextCapitalization.characters,
+                        placeholder: 'Adresát',
+                      )),
+                  SizedBox(
+                    height: 8,
+                  ),
                   CupertinoTextField(
-                    controller: _controller,
+                    controller: _messageController,
                     maxLines: 10,
                     autofocus: true,
                   ),
@@ -146,14 +171,8 @@ class _NewMessagePageState extends State<NewMessagePage> {
                   )
                 ],
               ),
-              Visibility(
-                child: PostListItem(
-                  _settings.post,
-                  isPreview: true,
-                ),
-                visible: _settings.post != null,
-              )
-            ],
+              _settings.replyWidget
+            ].where((Object o) => o != null).toList(),
           ),
         ),
       ),

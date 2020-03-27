@@ -9,6 +9,7 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/L.dart';
+import 'package:fyx/theme/T.dart';
 
 class PostListItem extends StatefulWidget {
   final Post post;
@@ -146,15 +147,15 @@ class _PostListItemState extends State<PostListItem> {
             child: GestureDetector(
                 onTap: () => Navigator.of(context).pushNamed('/new-message',
                     arguments: NewMessageSettings(
-                        post: _post,
+                        replyWidget: PostListItem(
+                          _post,
+                          isPreview: true,
+                        ),
                         onClose: this.widget.onUpdate,
                         onSubmit: (String inputField, String message, Map<String, dynamic> attachment) async {
                           await ApiController().postDiscussionMessage(_post.idKlub, message, attachment: attachment, replyPost: _post);
                         })),
-                child: Icon(
-                  Icons.reply,
-                  color: Colors.black38,
-                )),
+                child: T.ICO_REPLY),
           )
         ],
       ),
