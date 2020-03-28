@@ -98,7 +98,8 @@ class _NewMessagePageState extends State<NewMessagePage> {
                             ? null
                             : () async {
                                 setState(() => _sending = true);
-                                await _settings.onSubmit(null, _messageController.text, _images.length > 0 ? _images[0] : null);
+                                await _settings.onSubmit(
+                                    _settings.hasInputField == true ? _recipientController.text : null, _messageController.text, _images.length > 0 ? _images[0] : null);
                                 setState(() => _sending = false);
                                 if (_settings.onClose is Function) {
                                   _settings.onClose();

@@ -189,4 +189,17 @@ class ApiProvider implements IApiProvider {
         {'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'mail', 'l2': 'messages', 'id_mail': lastId, 'direction': lastId == null ? 'newest' : 'older'});
     return await dio.post(URL, data: formData, options: _options);
   }
+
+  Future<Response> sendMail(String recipient, String message, {Map<String, dynamic> attachment}) async {
+    FormData formData = new FormData.fromMap({
+      'auth_nick': _credentials.nickname,
+      'auth_token': _credentials.token,
+      'l': 'mail',
+      'l2': 'send',
+      'recipient': recipient,
+      'message': message,
+      'attachment': attachment is Map ? MultipartFile.fromBytes(attachment['bytes'], filename: attachment['filename']) : null
+    });
+    return await dio.post(URL, data: formData, options: _options);
+  }
 }

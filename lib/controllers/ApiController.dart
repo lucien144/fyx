@@ -113,6 +113,10 @@ class ApiController {
     return MailResponse.fromJson(jsonDecode(response.data));
   }
 
+  Future<Response> sendMail(String recipient, String message, {Map<String, dynamic> attachment}) {
+    return provider.sendMail(recipient, message, attachment: attachment);
+  }
+
   throwAuthException(LoginResponse loginResponse, {String message: ''}) {
     var state = AUTH_STATES.values.firstWhere((state) => state.toString() == 'AUTH_STATES.${loginResponse.authState}', orElse: () => null);
     if (state != null) {

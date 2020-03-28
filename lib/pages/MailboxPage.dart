@@ -59,7 +59,12 @@ class _MailboxPageState extends State<MailboxPage> {
           child: FloatingActionButton(
             backgroundColor: T.COLOR_PRIMARY,
             child: Icon(Icons.add),
-            onPressed: () => Navigator.of(context, rootNavigator: true).pushNamed('/new-message', arguments: NewMessageSettings(hasInputField: true)),
+            onPressed: () => Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
+                arguments: NewMessageSettings(
+                    hasInputField: true,
+                    onSubmit: (String inputField, String message, Map<String, dynamic> attachment) async {
+                      await ApiController().sendMail(inputField, message, attachment: attachment);
+                    })),
           ),
         ),
       )

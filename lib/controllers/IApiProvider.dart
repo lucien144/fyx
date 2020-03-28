@@ -17,6 +17,7 @@ abstract class IApiProvider {
   Future<Response> fetchHistory();
   Future<Response> fetchDiscussion(int id, {int lastId});
   Future<Response> fetchMail({int lastId});
+  Future<Response> sendMail(String recipient, String message, {Map<String, dynamic> attachment});
   Future<Response> postDiscussionMessage(int id, String message, {Map<String, dynamic> attachment});
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder);
   Future<Response> giveRating(int discussionId, int postId, bool add, bool confirm);
