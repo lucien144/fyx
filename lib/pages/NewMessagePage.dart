@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,13 +8,13 @@ import 'package:image/image.dart' as img;
 import 'package:image_picker_modern/image_picker_modern.dart';
 import 'package:path/path.dart';
 
-typedef F<T> = Future<T> Function(String inputField, String message, Map<String, dynamic> attachment);
+typedef F = Future<bool> Function(String inputField, String message, Map<String, dynamic> attachment);
 
-class NewMessageSettings<T> {
+class NewMessageSettings {
   bool hasInputField;
   Widget replyWidget;
   Function onClose;
-  F<T> onSubmit;
+  F onSubmit;
 
   NewMessageSettings({this.replyWidget, this.onClose, this.onSubmit, this.hasInputField});
 }
@@ -101,11 +100,13 @@ class _NewMessagePageState extends State<NewMessagePage> {
                                 setState(() => _sending = true);
                                 var response = await _settings.onSubmit(
                                     _settings.hasInputField == true ? _recipientController.text : null, _messageController.text, _images.length > 0 ? _images[0] : null);
-                                setState(() => _sending = false);
-                                if (_settings.onClose is Function) {
-                                  _settings.onClose();
+                                if (response) {
+                                  if (_settings.onClose is Function) {
+                                    _settings.onClose();
+                                  }
+                                  Navigator.of(context).pop();
                                 }
-                                Navigator.of(context).pop();
+                                setState(() => _sending = false);
                               },
                       )
                     ],

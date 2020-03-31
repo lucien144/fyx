@@ -13,6 +13,7 @@ import 'package:fyx/model/LoginResponse.dart';
 import 'package:fyx/model/MailResponse.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/RatingResponse.dart';
+import 'package:fyx/model/SendMailResponse.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -113,8 +114,9 @@ class ApiController {
     return MailResponse.fromJson(jsonDecode(response.data));
   }
 
-  Future<Response> sendMail(String recipient, String message, {Map<String, dynamic> attachment}) {
-    return provider.sendMail(recipient, message, attachment: attachment);
+  Future<SendMailResponse> sendMail(String recipient, String message, {Map<String, dynamic> attachment}) async {
+    var result = await provider.sendMail(recipient, message, attachment: attachment);
+    return SendMailResponse.fromJson(jsonDecode(result.data));
   }
 
   throwAuthException(LoginResponse loginResponse, {String message: ''}) {
