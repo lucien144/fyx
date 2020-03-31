@@ -153,7 +153,7 @@ class _PostListItemState extends State<PostListItem> {
                         ),
                         onClose: this.widget.onUpdate,
                         onSubmit: (String inputField, String message, Map<String, dynamic> attachment) async {
-                          await ApiController().postDiscussionMessage(_post.idKlub, message, attachment: attachment, replyPost: _post);
+                          return await ApiController().postDiscussionMessage(_post.idKlub, message, attachment: attachment, replyPost: _post);
                         })),
                 child: T.ICO_REPLY),
           )

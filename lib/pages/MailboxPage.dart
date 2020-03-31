@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/MailListItem.dart';
@@ -60,10 +61,10 @@ class _MailboxPageState extends State<MailboxPage> {
             backgroundColor: T.COLOR_PRIMARY,
             child: Icon(Icons.add),
             onPressed: () => Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
-                arguments: NewMessageSettings(
+                arguments: NewMessageSettings<Response>(
                     hasInputField: true,
                     onSubmit: (String inputField, String message, Map<String, dynamic> attachment) async {
-                      await ApiController().sendMail(inputField, message, attachment: attachment);
+                      return await ApiController().sendMail(inputField, message, attachment: attachment);
                     })),
           ),
         ),
