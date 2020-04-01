@@ -95,7 +95,6 @@ class ApiController {
 
   Future<RatingResponse> giveRating(int discussionId, int postId, {bool positive = true, bool confirm = false}) async {
     Response response = await provider.giveRating(discussionId, postId, positive, confirm);
-    print(response.data);
     var data = jsonDecode(response.data);
     return RatingResponse(
         isGiven: data['result'] == 'RATING_GIVEN',
