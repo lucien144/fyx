@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/components/ContentBoxLayout.dart';
 import 'package:fyx/components/post/PostAvatar.dart';
@@ -22,19 +24,30 @@ class MailListItem extends StatelessWidget {
           description: '→ ${mail.direction == MailDirection.to ? mail.participant : MainRepository().credentials.nickname}, ~${T.parseTime(mail.time)}',
           isHighlighted: mail.isNew,
         ),
-        topRightWidget: Visibility(
-          visible: isPreview != true,
-          child: GestureDetector(
-            child: T.ICO_REPLY,
-            onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
-                arguments: NewMessageSettings(
-                    inputFieldPlaceholder: mail.participant,
-                    hasInputField: true,
-                    replyWidget: MailListItem(
-                      mail,
-                      isPreview: true,
-                    ))),
-          ),
+        topRightWidget: Row(
+          children: <Widget>[
+            Visibility(
+              visible: mail.isUnread,
+              child: T.ICO_UNREAD,
+            ),
+            SizedBox(
+              width: 4,
+            ),
+            Visibility(
+              visible: isPreview != true,
+              child: GestureDetector(
+                child: T.ICO_REPLY,
+                onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
+                    arguments: NewMessageSettings(
+                        inputFieldPlaceholder: mail.participant,
+                        hasInputField: true,
+                        replyWidget: MailListItem(
+                          mail,
+                          isPreview: true,
+                        ))),
+              ),
+            ),
+          ],
         ));
   }
 }

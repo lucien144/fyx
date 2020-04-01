@@ -26,6 +26,8 @@ class Mail {
     _active = json['active'];
   }
 
+  bool get isUnread => status == MailStatus.unread;
+
   bool get isNew => _new == 'yes';
 
   Active get active => _active == null ? null : Active.fromJson(_active);

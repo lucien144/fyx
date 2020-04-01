@@ -18,8 +18,15 @@ class T {
       BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white, border: Border.all(color: COLOR_SECONDARY), boxShadow: [BOX_SHADOW]);
   static final LinearGradient GRADIENT = LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xff1AD592), Color(0xff2F4858)]);
 
+  // ************************
+  // Icons
+  // ************************
   static final ICO_REPLY = Icon(
     Icons.reply,
+    color: Colors.black38,
+  );
+  static final ICO_UNREAD = Icon(
+    Icons.markunread_mailbox,
     color: Colors.black38,
   );
 
