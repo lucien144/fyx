@@ -12,6 +12,7 @@ import 'package:fyx/model/DiscussionResponse.dart';
 import 'package:fyx/model/LoginResponse.dart';
 import 'package:fyx/model/MailResponse.dart';
 import 'package:fyx/model/Post.dart';
+import 'package:fyx/model/PostMessageResponse.dart';
 import 'package:fyx/model/RatingResponse.dart';
 import 'package:fyx/model/SendMailResponse.dart';
 import 'package:fyx/theme/L.dart';
@@ -80,11 +81,12 @@ class ApiController {
     return DiscussionResponse.fromJson(jsonDecode(response.data));
   }
 
-  Future<Response> postDiscussionMessage(int id, String message, {Map<String, dynamic> attachment, Post replyPost}) {
+  Future<PostMessageResponse> postDiscussionMessage(int id, String message, {Map<String, dynamic> attachment, Post replyPost}) async {
     if (replyPost != null) {
       message = '{reply ${replyPost.nick}|${replyPost.id}}: ${message}';
     }
-    return provider.postDiscussionMessage(id, message, attachment: attachment);
+    var result = await provider.postDiscussionMessage(id, message, attachment: attachment);
+    return PostMessageResponse.fromJson(jsonDecode(result.data));
   }
 
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder) {

@@ -153,9 +153,8 @@ class _PostListItemState extends State<PostListItem> {
                         ),
                         onClose: this.widget.onUpdate,
                         onSubmit: (String inputField, String message, Map<String, dynamic> attachment) async {
-                          await ApiController().postDiscussionMessage(_post.idKlub, message, attachment: attachment, replyPost: _post);
-                          // TODO: feature/mail
-                          return true;
+                          var result = await ApiController().postDiscussionMessage(_post.idKlub, message, attachment: attachment, replyPost: _post);
+                          return result.isOk;
                         })),
                 child: T.ICO_REPLY),
           )
