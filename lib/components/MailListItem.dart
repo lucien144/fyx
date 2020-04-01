@@ -27,6 +27,7 @@ class MailListItem extends StatelessWidget {
             child: T.ICO_REPLY,
             onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
                 arguments: NewMessageSettings(
+                    inputFieldPlaceholder: mail.participant,
                     hasInputField: true,
                     replyWidget: MailListItem(
                       mail,

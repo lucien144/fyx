@@ -11,12 +11,13 @@ import 'package:path/path.dart';
 typedef F = Future<bool> Function(String inputField, String message, Map<String, dynamic> attachment);
 
 class NewMessageSettings {
+  String inputFieldPlaceholder;
   bool hasInputField;
   Widget replyWidget;
   Function onClose;
   F onSubmit;
 
-  NewMessageSettings({this.replyWidget, this.onClose, this.onSubmit, this.hasInputField});
+  NewMessageSettings({this.replyWidget, this.onClose, this.onSubmit, this.hasInputField, this.inputFieldPlaceholder});
 }
 
 class NewMessagePage extends StatefulWidget {
@@ -75,7 +76,8 @@ class _NewMessagePageState extends State<NewMessagePage> {
   @override
   Widget build(BuildContext context) {
     if (_settings == null) {
-      _settings = ModalRoute.of(context).settings.arguments;
+      _settings = ModalRoute.of(context).settings.arguments as NewMessageSettings;
+      _recipientController.text = _settings.inputFieldPlaceholder.toUpperCase();
     }
 
     return Container(
