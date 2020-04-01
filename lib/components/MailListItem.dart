@@ -20,6 +20,7 @@ class MailListItem extends StatelessWidget {
         topLeftWidget: PostAvatar(
           mail.direction == MailDirection.from ? mail.participant : MainRepository().credentials.nickname,
           description: '→ ${mail.direction == MailDirection.to ? mail.participant : MainRepository().credentials.nickname}, ~${T.parseTime(mail.time)}',
+          isHighlighted: mail.isNew,
         ),
         topRightWidget: Visibility(
           visible: isPreview != true,

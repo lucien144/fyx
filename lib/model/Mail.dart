@@ -12,6 +12,7 @@ class Mail {
   String _direction;
   Content _content;
   String _message_status;
+  String _new;
   Map<String, dynamic> _active;
 
   Mail.fromJson(Map<String, dynamic> json) {
@@ -21,12 +22,15 @@ class Mail {
     _direction = json['direction'];
     _content = Content(json['content']);
     _message_status = (json['message_status'] ?? 'unknown');
+    _new = json['new'] ?? 'no';
     _active = json['active'];
   }
 
+  bool get isNew => _new == 'yes';
+
   Active get active => _active == null ? null : Active.fromJson(_active);
 
-  MailStatus get status => MailStatus.values.firstWhere((MailStatus s) => s.toString() == 'MailStatus.$status');
+  MailStatus get status => MailStatus.values.firstWhere((MailStatus s) => s.toString() == 'MailStatus.$_message_status');
 
   Content get content => _content;
 
