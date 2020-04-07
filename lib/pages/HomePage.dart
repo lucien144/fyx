@@ -144,17 +144,20 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                       Icons.mail,
                       size: 38,
                     ),
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      child: Container(
-                        padding: EdgeInsets.all(3),
-                        constraints: BoxConstraints(minWidth: 16),
-                        decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(16)),
-                        child: Text(
-                          notifications.newMails.toString(),
-                          style: TextStyle(color: Colors.white, fontSize: 10),
-                          textAlign: TextAlign.center,
+                    Visibility(
+                      visible: notifications.newMails > 0,
+                      child: Positioned(
+                        top: 0,
+                        right: 0,
+                        child: Container(
+                          padding: EdgeInsets.all(3),
+                          constraints: BoxConstraints(minWidth: 16),
+                          decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(16)),
+                          child: Text(
+                            notifications.newMails.toString(),
+                            style: TextStyle(color: Colors.white, fontSize: 10),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ),
                     ),

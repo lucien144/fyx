@@ -3,6 +3,8 @@ class System {
   int noticeCount;
   bool premium;
   String systemMessage;
+  int unreadPost;
+  String unreadPostLastFrom;
 
   System({this.maxFileSize, this.noticeCount, this.premium, this.systemMessage});
 
@@ -11,6 +13,8 @@ class System {
     noticeCount = int.parse(json['notice_count']);
     premium = json['premium'] == '1' ? true : false;
     systemMessage = json['system_message'];
+    unreadPost = int.parse(json['unread_post'] ?? '0');
+    unreadPostLastFrom = json['unread_post_last_from'];
   }
 
   Map<String, dynamic> toJson() {
@@ -19,6 +23,8 @@ class System {
     data['notice_count'] = this.noticeCount;
     data['premium'] = this.premium;
     data['system_message'] = this.systemMessage;
+    data['unread_post'] = this.unreadPost;
+    data['unread_post_last_from'] = this.unreadPostLastFrom;
     return data;
   }
 }

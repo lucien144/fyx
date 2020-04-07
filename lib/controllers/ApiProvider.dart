@@ -20,6 +20,7 @@ class ApiProvider implements IApiProvider {
 
   TOnError onError;
   TOnAuthError onAuthError;
+  TOnSystemData onSystemData;
 
   getCredentials() async {
     if (_credentials != null && _credentials.isValid) {
@@ -57,6 +58,10 @@ class ApiProvider implements IApiProvider {
       return options;
     }, onResponse: (Response response) async {
       Map data = jsonDecode(response.data);
+
+      if (data.containsKey('system')) {
+        onSystemData(data['system']);
+      }
 
       // All seems ok.
       // Endpoints: Auth + pulling data

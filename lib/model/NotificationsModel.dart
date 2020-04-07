@@ -6,7 +6,7 @@ class NotificationsModel extends ChangeNotifier {
   int get newMails => _newMails;
 
   void setNewMails(int val) {
-    _newMails = val;
+    _newMails = val ??= 0;
     notifyListeners();
   }
 }

@@ -1,13 +1,16 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/widgets.dart';
 import 'package:fyx/PlatformApp.dart';
 import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/controllers/ApiProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/exceptions/AuthException.dart';
 import 'package:fyx/model/Credentials.dart';
+import 'package:fyx/model/NotificationsModel.dart';
 import 'package:fyx/model/Post.dart';
+import 'package:fyx/model/System.dart';
 import 'package:fyx/model/reponses/BookmarksResponse.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/model/reponses/LoginResponse.dart';
@@ -16,6 +19,7 @@ import 'package:fyx/model/reponses/PostMessageResponse.dart';
 import 'package:fyx/model/reponses/RatingResponse.dart';
 import 'package:fyx/model/reponses/SendMailResponse.dart';
 import 'package:fyx/theme/L.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum AUTH_STATES { AUTH_INVALID_USERNAME, AUTH_NEW, AUTH_EXISTING }
@@ -24,6 +28,13 @@ class ApiController {
   static ApiController _instance = ApiController._init();
   IApiProvider provider;
   bool isLoggingIn = false;
+  BuildContext _context;
+
+  set context(BuildContext value) {
+    if (_context == null) {
+      _context = value;
+    }
+  }
 
   factory ApiController() {
     return _instance;
@@ -31,6 +42,7 @@ class ApiController {
 
   ApiController._init() {
     provider = ApiProvider();
+
     provider.onAuthError = () {
       // API returns the same error on authorization as well as on normal data request. Therefore this "workaround".
       if (isLoggingIn) {
@@ -41,7 +53,17 @@ class ApiController {
       PlatformTheme.error(L.AUTH_ERROR);
       PlatformApp.navigatorKey.currentState.pushNamed('/login');
     };
+
     provider.onError = (message) => PlatformTheme.error(message);
+
+    provider.onSystemData = (data) {
+      if (_context == null) {
+        return;
+      }
+
+      var system = System.fromJson(data);
+      Provider.of<NotificationsModel>(_context, listen: false).setNewMails(system.unreadPost);
+    };
   }
 
   Future<LoginResponse> login(String nickname) async {

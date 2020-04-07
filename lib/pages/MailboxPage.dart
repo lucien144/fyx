@@ -1,15 +1,11 @@
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/MailListItem.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Mail.dart';
-import 'package:fyx/model/NotificationsModel.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/T.dart';
-import 'package:provider/provider.dart';
 
 class MailboxPage extends StatefulWidget {
   int _refreshData = 0;
@@ -49,8 +45,6 @@ class _MailboxPageState extends State<MailboxPage> {
           isInfinite: true,
           dataProvider: (lastId) async {
             var result = await ApiController().loadMail(lastId: lastId);
-            // TODO: mail/notifications
-            Provider.of<NotificationsModel>(context, listen: false).setNewMails(Random().nextInt(100));
             var mails = result.data.map((_mail) {
               var mail = Mail.fromJson(_mail);
               return MailListItem(mail);
