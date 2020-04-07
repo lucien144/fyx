@@ -169,7 +169,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
         ),
         tabBuilder: (context, index) {
           switch (index) {
-            case 1:
+            case 0:
               return CupertinoTabView(builder: (context) {
                 return CupertinoPageScaffold(
                   navigationBar: CupertinoNavigationBar(
@@ -231,7 +231,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                   ),
                 );
               });
-            case 0:
+            case 1:
               return CupertinoTabView(builder: (context) {
                 return CupertinoPageScaffold(
                     navigationBar: CupertinoNavigationBar(
