@@ -52,6 +52,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
 
     if (widget._isInfinite) {
       _controller.addListener(() {
+        // TODO: Refactor, use ScrollNotification ?
         // Display loading and load next page if we are at the end of the list
         if (_controller.position.userScrollDirection == ScrollDirection.reverse && _controller.position.outOfRange) {
           if (_slivers.last is! SliverPadding) {
