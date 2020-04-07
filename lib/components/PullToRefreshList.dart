@@ -85,9 +85,11 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
 
     return _hasError || _slivers.length == 1
         ? PlatformTheme.feedbackScreen(isLoading: _isLoading, onPress: loadData, label: L.GENERAL_REFRESH)
-        : CustomScrollView(
-            slivers: _slivers,
-            controller: _controller,
+        : CupertinoScrollbar(
+            child: CustomScrollView(
+              slivers: _slivers,
+              controller: _controller,
+            ),
           );
   }
 
