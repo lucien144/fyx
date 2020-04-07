@@ -10,8 +10,11 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Category.dart';
 import 'package:fyx/model/Discussion.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/NotificationsModel.dart';
+import 'package:fyx/pages/MailboxPage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:package_info/package_info.dart';
+import 'package:provider/provider.dart';
 
 enum tabs { history, bookmarks }
 
@@ -128,14 +131,39 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
       child: CupertinoTabScaffold(
         tabBar: CupertinoTabBar(
           backgroundColor: Colors.white,
-          items: const <BottomNavigationBarItem>[
+          items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: Icon(CupertinoIcons.bookmark),
               title: Text('Sledované'),
             ),
             BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.mail),
-              title: Text('Posta'),
+              icon: Consumer<NotificationsModel>(
+                builder: (context, notifications, child) => Stack(
+                  children: <Widget>[
+                    Icon(
+                      Icons.mail,
+                      size: 38,
+                    ),
+                    Visibility(
+                      visible: notifications.newMails > 0,
+                      child: Positioned(
+                        top: 0,
+                        right: 0,
+                        child: Container(
+                          padding: EdgeInsets.all(3),
+                          constraints: BoxConstraints(minWidth: 16),
+                          decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(16)),
+                          child: Text(
+                            notifications.newMails.toString(),
+                            style: TextStyle(color: Colors.white, fontSize: 10),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -198,8 +226,6 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                               categories.add({'header': ListHeader(category), 'items': discussion});
                             });
                             return DataProviderResult(categories);
-
-                            return DataProviderResult([]);
                           }),
                     ],
                   ),
@@ -208,14 +234,21 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
             case 1:
               return CupertinoTabView(builder: (context) {
                 return CupertinoPageScaffold(
-                  child: Container(),
-                );
-              });
-            case 2:
-              return CupertinoTabView(builder: (context) {
-                return CupertinoPageScaffold(
-                  child: Container(),
-                );
+                    navigationBar: CupertinoNavigationBar(
+                        backgroundColor: Colors.white,
+                        trailing: GestureDetector(
+                          child: ca.CircleAvatar(
+                            MainRepository().credentials.avatar,
+                            size: 30,
+                          ),
+                          onTap: () {
+                            showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet());
+                          },
+                        ),
+                        middle: Text('Pošta')),
+                    child: MailboxPage(
+                      refreshData: _refreshData,
+                    ));
               });
             default:
               throw Exception('Selected undefined tab');

@@ -1,18 +1,25 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/widgets.dart';
 import 'package:fyx/PlatformApp.dart';
 import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/controllers/ApiProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/exceptions/AuthException.dart';
-import 'package:fyx/model/BookmarksResponse.dart';
 import 'package:fyx/model/Credentials.dart';
-import 'package:fyx/model/DiscussionResponse.dart';
-import 'package:fyx/model/LoginResponse.dart';
+import 'package:fyx/model/NotificationsModel.dart';
 import 'package:fyx/model/Post.dart';
-import 'package:fyx/model/RatingResponse.dart';
+import 'package:fyx/model/System.dart';
+import 'package:fyx/model/reponses/BookmarksResponse.dart';
+import 'package:fyx/model/reponses/DiscussionResponse.dart';
+import 'package:fyx/model/reponses/LoginResponse.dart';
+import 'package:fyx/model/reponses/MailResponse.dart';
+import 'package:fyx/model/reponses/PostMessageResponse.dart';
+import 'package:fyx/model/reponses/RatingResponse.dart';
+import 'package:fyx/model/reponses/SendMailResponse.dart';
 import 'package:fyx/theme/L.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum AUTH_STATES { AUTH_INVALID_USERNAME, AUTH_NEW, AUTH_EXISTING }
@@ -21,6 +28,13 @@ class ApiController {
   static ApiController _instance = ApiController._init();
   IApiProvider provider;
   bool isLoggingIn = false;
+  BuildContext _context;
+
+  set context(BuildContext value) {
+    if (_context == null) {
+      _context = value;
+    }
+  }
 
   factory ApiController() {
     return _instance;
@@ -28,6 +42,7 @@ class ApiController {
 
   ApiController._init() {
     provider = ApiProvider();
+
     provider.onAuthError = () {
       // API returns the same error on authorization as well as on normal data request. Therefore this "workaround".
       if (isLoggingIn) {
@@ -38,7 +53,17 @@ class ApiController {
       PlatformTheme.error(L.AUTH_ERROR);
       PlatformApp.navigatorKey.currentState.pushNamed('/login');
     };
+
     provider.onError = (message) => PlatformTheme.error(message);
+
+    provider.onSystemData = (data) {
+      if (_context == null) {
+        return;
+      }
+
+      var system = System.fromJson(data);
+      Provider.of<NotificationsModel>(_context, listen: false).setNewMails(system.unreadPost);
+    };
   }
 
   Future<LoginResponse> login(String nickname) async {
@@ -78,11 +103,12 @@ class ApiController {
     return DiscussionResponse.fromJson(jsonDecode(response.data));
   }
 
-  Future<Response> postDiscussionMessage(int id, String message, {Map<String, dynamic> attachment, Post replyPost}) {
+  Future<PostMessageResponse> postDiscussionMessage(int id, String message, {Map<String, dynamic> attachment, Post replyPost}) async {
     if (replyPost != null) {
       message = '{reply ${replyPost.nick}|${replyPost.id}}: ${message}';
     }
-    return provider.postDiscussionMessage(id, message, attachment: attachment);
+    var result = await provider.postDiscussionMessage(id, message, attachment: attachment);
+    return PostMessageResponse.fromJson(jsonDecode(result.data));
   }
 
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder) {
@@ -91,7 +117,6 @@ class ApiController {
 
   Future<RatingResponse> giveRating(int discussionId, int postId, {bool positive = true, bool confirm = false}) async {
     Response response = await provider.giveRating(discussionId, postId, positive, confirm);
-    print(response.data);
     var data = jsonDecode(response.data);
     return RatingResponse(
         isGiven: data['result'] == 'RATING_GIVEN',
@@ -105,6 +130,16 @@ class ApiController {
     if (removeAuthrorization) {
       provider.logout();
     }
+  }
+
+  Future<MailResponse> loadMail({int lastId}) async {
+    var response = await provider.fetchMail(lastId: lastId);
+    return MailResponse.fromJson(jsonDecode(response.data));
+  }
+
+  Future<SendMailResponse> sendMail(String recipient, String message, {Map<String, dynamic> attachment}) async {
+    var result = await provider.sendMail(recipient, message, attachment: attachment);
+    return SendMailResponse.fromJson(jsonDecode(result.data));
   }
 
   throwAuthException(LoginResponse loginResponse, {String message: ''}) {

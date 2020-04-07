@@ -22,9 +22,27 @@ class PostAvatar extends StatelessWidget {
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            nick,
-            style: TextStyle(color: isHighlighted ? T.COLOR_PRIMARY : material.Colors.black),
+          material.Row(
+            children: <material.Widget>[
+              Text(
+                nick,
+                style: TextStyle(color: isHighlighted ? T.COLOR_PRIMARY : material.Colors.black),
+              ),
+              Visibility(
+                visible: isHighlighted,
+                child: SizedBox(
+                  width: 4,
+                ),
+              ),
+              Visibility(
+                visible: isHighlighted,
+                child: Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(4), color: T.COLOR_PRIMARY),
+                ),
+              )
+            ],
           ),
           Text(
             description,

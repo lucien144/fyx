@@ -20,6 +20,7 @@ class ApiProvider implements IApiProvider {
 
   TOnError onError;
   TOnAuthError onAuthError;
+  TOnSystemData onSystemData;
 
   getCredentials() async {
     if (_credentials != null && _credentials.isValid) {
@@ -57,6 +58,10 @@ class ApiProvider implements IApiProvider {
       return options;
     }, onResponse: (Response response) async {
       Map data = jsonDecode(response.data);
+
+      if (data.containsKey('system')) {
+        onSystemData(data['system']);
+      }
 
       // All seems ok.
       // Endpoints: Auth + pulling data
@@ -181,6 +186,25 @@ class ApiProvider implements IApiProvider {
       'l2': 'remove_authorization',
     });
 
+    return await dio.post(URL, data: formData, options: _options);
+  }
+
+  Future<Response> fetchMail({int lastId}) async {
+    FormData formData = new FormData.fromMap(
+        {'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'mail', 'l2': 'messages', 'id_mail': lastId, 'direction': lastId == null ? 'newest' : 'older'});
+    return await dio.post(URL, data: formData, options: _options);
+  }
+
+  Future<Response> sendMail(String recipient, String message, {Map<String, dynamic> attachment}) async {
+    FormData formData = new FormData.fromMap({
+      'auth_nick': _credentials.nickname,
+      'auth_token': _credentials.token,
+      'l': 'mail',
+      'l2': 'send',
+      'recipient': recipient,
+      'message': message,
+      'attachment': attachment is Map ? MultipartFile.fromBytes(attachment['bytes'], filename: attachment['filename']) : null
+    });
     return await dio.post(URL, data: formData, options: _options);
   }
 }

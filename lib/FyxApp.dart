@@ -9,6 +9,9 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/pages/HomePage.dart';
 import 'package:fyx/pages/LoginPage.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:provider/provider.dart';
+
+import 'model/NotificationsModel.dart';
 
 enum Environment { dev, staging, production }
 
@@ -53,12 +56,15 @@ class FyxApp extends StatelessWidget {
           currentFocus.unfocus();
         }
       },
-      child: PlatformApp(
-        title: 'Fyx',
-        theme: PlatformThemeData(primaryColor: T.COLOR_PRIMARY),
-        home: MainRepository().credentials is Credentials && MainRepository().credentials.isValid ? HomePage() : LoginPage(),
-        debugShowCheckedModeBanner: FyxApp.isDev,
-        listNavigatorObservers: [FyxApp.routeObserver],
+      child: ChangeNotifierProvider(
+        create: (context) => NotificationsModel(),
+        child: PlatformApp(
+          title: 'Fyx',
+          theme: PlatformThemeData(primaryColor: T.COLOR_PRIMARY),
+          home: MainRepository().credentials is Credentials && MainRepository().credentials.isValid ? HomePage() : LoginPage(),
+          debugShowCheckedModeBanner: FyxApp.isDev,
+          listNavigatorObservers: [FyxApp.routeObserver],
+        ),
       ),
     );
   }

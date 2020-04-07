@@ -60,8 +60,8 @@ class PlatformApp extends PlatformAwareWidget<MaterialApp, CupertinoApp> {
       case '/discussion':
         print('[Router] Discussion');
         return CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings);
-      case '/discussion/new-message':
-        print('[Router] Discussion / New Message');
+      case '/new-message':
+        print('[Router] New Message');
         return CupertinoPageRoute(builder: (_) => NewMessagePage(), settings: settings, fullscreenDialog: true);
       case '/gallery':
         print('[Router] Gallery');

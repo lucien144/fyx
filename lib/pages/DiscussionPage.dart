@@ -6,8 +6,8 @@ import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/components/post/PostListItem.dart';
 import 'package:fyx/controllers/ApiController.dart';
-import 'package:fyx/model/DiscussionResponse.dart';
 import 'package:fyx/model/Post.dart';
+import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
@@ -182,7 +182,13 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
               child: FloatingActionButton(
                 backgroundColor: T.COLOR_PRIMARY,
                 child: Icon(Icons.add),
-                onPressed: () => Navigator.of(context).pushNamed('/discussion/new-message', arguments: NewMessageSettings(pageArguments.discussionId, onClose: this.refresh)),
+                onPressed: () => Navigator.of(context).pushNamed('/new-message',
+                    arguments: NewMessageSettings(
+                        onClose: this.refresh,
+                        onSubmit: (String inputField, String message, Map<String, dynamic> attachment) async {
+                          var result = await ApiController().postDiscussionMessage(pageArguments.discussionId, message, attachment: attachment);
+                          return result.isOk;
+                        })),
               ),
             ),
           ),
