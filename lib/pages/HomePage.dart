@@ -133,16 +133,15 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
           backgroundColor: Colors.white,
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.bookmark),
-              title: Text('Sledované'),
+              icon: Icon(CupertinoIcons.bookmark, size: 38),
             ),
             BottomNavigationBarItem(
               icon: Consumer<NotificationsModel>(
                 builder: (context, notifications, child) => Stack(
                   children: <Widget>[
                     Icon(
-                      Icons.mail,
-                      size: 38,
+                      CupertinoIcons.mail,
+                      size: 42,
                     ),
                     Visibility(
                       visible: notifications.newMails > 0,
