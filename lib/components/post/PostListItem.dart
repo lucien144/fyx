@@ -68,7 +68,7 @@ class _PostListItemState extends State<PostListItem> {
           Visibility(
             visible: _post.rating != 0 || MainRepository().credentials.nickname != _post.nick,
             child: Text(
-              _post.rating >= 0 ? '+${_post.rating}' : _post.rating.toString(),
+              _post.rating > 0 ? '+${_post.rating}' : _post.rating.toString(),
               style: TextStyle(color: _post.rating > 0 ? Colors.green : (_post.rating < 0 ? Colors.redAccent : Colors.black38)),
             ),
           ),
