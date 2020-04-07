@@ -77,7 +77,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
   Widget build(BuildContext context) {
     if (_settings == null) {
       _settings = ModalRoute.of(context).settings.arguments as NewMessageSettings;
-      _recipientController.text = _settings.inputFieldPlaceholder.toUpperCase();
+      _recipientController.text = _settings.inputFieldPlaceholder?.toUpperCase();
     }
 
     return Container(
