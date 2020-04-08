@@ -9,8 +9,8 @@ class System {
   System({this.maxFileSize, this.noticeCount, this.premium, this.systemMessage});
 
   System.fromJson(Map<String, dynamic> json) {
-    maxFileSize = int.parse(json['max_file_size']);
-    noticeCount = int.parse(json['notice_count']);
+    maxFileSize = int.parse(json['max_file_size'] ?? '0');
+    noticeCount = int.parse(json['notice_count'] ?? '0');
     premium = json['premium'] == '1' ? true : false;
     systemMessage = json['system_message'];
     unreadPost = int.parse(json['unread_post'] ?? '0');
