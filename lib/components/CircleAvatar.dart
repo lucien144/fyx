@@ -1,3 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/theme/T.dart';
@@ -21,9 +23,11 @@ class CircleAvatar extends StatelessWidget {
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(22), color: _isHighlighted ? T.COLOR_PRIMARY : Colors.white),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
-          child: Image.network(
-            url,
+          child: CachedNetworkImage(
+            imageUrl: url,
             fit: BoxFit.cover,
+            placeholder: (context, url) => CupertinoActivityIndicator(),
+            errorWidget: (context, url, error) => Icon(Icons.error),
             width: _size,
             height: _size,
           ),
