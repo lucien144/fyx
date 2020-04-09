@@ -35,6 +35,7 @@ class ApiProvider implements IApiProvider {
 
   ApiProvider() {
     try {
+      // TODO: Use the MainRepository() to obtain this info
       DeviceInfoPlugin()
         ..iosInfo.then((iosInfo) {
           PackageInfo.fromPlatform().then((info) {

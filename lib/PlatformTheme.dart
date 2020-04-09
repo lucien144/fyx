@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -34,6 +35,18 @@ class PlatformTheme {
     } catch (e) {
       PlatformTheme.error(L.INAPPBROWSER_ERROR);
     }
+  }
+
+  static prefillGithubIssue(String body, {String title = ''}) async {
+    var pkg = MainRepository().packageInfo;
+    var device = MainRepository().deviceInfo;
+    var version = '${pkg.version} (${pkg.buildNumber})';
+    var system = '${device.systemName} ${device.systemVersion} ${device.localizedModel}';
+
+    var _body = Uri.encodeComponent('$body\n\n---\n*Verze: $version\niOS: $system*');
+    var _title = Uri.encodeFull(title);
+    var url = 'https://github.com/lucien144/fyx/issues/new?title=$_title&body=$_body&labels=user+report';
+    PlatformTheme.openLink(url);
   }
 
   static Widget feedbackScreen({bool isLoading = false, bool isWarning = false, String label = '', String title = '', Function onPress}) {

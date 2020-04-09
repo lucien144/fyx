@@ -1,3 +1,4 @@
+import 'package:device_info/device_info.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +12,7 @@ import 'package:fyx/model/provider/SettingsModel.dart';
 import 'package:fyx/pages/HomePage.dart';
 import 'package:fyx/pages/LoginPage.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 
 enum Environment { dev, staging, production }
@@ -43,7 +45,12 @@ class FyxApp extends StatelessWidget {
   static init() async {
     WidgetsFlutterBinding.ensureInitialized();
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-    MainRepository().credentials = await ApiController().provider.getCredentials();
+
+    // TODO: Move to build using FutureBuilder.
+    var results = await Future.wait([ApiController().provider.getCredentials(), PackageInfo.fromPlatform(), DeviceInfoPlugin().iosInfo]);
+    MainRepository().credentials = results[0];
+    MainRepository().packageInfo = results[1];
+    MainRepository().deviceInfo = results[2];
   }
 
   @override

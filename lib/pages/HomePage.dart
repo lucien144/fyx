@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/FyxApp.dart';
+import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/CircleAvatar.dart' as ca;
 import 'package:fyx/components/DiscussionListItem.dart';
 import 'package:fyx/components/ListHeader.dart';
@@ -14,7 +15,6 @@ import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/model/provider/SettingsModel.dart';
 import 'package:fyx/pages/MailboxPage.dart';
 import 'package:fyx/theme/L.dart';
-import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 
 enum tabs { history, bookmarks }
@@ -93,24 +93,18 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
   }
 
   Widget actionSheet(BuildContext context) {
+    var pkg = MainRepository().packageInfo;
+    var version = '${pkg.version} (${pkg.buildNumber})';
+
     return Consumer<SettingsModel>(
         builder: (context, settings, child) => CupertinoActionSheet(
             title: Text('Přihlášen jako: ${MainRepository().credentials.nickname}'),
-            message: FutureBuilder<PackageInfo>(
-                future: PackageInfo.fromPlatform(),
-                builder: (BuildContext context, AsyncSnapshot<PackageInfo> snapshot) {
-                  if (snapshot.hasData) {
-                    return Text('Verze: ${snapshot.data.version} (${snapshot.data.buildNumber})');
-                  } else if (snapshot.hasError) {
-                    return Text('Verze: ¯\_(ツ)_/¯');
-                  } else {
-                    return Text('Verze: načítám...');
-                  }
-                }),
+            message: Text('Verze: $version'),
             actions: <Widget>[
               CupertinoActionSheetAction(
                   child: settings.useHeroPosts ? Text('Experimentální příspěvky (zapnuto)') : Text('Experimentální příspěvky (vypnuto)'),
                   onPressed: () => Provider.of<SettingsModel>(context, listen: false).toggleUseHeroPosts()),
+              CupertinoActionSheetAction(child: Text('⚠️ Nahlásit chybu'), onPressed: () => PlatformTheme.prefillGithubIssue('Zde popiš svůj problém...')),
               CupertinoActionSheetAction(
                 isDestructiveAction: true,
                 child: Text(L.GENERAL_LOGOUT),
