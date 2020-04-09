@@ -26,7 +26,7 @@ class _GalleryPageState extends State<GalleryPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_arguments.images.length > 1) {
         _arguments.images.asMap().forEach((key, image) {
-          if (image.image == _arguments.image.image) {
+          if (image.image == _arguments.imageUrl) {
             _controller.jumpToPage(key);
           }
         });

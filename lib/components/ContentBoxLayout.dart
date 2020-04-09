@@ -6,7 +6,9 @@ import 'package:fyx/components/post/PostHtml.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/model/post/Link.dart';
+import 'package:fyx/model/provider/SettingsModel.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:provider/provider.dart';
 
 enum LAYOUT_TYPES { textOnly, oneImageOnly, attachmentsOnly, attachmentsAndText }
 
@@ -25,7 +27,7 @@ class ContentBoxLayout extends StatelessWidget {
         LAYOUT_TYPES.textOnly,
         () => () {
               if (content.strippedContent.isNotEmpty && content.attachments.isEmpty) {
-                return PostHtml(content.body);
+                return PostHtml(content);
               }
               return null;
             });
@@ -69,7 +71,7 @@ class ContentBoxLayout extends StatelessWidget {
               var children = <Widget>[];
               children.add(Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[Expanded(child: PostHtml(content.body)), PostHeroAttachment(content.attachmentsWithFeatured['featured'], content)],
+                children: <Widget>[Expanded(child: PostHtml(content)), PostHeroAttachment(content.attachmentsWithFeatured['featured'], content)],
               ));
 
               if ((content.attachmentsWithFeatured['attachments'] as List).whereType<model.Image>().length > 0) {
@@ -132,20 +134,25 @@ class ContentBoxLayout extends StatelessWidget {
   }
 
   Widget getContentWidget() {
-    for (final layout in LAYOUT_TYPES.values) {
-      var result = _layoutMap[layout]();
-      if (result != null) {
-        return result;
-      }
-    }
+    return Consumer<SettingsModel>(
+        builder: (context, settings, child) => settings.useHeroPosts
+            ? (() {
+                for (final layout in LAYOUT_TYPES.values) {
+                  var result = _layoutMap[layout]();
+                  if (result != null) {
+                    return result;
+                  }
+                }
 
-    // TODO: Doplnit text a odkaz.
-    return Column(children: <Widget>[
-      Icon(Icons.warning),
-      Text(
-        'Nastal problém se zobrazením příspěvku.\n Vyplňte prosím github issues.',
-        textAlign: TextAlign.center,
-      )
-    ]);
+                // TODO: Doplnit text a odkaz.
+                return Column(children: <Widget>[
+                  Icon(Icons.warning),
+                  Text(
+                    'Nastal problém se zobrazením příspěvku.\n Vyplňte prosím github issues.',
+                    textAlign: TextAlign.center,
+                  )
+                ]);
+              })()
+            : PostHtml(content));
   }
 }

@@ -6,12 +6,12 @@ import 'package:fyx/PlatformThemeData.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/provider/NotificationsModel.dart';
+import 'package:fyx/model/provider/SettingsModel.dart';
 import 'package:fyx/pages/HomePage.dart';
 import 'package:fyx/pages/LoginPage.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:provider/provider.dart';
-
-import 'model/NotificationsModel.dart';
 
 enum Environment { dev, staging, production }
 
@@ -56,8 +56,11 @@ class FyxApp extends StatelessWidget {
           currentFocus.unfocus();
         }
       },
-      child: ChangeNotifierProvider(
-        create: (context) => NotificationsModel(),
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider<NotificationsModel>(create: (context) => NotificationsModel()),
+          ChangeNotifierProvider<SettingsModel>(create: (context) => SettingsModel())
+        ],
         child: PlatformApp(
           title: 'Fyx',
           theme: PlatformThemeData(primaryColor: T.COLOR_PRIMARY),

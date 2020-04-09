@@ -10,10 +10,10 @@ import 'package:fyx/model/post/Link.dart';
 import 'package:fyx/model/post/Video.dart';
 
 class GalleryArguments {
-  final model.Image image;
+  final String imageUrl;
   final List<model.Image> images;
 
-  GalleryArguments(this.image, {this.images});
+  GalleryArguments(this.imageUrl, {this.images});
 }
 
 class PostHeroAttachment extends StatelessWidget {
@@ -30,7 +30,7 @@ class PostHeroAttachment extends StatelessWidget {
   Widget build(BuildContext context) {
     if (attachment is model.Image) {
       return GestureDetector(
-        onTap: () => Navigator.of(context).pushNamed('/gallery', arguments: GalleryArguments(attachment, images: content.images)),
+        onTap: () => Navigator.of(context).pushNamed('/gallery', arguments: GalleryArguments((attachment as model.Image).image, images: content.images)),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: CachedNetworkImage(

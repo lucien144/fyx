@@ -10,7 +10,8 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Category.dart';
 import 'package:fyx/model/Discussion.dart';
 import 'package:fyx/model/MainRepository.dart';
-import 'package:fyx/model/NotificationsModel.dart';
+import 'package:fyx/model/provider/NotificationsModel.dart';
+import 'package:fyx/model/provider/SettingsModel.dart';
 import 'package:fyx/pages/MailboxPage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:package_info/package_info.dart';
@@ -91,37 +92,41 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     });
   }
 
-  CupertinoActionSheet actionSheet() {
-    return CupertinoActionSheet(
-        title: Text('Přihlášen jako: ${MainRepository().credentials.nickname}'),
-        message: FutureBuilder<PackageInfo>(
-            future: PackageInfo.fromPlatform(),
-            builder: (BuildContext context, AsyncSnapshot<PackageInfo> snapshot) {
-              if (snapshot.hasData) {
-                return Text('Verze: ${snapshot.data.version} (${snapshot.data.buildNumber})');
-              } else if (snapshot.hasError) {
-                return Text('Verze: ¯\_(ツ)_/¯');
-              } else {
-                return Text('Verze: načítám...');
-              }
-            }),
-        actions: <Widget>[
-          CupertinoActionSheetAction(
-            isDestructiveAction: true,
-            child: Text(L.GENERAL_LOGOUT),
-            onPressed: () {
-              ApiController().logout();
-              Navigator.of(context, rootNavigator: true).pushNamed('/login');
-            },
-          )
-        ],
-        cancelButton: CupertinoActionSheetAction(
-          isDefaultAction: true,
-          child: Text(L.GENERAL_CANCEL),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ));
+  Widget actionSheet(BuildContext context) {
+    return Consumer<SettingsModel>(
+        builder: (context, settings, child) => CupertinoActionSheet(
+            title: Text('Přihlášen jako: ${MainRepository().credentials.nickname}'),
+            message: FutureBuilder<PackageInfo>(
+                future: PackageInfo.fromPlatform(),
+                builder: (BuildContext context, AsyncSnapshot<PackageInfo> snapshot) {
+                  if (snapshot.hasData) {
+                    return Text('Verze: ${snapshot.data.version} (${snapshot.data.buildNumber})');
+                  } else if (snapshot.hasError) {
+                    return Text('Verze: ¯\_(ツ)_/¯');
+                  } else {
+                    return Text('Verze: načítám...');
+                  }
+                }),
+            actions: <Widget>[
+              CupertinoActionSheetAction(
+                  child: settings.useHeroPosts ? Text('Experimentální příspěvky (zapnuto)') : Text('Experimentální příspěvky (vypnuto)'),
+                  onPressed: () => Provider.of<SettingsModel>(context, listen: false).toggleUseHeroPosts()),
+              CupertinoActionSheetAction(
+                isDestructiveAction: true,
+                child: Text(L.GENERAL_LOGOUT),
+                onPressed: () {
+                  ApiController().logout();
+                  Navigator.of(context, rootNavigator: true).pushNamed('/login');
+                },
+              )
+            ],
+            cancelButton: CupertinoActionSheetAction(
+              isDefaultAction: true,
+              child: Text(L.GENERAL_CANCEL),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            )));
   }
 
   @override
@@ -179,7 +184,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                           size: 30,
                         ),
                         onTap: () {
-                          showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet());
+                          showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet(context));
                         },
                       ),
                       middle: CupertinoSegmentedControl(
@@ -241,7 +246,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                             size: 30,
                           ),
                           onTap: () {
-                            showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet());
+                            showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet(context));
                           },
                         ),
                         middle: Text('Pošta')),
