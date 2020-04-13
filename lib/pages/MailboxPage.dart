@@ -8,8 +8,8 @@ import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/T.dart';
 
 class MailboxPage extends StatefulWidget {
-  int _refreshData = 0;
-  MailboxPage({int refreshData = 0}) : _refreshData = refreshData;
+  final int refreshData;
+  MailboxPage({this.refreshData});
 
   @override
   _MailboxPageState createState() => _MailboxPageState();
@@ -20,7 +20,7 @@ class _MailboxPageState extends State<MailboxPage> {
 
   @override
   void initState() {
-    _refreshData = widget._refreshData;
+    _refreshData = widget.refreshData;
     super.initState();
   }
 
@@ -31,7 +31,7 @@ class _MailboxPageState extends State<MailboxPage> {
 
   @override
   void didUpdateWidget(MailboxPage oldWidget) {
-    if (oldWidget._refreshData != widget._refreshData) {
+    if (oldWidget.refreshData != widget.refreshData) {
       this.refreshData();
     }
     super.didUpdateWidget(oldWidget);

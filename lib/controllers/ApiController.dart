@@ -105,7 +105,7 @@ class ApiController {
 
   Future<PostMessageResponse> postDiscussionMessage(int id, String message, {Map<String, dynamic> attachment, Post replyPost}) async {
     if (replyPost != null) {
-      message = '{reply ${replyPost.nick}|${replyPost.id}}: ${message}';
+      message = '{reply ${replyPost.nick}|${replyPost.id}}: $message';
     }
     var result = await provider.postDiscussionMessage(id, message, attachment: attachment);
     return PostMessageResponse.fromJson(jsonDecode(result.data));

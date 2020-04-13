@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   // Called when the current route has been pushed.
   void didPopNext() {
-    debugPrint("didPopNext ${runtimeType}");
+    debugPrint("didPopNext $runtimeType");
     this.refreshData();
   }
 
