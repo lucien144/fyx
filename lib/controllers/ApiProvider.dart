@@ -35,7 +35,7 @@ class ApiProvider implements IApiProvider {
 
   ApiProvider() {
     try {
-      // TODO: Use the MainRepository() to obtain this info
+      // TODO: Use the MainRepository() to obtain this info... or not?
       DeviceInfoPlugin()
         ..iosInfo.then((iosInfo) {
           PackageInfo.fromPlatform().then((info) {
@@ -45,6 +45,8 @@ class ApiProvider implements IApiProvider {
             deviceName = deviceName.replaceAll(RegExp(r'[^\w _\-]', caseSensitive: false), '_');
             _options.headers['user-agent'] = '${_options.headers['user-agent']} | ${iosInfo.systemName} | ${info.version} (${info.buildNumber}) | $deviceName';
           });
+        }).catchError((error) {
+          _options.headers['user-agent'] = '${_options.headers['user-agent']} | Fyx';
         });
     } catch (e) {}
 

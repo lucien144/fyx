@@ -52,24 +52,73 @@ class ApiMock implements IApiProvider {
   }
 
   @override
-  // TODO
-  setCredentials(Credentials val) {}
+  var onSystemData;
 
   @override
-  // TODO
-  getCredentials() {}
+  Future<Response> fetchDiscussion(int id, {int lastId}) {
+    // TODO: implement fetchDiscussion
+    return null;
+  }
 
   @override
-  // TODO
-  Future<Response> fetchDiscussion(int id, {lastId}) {}
+  Future<Response> fetchMail({int lastId}) {
+    // TODO: implement fetchMail
+    return null;
+  }
 
   @override
-  // TODO
-  Future<Response> postDiscussionMessage(int id, String message, {Map<String, dynamic> attachment}) {}
+  Future<Credentials> getCredentials() {
+    // TODO: implement getCredentials
+    return null;
+  }
+
+  @override
+  Future<Response> giveRating(int discussionId, int postId, bool add, bool confirm) {
+    // TODO: implement giveRating
+    return null;
+  }
+
+  @override
+  Future<Response> logout() {
+    // TODO: implement logout
+    return null;
+  }
+
+  @override
+  Future<Response> postDiscussionMessage(int id, String message, {Map<String, dynamic> attachment}) {
+    // TODO: implement postDiscussionMessage
+    return null;
+  }
+
+  @override
+  Future<Response> sendMail(String recipient, String message, {Map<String, dynamic> attachment}) {
+    // TODO: implement sendMail
+    return null;
+  }
+
+  @override
+  void setCredentials(Credentials val) {
+    // TODO: implement setCredentials
+  }
+
+  @override
+  Future<Response> setPostReminder(int discussionId, int postId, bool setReminder) {
+    // TODO: implement setPostReminder
+    return null;
+  }
+
+  @override
+  Future<Response> testAuth() {
+    // TODO: implement testAuth
+    return null;
+  }
 }
 
 void main() {
-  setUp(() => SharedPreferences.setMockInitialValues({}));
+  setUp(() {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    SharedPreferences.setMockInitialValues({});
+  });
 
   test('User is not authorized.', () async {
     var loginName = 'TOMMYSHELBY';

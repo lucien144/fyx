@@ -22,16 +22,16 @@ void main() {
     var json = Map<String, dynamic>.from(_json);
     json.putIfAbsent("content", () => content);
 
-    var post = Post.fromJson(json);
+    var post = Post.fromJson(json, 1);
     expect(post.id, 51360794);
     expect(post.nick, 'TOMMYSHELBY');
     expect(post.avatar, 'https://i.nyx.cz/T/TOMMYSHELBY.gif');
     expect(post.time, 1573934376);
     expect(post.rating, 8);
     expect(post.type, 0);
-    expect(post.rawContent, content);
-    expect(0, parse(post.content).querySelectorAll('a > img').length, reason: 'Images have been removed.');
-    expect(1, parse(post.content).querySelectorAll('a').length, reason: 'Other links remains');
+    expect(post.content.rawBody, content);
+    expect(0, parse(post.content.body).querySelectorAll('a > img').length, reason: 'Images have been removed.');
+    expect(1, parse(post.content.body).querySelectorAll('a').length, reason: 'Other links remains');
 
     var imagesMatcher = [
       Image('http://i.nyx.cz/files/00/00/20/68/2068213_7dde4d7aa8e3021dd610.jpg?name=11.jpg',
@@ -39,9 +39,9 @@ void main() {
     ];
 
     Function deepEq = const DeepCollectionEquality().equals;
-    expect(deepEq(post.images, imagesMatcher), true);
+    expect(deepEq(post.content.images, imagesMatcher), true);
 
-    expect(post.links.length, 0, reason: 'Internal link is not treated as attachment.');
+    expect(post.content.links.length, 0, reason: 'Internal link is not treated as attachment.');
   });
 
   test('Post has more internal images', () {
@@ -55,16 +55,16 @@ void main() {
     var json = Map<String, dynamic>.from(_json);
     json.putIfAbsent("content", () => content);
 
-    var post = Post.fromJson(json);
-    expect(post.images.length, 2);
-    expect(post.images[0].image, 'http://i.nyx.cz/files/00/00/20/77/2077557_48d4a18f67ad53d7572e.jpg?name=dbk2.jpg');
-    expect(post.images[1].image, 'http://i.nyx.cz/files/00/00/20/77/2077556_45259e39b491933bb483.jpg?name=dbk.jpg');
-    expect(post.images[0].thumb,
+    var post = Post.fromJson(json, 1);
+    expect(post.content.images.length, 2);
+    expect(post.content.images[0].image, 'http://i.nyx.cz/files/00/00/20/77/2077557_48d4a18f67ad53d7572e.jpg?name=dbk2.jpg');
+    expect(post.content.images[1].image, 'http://i.nyx.cz/files/00/00/20/77/2077556_45259e39b491933bb483.jpg?name=dbk.jpg');
+    expect(post.content.images[0].thumb,
         'http://www.nyx.cz/i/t/6a6f8dae07571ecfb1510c18e6dd6d0a.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F77%2F2077557_48d4a18f67ad53d7572e.jpg%3Fname%3Ddbk2.jpg');
-    expect(post.images[1].thumb,
+    expect(post.content.images[1].thumb,
         'http://www.nyx.cz/i/t/8697a44511a1664f7adc53b39821ce7c.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F77%2F2077556_45259e39b491933bb483.jpg%3Fname%3Ddbk.jpg');
-    expect(post.links.length, 0);
-    expect(0, parse(post.content).querySelectorAll('a > img').length);
+    expect(post.content.links.length, 0);
+    expect(0, parse(post.content.body).querySelectorAll('a > img').length);
   });
 
   test('Post is mixed vide Youtube, links and images', () {
@@ -98,37 +98,37 @@ void main() {
     var json = Map<String, dynamic>.from(_json);
     json.putIfAbsent("content", () => content);
 
-    var post = Post.fromJson(json);
+    var post = Post.fromJson(json, 1);
 
     // Testing videos
-    expect(post.videos.length, 1);
-    expect(post.videos[0].id, 'B1_gcCu0-oI');
-    expect(post.videos[0].type, VIDEO_TYPE.youtube);
-    expect(post.videos[0].image, 'http://img.youtube.com/vi/B1_gcCu0-oI/0.jpg');
-    expect(post.videos[0].thumb, 'http://www.nyx.cz/i/t/e8464b77ee2b7a726f174be309201ade.png?url=http%3A%2F%2Fimg.youtube.com%2Fvi%2FB1_gcCu0-oI%2F0.jpg');
-    expect(post.videos[0].link.url, 'https://www.youtube.com/watch?v=B1_gcCu0-oI');
-    expect(post.videos[0].link.fancyUrl, 'youtube.com/watch?v=B1_gcCu0-oI');
-    expect(post.videos[0].link.title, 'youtube.com/watch?v=B1_gcCu0-oI');
-    expect(0, parse(post.content).querySelectorAll('div[data-embed-value="B1_gcCu0-oI"]').length);
+    expect(post.content.videos.length, 1);
+    expect(post.content.videos[0].id, 'B1_gcCu0-oI');
+    expect(post.content.videos[0].type, VIDEO_TYPE.youtube);
+    expect(post.content.videos[0].image, 'http://img.youtube.com/vi/B1_gcCu0-oI/0.jpg');
+    expect(post.content.videos[0].thumb, 'http://www.nyx.cz/i/t/e8464b77ee2b7a726f174be309201ade.png?url=http%3A%2F%2Fimg.youtube.com%2Fvi%2FB1_gcCu0-oI%2F0.jpg');
+    expect(post.content.videos[0].link.url, 'https://www.youtube.com/watch?v=B1_gcCu0-oI');
+    expect(post.content.videos[0].link.fancyUrl, 'youtube.com/watch?v=B1_gcCu0-oI');
+    expect(post.content.videos[0].link.title, 'youtube.com/watch?v=B1_gcCu0-oI');
+    expect(0, parse(post.content.body).querySelectorAll('div[data-embed-value="B1_gcCu0-oI"]').length);
 
     // Test images
-    expect(post.images.length, 1);
+    expect(post.content.images.length, 1);
 
     // Test links
-    expect(post.links.length, 3);
-    expect(post.links[0].title, 'Victoria Falls has not dried up - here\u2019s the proof - Africa Geographic');
-    expect(post.links[0].url, 'https://web.archive.org/web/20170331170530/https://africageographic.com/blog/victoria-falls-not-dried-heres-proof/');
-    expect(post.links[1].title, '\u65c5\u3059\u308b\u9234\u6728436:Victoria Falls in Dry season @Zimbabwe');
-    expect(post.links[1].url, 'http://www.youtube.com/watch?v=B1_gcCu0-oI');
-    expect(post.links[2].title, 'Tohle je link bez title');
-    expect(post.links[2].url, 'http://nyx.cz');
+    expect(post.content.links.length, 3);
+    expect(post.content.links[0].title, 'Victoria Falls has not dried up - here\u2019s the proof - Africa Geographic');
+    expect(post.content.links[0].url, 'https://web.archive.org/web/20170331170530/https://africageographic.com/blog/victoria-falls-not-dried-heres-proof/');
+    expect(post.content.links[1].title, '\u65c5\u3059\u308b\u9234\u6728436:Victoria Falls in Dry season @Zimbabwe');
+    expect(post.content.links[1].url, 'http://www.youtube.com/watch?v=B1_gcCu0-oI');
+    expect(post.content.links[2].title, 'Tohle je link bez title');
+    expect(post.content.links[2].url, 'http://nyx.cz');
 
     // Test attachments
-    expect(post.attachments.length, 5);
+    expect(post.content.attachments.length, 5);
 
     // Test featured attachments
-    expect(post.attachmentsWithFeatured['featured'] is Image, true);
-    expect(post.attachmentsWithFeatured['attachments'].length, 4);
+    expect(post.content.attachmentsWithFeatured['featured'] is Image, true);
+    expect(post.content.attachmentsWithFeatured['attachments'].length, 4);
   });
 
   test('Content is stripped for unnecessary <br> tags and comments from attached images', () {
@@ -147,9 +147,9 @@ void main() {
     var json = Map<String, dynamic>.from(_json);
     json.putIfAbsent("content", () => content);
 
-    var post = Post.fromJson(json);
-    expect(post.content.trim(), expectedContent.trim());
-    expect(post.strippedContent, 'Lorem ipsum dolor... sit amet :)');
+    var post = Post.fromJson(json, 1);
+    expect(post.content.body.trim(), expectedContent.trim());
+    expect(post.content.strippedContent, 'Lorem ipsum dolor... sit amet :)');
   });
 
   test('Content is stripped for unnecessary <br> tags and comments from attached embeds', () {
@@ -166,8 +166,8 @@ void main() {
     var json = Map<String, dynamic>.from(_json);
     json.putIfAbsent("content", () => content);
 
-    var post = Post.fromJson(json);
-    expect(post.content.trim(), 'lorem ipsum');
+    var post = Post.fromJson(json, 1);
+    expect(post.content.body.trim(), 'lorem ipsum');
   });
 
   test('Content is stripped for trailing <br>', () {
@@ -180,7 +180,7 @@ void main() {
     var json = Map<String, dynamic>.from(_json);
     json.putIfAbsent("content", () => content);
 
-    var post = Post.fromJson(json);
-    expect(post.content, 'lorem ipsum');
+    var post = Post.fromJson(json, 1);
+    expect(post.content.body, 'lorem ipsum');
   });
 }
