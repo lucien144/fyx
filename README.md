@@ -1,11 +1,3 @@
 # Fyx
 
-## Todo
-
-- Ulozit veskere barvy do vlastni T classy
-- Vycistit pubspec.yaml
-- LoginPage > design
-- Login > Prihlasit loading
-- Login > Step by step vysvetleni autorizace
-- ~~Pull2Refresh.onError callback?~~
-- ~~Fix Pull2Refresh obcas zustane viset po loadingu o par PX dole~~ 
+[![Build Status](https://travis-ci.com/lucien144/fyx.svg?branch=develop)](https://travis-ci.com/lucien144/fyx) [![Coverage Status](https://coveralls.io/repos/github/lucien144/fyx/badge.svg?branch=develop)](https://coveralls.io/github/lucien144/fyx?branch=develop)
