@@ -1,8 +1,8 @@
 import 'package:fyx/model/System.dart';
 
 class BookmarksResponse {
-  List<dynamic> _discussions;
-  List<dynamic> _categories;
+  List<dynamic> _discussions = [];
+  List<dynamic> _categories = [];
   System _system;
 
   BookmarksResponse.fromJson(Map<String, dynamic> json) {
