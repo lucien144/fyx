@@ -6,6 +6,23 @@
 
 Fyx je neoficiální mobilní klient pro diskuzní server [Nyx.cz](https://nyx.cz) ve [Flutteru](https://flutter.dev/). V tuto chvíli je psaný a optimalizovaný pro iOS, ale v plánu je i Android verze.
 
+## Funkce
+- Tutoriál k autorizaci
+- Kluby
+  - Historie (+ zobrazení prémiových ikon: odkazy, obrázky)
+  - Sledované
+  - Palcování
+  - Uložení do připomínek
+  - Skrytí spoilerů
+  - Galerie obrázků pokud jich je v příspěvku více
+  - Experimentální layout příspěvků
+  - In-app browser
+  - Psaní příspěvků (+ odesílání obrázků)
+- Pošta
+  - Odesílání
+  - Přečteno / Nepřečteno
+  - Badge nepřečtených
+
 ## Jak se zapojit
 Jakákoli pomoc - od každého - vítána! Nejrychleji se zapojíte přes [klub na Nyxu](https://www.nyx.cz/index.php?l=topic;id=24237;n=23dd), který se o vývojem nového klienta zabývá. 
 Také si můžete projít [Issues](https://github.com/lucien144/fyx/issues) případně [Projects](https://github.com/lucien144/fyx/projects) a poslat pull request.
