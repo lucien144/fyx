@@ -82,6 +82,14 @@ class ApiController {
     return loginResponse;
   }
 
+  Future<Credentials> setCredentials(String nickname, String token) async {
+    var prefs = await SharedPreferences.getInstance();
+    await Future.wait([prefs.setString('token', token), prefs.setString('nickname', nickname)]);
+    var credentials = Credentials(nickname, token);
+    provider.setCredentials(credentials);
+    return credentials;
+  }
+
   Future<bool> testAuth() async {
     var response = await provider.testAuth();
     var json = jsonDecode(response.data);

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/model/Credentials.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/T.dart';
 
 class LoginPage extends StatefulWidget {
@@ -12,7 +14,22 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _loginController = TextEditingController();
-  bool isRunning = false;
+  final TextEditingController _tokenController = TextEditingController();
+  bool _isRunning = false;
+  bool _useTokenToLogin = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _loginController.addListener(() {
+      if (_loginController.text.toUpperCase() == 'FYXBOT') {
+        setState(() => _useTokenToLogin = true);
+      } else {
+        setState(() => _useTokenToLogin = false);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +46,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void dispose() {
     _loginController.dispose();
+    _tokenController.dispose();
     super.dispose();
   }
 
@@ -51,13 +69,26 @@ class _LoginPageState extends State<LoginPage> {
           padding: EdgeInsets.only(top: 128 - offset),
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeInOut,
-          child: Container(
-            child: CupertinoTextField(
-              enabled: !isRunning,
-              placeholder: 'NICKNAME',
-              controller: _loginController,
-              decoration: T.TEXTFIELD_DECORATION,
-            ),
+          child: Column(
+            children: [
+              CupertinoTextField(
+                enabled: !_isRunning,
+                textCapitalization: TextCapitalization.characters,
+                placeholder: 'NICKNAME',
+                controller: _loginController,
+                decoration: T.TEXTFIELD_DECORATION,
+              ),
+              Visibility(
+                visible: _useTokenToLogin,
+                child: CupertinoTextField(
+                  obscureText: true,
+                  enabled: !_isRunning,
+                  placeholder: 'TOKEN',
+                  controller: _tokenController,
+                  decoration: T.TEXTFIELD_DECORATION,
+                ),
+              )
+            ],
           ),
         ),
         AnimatedPadding(
@@ -76,18 +107,28 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       width: 200,
       child: CupertinoButton(
-        child: isRunning
+        child: _isRunning
             ? CupertinoActivityIndicator()
             : Text(
                 'Přihlásit',
                 style: TextStyle(color: T.COLOR_SECONDARY),
               ),
         onPressed: () {
-          if (isRunning) {
+          if (_isRunning) {
             return;
           }
 
-          setState(() => isRunning = true);
+          setState(() => _isRunning = true);
+
+          if (_useTokenToLogin && _tokenController.text.length > 0) {
+            ApiController().setCredentials(_loginController.text, _tokenController.text).then((Credentials credentials) {
+              MainRepository().credentials = credentials;
+              Navigator.of(context).pushNamed('/home');
+            }).whenComplete(() {
+              setState(() => _isRunning = false);
+            });
+            return;
+          }
 
           ApiController().login(_loginController.text).then((response) {
             setState(() {
@@ -95,7 +136,7 @@ class _LoginPageState extends State<LoginPage> {
             });
           }).catchError((error) {
             PlatformTheme.error(error.toString());
-          }).whenComplete(() => setState(() => isRunning = false));
+          }).whenComplete(() => setState(() => _isRunning = false));
         },
         color: Colors.white,
       ),

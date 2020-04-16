@@ -112,6 +112,17 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                   ApiController().logout();
                   Navigator.of(context, rootNavigator: true).pushNamed('/login');
                 },
+              ),
+              Visibility(
+                visible: FyxApp.isDev,
+                child: CupertinoActionSheetAction(
+                  isDestructiveAction: true,
+                  child: Text('${L.GENERAL_LOGOUT} (bez resetu)'),
+                  onPressed: () {
+                    ApiController().logout(removeAuthrorization: false);
+                    Navigator.of(context, rootNavigator: true).pushNamed('/login');
+                  },
+                ),
               )
             ],
             cancelButton: CupertinoActionSheetAction(
