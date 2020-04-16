@@ -139,13 +139,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.11.1"
-  flutter_spinkit:
-    dependency: "direct main"
-    description:
-      name: flutter_spinkit
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.1.2+1"
   flutter_sticky_header:
     dependency: "direct main"
     description:
@@ -310,13 +303,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.2"
-  progressive_image:
-    dependency: "direct main"
-    description:
-      name: progressive_image
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.1"
   provider:
     dependency: "direct main"
     description:
@@ -399,13 +385,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.9.3"
-  sticky_headers:
-    dependency: "direct main"
-    description:
-      name: sticky_headers
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.8+1"
   stream_channel:
     dependency: transitive
     description:
