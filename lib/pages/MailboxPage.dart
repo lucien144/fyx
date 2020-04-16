@@ -54,7 +54,7 @@ class _MailboxPageState extends State<MailboxPage> {
           }),
       Positioned(
         right: 20,
-        bottom: 0,
+        bottom: 20,
         child: SafeArea(
           child: FloatingActionButton(
             backgroundColor: T.COLOR_PRIMARY,
