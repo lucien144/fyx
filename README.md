@@ -1,4 +1,4 @@
-> 🇨🇿 Disclaimer: This repository is managed in czech language although the source code along with comments is written in english.
+> 🇨🇿 This repository is managed in czech language although the source code along with comments is written in english.
 
 # Fyx
 
@@ -22,6 +22,38 @@ Fyx je neoficiální mobilní klient pro diskuzní server [Nyx.cz](https://nyx.c
   - Odesílání
   - Přečteno / Nepřečteno
   - Badge nepřečtených
+  
+## Roadmap
+
+- v0.3: první veřejný release
+  - Login
+  - Příspěvky: zobrazení (galerie, odkazy, ...), psaní, palcování, připomínky
+  - Kluby: historie, sledované
+  - Pošta: psaní, připomínky
+- v0.4:
+  - Notifikace
+- v0.5
+  - Hledání: pošta, kluby a příspěvky
+- v0.6
+  - Kluby: nástěnka, přidání/odebrání ze sledovaných
+  - Mazání: pošty, příspěvků
+- v0.7
+  - Přehled
+  - Upozornění (~ notices)
+- v0.8
+  - Pošta: konverzace
+- v0.8
+  - Marketplace
+v0.9
+  - Lidé, přátelé
+  - Události
+
+### Priority mimo roadmapu
+
+*Toto se pravděpodobně přidá prioritně někam do roadmapy, záleží na diskuzi.* 
+
+1. Android verze s hybridnínm designem
+1. Darkmode 
 
 ## Jak se zapojit
 Jakákoli pomoc - od každého - vítána! Nejrychleji se zapojíte přes [klub na Nyxu](https://www.nyx.cz/index.php?l=topic;id=24237;n=23dd), který se o vývojem nového klienta zabývá. 
