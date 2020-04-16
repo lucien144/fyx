@@ -22,7 +22,7 @@ Fyx je neoficiální mobilní klient pro diskuzní server [Nyx.cz](https://nyx.c
   - Odesílání
   - Přečteno / Nepřečteno
   - Badge nepřečtených
-  
+
 ## Roadmap
 
 - v0.3: první veřejný release
@@ -50,13 +50,13 @@ v0.9
 
 ### Priority mimo roadmapu
 
-*Toto se pravděpodobně přidá prioritně někam do roadmapy, záleží na diskuzi.* 
+*Toto se pravděpodobně přidá prioritně někam do roadmapy, záleží na diskuzi.*
 
 1. Android verze s hybridnínm designem
-1. Darkmode 
+1. Darkmode
 
 ## Jak se zapojit
-Jakákoli pomoc - od každého - vítána! Nejrychleji se zapojíte přes [klub na Nyxu](https://www.nyx.cz/index.php?l=topic;id=24237;n=23dd), který se o vývojem nového klienta zabývá. 
+Jakákoli pomoc - od každého - vítána! Nejrychleji se zapojíte přes [klub na Nyxu](https://www.nyx.cz/index.php?l=topic;id=24237;n=23dd), který se o vývojem nového klienta zabývá.
 Také si můžete projít [Issues](https://github.com/lucien144/fyx/issues) případně [Projects](https://github.com/lucien144/fyx/projects) a poslat pull request.
 
 ### Gitflow
@@ -67,11 +67,18 @@ Pokud jste našli chybu, pak ji nahlaste ideálně přes aplikaci. Pokud to nejd
 
 ## FAQ
 
-1. Proč není podporovaný i Android?
-  - Protože je to moc práce a iOS je pro mě (Lucien) nativní prostředí. Aplikace má v sobě fragmenty přípravy pro Android (viz. [`PlatformAwareWidget`](https://github.com/lucien144/fyx/blob/develop/lib/PlatformAwareWidget.dart)), ale později jsem se rozhodl jít pro mě lehčí cestou, vydat první verzi asap a Android případně řešit s grafiky, kteří by připravili hodnotný hybridní design funkční jak na Androidu tak i na iOS.
-1. Proč je tento repozitář v češtině?
-  - Vzhledem k tomu, že [klub na Nyxu](https://www.nyx.cz/index.php?l=topic;id=24237;n=23dd) věnující se novému klientovi vznikl v češtině, rozhodl jsem se (Lucien) vést tento repozitář také v češtině. Naproti tomu kód a komentáře v kódu jsou v angličtině, protože to je pro mě přiřozené. Dále by měly [Issues](https://github.com/lucien144/fyx/issues) sloužit jako centrální hub pro vedení veškerých chyb a připomínek, což se mi zdá opět lepší vést v češtině pro běžné uživatele. Nicméně, změně na kompletně anglické repo se po diskuzi nebráním...
-  
+- **Q:** Proč není podporovaný i Android?
+
+  **A:** Protože je to moc práce a iOS je pro mě (Lucien) nativní prostředí. Aplikace má v sobě fragmenty přípravy pro Android (viz. [`PlatformAwareWidget`](https://github.com/lucien144/fyx/blob/develop/lib/PlatformAwareWidget.dart)), ale později jsem se rozhodl jít pro mě lehčí cestou, vydat první verzi asap a Android případně řešit s grafiky, kteří by připravili hodnotný hybridní design funkční jak na Androidu tak i na iOS.
+
+- **Q:** Kde je uživatelský profil a nastavení?
+
+  **A:** Cílem bylo vytvořit jednoduchou a malou aplikaci - proto (v tuto chvíli) není v aplikaci např. hamburger menu, uživatelský profil nebo nastavení. Předpokladem je, že toto se časem změní - záleží na uživatelské diskuzi.
+
+- **Q:** Proč je tento repozitář v češtině?
+
+  **A:** Vzhledem k tomu, že [klub na Nyxu](https://www.nyx.cz/index.php?l=topic;id=24237;n=23dd) věnující se novému klientovi vznikl v češtině, rozhodl jsem se (Lucien) vést tento repozitář také v češtině. Naproti tomu kód a komentáře v kódu jsou v angličtině, protože to je pro mě přiřozené. Dále by měly [Issues](https://github.com/lucien144/fyx/issues) sloužit jako centrální hub pro vedení veškerých chyb a připomínek, což se mi zdá opět lepší vést v češtině pro běžné uživatele. Nicméně, změně na kompletně anglické repo se po diskuzi nebráním...
+
 ## Náhled
 
 ![](sources/preview.gif)
