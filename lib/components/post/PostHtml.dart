@@ -14,6 +14,7 @@ import 'package:provider/provider.dart';
 
 class PostHtml extends StatelessWidget {
   final Content content;
+  bool _isImageTap = false;
 
   PostHtml(this.content);
 
@@ -37,10 +38,15 @@ class PostHtml extends StatelessWidget {
                 }
               },
               onImageTap: (String src) {
+                _isImageTap = true;
                 Navigator.of(context).pushNamed('/gallery', arguments: GalleryArguments(src, images: content.images));
               },
               onLinkTap: (String link) async {
-                print(link);
+                // 👇 https://github.com/Sub6Resources/flutter_html/issues/121#issuecomment-581593467
+                if (_isImageTap) {
+                  _isImageTap = false;
+                  return;
+                }
 
                 // Click through to another discussion
                 RegExp topicTest = new RegExp(r"^\?l=topic;id=([0-9]+)$");
