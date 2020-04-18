@@ -10,4 +10,4 @@ perl -i -pe 's/^(version:\s+\d+\.\d+\.\d+\+)(\d+)$/$1.($2+1)/e' pubspec.yaml
 
 version=`grep 'version: ' pubspec.yaml | sed 's/version: //'`
 echo "Building version: $version"
-#flutter build ios -t lib/main_production.dart
+flutter build ios -t lib/main_production.dart
