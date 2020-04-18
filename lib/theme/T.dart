@@ -6,9 +6,9 @@ import 'package:flutter/painting.dart';
 class T {
   // Colors
   // Color scheme -> https://mycolor.space/?hex=%231AD592&sub=1
-  static final Color COLOR_PRIMARY = Color(0xFF196378);
-  static final Color COLOR_SECONDARY = Color(0xff007F90);
-  static final Color COLOR_BLACK = Color(0xFF282828);
+  static const Color COLOR_PRIMARY = Color(0xFF196378);
+  static const Color COLOR_SECONDARY = Color(0xff007F90);
+  static const Color COLOR_BLACK = Color(0xFF282828);
 
   // Others
   static final BoxShadow BOX_SHADOW = BoxShadow(color: Color.fromRGBO(0, 0, 0, 0.5), offset: Offset(0, 0), blurRadius: 16);

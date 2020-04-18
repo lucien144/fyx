@@ -6,6 +6,7 @@ import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/CircleAvatar.dart' as ca;
 import 'package:fyx/components/DiscussionListItem.dart';
 import 'package:fyx/components/ListHeader.dart';
+import 'package:fyx/components/NavigationBarIcon.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Category.dart';
@@ -96,42 +97,38 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     var pkg = MainRepository().packageInfo;
     var version = '${pkg.version} (${pkg.buildNumber})';
 
-    return Consumer<SettingsModel>(
-        builder: (context, settings, child) => CupertinoActionSheet(
-            title: Text('Přihlášen jako: ${MainRepository().credentials.nickname}'),
-            message: Text('Verze: $version'),
-            actions: <Widget>[
-              CupertinoActionSheetAction(
-                  child: settings.useHeroPosts ? Text('Experimentální příspěvky (zapnuto)') : Text('Experimentální příspěvky (vypnuto)'),
-                  onPressed: () => Provider.of<SettingsModel>(context, listen: false).toggleUseHeroPosts()),
-              CupertinoActionSheetAction(child: Text('⚠️ Nahlásit chybu'), onPressed: () => PlatformTheme.prefillGithubIssue('Zde popiš svůj problém...')),
-              CupertinoActionSheetAction(
-                isDestructiveAction: true,
-                child: Text(L.GENERAL_LOGOUT),
-                onPressed: () {
-                  ApiController().logout();
-                  Navigator.of(context, rootNavigator: true).pushNamed('/login');
-                },
-              ),
-              Visibility(
-                visible: FyxApp.isDev,
-                child: CupertinoActionSheetAction(
-                  isDestructiveAction: true,
-                  child: Text('${L.GENERAL_LOGOUT} (bez resetu)'),
-                  onPressed: () {
-                    ApiController().logout(removeAuthrorization: false);
-                    Navigator.of(context, rootNavigator: true).pushNamed('/login');
-                  },
-                ),
-              )
-            ],
-            cancelButton: CupertinoActionSheetAction(
-              isDefaultAction: true,
-              child: Text(L.GENERAL_CANCEL),
+    return CupertinoActionSheet(
+        title: Text('Přihlášen jako: ${MainRepository().credentials.nickname}'),
+        message: Text('Verze: $version'),
+        actions: <Widget>[
+          CupertinoActionSheetAction(child: Text('⚠️ Nahlásit chybu'), onPressed: () => PlatformTheme.prefillGithubIssue('Zde popiš svůj problém...')),
+          CupertinoActionSheetAction(
+            isDestructiveAction: true,
+            child: Text(L.GENERAL_LOGOUT),
+            onPressed: () {
+              ApiController().logout();
+              Navigator.of(context, rootNavigator: true).pushNamed('/login');
+            },
+          ),
+          Visibility(
+            visible: FyxApp.isDev,
+            child: CupertinoActionSheetAction(
+              isDestructiveAction: true,
+              child: Text('${L.GENERAL_LOGOUT} (bez resetu)'),
               onPressed: () {
-                Navigator.pop(context);
+                ApiController().logout(removeAuthrorization: false);
+                Navigator.of(context, rootNavigator: true).pushNamed('/login');
               },
-            )));
+            ),
+          )
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          isDefaultAction: true,
+          child: Text(L.GENERAL_CANCEL),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ));
   }
 
   @override
@@ -245,6 +242,12 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                 return CupertinoPageScaffold(
                     navigationBar: CupertinoNavigationBar(
                         backgroundColor: Colors.white,
+                        leading: Consumer<SettingsModel>(
+                            builder: (context, settings, child) => CupertinoButton(
+                                  padding: EdgeInsets.zero,
+                                  onPressed: () => Provider.of<SettingsModel>(context, listen: false).toggleUseHeroPosts(),
+                                  child: NavigationBarIcon(settings.useHeroPosts ? CupertinoIcons.lab_flask_solid : CupertinoIcons.lab_flask),
+                                )),
                         trailing: GestureDetector(
                           child: ca.CircleAvatar(
                             MainRepository().credentials.avatar,
