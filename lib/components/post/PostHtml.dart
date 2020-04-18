@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_html/html_parser.dart';
+import 'package:flutter_html/style.dart';
 import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/components/post/Spoiler.dart';
@@ -20,15 +22,20 @@ class PostHtml extends StatelessWidget {
     return Consumer<SettingsModel>(
         builder: (context, settings, child) => Html(
               data: settings.useHeroPosts ? content.body : content.rawBody,
-              customRender: (dom.Node node, children) {
-                if (node is dom.Element) {
-                  if (node.localName == 'span' && node.classes.contains('spoiler')) {
-                    return Spoiler(node.innerHtml);
+              style: {"html": Style.fromTextStyle(PlatformTheme.of(context).textTheme.textStyle ?? PlatformTheme.of(context).textTheme.body1)},
+              customRender: {
+                'span': (
+                  RenderContext context,
+                  Widget parsedChild,
+                  Map<String, String> attributes,
+                  dom.Element element,
+                ) {
+                  if (element.classes.contains('spoiler')) {
+                    return Spoiler(element.text);
                   }
+                  return null;
                 }
-                return null;
               },
-              useRichText: false,
               onImageTap: (String src) {
                 Navigator.of(context).pushNamed('/gallery', arguments: GalleryArguments(src, images: content.images));
               },
