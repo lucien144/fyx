@@ -144,20 +144,26 @@ class _TutorialPageState extends State<TutorialPage> {
       ]);
     }
 
-    return CupertinoButton(
-      child: body is Widget ? body : text,
-      color: Colors.white,
-      onPressed: () => onTap is Function ? onTap() : _slider.nextPage(duration: Duration(milliseconds: 800), curve: Curves.fastOutSlowIn),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      child: CupertinoButton(
+        padding: EdgeInsets.all(0),
+        child: body is Widget ? body : text,
+        color: Colors.white,
+        onPressed: () => onTap is Function ? onTap() : _slider.nextPage(duration: Duration(milliseconds: 800), curve: Curves.fastOutSlowIn),
+      ),
     );
   }
 
   Widget slide(String title, String copy, Widget footer) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Text(
           title,
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+          textAlign: TextAlign.center,
         ),
         SizedBox(height: 16),
         this.slideCard(Text(copy, textAlign: TextAlign.center)),
@@ -174,10 +180,12 @@ class _TutorialPageState extends State<TutorialPage> {
   Widget slideToken(String title) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Text(
           title,
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+          textAlign: TextAlign.center,
         ),
         SizedBox(height: 16),
         this.slideCard(
@@ -221,10 +229,12 @@ class _TutorialPageState extends State<TutorialPage> {
   Widget slideTutorial(String title, int step, String copy) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Text(
           title,
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+          textAlign: TextAlign.center,
         ),
         SizedBox(height: 16),
         this.slideCard(Column(
