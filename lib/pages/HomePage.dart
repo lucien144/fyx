@@ -87,6 +87,12 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     // Called when a new route has been pushed, and the current route is no longer visible.
   }
 
+  @override
+  void deactivate() {
+    super.deactivate();
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
   void refreshData() {
     setState(() {
       _refreshData = DateTime.now().millisecondsSinceEpoch;
