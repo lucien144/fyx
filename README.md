@@ -93,5 +93,5 @@ Pokud jste našli chybu, pak ji nahlaste ideálně přes aplikaci. Pokud to nejd
 
 | | | |
 |:-------------------------:|:-------------------------:|:-------------------------:|
-| ![](source/screenshots/discussion.gif) **Diskuze** | ![](source/screenshots/reddit-like.gif) **Experimentální náhledy** | ![](sources/screenshots/mail.gif) **Pošta** |
-| ![](source/screenshots/tutorial.gif)  **Login / Tutoriál** | - | - |
+| ![](sources/screenshots/discussion.gif) **Diskuze** | ![](sources/screenshots/reddit-like.gif) **Experimentální náhledy** | ![](sources/screenshots/mail.gif) **Pošta** |
+| ![](sources/screenshots/tutorial.gif)  **Login / Tutoriál** | - | - |
