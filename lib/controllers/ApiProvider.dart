@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:device_info/device_info.dart';
 import 'package:dio/dio.dart';
@@ -36,18 +37,26 @@ class ApiProvider implements IApiProvider {
   ApiProvider() {
     try {
       // TODO: Use the MainRepository() to obtain this info... or not?
-      DeviceInfoPlugin()
-        ..iosInfo.then((iosInfo) {
-          PackageInfo.fromPlatform().then((info) {
+      PackageInfo.fromPlatform().then((info) {
+        if (Platform.isIOS) {
+          DeviceInfoPlugin().iosInfo.then((iosInfo) {
             // Basic sanitize due to the Xr unicode character and others...
             // TODO: Perhaps, solve Czech characters too...
             var deviceName = iosInfo.name.replaceAll(RegExp(r'[ʀ]', caseSensitive: false), 'r');
             deviceName = deviceName.replaceAll(RegExp(r'[^\w _\-]', caseSensitive: false), '_');
             _options.headers['user-agent'] = '${_options.headers['user-agent']} | ${iosInfo.systemName} | ${info.version} (${info.buildNumber}) | $deviceName';
+          }).catchError((error) {
+            useDefaultUserAgent();
+          });;
+        } else if (Platform.isAndroid) {
+          DeviceInfoPlugin().androidInfo.then((androidInfo) {
+            var deviceName = androidInfo.manufacturer + " " + androidInfo.model;
+            _options.headers['user-agent'] = '${_options.headers['user-agent']} | "Android" | ${info.version} (${info.buildNumber}) | $deviceName';
+          }).catchError((error) {
+            useDefaultUserAgent();
           });
-        }).catchError((error) {
-          _options.headers['user-agent'] = '${_options.headers['user-agent']} | Fyx';
-        });
+        }
+      });
     } catch (e) {}
 
     SharedPreferences.getInstance().then((prefs) {
@@ -97,6 +106,10 @@ class ApiProvider implements IApiProvider {
     }, onError: (DioError e) async {
       onError(e.message);
     }));
+  }
+
+  void useDefaultUserAgent() {
+    _options.headers['user-agent'] = '${_options.headers['user-agent']} | Fyx';
   }
 
   Future<Response> login(String username) async {

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:device_info/device_info.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -47,10 +49,16 @@ class FyxApp extends StatelessWidget {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
     // TODO: Move to build using FutureBuilder.
-    var results = await Future.wait([ApiController().provider.getCredentials(), PackageInfo.fromPlatform(), DeviceInfoPlugin().iosInfo]);
+    var results = await Future.wait([ApiController().provider.getCredentials(), PackageInfo.fromPlatform()]);
+
+    if (Platform.isIOS) {
+      MainRepository().iosDeviceInfo = await DeviceInfoPlugin().iosInfo;
+    } else if (Platform.isAndroid) {
+      MainRepository().androidDeviceInfo = await DeviceInfoPlugin().androidInfo;
+    }
+
     MainRepository().credentials = results[0];
     MainRepository().packageInfo = results[1];
-    MainRepository().deviceInfo = results[2];
   }
 
   @override

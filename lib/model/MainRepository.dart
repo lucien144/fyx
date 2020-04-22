@@ -6,7 +6,8 @@ class MainRepository {
   static final MainRepository _singleton = MainRepository._internal();
   Credentials credentials;
   PackageInfo packageInfo;
-  IosDeviceInfo deviceInfo;
+  IosDeviceInfo iosDeviceInfo;
+  AndroidDeviceInfo androidDeviceInfo;
 
   factory MainRepository() {
     return _singleton;
