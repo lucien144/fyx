@@ -33,28 +33,7 @@ Fyx je neoficiální mobilní klient pro diskuzní server [Nyx.cz](https://nyx.c
 
 ## Roadmap
 
-- v0.3: první veřejný release
-  - Login
-  - Příspěvky: zobrazení (galerie, odkazy, ...), psaní, palcování, připomínky
-  - Kluby: historie, sledované
-  - Pošta: psaní, připomínky
-- v0.4:
-  - Notifikace
-- v0.5
-  - Hledání: pošta, kluby a příspěvky
-- v0.6
-  - Kluby: nástěnka, přidání/odebrání ze sledovaných
-  - Mazání: pošty, příspěvků
-- v0.7
-  - Přehled
-  - Upozornění (~ notices)
-- v0.8
-  - Pošta: konverzace
-- v0.8
-  - Marketplace
-v0.9
-  - Lidé, přátelé
-  - Události
+👉 [Zde.](https://github.com/lucien144/fyx/projects/2)
 
 ### Priority mimo roadmapu
 
