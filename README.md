@@ -1,5 +1,13 @@
 > 🇨🇿 This repository is managed in czech language although the source code along with comments is written in english.
 
+---
+<p align="center">
+🔥 Looking for <strong>cool t-shirts for web developers</strong>?<br>
+Check out my <a href="https://devnull.store?utm_source=github&utm_medium=link&utm_campaign=lemp" target="_blank">Devnull Clothing</a>.
+</p>
+
+---
+
 # Fyx
 
 [![Build Status](https://travis-ci.com/lucien144/fyx.svg?branch=develop)](https://travis-ci.com/lucien144/fyx) [![Coverage Status](https://coveralls.io/repos/github/lucien144/fyx/badge.svg?branch=develop)](https://coveralls.io/github/lucien144/fyx?branch=develop)
@@ -81,6 +89,9 @@ Pokud jste našli chybu, pak ji nahlaste ideálně přes aplikaci. Pokud to nejd
 
   **A:** Vzhledem k tomu, že [klub na Nyxu](https://www.nyx.cz/index.php?l=topic;id=24237;n=23dd) věnující se novému klientovi vznikl v češtině, rozhodl jsem se (Lucien) vést tento repozitář také v češtině. Naproti tomu kód a komentáře v kódu jsou v angličtině, protože to je pro mě přiřozené. Dále by měly [Issues](https://github.com/lucien144/fyx/issues) sloužit jako centrální hub pro vedení veškerých chyb a připomínek, což se mi zdá opět lepší vést v češtině pro běžné uživatele. Nicméně, změně na kompletně anglické repo se po diskuzi nebráním...
 
-## Náhled
+## Náhledy
 
-![](sources/preview.gif)
+| | | |
+|:-------------------------:|:-------------------------:|:-------------------------:|
+| ![](sources/screenshots/discussion.gif) **Diskuze** | ![](sources/screenshots/reddit-like.gif) **Experimentální náhledy** | ![](sources/screenshots/mail.gif) **Pošta** |
+| ![](sources/screenshots/tutorial.gif)  **Login / Tutoriál** | - | - |

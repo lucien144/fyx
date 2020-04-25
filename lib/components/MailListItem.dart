@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/components/ContentBoxLayout.dart';
 import 'package:fyx/components/post/PostAvatar.dart';
+import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Mail.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
@@ -39,6 +40,10 @@ class MailListItem extends StatelessWidget {
                 child: T.ICO_REPLY,
                 onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
                     arguments: NewMessageSettings(
+                        onSubmit: (String inputField, String message, Map<String, dynamic> attachment) async {
+                          var response = await ApiController().sendMail(inputField, message, attachment: attachment);
+                          return response.isOk;
+                        },
                         inputFieldPlaceholder: mail.participant,
                         hasInputField: true,
                         replyWidget: MailListItem(

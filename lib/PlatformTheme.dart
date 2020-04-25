@@ -39,11 +39,20 @@ class PlatformTheme {
 
   static prefillGithubIssue(String body, {String title = ''}) async {
     var pkg = MainRepository().packageInfo;
-    var device = MainRepository().deviceInfo;
     var version = '${pkg.version} (${pkg.buildNumber})';
-    var system = '${device.systemName} ${device.systemVersion} ${device.localizedModel}';
+    var system;
+    if (Platform.isIOS) {
+      var device = MainRepository().iosDeviceInfo;
+      system = '${device.systemName} ${device.systemVersion} ${device.localizedModel}';
+    } else if (Platform.isAndroid) {
+      var device = MainRepository().androidDeviceInfo;
+      system = 'Android ${device.version.release} ${device.manufacturer} ${device.model}';
+    } else {
+      system = 'Unrecognized system';
+    }
 
-    var _body = Uri.encodeComponent('$body\n\n---\n*Verze: $version\niOS: $system*');
+
+    var _body = Uri.encodeComponent('$body\n\n---\n*Verze: $version\nOS: $system*');
     var _title = Uri.encodeFull(title);
     var url = 'https://github.com/lucien144/fyx/issues/new?title=$_title&body=$_body&labels=user+report';
     PlatformTheme.openLink(url);
