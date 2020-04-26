@@ -58,7 +58,9 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
+    // If we omit the Route check, there's very rare issue during authorization
+    // See: https://github.com/lucien144/fyx/issues/57
+    if (state == AppLifecycleState.resumed && ModalRoute.of(context).isCurrent) {
       this.refreshData();
     }
   }
@@ -85,12 +87,6 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   void didPushNext() {
     // Called when a new route has been pushed, and the current route is no longer visible.
-  }
-
-  @override
-  void deactivate() {
-    super.deactivate();
-    WidgetsBinding.instance.removeObserver(this);
   }
 
   void refreshData() {
