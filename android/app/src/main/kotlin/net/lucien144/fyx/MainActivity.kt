@@ -1,4 +1,4 @@
-package com.example.fyx
+package net.lucien144.fyx
 
 import android.os.Bundle
 
