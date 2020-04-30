@@ -20,9 +20,12 @@ class ContentBoxLayout extends StatelessWidget {
   final Widget topRightWidget;
   final Content content;
   final bool _isPreview;
+  final bool _isHighlighted;
   final Map<LAYOUT_TYPES, TLayout> _layoutMap = {};
 
-  ContentBoxLayout({this.topLeftWidget, this.topRightWidget, this.content, isPreview = false}) : _isPreview = isPreview {
+  ContentBoxLayout({this.topLeftWidget, this.topRightWidget, this.content, isPreview = false, isHighlighted = false})
+      : _isPreview = isPreview,
+        _isHighlighted = isHighlighted {
     // The order here is important!
     _layoutMap.putIfAbsent(
         LAYOUT_TYPES.textOnly,
@@ -103,31 +106,38 @@ class ContentBoxLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: _isPreview ? T.CARD_SHADOW_DECORATION : null,
       child: Column(
         children: <Widget>[
           Visibility(
             visible: _isPreview != true,
             child: Divider(
+              height: 8,
               thickness: 8,
             ),
           ),
-          SizedBox(
-            height: 8,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[topLeftWidget ?? Container(), SizedBox(), topRightWidget ?? Container()],
-            ),
-          ),
           Container(
-            padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-            child: getContentWidget(),
-          ),
-          SizedBox(
-            height: 8,
+            color: _isHighlighted ? T.COLOR_SECONDARY.withOpacity(0.1) : null,
+            child: Column(
+              children: <Widget>[
+                SizedBox(
+                  height: 8,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[topLeftWidget ?? Container(), SizedBox(), topRightWidget ?? Container()],
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                  child: getContentWidget(),
+                ),
+                SizedBox(
+                  height: 8,
+                ),
+              ],
+            ),
           ),
         ],
       ),
