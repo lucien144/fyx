@@ -139,6 +139,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
       onWillPop: () async => false,
       child: CupertinoTabScaffold(
         tabBar: CupertinoTabBar(
+          onTap: (_) => this.refreshData(),
           backgroundColor: Colors.white,
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
