@@ -9,6 +9,7 @@ import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/model/post/Link.dart';
 import 'package:fyx/model/provider/SettingsModel.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/UnreadBadgeDecoration.dart';
 import 'package:provider/provider.dart';
 
 enum LAYOUT_TYPES { textOnly, oneImageOnly, attachmentsOnly, attachmentsAndText }
@@ -117,6 +118,7 @@ class ContentBoxLayout extends StatelessWidget {
           ),
           Container(
             color: _isHighlighted ? T.COLOR_SECONDARY.withOpacity(0.1) : null,
+            foregroundDecoration: _isHighlighted ? UnreadBadgeDecoration(badgeColor: T.COLOR_PRIMARY, badgeSize: 16) : null,
             child: Column(
               children: <Widget>[
                 SizedBox(
