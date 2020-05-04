@@ -26,10 +26,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObserver {
+  static const int PAGE_BOOKMARK = 0;
+  static const int PAGE_MAIL = 1;
+
   final PageController _bookmarksController = PageController(initialPage: 0);
 
   tabs activeTab;
+  int _pageIndex = PAGE_BOOKMARK;
   int _refreshData = 0;
+  bool _filterUnread = false;
 
   @override
   void initState() {
@@ -139,11 +144,17 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
       onWillPop: () async => false,
       child: CupertinoTabScaffold(
         tabBar: CupertinoTabBar(
-          onTap: (_) => this.refreshData(),
+          onTap: (index) {
+            if (_pageIndex == index && index == PAGE_BOOKMARK) {
+              setState(() => _filterUnread = !_filterUnread);
+            }
+            _pageIndex = index;
+            this.refreshData();
+          },
           backgroundColor: Colors.white,
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
-              icon: Icon(CupertinoIcons.bookmark, size: 38),
+              icon: Icon(_filterUnread ? CupertinoIcons.bookmark_solid : CupertinoIcons.bookmark, size: 38),
             ),
             BottomNavigationBarItem(
               icon: Consumer<NotificationsModel>(
@@ -178,7 +189,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
         ),
         tabBuilder: (context, index) {
           switch (index) {
-            case 0:
+            case PAGE_BOOKMARK:
               return CupertinoTabView(builder: (context) {
                 return CupertinoPageScaffold(
                   navigationBar: CupertinoNavigationBar(
@@ -217,7 +228,11 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                           rebuild: _refreshData,
                           dataProvider: (lastId) async {
                             var result = await ApiController().loadHistory();
-                            var data = result.discussions.map((discussion) => DiscussionListItem(Discussion.fromJson(discussion))).toList();
+                            var data = result.discussions
+                                .map((discussion) => Discussion.fromJson(discussion))
+                                .where((discussion) => this._filterUnread ? discussion.unread > 0 : true)
+                                .map((discussion) => DiscussionListItem(discussion))
+                                .toList();
                             return DataProviderResult(data);
                           }),
                       PullToRefreshList(
@@ -229,8 +244,10 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                             result.categories.forEach((_category) {
                               var category = Category.fromJson(_category);
                               var discussion = result.discussions
-                                  .map((discussion) => DiscussionListItem(Discussion.fromJson(discussion)))
-                                  .where((discussion) => discussion.category == category.idCat)
+                                  .map((discussion) => Discussion.fromJson(discussion))
+                                  .where((discussion) => this._filterUnread ? discussion.unread > 0 : true)
+                                  .map((discussion) => DiscussionListItem(discussion))
+                                  .where((discussionListItem) => discussionListItem.category == category.idCat)
                                   .toList();
                               categories.add({'header': ListHeader(category), 'items': discussion});
                             });
@@ -240,7 +257,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                   ),
                 );
               });
-            case 1:
+            case PAGE_MAIL:
               return CupertinoTabView(builder: (context) {
                 return CupertinoPageScaffold(
                     navigationBar: CupertinoNavigationBar(
