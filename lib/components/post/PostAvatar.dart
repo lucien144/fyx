@@ -33,14 +33,6 @@ class PostAvatar extends StatelessWidget {
                 child: SizedBox(
                   width: 4,
                 ),
-              ),
-              Visibility(
-                visible: isHighlighted,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(4), color: T.COLOR_PRIMARY),
-                ),
               )
             ],
           ),

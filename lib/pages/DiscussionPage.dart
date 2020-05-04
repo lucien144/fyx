@@ -62,7 +62,7 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
+    if (state == AppLifecycleState.resumed && ModalRoute.of(context).isCurrent) {
       this.refresh();
     }
   }

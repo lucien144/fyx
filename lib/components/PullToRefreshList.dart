@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/theme/L.dart';
+import 'package:fyx/theme/T.dart';
 
 class DataProviderResult {
   final List data;
@@ -33,6 +34,7 @@ class PullToRefreshList extends StatefulWidget {
 class _PullToRefreshListState extends State<PullToRefreshList> {
   ScrollController _controller = ScrollController();
   bool _isLoading = true;
+  bool _hasPulledDown = false;
   bool _hasError = false;
   DataProviderResult _result;
   int _lastId;
@@ -65,7 +67,10 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
 
     // Add the refresh control on first position
     _slivers.add(CupertinoSliverRefreshControl(
-      onRefresh: () => this.loadData(),
+      onRefresh: () {
+        setState(() => _hasPulledDown = true);
+        return this.loadData();
+      },
     ));
 
     this.loadData();
@@ -87,9 +92,28 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
     return _hasError || _slivers.length == 1
         ? PlatformTheme.feedbackScreen(isLoading: _isLoading, onPress: loadData, label: L.GENERAL_REFRESH)
         : CupertinoScrollbar(
-            child: CustomScrollView(
-              slivers: _slivers,
-              controller: _controller,
+            child: Stack(
+              children: [
+                CustomScrollView(
+                  slivers: _slivers,
+                  controller: _controller,
+                ),
+                Visibility(
+                  visible: _isLoading && !_hasPulledDown, // Show only when not pulling down the list
+                  child: Positioned(
+                    top: 0,
+                    left: 0,
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: 1,
+                      child: LinearProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        backgroundColor: T.COLOR_PRIMARY,
+                      ),
+                    ),
+                  ),
+                )
+              ],
             ),
           );
   }
@@ -149,7 +173,10 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
       print(StackTrace.current);
       setState(() => _hasError = true);
     } finally {
-      setState(() => _isLoading = false);
+      setState(() {
+        _hasPulledDown = false;
+        _isLoading = false;
+      });
     }
   }
 }

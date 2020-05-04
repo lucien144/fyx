@@ -38,6 +38,7 @@ class _PostListItemState extends State<PostListItem> {
   Widget build(BuildContext context) {
     return ContentBoxLayout(
       isPreview: widget._isPreview,
+      isHighlighted: widget._isHighlighted,
       topLeftWidget: PostAvatar(
         _post.nick,
         isHighlighted: widget._isHighlighted,

@@ -25,7 +25,6 @@ class _MailboxPageState extends State<MailboxPage> {
   }
 
   refreshData() {
-    print('refreshData');
     setState(() => _refreshData = DateTime.now().millisecondsSinceEpoch);
   }
 
