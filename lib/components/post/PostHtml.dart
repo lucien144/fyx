@@ -6,6 +6,7 @@ import 'package:flutter_html/style.dart';
 import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/components/post/Spoiler.dart';
+import 'package:fyx/components/post/VideoPlayer.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/provider/SettingsModel.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
@@ -25,6 +26,26 @@ class PostHtml extends StatelessWidget {
               data: settings.useHeroPosts ? content.body : content.rawBody,
               style: {"html": Style.fromTextStyle(PlatformTheme.of(context).textTheme.textStyle ?? PlatformTheme.of(context).textTheme.body1)},
               customRender: {
+                'video': (
+                  RenderContext context,
+                  Widget parsedChild,
+                  Map<String, String> attributes,
+                  dom.Element element,
+                ) {
+                  var url = element.attributes['src'];
+                  var urls = element.querySelectorAll('source').map((element) => element.attributes['src']).toList();
+                  if ([null, ''].contains(url) && urls.length > 0) {
+                    url = urls.firstWhere((url) => url.endsWith('.mp4'));
+                    if (url.isEmpty) {
+                      url = urls.first;
+                    }
+                  }
+                  if (url?.isNotEmpty ?? false) {
+                    return VideoPlayer(url);
+                  }
+                  // TODO: fallback
+                  return null;
+                },
                 'span': (
                   RenderContext context,
                   Widget parsedChild,

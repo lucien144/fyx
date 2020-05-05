@@ -37,6 +37,8 @@ dependencies:
   path: ^1.6.4
   image: 2.1.4
   async: ^2.4.0
+  chewie: ^0.9.10
+  video_player: ^0.10.9+1
   flutter:
     sdk: flutter
 
