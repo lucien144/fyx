@@ -17,15 +17,21 @@ class VideoPlayer extends StatefulWidget {
 class _VideoPlayerState extends State<VideoPlayer> {
   VideoPlayerController videoPlayerController;
   ChewieController chewieController;
+  double _aspectRatio;
 
   @override
   void initState() {
     super.initState();
     videoPlayerController = VideoPlayerController.network(widget.videoUrl);
+    videoPlayerController.addListener(() {
+      if (_aspectRatio == null) {
+        setState(() => _aspectRatio = videoPlayerController.value.aspectRatio);
+      }
+    });
+
     chewieController = ChewieController(
         videoPlayerController: videoPlayerController,
-        autoPlay: false,
-        autoInitialize: true,
+        aspectRatio: _aspectRatio ?? 3 / 4,
         placeholder: Container(
           color: T.COLOR_PRIMARY,
           child: Icon(
@@ -37,6 +43,11 @@ class _VideoPlayerState extends State<VideoPlayer> {
         ));
   }
 
+  Future<bool> initVideo() async {
+    await videoPlayerController.initialize();
+    return true;
+  }
+
   @override
   void dispose() {
     chewieController.dispose();
@@ -46,6 +57,13 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    return Chewie(controller: chewieController);
+    return FutureBuilder(
+        future: initVideo(),
+        builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+          if (snapshot.hasData && snapshot.data == true) {
+            return AspectRatio(aspectRatio: videoPlayerController.value.aspectRatio, child: Chewie(controller: chewieController));
+          }
+          return Center(child: CupertinoActivityIndicator());
+        });
   }
 }
