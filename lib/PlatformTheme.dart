@@ -49,6 +49,19 @@ class PlatformTheme {
     PlatformTheme.openLink(url);
   }
 
+  static Widget somethingsWrongButton(String content) {
+    return GestureDetector(
+      onTap: () => PlatformTheme.prefillGithubIssue('**Zdroj:**\n```$content```', title: 'Chyba zobrazení příspěvku'),
+      child: Column(children: <Widget>[
+        Icon(Icons.warning),
+        Text(
+          'Nastal problém se zobrazením příspěvku.\n Vyplňte prosím github issue kliknutím sem...',
+          textAlign: TextAlign.center,
+        )
+      ]),
+    );
+  }
+
   static Widget feedbackScreen({bool isLoading = false, bool isWarning = false, String label = '', String title = '', Function onPress}) {
     return Container(
       width: double.infinity,

@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/post/PostFooterLink.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/components/post/PostHtml.dart';
@@ -157,18 +156,7 @@ class ContentBoxLayout extends StatelessWidget {
                   }
                 }
 
-                // TODO: Doplnit text a odkaz.
-                return GestureDetector(
-                  onTap: () => PlatformTheme.prefillGithubIssue('**Zdroj:**\n```${content.rawBody}```', title: 'Chyba zobrazení příspěvku'),
-                  child: Column(children: <Widget>[
-                    PostHtml(content),
-                    Icon(Icons.warning),
-                    Text(
-                      'Nastal problém se zobrazením příspěvku.\n Vyplňte prosím github issue kliknutím sem...',
-                      textAlign: TextAlign.center,
-                    )
-                  ]),
-                );
+                return PostHtml(content);
               })()
             : PostHtml(content));
   }

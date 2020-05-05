@@ -41,10 +41,10 @@ class PostHtml extends StatelessWidget {
                     }
                   }
                   if (url?.isNotEmpty ?? false) {
-                    return VideoPlayer(url);
+                    return VideoPlayer(element);
                   }
-                  // TODO: fallback
-                  return null;
+
+                  return PlatformTheme.somethingsWrongButton(content.rawBody);
                 },
                 'span': (
                   RenderContext context,

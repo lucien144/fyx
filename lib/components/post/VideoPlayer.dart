@@ -2,13 +2,25 @@ import 'package:chewie/chewie.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:html/dom.dart' as dom;
 import 'package:video_player/video_player.dart';
 
 class VideoPlayer extends StatefulWidget {
-  final String videoUrl;
+  final dom.Element element;
+  String videoUrl;
 
-  VideoPlayer(this.videoUrl);
+  VideoPlayer(this.element) {
+    videoUrl = element.attributes['src'];
+    var urls = element.querySelectorAll('source').map((element) => element.attributes['src']).toList();
+    if ([null, ''].contains(videoUrl) && urls.length > 0) {
+      videoUrl = urls.firstWhere((url) => url.endsWith('.mp4'));
+      if (videoUrl.isEmpty) {
+        videoUrl = urls.first;
+      }
+    }
+  }
 
   @override
   _VideoPlayerState createState() => _VideoPlayerState();
@@ -22,6 +34,10 @@ class _VideoPlayerState extends State<VideoPlayer> {
   @override
   void initState() {
     super.initState();
+    if (widget.videoUrl?.isEmpty ?? true) {
+      return;
+    }
+
     videoPlayerController = VideoPlayerController.network(widget.videoUrl);
     videoPlayerController.addListener(() {
       if (_aspectRatio == null) {
@@ -50,13 +66,21 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
   @override
   void dispose() {
-    chewieController.dispose();
-    videoPlayerController.dispose();
+    if (chewieController != null) {
+      chewieController.dispose();
+    }
+    if (videoPlayerController != null) {
+      videoPlayerController.dispose();
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.videoUrl?.isEmpty ?? true) {
+      return PlatformTheme.somethingsWrongButton(widget.element.outerHtml);
+    }
+
     return FutureBuilder(
         future: initVideo(),
         builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
