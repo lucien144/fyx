@@ -161,6 +161,7 @@ class ContentBoxLayout extends StatelessWidget {
                 return GestureDetector(
                   onTap: () => PlatformTheme.prefillGithubIssue('**Zdroj:**\n```${content.rawBody}```', title: 'Chyba zobrazení příspěvku'),
                   child: Column(children: <Widget>[
+                    PostHtml(content),
                     Icon(Icons.warning),
                     Text(
                       'Nastal problém se zobrazením příspěvku.\n Vyplňte prosím github issue kliknutím sem...',
