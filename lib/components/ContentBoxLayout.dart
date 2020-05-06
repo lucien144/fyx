@@ -1,11 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fyx/components/post/PostFooterLink.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/components/post/PostHtml.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/Image.dart' as model;
-import 'package:fyx/model/post/Link.dart';
 import 'package:fyx/model/provider/SettingsModel.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/UnreadBadgeDecoration.dart';
@@ -92,10 +90,6 @@ class ContentBoxLayout extends StatelessWidget {
                   return Row(children: children, mainAxisAlignment: MainAxisAlignment.start);
                 }());
               }
-
-              children.addAll((content.attachmentsWithFeatured['attachments'] as List).whereType<Link>().map((attachment) {
-                return PostFooterLink(attachment);
-              }));
 
               return Column(
                 children: children,
