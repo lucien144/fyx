@@ -10,6 +10,11 @@ class Content {
   String _body;
   String _rawBody;
 
+  /// If the post have consecutive images = ON
+  /// Consecutive images means there are now characters other than
+  /// whitespaces and <br> in between of images.
+  bool _consecutiveImages = false;
+
   List<Image> _images = [];
   List<Link> _links = [];
   List<Video> _videos = [];
@@ -17,9 +22,8 @@ class Content {
   Content(this._body) {
     _rawBody = _body;
     _body = HtmlUnescape().convert(_body);
-    // TODO: Handle spoilers
     // TODO: Handle <code/> tags
-    this._removeTrailingBr();
+    this._cleanupBody();
     this._parseEmbeds();
     this._parseAttachedImages();
     this._parseLinks();
@@ -32,6 +36,8 @@ class Content {
   String get rawBody => _rawBody;
 
   List<Image> get images => _images;
+
+  bool get consecutiveImages => _consecutiveImages;
 
   List<Link> get links => _links;
 
@@ -70,7 +76,11 @@ class Content {
     return {'featured': featured, 'attachments': attachments};
   }
 
-  void _removeTrailingBr() {
+  void _cleanupBody() {
+    // Remove all HTML comments
+    _body = _body.replaceAll(RegExp(r'<!--(.*?)-->'), '');
+
+    // Remove trailing <br>
     var startBr = RegExp(r'^(((\s*)<\s*br\s*\/?\s*>(\s*))*)', caseSensitive: false);
     _body = _body.replaceAll(startBr, '');
 
@@ -111,9 +121,13 @@ class Content {
   }
 
   /// Parse attached images
-  /// TODO: Parse other attachments and standalone <img/>
+  /// For some reason the a>img[src] selector also selects standalone <img/> files
   void _parseAttachedImages() {
-    var document = parse(_body);
+    Document document = parse(_body);
+
+    RegExp reg = RegExp(r'^((?!<img).)*(((<a([^>]*?)>)?<img([^>]*?)>(<\/\s*a\s*>)?(\s*(\s*<\s*br\s*\/?\s*>\s*)*\s*))*)$', caseSensitive: false, dotAll: true);
+    _consecutiveImages = reg.hasMatch(_body);
+
     document.querySelectorAll('a > img[src]').forEach((Element el) {
       var thumb = el.attributes['src'];
       var image = el.parent.attributes['href'];

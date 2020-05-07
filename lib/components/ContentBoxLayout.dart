@@ -70,6 +70,14 @@ class ContentBoxLayout extends StatelessWidget {
                 return null;
               }
 
+              // If there are NOT consecutive images, do not display the post with hero attachment and render it from raw HTML body instead.
+              if (!content.consecutiveImages) {
+                return PostHtml(
+                  content,
+                  overloadRaw: true,
+                );
+              }
+
               var children = <Widget>[];
               children.add(Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,7 +138,7 @@ class ContentBoxLayout extends StatelessWidget {
                 ),
                 SizedBox(
                   height: 8,
-                ),
+                )
               ],
             ),
           ),

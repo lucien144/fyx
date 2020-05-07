@@ -15,15 +15,17 @@ import 'package:provider/provider.dart';
 
 class PostHtml extends StatelessWidget {
   final Content content;
+  final bool _overloadRaw;
   bool _isImageTap = false;
 
-  PostHtml(this.content);
+  /// overloadRaw - if true, the content.rawBody is used to parse no matter what settings is on.
+  PostHtml(this.content, {overloadRaw = false}) : _overloadRaw = overloadRaw;
 
   @override
   Widget build(BuildContext context) {
     return Consumer<SettingsModel>(
         builder: (context, settings, child) => Html(
-              data: settings.useHeroPosts ? content.body : content.rawBody,
+              data: settings.useHeroPosts && !_overloadRaw ? content.body : content.rawBody,
               style: {"html": Style.fromTextStyle(PlatformTheme.of(context).textTheme.textStyle ?? PlatformTheme.of(context).textTheme.body1)},
               customRender: {
                 'video': (
