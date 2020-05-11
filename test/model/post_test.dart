@@ -183,4 +183,37 @@ void main() {
     var post = Post.fromJson(json, 1);
     expect(post.content.body, 'lorem ipsum');
   });
+
+  test('Content has consecutive images', () {
+    var content = """
+    Lorem ipsum dolor sit amet...
+    <img src='http://i.mg/img.jpg'><br  /><br>
+    <a href='http://i.mg/img.jpg'> <img src='http://i.mg/img.jpg' /></a>
+    <br><BR>
+    <img src='http://i.mg/img.jpg'><br  /><br>
+    """;
+
+    var json = Map<String, dynamic>.from(_json);
+    json.putIfAbsent("content", () => content);
+
+    var post = Post.fromJson(json, 1);
+    expect(post.content.consecutiveImages, true);
+  });
+
+  test('Content has NO consecutive images', () {
+    var content = """
+    Lorem ipsum dolor sit amet...
+    <img src='http://i.mg/img.jpg'><br  /><br>
+    <a href='http://i.mg/img.jpg'> <img src='http://i.mg/img.jpg' /></a>
+    Some copy in between.
+    <br><BR>
+    <img src='http://i.mg/img.jpg'><br  /><br>
+    """;
+
+    var json = Map<String, dynamic>.from(_json);
+    json.putIfAbsent("content", () => content);
+
+    var post = Post.fromJson(json, 1);
+    expect(post.content.consecutiveImages, false);
+  });
 }

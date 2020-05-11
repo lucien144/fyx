@@ -125,7 +125,7 @@ class Content {
   void _parseAttachedImages() {
     Document document = parse(_body);
 
-    RegExp reg = RegExp(r'^((?!<img).)*(((<a([^>]*?)>)?<img([^>]*?)>(<\/\s*a\s*>)?(\s*(\s*<\s*br\s*\/?\s*>\s*)*\s*))*)$', caseSensitive: false, dotAll: true);
+    RegExp reg = RegExp(r'^((?!<img).)*(((<a([^>]*?)>)?(\s*)<img([^>]*?)>(\s*)(<\/\s*a\s*>)?(\s*(\s*<\s*br\s*\/?\s*>\s*)*\s*))*)$', caseSensitive: false, dotAll: true);
     _consecutiveImages = reg.hasMatch(_body);
 
     document.querySelectorAll('a > img[src]').forEach((Element el) {
