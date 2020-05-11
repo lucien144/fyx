@@ -124,24 +124,24 @@ void main() {
     expect(post.content.links[2].url, 'http://nyx.cz');
 
     // Test attachments
-    expect(post.content.attachments.length, 5);
+    expect(post.content.attachments.length, 2);
+    expect(post.content.attachments[0], isA<Image>());
+    expect(post.content.attachments[1], isA<Video>());
 
     // Test featured attachments
     expect(post.content.attachmentsWithFeatured['featured'] is Image, true);
-    expect(post.content.attachmentsWithFeatured['attachments'].length, 4);
+    expect(post.content.attachmentsWithFeatured['attachments'].length, 1);
   });
 
   test('Content is stripped for unnecessary <br> tags and comments from attached images', () {
     var content = """
     Lorem ipsum dolor... sit amet :)<br><br>
-    <!-- http,img,attachment --><a href="http://i.nyx.cz/files/00/00/20/77/2077557_48d4a18f67ad53d7572e.jpg?name=dbk2.jpg"><img src="http://www.nyx.cz/i/t/6a6f8dae07571ecfb1510c18e6dd6d0a.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F77%2F2077557_48d4a18f67ad53d7572e.jpg%3Fname%3Ddbk2.jpg" class="thumb"></a><br><br>
-    <!-- http,img,attachment --><a href="http://i.nyx.cz/files/00/00/20/77/2077556_45259e39b491933bb483.jpg?name=dbk.jpg"><img src="http://www.nyx.cz/i/t/8697a44511a1664f7adc53b39821ce7c.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F77%2F2077556_45259e39b491933bb483.jpg%3Fname%3Ddbk.jpg" class="thumb"></a><br>
+    <a href="http://i.nyx.cz/files/00/00/20/77/2077557_48d4a18f67ad53d7572e.jpg?name=dbk2.jpg"><img src="http://www.nyx.cz/i/t/6a6f8dae07571ecfb1510c18e6dd6d0a.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F77%2F2077557_48d4a18f67ad53d7572e.jpg%3Fname%3Ddbk2.jpg" class="thumb"></a><br><br>
+    <a href="http://i.nyx.cz/files/00/00/20/77/2077556_45259e39b491933bb483.jpg?name=dbk.jpg"><img src="http://www.nyx.cz/i/t/8697a44511a1664f7adc53b39821ce7c.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F77%2F2077556_45259e39b491933bb483.jpg%3Fname%3Ddbk.jpg" class="thumb"></a><br>
     """;
 
     var expectedContent = """
     Lorem ipsum dolor... sit amet :)<br><br>
-    <!-- http,img,attachment -->
-    <!-- http,img,attachment -->
     """;
 
     var json = Map<String, dynamic>.from(_json);
