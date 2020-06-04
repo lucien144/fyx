@@ -21,16 +21,27 @@ class PostHeroAttachment extends StatelessWidget {
   final Content content;
   final double _size;
   final bool _crop;
+  final Function _onTap;
+  final bool _openGallery;
 
-  PostHeroAttachment(this.attachment, this.content, {crop = true, size = 100.0})
+  PostHeroAttachment(this.attachment, this.content, {crop = true, size = 100.0, onTap, openGallery = true})
       : this._crop = crop,
-        this._size = size;
+        this._size = size,
+        this._onTap = onTap,
+        this._openGallery = openGallery;
 
   @override
   Widget build(BuildContext context) {
     if (attachment is model.Image) {
       return GestureDetector(
-        onTap: () => Navigator.of(context).pushNamed('/gallery', arguments: GalleryArguments((attachment as model.Image).image, images: content.images)),
+        onTap: () {
+          if (_onTap is Function) {
+            _onTap();
+          }
+          if (_openGallery) {
+            Navigator.of(context).pushNamed('/gallery', arguments: GalleryArguments((attachment as model.Image).image, images: content.images));
+          }
+        },
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: CachedNetworkImage(

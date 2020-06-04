@@ -8,6 +8,7 @@ import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/components/post/Spoiler.dart';
 import 'package:fyx/components/post/VideoPlayer.dart';
 import 'package:fyx/model/post/Content.dart';
+import 'package:fyx/model/post/Image.dart' as post;
 import 'package:fyx/model/provider/SettingsModel.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:html/dom.dart' as dom;
@@ -28,6 +29,35 @@ class PostHtml extends StatelessWidget {
               data: settings.useHeroPosts && !_overloadRaw ? content.body : content.rawBody,
               style: {"html": Style.fromTextStyle(PlatformTheme.of(context).textTheme.textStyle ?? PlatformTheme.of(context).textTheme.body1)},
               customRender: {
+                'img': (
+                  RenderContext context,
+                  Widget parsedChild,
+                  Map<String, String> attributes,
+                  dom.Element element,
+                ) {
+                  final String thumb = element.attributes['src'];
+                  String src = thumb;
+                  bool openGallery = true;
+                  if (element.parent.localName == 'a') {
+                    final RegExp r = RegExp(r'\.(jpg|jpeg|png|gif|webp)(\?.*)?$');
+                    if (r.hasMatch(element.parent.attributes['href'] ?? '')) {
+                      src = element.parent.attributes['href'];
+                    } else {
+                      openGallery = false;
+                    }
+                  }
+                  post.Image img = post.Image(src, thumb);
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: PostHeroAttachment(
+                      img,
+                      content,
+                      openGallery: openGallery,
+                      onTap: () => openGallery ? _isImageTap = true : null,
+                      crop: false,
+                    ),
+                  );
+                },
                 'video': (
                   RenderContext context,
                   Widget parsedChild,

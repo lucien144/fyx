@@ -41,7 +41,7 @@ void main() {
     Function deepEq = const DeepCollectionEquality().equals;
     expect(deepEq(post.content.images, imagesMatcher), true);
 
-    expect(post.content.links.length, 0, reason: 'Internal link is not treated as attachment.');
+    expect(post.content.emptyLinks.length, 0, reason: 'Internal link is not treated as attachment.');
   });
 
   test('Post has more internal images', () {
@@ -56,6 +56,7 @@ void main() {
     json.putIfAbsent("content", () => content);
 
     var post = Post.fromJson(json, 1);
+    expect(post.content.consecutiveImages, true);
     expect(post.content.images.length, 2);
     expect(post.content.images[0].image, 'http://i.nyx.cz/files/00/00/20/77/2077557_48d4a18f67ad53d7572e.jpg?name=dbk2.jpg');
     expect(post.content.images[1].image, 'http://i.nyx.cz/files/00/00/20/77/2077556_45259e39b491933bb483.jpg?name=dbk.jpg');
@@ -63,7 +64,7 @@ void main() {
         'http://www.nyx.cz/i/t/6a6f8dae07571ecfb1510c18e6dd6d0a.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F77%2F2077557_48d4a18f67ad53d7572e.jpg%3Fname%3Ddbk2.jpg');
     expect(post.content.images[1].thumb,
         'http://www.nyx.cz/i/t/8697a44511a1664f7adc53b39821ce7c.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F77%2F2077556_45259e39b491933bb483.jpg%3Fname%3Ddbk.jpg');
-    expect(post.content.links.length, 0);
+    expect(post.content.emptyLinks.length, 0);
     expect(0, parse(post.content.body).querySelectorAll('a > img').length);
   });
 
@@ -100,6 +101,9 @@ void main() {
 
     var post = Post.fromJson(json, 1);
 
+    // No consecutive images
+    expect(post.content.consecutiveImages, false);
+
     // Testing videos
     expect(post.content.videos.length, 1);
     expect(post.content.videos[0].id, 'B1_gcCu0-oI');
@@ -115,13 +119,7 @@ void main() {
     expect(post.content.images.length, 1);
 
     // Test links
-    expect(post.content.links.length, 3);
-    expect(post.content.links[0].title, 'Victoria Falls has not dried up - here\u2019s the proof - Africa Geographic');
-    expect(post.content.links[0].url, 'https://web.archive.org/web/20170331170530/https://africageographic.com/blog/victoria-falls-not-dried-heres-proof/');
-    expect(post.content.links[1].title, '\u65c5\u3059\u308b\u9234\u6728436:Victoria Falls in Dry season @Zimbabwe');
-    expect(post.content.links[1].url, 'http://www.youtube.com/watch?v=B1_gcCu0-oI');
-    expect(post.content.links[2].title, 'Tohle je link bez title');
-    expect(post.content.links[2].url, 'http://nyx.cz');
+    expect(post.content.emptyLinks.length, 0);
 
     // Test attachments
     expect(post.content.attachments.length, 2);
@@ -215,5 +213,23 @@ void main() {
 
     var post = Post.fromJson(json, 1);
     expect(post.content.consecutiveImages, false);
+  });
+
+  test('Content has empty links', () {
+    var content = """
+    Lorem ipsum dolor sit amet...
+    <img src='http://i.mg/img.jpg'><br  /><br>
+    <a href="http://google.com"><a href='http://i.mg/full.jpg'> <img src='http://i.mg/thumb.jpg' /></a></a>
+    Some copy in between.
+    <br><BR>
+    <img src='http://i.mg/img.jpg'><br  /><br>
+    """;
+
+    var json = Map<String, dynamic>.from(_json);
+    json.putIfAbsent("content", () => content);
+
+    var post = Post.fromJson(json, 1);
+    expect(post.content.consecutiveImages, false);
+    expect(post.content.emptyLinks.length, 1);
   });
 }

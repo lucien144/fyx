@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fyx/components/post/PostFooterLink.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/components/post/PostHtml.dart';
 import 'package:fyx/model/post/Content.dart';
@@ -135,6 +136,14 @@ class ContentBoxLayout extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
                   child: getContentWidget(),
+                ),
+                Visibility(
+                  visible: content.emptyLinks.length > 0,
+                  child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Column(
+                        children: content.emptyLinks.map((link) => PostFooterLink(link)).toList(),
+                      )),
                 ),
                 SizedBox(
                   height: 8,

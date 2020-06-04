@@ -11,7 +11,7 @@ class PostFooterLink extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => print('Go to: link.url'),
+      onTap: () => PlatformTheme.openLink(link.url),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Row(
@@ -29,7 +29,8 @@ class PostFooterLink extends StatelessWidget {
             Expanded(
                 child: Text(
               link.title,
-              overflow: TextOverflow.ellipsis,
+              softWrap: false,
+              overflow: TextOverflow.fade,
             ))
           ],
         ),

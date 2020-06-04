@@ -16,17 +16,16 @@ class Content {
   bool _consecutiveImages = false;
 
   List<Image> _images = [];
-  List<Link> _links = [];
+  List<Link> _emptyLinks = [];
   List<Video> _videos = [];
 
   Content(this._body) {
     _rawBody = _body;
     _body = HtmlUnescape().convert(_body);
-    // TODO: Handle <code/> tags
     this._cleanupBody();
     this._parseEmbeds();
     this._parseAttachedImages();
-    this._parseLinks();
+    this._parseEmptyLinks();
   }
 
   String get strippedContent => parse(parse(_body).body.text).documentElement.text.trim();
@@ -39,7 +38,7 @@ class Content {
 
   bool get consecutiveImages => _consecutiveImages;
 
-  List<Link> get links => _links;
+  List<Link> get emptyLinks => _emptyLinks;
 
   List<Video> get videos => _videos;
 
@@ -122,6 +121,7 @@ class Content {
 
   /// Parse attached images
   /// For some reason the a>img[src] selector also selects standalone <img/> files
+  /// -> Solved. It's the Nyx API. It wraps all images into the <a> tag with full image and replaces the img with thumbnail.
   void _parseAttachedImages() {
     Document document = parse(_body);
 
@@ -142,20 +142,22 @@ class Content {
   }
 
   ///
-  /// Parse any link that's not internal link.
+  /// Nyx wraps all images to a link. So if we pick the images to the gallery, there will be empty links if the image has been wrapped by user.
   ///
-  void _parseLinks() {
-    var document = parse(_body);
-
-    // Find all links with scraped title.
-    _links = document.querySelectorAll('b + br + a:not([data-link-wu])').map((Element el) {
-      var link = Link(el.attributes['href'], title: el.previousElementSibling.previousElementSibling.text);
-      el.remove();
-      return link;
-    }).toList();
-
-    // Find all other links.
-    document = parse(document.body.innerHtml);
-    _links.addAll(document.querySelectorAll('a:not([data-link-wu]):not([href^=\\?])').map((Element el) => Link(el.attributes['href'], title: el.text)));
+  /// Example
+  /// Post: <a href="google.com"><img src="img.png"></a>
+  /// Nyx API returns: <a href="google.com"><a href="img.png"><img src="i.nyx.cz/thumb.jpg"></a></a>
+  ///
+  void _parseEmptyLinks() {
+    RegExp r = RegExp(r'<a[^>]*?>\s*<\/a>', caseSensitive: false, multiLine: true);
+    r.allMatches(_body).forEach((match) {
+      String element = match.group(0);
+      Document html = parse(element);
+      String url = html.querySelector('a').attributes['href'];
+      if (url != null) {
+        _emptyLinks.add(Link(url));
+        _body = _body.replaceFirst(element, '');
+      }
+    });
   }
 }
