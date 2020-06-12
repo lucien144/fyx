@@ -232,4 +232,18 @@ void main() {
     expect(post.content.consecutiveImages, false);
     expect(post.content.emptyLinks.length, 1);
   });
+
+  test('Content has tagged link images', () {
+    var content = """
+    test
+    <a href='http://i.mg/full.jpg'><img src='http://i.mg/thumb.jpg' /></a>
+    test<br>adasd
+    """;
+
+    var json = Map<String, dynamic>.from(_json);
+    json.putIfAbsent("content", () => content);
+
+    var post = Post.fromJson(json, 1);
+    expect(post.content.body, 'test');
+  });
 }

@@ -16,11 +16,10 @@ import 'package:provider/provider.dart';
 
 class PostHtml extends StatelessWidget {
   final Content content;
-  final bool _overloadRaw;
   bool _isImageTap = false;
 
   /// overloadRaw - if true, the content.rawBody is used to parse no matter what settings is on.
-  PostHtml(this.content, {overloadRaw = false}) : _overloadRaw = overloadRaw;
+  PostHtml(this.content);
 
   @override
   Widget build(BuildContext context) {

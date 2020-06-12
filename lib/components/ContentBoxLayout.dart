@@ -73,10 +73,7 @@ class ContentBoxLayout extends StatelessWidget {
 
               // If there are NOT consecutive images, do not display the post with hero attachment and render it from raw HTML body instead.
               if (!content.consecutiveImages) {
-                return PostHtml(
-                  content,
-                  overloadRaw: true,
-                );
+                return PostHtml(content);
               }
 
               var children = <Widget>[];

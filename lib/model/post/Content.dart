@@ -138,7 +138,10 @@ class Content {
       while (el.parent.nextElementSibling?.localName == 'br') {
         el.parent.nextElementSibling.remove();
       }
-      el.parent.remove();
+
+      if (_consecutiveImages) {
+        el.parent.remove();
+      }
     });
     _body = document.body.innerHtml;
   }
