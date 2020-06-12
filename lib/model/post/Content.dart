@@ -21,6 +21,8 @@ class Content {
 
   Content(this._body) {
     _rawBody = _body;
+    this._tagAllImageLinks(); // This updates the raw body.
+
     _body = HtmlUnescape().convert(_body);
     this._cleanupBody();
     this._parseEmbeds();
@@ -139,6 +141,14 @@ class Content {
       el.parent.remove();
     });
     _body = document.body.innerHtml;
+  }
+
+  void _tagAllImageLinks() {
+    Document document = parse(_rawBody);
+    document.querySelectorAll('a > img').forEach((Element el) {
+      el.parent.classes.add('image-link');
+    });
+    _rawBody = document.body.innerHtml;
   }
 
   ///

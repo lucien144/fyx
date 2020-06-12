@@ -26,8 +26,11 @@ class PostHtml extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<SettingsModel>(
         builder: (context, settings, child) => Html(
-              data: settings.useHeroPosts && !_overloadRaw ? content.body : content.rawBody,
-              style: {"html": Style.fromTextStyle(PlatformTheme.of(context).textTheme.textStyle ?? PlatformTheme.of(context).textTheme.body1)},
+              data: settings.useHeroPosts && content.consecutiveImages ? content.body : content.rawBody,
+              style: {
+                "html": Style.fromTextStyle(PlatformTheme.of(context).textTheme.textStyle ?? PlatformTheme.of(context).textTheme.body1),
+                ".image-link": Style(textDecoration: TextDecoration.none)
+              },
               customRender: {
                 'img': (
                   RenderContext context,
