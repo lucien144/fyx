@@ -21,15 +21,20 @@ class Content {
 
   Content(this._body) {
     _rawBody = _body;
-    this._tagAllImageLinks(); // This updates the raw body.
+    _rawBody = this._tagAllImageLinks(_rawBody); // This updates the raw body.
+    _body = this._tagAllImageLinks(_body); // This updates the raw body.
 
     _body = HtmlUnescape().convert(_body);
     this._cleanupBody();
     this._parseEmbeds();
     this._parseAttachedImages();
     this._parseEmptyLinks();
+    this._cleanupBody();
   }
 
+  // HTML body stripped out of all HTML elements
+  // Clean text content without single HTML element.
+  // Used to check if there's ANY content at all.
   String get strippedContent => parse(parse(_body).body.text).documentElement.text.trim();
 
   String get body => _body;
@@ -110,9 +115,6 @@ class Content {
         // Remove the video element from the content.
         this._videos.add(video);
 
-        while (el.nextElementSibling?.localName == 'br') {
-          el.nextElementSibling.remove();
-        }
         el.remove();
       });
       _body = document.body.innerHtml;
@@ -135,10 +137,6 @@ class Content {
       var image = el.parent.attributes['href'];
       _images.add(Image(image, thumb));
 
-      while (el.parent.nextElementSibling?.localName == 'br') {
-        el.parent.nextElementSibling.remove();
-      }
-
       if (_consecutiveImages) {
         el.parent.remove();
       }
@@ -146,12 +144,12 @@ class Content {
     _body = document.body.innerHtml;
   }
 
-  void _tagAllImageLinks() {
-    Document document = parse(_rawBody);
+  String _tagAllImageLinks(String source) {
+    Document document = parse(source);
     document.querySelectorAll('a > img').forEach((Element el) {
       el.parent.classes.add('image-link');
     });
-    _rawBody = document.body.innerHtml;
+    return document.body.innerHtml;
   }
 
   ///

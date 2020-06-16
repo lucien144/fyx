@@ -16,8 +16,16 @@ void main() {
           <img src="http://www.nyx.cz/i/t/b0ccf0fde73a5840dea9f0dbc5d18e6d.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F68%2F2068213_7dde4d7aa8e3021dd610.jpg%3Fname%3D11.jpg" class="thumb">
           </a>
           <a href="?l=topic;id=14158;wu=51447388" class="r" data-link-topic="14158" data-link-wu="51447388" data-reply-to="replytoJAKKILLER">JAKKILLER</a>: 
-          ale jo, to patri, ale o tom ten muj post nebyl. Vsechno jde udelat vkusne a nebo hnusne. O tom to je. Na ty budejarne MNE OSOBNE prijdou ty reklamy jako pest na oko...
-    """;
+          ale jo, to patri, ale o tom ten muj post nebyl. Vsechno jde udelat vkusne a nebo hnusne. O tom to je. Na ty budejarne MNE OSOBNE prijdou ty reklamy jako pest na oko...""";
+
+    var rawContent = """
+          James Caan on set of The Godfather.<br><br>
+          <!-- http,img,attachment -->
+          <a href="http://i.nyx.cz/files/00/00/20/68/2068213_7dde4d7aa8e3021dd610.jpg?name=11.jpg" class="image-link">
+          <img src="http://www.nyx.cz/i/t/b0ccf0fde73a5840dea9f0dbc5d18e6d.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F68%2F2068213_7dde4d7aa8e3021dd610.jpg%3Fname%3D11.jpg" class="thumb">
+          </a>
+          <a href="?l=topic;id=14158;wu=51447388" class="r" data-link-topic="14158" data-link-wu="51447388" data-reply-to="replytoJAKKILLER">JAKKILLER</a>: 
+          ale jo, to patri, ale o tom ten muj post nebyl. Vsechno jde udelat vkusne a nebo hnusne. O tom to je. Na ty budejarne MNE OSOBNE prijdou ty reklamy jako pest na oko...""";
 
     var json = Map<String, dynamic>.from(_json);
     json.putIfAbsent("content", () => content);
@@ -29,9 +37,9 @@ void main() {
     expect(post.time, 1573934376);
     expect(post.rating, 8);
     expect(post.type, 0);
-    expect(post.content.rawBody, content);
-    expect(0, parse(post.content.body).querySelectorAll('a > img').length, reason: 'Images have been removed.');
-    expect(1, parse(post.content.body).querySelectorAll('a').length, reason: 'Other links remains');
+    expect(post.content.rawBody, rawContent.trim());
+    expect(parse(post.content.body).querySelectorAll('a > img').length, 1, reason: 'No consecutive image, therefore image not removed.');
+    expect(2, parse(post.content.body).querySelectorAll('a').length, reason: 'Both links remains');
 
     var imagesMatcher = [
       Image('http://i.nyx.cz/files/00/00/20/68/2068213_7dde4d7aa8e3021dd610.jpg?name=11.jpg',
@@ -139,7 +147,7 @@ void main() {
     """;
 
     var expectedContent = """
-    Lorem ipsum dolor... sit amet :)<br><br>
+    Lorem ipsum dolor... sit amet :)
     """;
 
     var json = Map<String, dynamic>.from(_json);
@@ -236,14 +244,22 @@ void main() {
   test('Content has tagged link images', () {
     var content = """
     test
-    <a href='http://i.mg/full.jpg'><img src='http://i.mg/thumb.jpg' /></a>
+    <a href="http://i.mg/full.jpg"><img src="http://i.mg/thumb.jpg"></a>
     test<br>adasd
-    """;
+    """
+        .trim();
+
+    var expectedContent = """
+    test
+    <a href="http://i.mg/full.jpg" class="image-link"><img src="http://i.mg/thumb.jpg"></a>
+    test<br>adasd
+    """
+        .trim();
 
     var json = Map<String, dynamic>.from(_json);
     json.putIfAbsent("content", () => content);
 
     var post = Post.fromJson(json, 1);
-    expect(post.content.body, 'test');
+    expect(post.content.body, expectedContent);
   });
 }
