@@ -128,6 +128,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                     controller: _messageController,
                     maxLines: 10,
                     autofocus: true,
+                    textCapitalization: TextCapitalization.sentences,
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
