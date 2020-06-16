@@ -108,6 +108,12 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
         title: Text('Přihlášen jako: ${MainRepository().credentials.nickname}'),
         message: Text('Verze: $version'),
         actions: <Widget>[
+          CupertinoActionSheetAction(
+              child: Text('Nastavení'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context, rootNavigator: true).pushNamed('/settings');
+              }),
           CupertinoActionSheetAction(child: Text('⚠️ Nahlásit chybu'), onPressed: () => PlatformTheme.prefillGithubIssue('Zde popiš svůj problém...')),
           CupertinoActionSheetAction(
             isDestructiveAction: true,
