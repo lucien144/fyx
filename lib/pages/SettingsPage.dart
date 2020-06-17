@@ -34,76 +34,74 @@ class _SettingsPageState extends State<SettingsPage> {
     var pkg = MainRepository().packageInfo;
     var version = '${pkg.version} (${pkg.buildNumber})';
 
-    return CupertinoTabView(builder: (context) {
-      return CupertinoPageScaffold(
-          navigationBar: CupertinoNavigationBar(
-              backgroundColor: Colors.white,
-              middle: Text(L.SETTINGS),
-              leading: CupertinoNavigationBarBackButton(
-                color: T.COLOR_PRIMARY,
-                onPressed: () {
-                  Navigator.of(context, rootNavigator: true).pop();
-                },
-              )),
-          child: CupertinoSettings(items: <Widget>[
-            const CSHeader('Příspěvky'),
-            CSControl(
-              nameWidget: Text('Kompaktní zobrazení'),
-              contentWidget: CupertinoSwitch(
-                  value: _compactMode,
-                  onChanged: (bool value) {
-                    setState(() => _compactMode = value);
-                    MainRepository().settings.useCompactMode = value;
-                  }),
-              style: postsStyle,
-            ),
-            CSDescription(
-              'Kompaktní zobrazení je zobrazení obrázků po stranách pokud to obsah příspěvku dovoluje (nedojde tak k narušení kontextu).',
-            ),
-            CSHeader('Úvodní obrazovka'),
-            CSSelection<DefaultView>(
-              items: const <CSSelectionItem<DefaultView>>[
-                CSSelectionItem<DefaultView>(text: 'Historie (vše)', value: DefaultView.history),
-                CSSelectionItem<DefaultView>(text: 'Historie (nepřečtené)', value: DefaultView.historyUnread),
-                CSSelectionItem<DefaultView>(text: 'Sledované (vše)', value: DefaultView.bookmarks),
-                CSSelectionItem<DefaultView>(text: 'Sledované (nepřečtené)', value: DefaultView.bookmarksUnread),
-              ],
-              onSelected: (index) {
-                MainRepository().settings.defaultView = index;
+    return CupertinoPageScaffold(
+        navigationBar: CupertinoNavigationBar(
+            backgroundColor: Colors.white,
+            middle: Text(L.SETTINGS),
+            leading: CupertinoNavigationBarBackButton(
+              color: T.COLOR_PRIMARY,
+              onPressed: () {
+                Navigator.of(context, rootNavigator: true).pop();
               },
-              currentSelection: MainRepository().settings.defaultView,
-            ),
-            const CSHeader(''),
-            CSButton(
-              CSButtonType.DEFAULT,
-              L.SETTINGS_BUGREPORT,
-              () => PlatformTheme.prefillGithubIssue(L.SETTINGS_BUGREPORT_TITLE),
-              style: bugreportStyle,
-            ),
-            CSButton(CSButtonType.DEFAULT, "O aplikaci", () {
+            )),
+        child: CupertinoSettings(items: <Widget>[
+          const CSHeader('Příspěvky'),
+          CSControl(
+            nameWidget: Text('Kompaktní zobrazení'),
+            contentWidget: CupertinoSwitch(
+                value: _compactMode,
+                onChanged: (bool value) {
+                  setState(() => _compactMode = value);
+                  MainRepository().settings.useCompactMode = value;
+                }),
+            style: postsStyle,
+          ),
+          CSDescription(
+            'Kompaktní zobrazení je zobrazení obrázků po stranách pokud to obsah příspěvku dovoluje (nedojde tak k narušení kontextu).',
+          ),
+          CSHeader('Úvodní obrazovka'),
+          CSSelection<DefaultView>(
+            items: const <CSSelectionItem<DefaultView>>[
+              CSSelectionItem<DefaultView>(text: 'Historie (vše)', value: DefaultView.history),
+              CSSelectionItem<DefaultView>(text: 'Historie (nepřečtené)', value: DefaultView.historyUnread),
+              CSSelectionItem<DefaultView>(text: 'Sledované (vše)', value: DefaultView.bookmarks),
+              CSSelectionItem<DefaultView>(text: 'Sledované (nepřečtené)', value: DefaultView.bookmarksUnread),
+            ],
+            onSelected: (index) {
+              MainRepository().settings.defaultView = index;
+            },
+            currentSelection: MainRepository().settings.defaultView,
+          ),
+          const CSHeader(''),
+          CSButton(
+            CSButtonType.DEFAULT,
+            L.SETTINGS_BUGREPORT,
+            () => PlatformTheme.prefillGithubIssue(L.SETTINGS_BUGREPORT_TITLE),
+            style: bugreportStyle,
+          ),
+          CSButton(CSButtonType.DEFAULT, "O aplikaci", () {
+            print("It works!");
+          }, style: aboutStyle),
+          CSButton(
+            CSButtonType.DEFAULT,
+            "Podpoř vývoj!",
+            () {
               print("It works!");
-            }, style: aboutStyle),
-            CSButton(
-              CSButtonType.DEFAULT,
-              "Patroni",
-              () {
-                print("It works!");
-              },
-              style: patronsStyle,
-            ),
-            const CSHeader(''),
-            CSButton(CSButtonType.DESTRUCTIVE, L.GENERAL_LOGOUT, () {
-              ApiController().logout();
-              Navigator.of(context, rootNavigator: true).pushNamed('/login');
-            }),
-            Visibility(
-                visible: FyxApp.isDev,
-                child: CSButton(CSButtonType.DESTRUCTIVE, '${L.GENERAL_LOGOUT} (bez resetu)', () {
-                  ApiController().logout(removeAuthrorization: false);
-                  Navigator.of(context, rootNavigator: true).pushNamed('/login');
-                })),
-            CSDescription('Verze: ${version}')
-          ]));
-    });
+            },
+            style: patronsStyle,
+          ),
+          const CSHeader(''),
+          CSButton(CSButtonType.DESTRUCTIVE, L.GENERAL_LOGOUT, () {
+            ApiController().logout();
+            Navigator.of(context, rootNavigator: true).pushNamed('/login');
+          }),
+          Visibility(
+              visible: FyxApp.isDev,
+              child: CSButton(CSButtonType.DESTRUCTIVE, '${L.GENERAL_LOGOUT} (bez resetu)', () {
+                ApiController().logout(removeAuthrorization: false);
+                Navigator.of(context, rootNavigator: true).pushNamed('/login');
+              })),
+          CSDescription('Verze: ${version}')
+        ]));
   }
 }
