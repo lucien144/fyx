@@ -27,16 +27,8 @@ class SettingsProvider {
   Future<SettingsProvider> init() async {
     _prefs = await SharedPreferences.getInstance();
     _settings = new Settings();
-    _settings.defaultView = DefaultView.values.firstWhere((DefaultView view) => view.toString() == _prefs.get('defaultView'));
-    _settings.useCompactMode = _prefs.get('useCompactMode');
-
-    if (_settings.defaultView == null) {
-      defaultView = Settings().defaultView;
-    }
-
-    if (_settings.useCompactMode == null) {
-      useCompactMode = Settings().useCompactMode;
-    }
+    _settings.defaultView = DefaultView.values.firstWhere((DefaultView view) => view.toString() == _prefs.get('defaultView'), orElse: () => Settings().defaultView);
+    _settings.useCompactMode = _prefs.get('useCompactMode') ?? Settings().useCompactMode;
 
     return _singleton;
   }
