@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/PlatformAwareWidget.dart';
 import 'package:fyx/PlatformThemeData.dart';
+import 'package:fyx/pages/AboutPage.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/pages/GalleryPage.dart';
 import 'package:fyx/pages/HomePage.dart';
@@ -71,6 +72,9 @@ class PlatformApp extends PlatformAwareWidget<MaterialApp, CupertinoApp> {
       case '/settings':
         print('[Router] Settings');
         return CupertinoPageRoute(builder: (_) => SettingsPage(), settings: settings);
+      case '/settings/about':
+        print('[Router] Settings / About');
+        return CupertinoPageRoute(builder: (_) => AboutPage(), settings: settings);
       default:
         print('[Router] Discussion');
         return CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings);

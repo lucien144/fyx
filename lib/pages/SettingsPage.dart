@@ -79,9 +79,7 @@ class _SettingsPageState extends State<SettingsPage> {
             () => PlatformTheme.prefillGithubIssue(L.SETTINGS_BUGREPORT_TITLE),
             style: bugreportStyle,
           ),
-          CSButton(CSButtonType.DEFAULT, "O aplikaci", () {
-            print("It works!");
-          }, style: aboutStyle),
+          CSButton(CSButtonType.DEFAULT, L.ABOUT, () => Navigator.of(context).pushNamed('/settings/about'), style: aboutStyle),
           CSButton(
             CSButtonType.DEFAULT,
             "Podpoř vývoj!",

@@ -20,6 +20,8 @@ class L {
   static String GENERAL_REFRESH = 'Načíst znovu...';
   static String GENERAL_CANCEL = 'Zrušit';
   static String GENERAL_WARNING = 'Pozor';
+  static String GENERAL_LOADING = 'Načítám...';
+  static String GENERAL_ERROR = 'Chyba!';
 
   // Tutorial page
   static String TUTORIAL_SUCCESS = 'Paráda 🤘';
@@ -39,6 +41,8 @@ class L {
 
   // Settings page
   static String SETTINGS = 'Nastavení';
+  static String ABOUT = 'O aplikaci';
   static String SETTINGS_BUGREPORT = 'Nahlásit chybu';
   static String SETTINGS_BUGREPORT_TITLE = 'Zde popiš svůj problém...';
+  static String SETTINGS_LOAD_ERROR = 'Nepodařilo se načíst data.';
 }
