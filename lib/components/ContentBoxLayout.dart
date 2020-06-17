@@ -3,12 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:fyx/components/post/PostFooterLink.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/components/post/PostHtml.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/Image.dart' as model;
-import 'package:fyx/model/provider/SettingsModel.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/UnreadBadgeDecoration.dart';
-import 'package:provider/provider.dart';
 
 enum LAYOUT_TYPES { textOnly, oneImageOnly, attachmentsOnly, attachmentsAndText }
 
@@ -154,18 +153,17 @@ class ContentBoxLayout extends StatelessWidget {
   }
 
   Widget getContentWidget() {
-    return Consumer<SettingsModel>(
-        builder: (context, settings, child) => settings.useHeroPosts
-            ? (() {
-                for (final layout in LAYOUT_TYPES.values) {
-                  var result = _layoutMap[layout]();
-                  if (result != null) {
-                    return result;
-                  }
-                }
+    return MainRepository().settings.useCompactMode
+        ? (() {
+            for (final layout in LAYOUT_TYPES.values) {
+              var result = _layoutMap[layout]();
+              if (result != null) {
+                return result;
+              }
+            }
 
-                return PostHtml(content);
-              })()
-            : PostHtml(content));
+            return PostHtml(content);
+          })()
+        : PostHtml(content);
   }
 }

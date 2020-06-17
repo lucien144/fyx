@@ -6,14 +6,13 @@ import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/CircleAvatar.dart' as ca;
 import 'package:fyx/components/DiscussionListItem.dart';
 import 'package:fyx/components/ListHeader.dart';
-import 'package:fyx/components/NavigationBarIcon.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Category.dart';
 import 'package:fyx/model/Discussion.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/Settings.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
-import 'package:fyx/model/provider/SettingsModel.dart';
 import 'package:fyx/pages/MailboxPage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:provider/provider.dart';
@@ -29,7 +28,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
   static const int PAGE_BOOKMARK = 0;
   static const int PAGE_MAIL = 1;
 
-  final PageController _bookmarksController = PageController(initialPage: 0);
+  PageController _bookmarksController;
 
   tabs activeTab;
   int _pageIndex = PAGE_BOOKMARK;
@@ -39,9 +38,16 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
   @override
   void initState() {
     super.initState();
-    activeTab = tabs.history;
-
     WidgetsBinding.instance.addObserver(this);
+
+    _filterUnread = [DefaultView.bookmarksUnread, DefaultView.historyUnread].indexOf(MainRepository().settings.defaultView) >= 0;
+
+    activeTab = [DefaultView.history, DefaultView.historyUnread].indexOf(MainRepository().settings.defaultView) >= 0 ? tabs.history : tabs.bookmarks;
+    if (activeTab == tabs.bookmarks) {
+      _bookmarksController = PageController(initialPage: 1);
+    } else {
+      _bookmarksController = PageController(initialPage: 0);
+    }
 
     _bookmarksController.addListener(() {
       // If the CupertinoTabView is sliding and the animation is finished, change the active tab
@@ -245,12 +251,6 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                 return CupertinoPageScaffold(
                     navigationBar: CupertinoNavigationBar(
                         backgroundColor: Colors.white,
-                        leading: Consumer<SettingsModel>(
-                            builder: (context, settings, child) => CupertinoButton(
-                                  padding: EdgeInsets.zero,
-                                  onPressed: () => Provider.of<SettingsModel>(context, listen: false).toggleUseHeroPosts(),
-                                  child: NavigationBarIcon(settings.useHeroPosts ? CupertinoIcons.lab_flask_solid : CupertinoIcons.lab_flask),
-                                )),
                         trailing: GestureDetector(
                           child: ca.CircleAvatar(
                             MainRepository().credentials.avatar,

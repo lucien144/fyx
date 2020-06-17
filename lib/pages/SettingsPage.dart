@@ -5,10 +5,25 @@ import 'package:fyx/FyxApp.dart';
 import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/Settings.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
+  @override
+  _SettingsPageState createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  bool _compactMode;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _compactMode = MainRepository().settings.useCompactMode;
+  }
+
   @override
   Widget build(BuildContext context) {
     CSWidgetStyle postsStyle = const CSWidgetStyle(icon: const Icon(Icons.view_compact, color: Colors.black54));
@@ -34,24 +49,29 @@ class SettingsPage extends StatelessWidget {
             const CSHeader('Příspěvky'),
             CSControl(
               nameWidget: Text('Kompaktní zobrazení'),
-              contentWidget: CupertinoSwitch(value: false),
+              contentWidget: CupertinoSwitch(
+                  value: _compactMode,
+                  onChanged: (bool value) {
+                    setState(() => _compactMode = value);
+                    MainRepository().settings.useCompactMode = value;
+                  }),
               style: postsStyle,
             ),
             CSDescription(
               'Kompaktní zobrazení je zobrazení obrázků po stranách pokud to obsah příspěvku dovoluje (nedojde tak k narušení kontextu).',
             ),
             CSHeader('Úvodní obrazovka'),
-            CSSelection<int>(
-              items: const <CSSelectionItem<int>>[
-                CSSelectionItem<int>(text: 'Historie (vše)', value: 0),
-                CSSelectionItem<int>(text: 'Historie (nepřečtené)', value: 1),
-                CSSelectionItem<int>(text: 'Sledované (vše)', value: 2),
-                CSSelectionItem<int>(text: 'Sledované (nepřečtené)', value: 3),
+            CSSelection<DefaultView>(
+              items: const <CSSelectionItem<DefaultView>>[
+                CSSelectionItem<DefaultView>(text: 'Historie (vše)', value: DefaultView.history),
+                CSSelectionItem<DefaultView>(text: 'Historie (nepřečtené)', value: DefaultView.historyUnread),
+                CSSelectionItem<DefaultView>(text: 'Sledované (vše)', value: DefaultView.bookmarks),
+                CSSelectionItem<DefaultView>(text: 'Sledované (nepřečtené)', value: DefaultView.bookmarksUnread),
               ],
               onSelected: (index) {
-                print(index);
+                MainRepository().settings.defaultView = index;
               },
-              currentSelection: 0,
+              currentSelection: MainRepository().settings.defaultView,
             ),
             const CSHeader(''),
             CSButton(

@@ -5,10 +5,10 @@ import 'package:flutter/services.dart';
 import 'package:fyx/PlatformApp.dart';
 import 'package:fyx/PlatformThemeData.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
-import 'package:fyx/model/provider/SettingsModel.dart';
 import 'package:fyx/pages/HomePage.dart';
 import 'package:fyx/pages/LoginPage.dart';
 import 'package:fyx/theme/T.dart';
@@ -47,10 +47,11 @@ class FyxApp extends StatelessWidget {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
     // TODO: Move to build using FutureBuilder.
-    var results = await Future.wait([ApiController().provider.getCredentials(), PackageInfo.fromPlatform(), DeviceInfoPlugin().iosInfo]);
+    var results = await Future.wait([ApiController().provider.getCredentials(), PackageInfo.fromPlatform(), DeviceInfoPlugin().iosInfo, SettingsProvider().init()]);
     MainRepository().credentials = results[0];
     MainRepository().packageInfo = results[1];
     MainRepository().deviceInfo = results[2];
+    MainRepository().settings = results[3];
   }
 
   @override
@@ -66,7 +67,6 @@ class FyxApp extends StatelessWidget {
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider<NotificationsModel>(create: (context) => NotificationsModel()),
-          ChangeNotifierProvider<SettingsModel>(create: (context) => SettingsModel())
         ],
         child: PlatformApp(
           title: 'Fyx',
