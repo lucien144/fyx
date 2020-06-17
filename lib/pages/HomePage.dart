@@ -101,39 +101,16 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
   }
 
   Widget actionSheet(BuildContext context) {
-    var pkg = MainRepository().packageInfo;
-    var version = '${pkg.version} (${pkg.buildNumber})';
-
     return CupertinoActionSheet(
         title: Text('Přihlášen jako: ${MainRepository().credentials.nickname}'),
-        message: Text('Verze: $version'),
         actions: <Widget>[
           CupertinoActionSheetAction(
-              child: Text('Nastavení'),
+              child: Text(L.SETTINGS),
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.of(context, rootNavigator: true).pushNamed('/settings');
               }),
-          CupertinoActionSheetAction(child: Text('⚠️ Nahlásit chybu'), onPressed: () => PlatformTheme.prefillGithubIssue('Zde popiš svůj problém...')),
-          CupertinoActionSheetAction(
-            isDestructiveAction: true,
-            child: Text(L.GENERAL_LOGOUT),
-            onPressed: () {
-              ApiController().logout();
-              Navigator.of(context, rootNavigator: true).pushNamed('/login');
-            },
-          ),
-          Visibility(
-            visible: FyxApp.isDev,
-            child: CupertinoActionSheetAction(
-              isDestructiveAction: true,
-              child: Text('${L.GENERAL_LOGOUT} (bez resetu)'),
-              onPressed: () {
-                ApiController().logout(removeAuthrorization: false);
-                Navigator.of(context, rootNavigator: true).pushNamed('/login');
-              },
-            ),
-          )
+          CupertinoActionSheetAction(child: Text('⚠️ ${L.SETTINGS_BUGREPORT}'), onPressed: () => PlatformTheme.prefillGithubIssue(L.SETTINGS_BUGREPORT_TITLE)),
         ],
         cancelButton: CupertinoActionSheetAction(
           isDefaultAction: true,

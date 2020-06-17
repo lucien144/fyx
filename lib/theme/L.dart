@@ -36,4 +36,9 @@ class L {
 
   static String RATING_CONFIRMATION =
       'Tento uživatel si nepřeje, aby bylo možné jeho příspěvky hodnotit negativně anonymně. Pokud si přejete hodnotit příspěvek neanonymně, klikněte na "Hodnotit".';
+
+  // Settings page
+  static String SETTINGS = 'Nastavení';
+  static String SETTINGS_BUGREPORT = 'Nahlásit chybu';
+  static String SETTINGS_BUGREPORT_TITLE = 'Zde popiš svůj problém...';
 }

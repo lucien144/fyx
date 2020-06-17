@@ -1,18 +1,29 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cupertino_settings/flutter_cupertino_settings.dart';
+import 'package:fyx/FyxApp.dart';
+import 'package:fyx/PlatformTheme.dart';
+import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 
 class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    CSWidgetStyle brightnessStyle = const CSWidgetStyle(icon: const Icon(Icons.view_compact, color: Colors.black54));
+    CSWidgetStyle postsStyle = const CSWidgetStyle(icon: const Icon(Icons.view_compact, color: Colors.black54));
+    CSWidgetStyle bugreportStyle = const CSWidgetStyle(icon: const Icon(Icons.bug_report, color: Colors.black54));
+    CSWidgetStyle aboutStyle = const CSWidgetStyle(icon: const Icon(Icons.info, color: Colors.black54));
+    CSWidgetStyle patronsStyle = const CSWidgetStyle(icon: const Icon(Icons.stars, color: Colors.black54));
+
+    var pkg = MainRepository().packageInfo;
+    var version = '${pkg.version} (${pkg.buildNumber})';
 
     return CupertinoTabView(builder: (context) {
       return CupertinoPageScaffold(
           navigationBar: CupertinoNavigationBar(
               backgroundColor: Colors.white,
-              middle: Text('Nastavení'),
+              middle: Text(L.SETTINGS),
               leading: CupertinoNavigationBarBackButton(
                 color: T.COLOR_PRIMARY,
                 onPressed: () {
@@ -24,7 +35,7 @@ class SettingsPage extends StatelessWidget {
             CSControl(
               nameWidget: Text('Kompaktní zobrazení'),
               contentWidget: CupertinoSwitch(value: false),
-              style: brightnessStyle,
+              style: postsStyle,
             ),
             CSDescription(
               'Kompaktní zobrazení je zobrazení obrázků po stranách pokud to obsah příspěvku dovoluje (nedojde tak k narušení kontextu).',
@@ -43,59 +54,36 @@ class SettingsPage extends StatelessWidget {
               currentSelection: 0,
             ),
             const CSHeader(''),
-            CSButton(CSButtonType.DEFAULT, "Nahlásit chybu", () {
-              print("It works!");
-            }),
+            CSButton(
+              CSButtonType.DEFAULT,
+              L.SETTINGS_BUGREPORT,
+              () => PlatformTheme.prefillGithubIssue(L.SETTINGS_BUGREPORT_TITLE),
+              style: bugreportStyle,
+            ),
             CSButton(CSButtonType.DEFAULT, "O aplikaci", () {
               print("It works!");
-            }),
-            CSButton(CSButtonType.DEFAULT, "Podpořit vývoj", () {
-              print("It works!");
-            }),
+            }, style: aboutStyle),
+            CSButton(
+              CSButtonType.DEFAULT,
+              "Patroni",
+              () {
+                print("It works!");
+              },
+              style: patronsStyle,
+            ),
             const CSHeader(''),
-            CSButton(CSButtonType.DESTRUCTIVE, "Odhlásit", () {}),
-            CSButton(CSButtonType.DESTRUCTIVE, "Odhlásit (bez resetu)", () {}),
-            CSDescription(
-              'Verze: 0.3.0',
-            )
+            CSButton(CSButtonType.DESTRUCTIVE, L.GENERAL_LOGOUT, () {
+              ApiController().logout();
+              Navigator.of(context, rootNavigator: true).pushNamed('/login');
+            }),
+            Visibility(
+                visible: FyxApp.isDev,
+                child: CSButton(CSButtonType.DESTRUCTIVE, '${L.GENERAL_LOGOUT} (bez resetu)', () {
+                  ApiController().logout(removeAuthrorization: false);
+                  Navigator.of(context, rootNavigator: true).pushNamed('/login');
+                })),
+            CSDescription('Verze: ${version}')
           ]));
     });
-
-    return Container(
-      color: Colors.white,
-      child: CupertinoSettings(items: <Widget>[
-        const CSHeader('Brightness'),
-        CSWidget(CupertinoSlider(value: 0.5), style: brightnessStyle),
-        CSControl(
-          nameWidget: Text('Auto brightness'),
-          contentWidget: CupertinoSwitch(value: true),
-          style: brightnessStyle,
-        ),
-        CSHeader('Selection'),
-        CSSelection<int>(
-          items: const <CSSelectionItem<int>>[
-            CSSelectionItem<int>(text: 'Day mode', value: 0),
-            CSSelectionItem<int>(text: 'Night mode', value: 1),
-          ],
-          onSelected: (index) {
-            print(index);
-          },
-          currentSelection: 0,
-        ),
-        CSDescription(
-          'Using Night mode extends battery life on devices with OLED display',
-        ),
-        const CSHeader(''),
-        CSControl(
-          nameWidget: Text('Loading...'),
-          contentWidget: CupertinoActivityIndicator(),
-        ),
-        CSButton(CSButtonType.DEFAULT, "Licenses", () {
-          print("It works!");
-        }),
-        const CSHeader(''),
-        CSButton(CSButtonType.DESTRUCTIVE, "Delete all data", () {})
-      ]),
-    );
   }
 }
