@@ -6,27 +6,39 @@ import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:http/http.dart';
 
-class AboutPage extends StatefulWidget {
-  @override
-  _AboutPageState createState() => _AboutPageState();
+class InfoPageSettings {
+  String url;
+  String title;
+
+  InfoPageSettings(this.title, this.url);
 }
 
-class _AboutPageState extends State<AboutPage> {
+class InfoPage extends StatefulWidget {
+  @override
+  _InfoPageState createState() => _InfoPageState();
+}
+
+class _InfoPageState extends State<InfoPage> {
   var _client = Client();
   Future<Response> _response;
 
   @override
   void initState() {
     super.initState();
-    _response = _client.get('https://raw.githubusercontent.com/lucien144/fyx/develop/README.md');
   }
 
   @override
   Widget build(BuildContext context) {
+    InfoPageSettings settings = ModalRoute.of(context).settings.arguments;
+
+    if (_response == null) {
+      _response = _client.get(settings.url);
+    }
+
     return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
             backgroundColor: Colors.white,
-            middle: Text(L.ABOUT),
+            middle: Text(settings.title),
             leading: CupertinoNavigationBarBackButton(
               color: T.COLOR_PRIMARY,
               onPressed: () {
@@ -37,7 +49,7 @@ class _AboutPageState extends State<AboutPage> {
             future: _response,
             builder: (BuildContext context, AsyncSnapshot<Response> snapshot) {
               if (snapshot.hasData) {
-                return Markdown(data: snapshot.data.body);
+                return Markdown(data: snapshot.data.body, onTapLink: (String url) => PlatformTheme.openLink(url));
               }
               if (snapshot.hasError) {
                 return PlatformTheme.feedbackScreen(
@@ -45,7 +57,7 @@ class _AboutPageState extends State<AboutPage> {
                     isWarning: true,
                     title: L.GENERAL_ERROR,
                     onPress: () async {
-                      setState(() => {_response = _client.get('https://raw.githubusercontent.com/lucien144/fyx/develop/README.md')});
+                      setState(() => _response = _client.get(settings.url));
                     });
               }
               return PlatformTheme.feedbackScreen(isLoading: true);

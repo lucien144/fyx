@@ -6,6 +6,7 @@ import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Settings.dart';
+import 'package:fyx/pages/InfoPage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 
@@ -75,18 +76,22 @@ class _SettingsPageState extends State<SettingsPage> {
           const CSHeader(''),
           CSButton(
             CSButtonType.DEFAULT,
+            L.BACKERS,
+            () => Navigator.of(context)
+                .pushNamed('/settings/info', arguments: InfoPageSettings(L.BACKERS, 'https://raw.githubusercontent.com/lucien144/fyx/feature/settings/BACKERS.md')),
+            style: patronsStyle,
+          ),
+          CSButton(
+              CSButtonType.DEFAULT,
+              L.ABOUT,
+              () => Navigator.of(context)
+                  .pushNamed('/settings/info', arguments: InfoPageSettings(L.ABOUT, 'https://raw.githubusercontent.com/lucien144/fyx/feature/settings/ABOUT.md')),
+              style: aboutStyle),
+          CSButton(
+            CSButtonType.DEFAULT,
             L.SETTINGS_BUGREPORT,
             () => PlatformTheme.prefillGithubIssue(L.SETTINGS_BUGREPORT_TITLE),
             style: bugreportStyle,
-          ),
-          CSButton(CSButtonType.DEFAULT, L.ABOUT, () => Navigator.of(context).pushNamed('/settings/about'), style: aboutStyle),
-          CSButton(
-            CSButtonType.DEFAULT,
-            "Podpoř vývoj!",
-            () {
-              print("It works!");
-            },
-            style: patronsStyle,
           ),
           const CSHeader(''),
           CSButton(CSButtonType.DESTRUCTIVE, L.GENERAL_LOGOUT, () {
