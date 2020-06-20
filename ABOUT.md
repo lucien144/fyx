@@ -12,7 +12,7 @@ Další moje projekty:
 * [144.wtf](https://144.wtf) - osobní web
 * [artkina.cz](https://artkina.cz) - aplikace pro milovníky artových kin
 * [devnull.store](https://devnull.store) - obchod s oblečením pro programátory 
-* [tbga.me](https://tbga.me) - nejintenzivnější hra pro mobil co jste kdy hráli 
+* [thebuttongame.io](https://www.thebuttongame.io/) - nejintenzivnější hra pro mobil co jste kdy hráli 
 
 ## Poděkování 
 Rád bych zde poděkoval těm, kteří  se nějakým způsobem zasloužili o rozvoj Fyxu:
