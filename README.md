@@ -56,7 +56,6 @@ Také si můžete projít [Issues](https://github.com/lucien144/fyx/issues) př�
 
 Build produkce lze spustit zavoláním skpriput `$ ./ios/build.sh`, který zároveň zvýší build verzi o +1.
 
-### Gitflow
 Tento repozitář používá [Gitflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow). Připravujte veškerou práci ve `feature` větvích nebo forku, pak pošlete PR do `develop` větve. PR jsou mergovány pouze adminy (a jako `squash commits`).
 
 ## Hlášení chyb
