@@ -3,17 +3,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/PlatformTheme.dart';
-import 'package:fyx/components/NavigationBarIcon.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/components/post/PostListItem.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Post.dart';
-import 'package:fyx/model/provider/SettingsModel.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
-import 'package:provider/provider.dart';
 
 import '../FyxApp.dart';
 
@@ -108,46 +105,16 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
   Widget _createDiscussionPage(DiscussionResponse discussionResponse, DiscussionPageArguments pageArguments) {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-          backgroundColor: Colors.white,
-          leading: CupertinoNavigationBarBackButton(
-            color: T.COLOR_PRIMARY,
-            onPressed: () {
-              DiscussionPage.deeplinkDepth = 0;
-              Navigator.of(context).pop();
-            },
-          ),
-          middle: Text(discussionResponse.discussion['name'], overflow: TextOverflow.ellipsis),
-          trailing: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Consumer<SettingsModel>(
-                  builder: (context, settings, child) => CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () => Provider.of<SettingsModel>(context, listen: false).toggleUseHeroPosts(),
-                        child: NavigationBarIcon(settings.useHeroPosts ? CupertinoIcons.lab_flask_solid : CupertinoIcons.lab_flask),
-                      )),
-              Visibility(
-                visible: _hasBackToRootButton,
-                child: CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () {
-                    Navigator.of(context).popUntil((route) {
-                      if (DiscussionPage.deeplinkDepth <= 0) {
-                        return true;
-                      }
-                      return false;
-                    });
-                  },
-                  child: Transform(
-                    transform: Matrix4.rotationZ(1.57079633),
-                    alignment: Alignment.center,
-                    child: NavigationBarIcon(CupertinoIcons.back),
-                  ),
-                ),
-              ),
-            ],
-          )),
+        backgroundColor: Colors.white,
+        leading: CupertinoNavigationBarBackButton(
+          color: T.COLOR_PRIMARY,
+          onPressed: () {
+            DiscussionPage.deeplinkDepth = 0;
+            Navigator.of(context).pop();
+          },
+        ),
+        middle: Text(discussionResponse.discussion['name'], overflow: TextOverflow.ellipsis),
+      ),
       child: Stack(
         children: [
           PullToRefreshList(

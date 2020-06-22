@@ -5,8 +5,10 @@ import 'package:fyx/PlatformThemeData.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/pages/GalleryPage.dart';
 import 'package:fyx/pages/HomePage.dart';
+import 'package:fyx/pages/InfoPage.dart';
 import 'package:fyx/pages/LoginPage.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
+import 'package:fyx/pages/SettingsPage.dart';
 import 'package:fyx/pages/TutorialPage.dart';
 
 class PlatformApp extends PlatformAwareWidget<MaterialApp, CupertinoApp> {
@@ -67,6 +69,12 @@ class PlatformApp extends PlatformAwareWidget<MaterialApp, CupertinoApp> {
         print('[Router] Gallery');
         return PageRouteBuilder(
             transitionDuration: const Duration(milliseconds: 0), opaque: false, pageBuilder: (_, __, ___) => GalleryPage(), settings: settings, fullscreenDialog: true);
+      case '/settings':
+        print('[Router] Settings');
+        return CupertinoPageRoute(builder: (_) => SettingsPage(), settings: settings);
+      case '/settings/info':
+        print('[Router] Settings / info');
+        return CupertinoPageRoute(builder: (_) => InfoPage(), settings: settings);
       default:
         print('[Router] Discussion');
         return CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings);

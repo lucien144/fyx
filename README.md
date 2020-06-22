@@ -1,18 +1,17 @@
 > 🇨🇿 This repository is managed in czech language although the source code along with comments is written in english.
 
----
-<p align="center">
-🔥 Looking for <strong>cool t-shirts for web developers</strong>?<br>
-Check out my <a href="https://devnull.store?utm_source=github&utm_medium=link&utm_campaign=lemp" target="_blank">Devnull Clothing</a>.
-</p>
-
----
-
 # Fyx
 
 [![Build Status](https://travis-ci.com/lucien144/fyx.svg?branch=develop)](https://travis-ci.com/lucien144/fyx) [![Coverage Status](https://coveralls.io/repos/github/lucien144/fyx/badge.svg?branch=develop)](https://coveralls.io/github/lucien144/fyx?branch=develop)
 
 Fyx je neoficiální mobilní klient pro diskuzní server [Nyx.cz](https://nyx.cz) ve [Flutteru](https://flutter.dev/). V tuto chvíli je psaný a optimalizovaný pro iOS, ale v plánu je i Android verze.
+
+---
+<p align="center">
+👍 Podpořte vývoj Fyxu na <a href="http://patreon.com/fyxapp" target="_blank">Patreonu</a>!
+</p>
+
+---
 
 ## Funkce
 - Tutoriál k autorizaci
@@ -23,9 +22,11 @@ Fyx je neoficiální mobilní klient pro diskuzní server [Nyx.cz](https://nyx.c
   - Uložení do připomínek
   - Skrytí spoilerů
   - Galerie obrázků pokud jich je v příspěvku více
-  - Experimentální layout příspěvků
+  - Kompaktní zobrazení příspěvků
   - In-app browser
+  - In-app video player
   - Psaní příspěvků (+ odesílání obrázků)
+  - Nastavení (výchozí stránka a další...)
 - Pošta
   - Odesílání
   - Přečteno / Nepřečteno
@@ -43,12 +44,18 @@ Fyx je neoficiální mobilní klient pro diskuzní server [Nyx.cz](https://nyx.c
 1. Darkmode
 
 ## Jak se zapojit
+
+### Finanční podpora
+
+Pokud chcete vývoj Fyxu, který je nabízen zdarma, finančně podpořit, pak můžete skrz [Patreon účet](http://patreon.com/fyxapp).
+
+### Vývoj
+
 Jakákoli pomoc - od každého - vítána! Nejrychleji se zapojíte přes [klub na Nyxu](https://www.nyx.cz/index.php?l=topic;id=24237;n=23dd), který se o vývojem nového klienta zabývá.
 Také si můžete projít [Issues](https://github.com/lucien144/fyx/issues) případně [Projects](https://github.com/lucien144/fyx/projects) a poslat pull request.
 
 Build produkce lze spustit zavoláním skpriput `$ ./ios/build.sh`, který zároveň zvýší build verzi o +1.
 
-### Gitflow
 Tento repozitář používá [Gitflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow). Připravujte veškerou práci ve `feature` větvích nebo forku, pak pošlete PR do `develop` větve. PR jsou mergovány pouze adminy (a jako `squash commits`).
 
 ## Hlášení chyb
@@ -60,9 +67,9 @@ Pokud jste našli chybu, pak ji nahlaste ideálně přes aplikaci. Pokud to nejd
 
   **A:** Protože je to moc práce a iOS je pro mě (Lucien) nativní prostředí. Aplikace má v sobě fragmenty přípravy pro Android (viz. [`PlatformAwareWidget`](https://github.com/lucien144/fyx/blob/develop/lib/PlatformAwareWidget.dart)), ale později jsem se rozhodl jít pro mě lehčí cestou, vydat první verzi asap a Android případně řešit s grafiky, kteří by připravili hodnotný hybridní design funkční jak na Androidu tak i na iOS.
 
-- **Q:** Kde je uživatelský profil a nastavení?
+- **Q:** Kde je uživatelský profil?
 
-  **A:** Cílem bylo vytvořit jednoduchou a malou aplikaci - proto (v tuto chvíli) není v aplikaci např. hamburger menu, uživatelský profil nebo nastavení. Předpokladem je, že toto se časem změní - záleží na uživatelské diskuzi.
+  **A:** Cílem bylo vytvořit jednoduchou a malou aplikaci - proto (v tuto chvíli) není v aplikaci např. hamburger menu nebo uživatelský profil. Předpokladem je, že toto se časem změní - záleží na uživatelské diskuzi.
 
 - **Q:** Proč je tento repozitář v češtině?
 

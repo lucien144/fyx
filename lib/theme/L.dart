@@ -20,6 +20,8 @@ class L {
   static String GENERAL_REFRESH = 'Načíst znovu...';
   static String GENERAL_CANCEL = 'Zrušit';
   static String GENERAL_WARNING = 'Pozor';
+  static String GENERAL_LOADING = 'Načítám...';
+  static String GENERAL_ERROR = 'Chyba!';
 
   // Tutorial page
   static String TUTORIAL_SUCCESS = 'Paráda 🤘';
@@ -36,4 +38,12 @@ class L {
 
   static String RATING_CONFIRMATION =
       'Tento uživatel si nepřeje, aby bylo možné jeho příspěvky hodnotit negativně anonymně. Pokud si přejete hodnotit příspěvek neanonymně, klikněte na "Hodnotit".';
+
+  // Settings page
+  static String SETTINGS = 'Nastavení';
+  static String ABOUT = 'O aplikaci';
+  static String BACKERS = 'Podpoř vývoj!';
+  static String SETTINGS_BUGREPORT = 'Nahlásit chybu';
+  static String SETTINGS_BUGREPORT_TITLE = 'Zde popiš svůj problém...';
+  static String SETTINGS_LOAD_ERROR = 'Nepodařilo se načíst data.';
 }
