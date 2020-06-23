@@ -1,7 +1,7 @@
 ---
 name: Nahlášení chyby
 about: Pokud jste našli chybu, nahlašte to zde...
-title: "[Chyba:]"
+title: ""
 labels: "user report \U0001F468‍\U0001F4BB"
 assignees: ''
 
