@@ -16,12 +16,13 @@ typedef Widget TLayout();
 class ContentBoxLayout extends StatelessWidget {
   final Widget topLeftWidget;
   final Widget topRightWidget;
+  final Widget bottomWidget;
   final Content content;
   final bool _isPreview;
   final bool _isHighlighted;
   final Map<LAYOUT_TYPES, TLayout> _layoutMap = {};
 
-  ContentBoxLayout({this.topLeftWidget, this.topRightWidget, this.content, isPreview = false, isHighlighted = false})
+  ContentBoxLayout({this.topLeftWidget, this.topRightWidget, this.bottomWidget, this.content, isPreview = false, isHighlighted = false})
       : _isPreview = isPreview,
         _isHighlighted = isHighlighted {
     // The order here is important!
@@ -141,6 +142,11 @@ class ContentBoxLayout extends StatelessWidget {
                         children: content.emptyLinks.map((link) => PostFooterLink(link)).toList(),
                       )),
                 ),
+                SizedBox(
+                  height: 8,
+                ),
+                Divider(color: Colors.black38),
+                this.bottomWidget != null ? Container(child: this.bottomWidget, padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16)) : Container(),
                 SizedBox(
                   height: 8,
                 )
