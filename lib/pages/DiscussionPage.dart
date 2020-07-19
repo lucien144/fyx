@@ -6,6 +6,7 @@ import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/components/post/PostListItem.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
@@ -138,10 +139,13 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
                   result = response.data;
                 }
               }
-              var data = (result as List).map((post) {
-                var postObject = Post.fromJson(post, pageArguments.discussionId);
-                return PostListItem(postObject, onUpdate: this.refresh, isHighlighted: postObject.id > int.parse(discussionResponse.discussion['last_visit']));
-              }).toList();
+              var data = (result as List)
+                  .map((post) {
+                    return Post.fromJson(post, pageArguments.discussionId);
+                  })
+                  .where((post) => !MainRepository().settings.isPostBlocked(post.id))
+                  .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.id > int.parse(discussionResponse.discussion['last_visit'])))
+                  .toList();
               var id = Post.fromJson((result as List).last, pageArguments.discussionId).id;
               return DataProviderResult(data, lastId: id);
             },

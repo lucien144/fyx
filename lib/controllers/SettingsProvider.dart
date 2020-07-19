@@ -2,10 +2,12 @@ import 'package:fyx/model/Settings.dart';
 import "package:hive/hive.dart";
 import "package:hive_flutter/hive_flutter.dart";
 
-class SettingsProvider<T> {
+class SettingsProvider {
   static final SettingsProvider _singleton = SettingsProvider._internal();
   Settings _settings;
   Box<dynamic> _box;
+
+  Box<dynamic> get box => _box;
 
   DefaultView get defaultView => _settings.defaultView;
   set defaultView(DefaultView view) {
@@ -17,6 +19,16 @@ class SettingsProvider<T> {
   set useCompactMode(bool mode) {
     _box.put('useCompactMode', mode);
     _settings.useCompactMode = mode;
+  }
+
+  bool isPostBlocked(int postId) => _box.get('blockedPosts', defaultValue: Settings().blockedPosts).indexOf(postId) >= 0;
+
+  void blockPost(int postId) {
+    List<int> blockedPosts = _box.get('blockedPosts', defaultValue: Settings().blockedPosts);
+    if (blockedPosts.indexOf(postId) == -1) {
+      blockedPosts.add(postId);
+    }
+    _box.put('blockedPosts', blockedPosts);
   }
 
   factory SettingsProvider() {

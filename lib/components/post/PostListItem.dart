@@ -193,6 +193,13 @@ class _PostListItemState extends State<PostListItem> {
                 Navigator.of(context).pop();
               }),
           CupertinoActionSheetAction(
+              child: Text('Skrýt příspěvek'),
+              isDestructiveAction: true,
+              onPressed: () {
+                MainRepository().settings.blockPost(postId);
+                Navigator.pop(context);
+              }),
+          CupertinoActionSheetAction(
               child: _reportIndicator ? Text('⚠️ Nahlašuji...') : Text('⚠️ Nahlásit'),
               isDestructiveAction: true,
               onPressed: () async {
