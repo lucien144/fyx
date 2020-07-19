@@ -191,7 +191,6 @@ class _PostListItemState extends State<PostListItem> {
               isDestructiveAction: true,
               onPressed: () {
                 Navigator.of(context).pop();
-                Navigator.of(context, rootNavigator: true).pushNamed('/settings');
               }),
           CupertinoActionSheetAction(
               child: _reportIndicator ? Text('⚠️ Nahlašuji...') : Text('⚠️ Nahlásit'),

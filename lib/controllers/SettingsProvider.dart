@@ -1,20 +1,21 @@
 import 'package:fyx/model/Settings.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import "package:hive/hive.dart";
+import "package:hive_flutter/hive_flutter.dart";
 
-class SettingsProvider {
+class SettingsProvider<T> {
   static final SettingsProvider _singleton = SettingsProvider._internal();
   Settings _settings;
-  SharedPreferences _prefs;
+  Box<dynamic> _box;
 
   DefaultView get defaultView => _settings.defaultView;
   set defaultView(DefaultView view) {
-    _prefs.setString('defaultView', view.toString());
+    _box.put('defaultView', view);
     _settings.defaultView = view;
   }
 
   bool get useCompactMode => _settings.useCompactMode;
   set useCompactMode(bool mode) {
-    _prefs.setBool('useCompactMode', mode);
+    _box.put('useCompactMode', mode);
     _settings.useCompactMode = mode;
   }
 
@@ -25,10 +26,12 @@ class SettingsProvider {
   SettingsProvider._internal();
 
   Future<SettingsProvider> init() async {
-    _prefs = await SharedPreferences.getInstance();
+    await Hive.initFlutter();
+    _box = await Hive.openBox('settings');
+
     _settings = new Settings();
-    _settings.defaultView = DefaultView.values.firstWhere((DefaultView view) => view.toString() == _prefs.get('defaultView'), orElse: () => Settings().defaultView);
-    _settings.useCompactMode = _prefs.get('useCompactMode') ?? Settings().useCompactMode;
+    _settings.defaultView = _box.get('defaultView', defaultValue: Settings().defaultView);
+    _settings.useCompactMode = _box.get('useCompactMode', defaultValue: Settings().useCompactMode);
 
     return _singleton;
   }
