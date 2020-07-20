@@ -12,6 +12,7 @@ import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import '../FyxApp.dart';
 
@@ -121,6 +122,23 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
           PullToRefreshList(
             rebuild: _refreshList,
             isInfinite: true,
+            sliverListBuilder: (List data) {
+              return ValueListenableBuilder(
+                valueListenable: MainRepository().settings.box.listenable(),
+                builder: (BuildContext context, value, Widget child) {
+                  var filtered = data;
+                  if (data[0] is PostListItem) {
+                    filtered = data.where((item) => !MainRepository().settings.isPostBlocked(item.post.id)).toList();
+                  }
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, i) => filtered[i],
+                      childCount: filtered.length,
+                    ),
+                  );
+                },
+              );
+            },
             dataProvider: (lastId) async {
               var result;
               if (lastId != null) {
