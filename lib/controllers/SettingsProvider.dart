@@ -23,17 +23,7 @@ class SettingsProvider {
 
   List get blockedPosts => _box.get('blockedPosts', defaultValue: Settings().blockedPosts);
 
-  bool isPostBlocked(int postId) => _box.get('blockedPosts', defaultValue: Settings().blockedPosts).indexOf(postId) >= 0;
-
-  void blockPost(int postId) {
-    List<int> blockedPosts = _box.get('blockedPosts', defaultValue: Settings().blockedPosts);
-    if (blockedPosts.indexOf(postId) == -1) {
-      blockedPosts.add(postId);
-    }
-    _box.put('blockedPosts', blockedPosts);
-  }
-
-  void resetBlockedPosts() => _box.delete('blockedPosts');
+  List get blockedUsers => _box.get('blockedUsers', defaultValue: Settings().blockedUsers);
 
   factory SettingsProvider() {
     return _singleton;
@@ -50,5 +40,30 @@ class SettingsProvider {
     _settings.useCompactMode = _box.get('useCompactMode', defaultValue: Settings().useCompactMode);
 
     return _singleton;
+  }
+
+  bool isPostBlocked(int postId) => _box.get('blockedPosts', defaultValue: Settings().blockedPosts).indexOf(postId) >= 0;
+
+  void blockPost(int postId) {
+    List<int> blockedPosts = _box.get('blockedPosts', defaultValue: Settings().blockedPosts);
+    if (blockedPosts.indexOf(postId) == -1) {
+      blockedPosts.add(postId);
+    }
+    _box.put('blockedPosts', blockedPosts);
+  }
+
+  void resetBlockedContent() {
+    _box.delete('blockedPosts');
+    _box.delete('blockedUsers');
+  }
+
+  void isUserBlocked(String user) => _box.get('blockedUsers', defaultValue: Settings().blockedUsers).indexOf(user) >= 0;
+
+  void blockUser(String user) {
+    List<String> blockedUsers = _box.get('blockedUsers', defaultValue: Settings().blockedUsers);
+    if (blockedUsers.indexOf(user) == -1) {
+      blockedUsers.add(user);
+    }
+    _box.put('blockedUsers', blockedPosts);
   }
 }

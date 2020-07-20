@@ -96,6 +96,14 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           CSHeader('Soukromí'),
           CSControl(
+            nameWidget: Text('Blokovaných uživatelů'),
+            contentWidget: ValueListenableBuilder(
+                valueListenable: MainRepository().settings.box.listenable(keys: ['blockedUsers']),
+                builder: (BuildContext context, value, Widget child) {
+                  return Text(MainRepository().settings.blockedUsers.length.toString());
+                }),
+          ),
+          CSControl(
             nameWidget: Text('Skrytých přísěvků'),
             contentWidget: ValueListenableBuilder(
                 valueListenable: MainRepository().settings.box.listenable(keys: ['blockedPosts']),
@@ -103,7 +111,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   return Text(MainRepository().settings.blockedPosts.length.toString());
                 }),
           ),
-          CSButton(CSButtonType.DESTRUCTIVE, 'Reset', () => MainRepository().settings.resetBlockedPosts()),
+          CSButton(CSButtonType.DESTRUCTIVE, 'Reset', () => MainRepository().settings.resetBlockedContent()),
           const CSHeader(''),
           CSButton(CSButtonType.DESTRUCTIVE, L.GENERAL_LOGOUT, () {
             ApiController().logout();

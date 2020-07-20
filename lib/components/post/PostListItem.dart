@@ -190,6 +190,7 @@ class _PostListItemState extends State<PostListItem> {
               child: Text('Blokovat uživatele'),
               isDestructiveAction: true,
               onPressed: () {
+                MainRepository().settings.blockUser(user);
                 Navigator.of(context).pop();
               }),
           CupertinoActionSheetAction(
