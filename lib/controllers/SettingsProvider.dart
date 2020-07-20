@@ -21,6 +21,8 @@ class SettingsProvider {
     _settings.useCompactMode = mode;
   }
 
+  List get blockedPosts => _box.get('blockedPosts', defaultValue: Settings().blockedPosts);
+
   bool isPostBlocked(int postId) => _box.get('blockedPosts', defaultValue: Settings().blockedPosts).indexOf(postId) >= 0;
 
   void blockPost(int postId) {
@@ -30,6 +32,8 @@ class SettingsProvider {
     }
     _box.put('blockedPosts', blockedPosts);
   }
+
+  void resetBlockedPosts() => _box.delete('blockedPosts');
 
   factory SettingsProvider() {
     return _singleton;

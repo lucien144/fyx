@@ -9,6 +9,7 @@ import 'package:fyx/model/Settings.dart';
 import 'package:fyx/pages/InfoPage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -93,6 +94,16 @@ class _SettingsPageState extends State<SettingsPage> {
             () => PlatformTheme.prefillGithubIssue(L.SETTINGS_BUGREPORT_TITLE),
             style: bugreportStyle,
           ),
+          CSHeader('Soukromí'),
+          CSControl(
+            nameWidget: Text('Skrytých přísěvků'),
+            contentWidget: ValueListenableBuilder(
+                valueListenable: MainRepository().settings.box.listenable(keys: ['blockedPosts']),
+                builder: (BuildContext context, value, Widget child) {
+                  return Text(MainRepository().settings.blockedPosts.length.toString());
+                }),
+          ),
+          CSButton(CSButtonType.DESTRUCTIVE, 'Reset', () => MainRepository().settings.resetBlockedPosts()),
           const CSHeader(''),
           CSButton(CSButtonType.DESTRUCTIVE, L.GENERAL_LOGOUT, () {
             ApiController().logout();

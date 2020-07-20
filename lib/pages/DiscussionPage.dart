@@ -124,7 +124,7 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
             isInfinite: true,
             sliverListBuilder: (List data) {
               return ValueListenableBuilder(
-                valueListenable: MainRepository().settings.box.listenable(),
+                valueListenable: MainRepository().settings.box.listenable(keys: ['blockedPosts']),
                 builder: (BuildContext context, value, Widget child) {
                   var filtered = data;
                   if (data[0] is PostListItem) {
