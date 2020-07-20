@@ -13,4 +13,5 @@ Díky.
 *Mimochodem - Fyx má ke dni 18. 6. 2020 cca 4218 řádků kódu, resp. 141 746 znaků. To jsem pro vás napsal. Jen tak za pár plusíků.* 
 
 ## Podporovatelé
-Zde také časem najdete seznam podporovatelů rozdělených do kategorií podle výše podpory.
+- ID CROSS ($3)
+- ID MADBANANA ($3)
