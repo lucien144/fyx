@@ -23,7 +23,7 @@ class PullToRefreshList extends StatefulWidget {
   bool _isInfinite;
   int _rebuild;
 
-  PullToRefreshList({@required this.dataProvider, isInfinite = false, int rebuild = 0, Function this.sliverListBuilder})
+  PullToRefreshList({@required this.dataProvider, isInfinite = false, int rebuild = 0, this.sliverListBuilder})
       : _isInfinite = isInfinite,
         _rebuild = rebuild,
         assert(dataProvider != null);

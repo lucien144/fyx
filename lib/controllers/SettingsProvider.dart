@@ -57,13 +57,13 @@ class SettingsProvider {
     _box.delete('blockedUsers');
   }
 
-  void isUserBlocked(String user) => _box.get('blockedUsers', defaultValue: Settings().blockedUsers).indexOf(user) >= 0;
+  bool isUserBlocked(String user) => _box.get('blockedUsers', defaultValue: Settings().blockedUsers).indexOf(user) >= 0;
 
   void blockUser(String user) {
     List<String> blockedUsers = _box.get('blockedUsers', defaultValue: Settings().blockedUsers);
     if (blockedUsers.indexOf(user) == -1) {
       blockedUsers.add(user);
     }
-    _box.put('blockedUsers', blockedPosts);
+    _box.put('blockedUsers', blockedUsers);
   }
 }
