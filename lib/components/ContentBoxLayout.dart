@@ -106,6 +106,7 @@ class ContentBoxLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      decoration: _isPreview ? T.CARD_SHADOW_DECORATION : null,
       child: Column(
         children: <Widget>[
           Visibility(
@@ -127,7 +128,7 @@ class ContentBoxLayout extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[topLeftWidget ?? Container(), SizedBox(), topRightWidget ?? Container()],
+                    children: <Widget>[topLeftWidget ?? Container(), SizedBox(), _isPreview ? Container() : (topRightWidget ?? Container())],
                   ),
                 ),
                 Container(
@@ -145,7 +146,7 @@ class ContentBoxLayout extends StatelessWidget {
                 SizedBox(
                   height: 8,
                 ),
-                Divider(color: Colors.black38),
+                this.bottomWidget != null ? Divider(color: Colors.black38) : Container(),
                 this.bottomWidget != null ? Container(child: this.bottomWidget, padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16)) : Container(),
                 SizedBox(
                   height: 8,
