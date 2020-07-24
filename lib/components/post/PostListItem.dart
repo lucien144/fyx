@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/ContentBoxLayout.dart';
+import 'package:fyx/components/actionSheets/PostActionSheet.dart';
 import 'package:fyx/components/post/PostAvatar.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
@@ -27,7 +28,6 @@ class PostListItem extends StatefulWidget {
 
 class _PostListItemState extends State<PostListItem> {
   Post _post;
-  bool _reportIndicator = false;
 
   @override
   void initState() {
@@ -47,7 +47,10 @@ class _PostListItemState extends State<PostListItem> {
       ),
       topRightWidget: GestureDetector(
           child: Icon(Icons.more_vert, color: Colors.black38),
-          onTap: () => showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet(context, _post.nick, _post.id))),
+          onTap: () => showCupertinoModalPopup(
+              context: context,
+              builder: (BuildContext context) =>
+                  PostActionSheet(parentContext: context, user: _post.nick, postId: _post.id, flagPostCallback: (postId) => MainRepository().settings.blockPost(postId)))),
       bottomWidget: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
@@ -181,48 +184,6 @@ class _PostListItemState extends State<PostListItem> {
       ),
       content: _post.content,
     );
-  }
-
-  Widget actionSheet(BuildContext context, String user, int postId) {
-    return CupertinoActionSheet(
-        actions: <Widget>[
-          CupertinoActionSheetAction(
-              child: Text('Blokovat uživatele'),
-              isDestructiveAction: true,
-              onPressed: () {
-                MainRepository().settings.blockUser(user);
-                Navigator.of(context).pop();
-              }),
-          CupertinoActionSheetAction(
-              child: Text('Skrýt příspěvek'),
-              isDestructiveAction: true,
-              onPressed: () {
-                MainRepository().settings.blockPost(postId);
-                Navigator.pop(context);
-              }),
-          CupertinoActionSheetAction(
-              child: _reportIndicator ? Text('⚠️ Nahlašuji...') : Text('⚠️ Nahlásit'),
-              isDestructiveAction: true,
-              onPressed: () async {
-                try {
-                  setState(() => _reportIndicator = true);
-                  await ApiController().sendMail('FYXBOT', 'Inappropriate post reportr: ID $postId by user @$user.');
-                  PlatformTheme.success('Příspěvek byl nahlášen. Děkujeme, budeme se tomu věnovat.');
-                } catch (error) {
-                  PlatformTheme.error('Příspěvek se nepodařilo nahlásit, zkuste to znovu.');
-                } finally {
-                  setState(() => _reportIndicator = false);
-                  Navigator.pop(context);
-                }
-              }),
-        ],
-        cancelButton: CupertinoActionSheetAction(
-          isDefaultAction: true,
-          child: Text(L.GENERAL_CANCEL),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ));
   }
 
   @override

@@ -21,6 +21,8 @@ class SettingsProvider {
     _settings.useCompactMode = mode;
   }
 
+  List get blockedMails => _box.get('blockedMails', defaultValue: Settings().blockedMails);
+
   List get blockedPosts => _box.get('blockedPosts', defaultValue: Settings().blockedPosts);
 
   List get blockedUsers => _box.get('blockedUsers', defaultValue: Settings().blockedUsers);
@@ -44,6 +46,8 @@ class SettingsProvider {
 
   bool isPostBlocked(int postId) => _box.get('blockedPosts', defaultValue: Settings().blockedPosts).indexOf(postId) >= 0;
 
+  bool isMailBlocked(int mailId) => _box.get('blockedMails', defaultValue: Settings().blockedMails).indexOf(mailId) >= 0;
+
   void blockPost(int postId) {
     List<int> blockedPosts = _box.get('blockedPosts', defaultValue: Settings().blockedPosts);
     if (blockedPosts.indexOf(postId) == -1) {
@@ -52,8 +56,17 @@ class SettingsProvider {
     _box.put('blockedPosts', blockedPosts);
   }
 
+  void blockMail(int mailId) {
+    List<int> blockedMails = _box.get('blockedMails', defaultValue: Settings().blockedMails);
+    if (blockedMails.indexOf(mailId) == -1) {
+      blockedMails.add(mailId);
+    }
+    _box.put('blockedMails', blockedMails);
+  }
+
   void resetBlockedContent() {
     _box.delete('blockedPosts');
+    _box.delete('blockedMails');
     _box.delete('blockedUsers');
   }
 

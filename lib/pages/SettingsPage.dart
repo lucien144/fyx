@@ -111,6 +111,14 @@ class _SettingsPageState extends State<SettingsPage> {
                   return Text(MainRepository().settings.blockedPosts.length.toString());
                 }),
           ),
+          CSControl(
+            nameWidget: Text('Skrytých mailů'),
+            contentWidget: ValueListenableBuilder(
+                valueListenable: MainRepository().settings.box.listenable(keys: ['blockedMails']),
+                builder: (BuildContext context, value, Widget child) {
+                  return Text(MainRepository().settings.blockedMails.length.toString());
+                }),
+          ),
           CSButton(CSButtonType.DESTRUCTIVE, 'Reset', () => MainRepository().settings.resetBlockedContent()),
           const CSHeader(''),
           CSButton(CSButtonType.DESTRUCTIVE, L.GENERAL_LOGOUT, () {

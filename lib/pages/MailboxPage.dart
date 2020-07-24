@@ -4,11 +4,14 @@ import 'package:fyx/components/MailListItem.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Mail.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class MailboxPage extends StatefulWidget {
   final int refreshData;
+
   MailboxPage({this.refreshData});
 
   @override
@@ -42,12 +45,34 @@ class _MailboxPageState extends State<MailboxPage> {
       PullToRefreshList(
           rebuild: _refreshData,
           isInfinite: true,
+          sliverListBuilder: (List data) {
+            return ValueListenableBuilder(
+              valueListenable: MainRepository().settings.box.listenable(keys: ['blockedMails', 'blockedUsers']),
+              builder: (BuildContext context, value, Widget child) {
+                var filtered = data;
+                if (data[0] is MailListItem) {
+                  filtered = data
+                      .where((item) => !MainRepository().settings.isMailBlocked((item as MailListItem).mail.id))
+                      .where((item) => !MainRepository().settings.isUserBlocked((item as MailListItem).mail.participant))
+                      .toList();
+                }
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, i) => filtered[i],
+                    childCount: filtered.length,
+                  ),
+                );
+              },
+            );
+          },
           dataProvider: (lastId) async {
             var result = await ApiController().loadMail(lastId: lastId);
-            var mails = result.data.map((_mail) {
-              var mail = Mail.fromJson(_mail);
-              return MailListItem(mail);
-            }).toList();
+            var mails = result.data
+                .map((_mail) => Mail.fromJson(_mail))
+                .where((mail) => !MainRepository().settings.isMailBlocked(mail.id))
+                .where((mail) => !MainRepository().settings.isUserBlocked(mail.participant))
+                .map((mail) => MailListItem(mail))
+                .toList();
             var id = Mail.fromJson(result.data.last).id;
             return DataProviderResult(mails, lastId: id);
           }),
