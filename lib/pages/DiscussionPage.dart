@@ -6,11 +6,13 @@ import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/components/post/PostListItem.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import '../FyxApp.dart';
 
@@ -120,6 +122,26 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
           PullToRefreshList(
             rebuild: _refreshList,
             isInfinite: true,
+            sliverListBuilder: (List data) {
+              return ValueListenableBuilder(
+                valueListenable: MainRepository().settings.box.listenable(keys: ['blockedPosts', 'blockedUsers']),
+                builder: (BuildContext context, value, Widget child) {
+                  var filtered = data;
+                  if (data[0] is PostListItem) {
+                    filtered = data
+                        .where((item) => !MainRepository().settings.isPostBlocked((item as PostListItem).post.id))
+                        .where((item) => !MainRepository().settings.isUserBlocked((item as PostListItem).post.nick))
+                        .toList();
+                  }
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, i) => filtered[i],
+                      childCount: filtered.length,
+                    ),
+                  );
+                },
+              );
+            },
             dataProvider: (lastId) async {
               var result;
               if (lastId != null) {
@@ -138,10 +160,14 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
                   result = response.data;
                 }
               }
-              var data = (result as List).map((post) {
-                var postObject = Post.fromJson(post, pageArguments.discussionId);
-                return PostListItem(postObject, onUpdate: this.refresh, isHighlighted: postObject.id > int.parse(discussionResponse.discussion['last_visit']));
-              }).toList();
+              var data = (result as List)
+                  .map((post) {
+                    return Post.fromJson(post, pageArguments.discussionId);
+                  })
+                  .where((post) => !MainRepository().settings.isPostBlocked(post.id))
+                  .where((post) => !MainRepository().settings.isUserBlocked(post.nick))
+                  .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.id > int.parse(discussionResponse.discussion['last_visit'])))
+                  .toList();
               var id = Post.fromJson((result as List).last, pageArguments.discussionId).id;
               return DataProviderResult(data, lastId: id);
             },

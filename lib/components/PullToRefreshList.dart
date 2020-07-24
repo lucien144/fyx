@@ -19,10 +19,11 @@ typedef Future<DataProviderResult> TDataProvider(int id);
 // ignore: must_be_immutable
 class PullToRefreshList extends StatefulWidget {
   final TDataProvider dataProvider;
+  Function sliverListBuilder;
   bool _isInfinite;
   int _rebuild;
 
-  PullToRefreshList({@required this.dataProvider, isInfinite = false, int rebuild = 0})
+  PullToRefreshList({@required this.dataProvider, isInfinite = false, int rebuild = 0, this.sliverListBuilder})
       : _isInfinite = isInfinite,
         _rebuild = rebuild,
         assert(dataProvider != null);
@@ -120,14 +121,18 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
 
   List<Widget> buildTheList(List _data) {
     if (_data.first is Widget) {
-      return [
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, i) => _data[i],
-            childCount: _data.length,
-          ),
-        )
-      ];
+      if (widget.sliverListBuilder is Function) {
+        return [widget.sliverListBuilder(_data)];
+      } else {
+        return [
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, i) => _data[i],
+              childCount: _data.length,
+            ),
+          )
+        ];
+      }
     }
 
     if (_data.first is Map && (_data.first as Map).containsKey('header')) {

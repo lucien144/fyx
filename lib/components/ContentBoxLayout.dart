@@ -16,12 +16,13 @@ typedef Widget TLayout();
 class ContentBoxLayout extends StatelessWidget {
   final Widget topLeftWidget;
   final Widget topRightWidget;
+  final Widget bottomWidget;
   final Content content;
   final bool _isPreview;
   final bool _isHighlighted;
   final Map<LAYOUT_TYPES, TLayout> _layoutMap = {};
 
-  ContentBoxLayout({this.topLeftWidget, this.topRightWidget, this.content, isPreview = false, isHighlighted = false})
+  ContentBoxLayout({this.topLeftWidget, this.topRightWidget, this.bottomWidget, this.content, isPreview = false, isHighlighted = false})
       : _isPreview = isPreview,
         _isHighlighted = isHighlighted {
     // The order here is important!
@@ -105,6 +106,7 @@ class ContentBoxLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      decoration: _isPreview ? T.CARD_SHADOW_DECORATION : null,
       child: Column(
         children: <Widget>[
           Visibility(
@@ -126,7 +128,7 @@ class ContentBoxLayout extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[topLeftWidget ?? Container(), SizedBox(), topRightWidget ?? Container()],
+                    children: <Widget>[topLeftWidget ?? Container(), SizedBox(), _isPreview ? Container() : (topRightWidget ?? Container())],
                   ),
                 ),
                 Container(
@@ -141,6 +143,11 @@ class ContentBoxLayout extends StatelessWidget {
                         children: content.emptyLinks.map((link) => PostFooterLink(link)).toList(),
                       )),
                 ),
+                SizedBox(
+                  height: 8,
+                ),
+                this.bottomWidget != null ? Divider(color: Colors.black38) : Container(),
+                this.bottomWidget != null ? Container(child: this.bottomWidget, padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16)) : Container(),
                 SizedBox(
                   height: 8,
                 )

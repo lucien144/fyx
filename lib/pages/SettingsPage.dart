@@ -9,6 +9,7 @@ import 'package:fyx/model/Settings.dart';
 import 'package:fyx/pages/InfoPage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -31,6 +32,7 @@ class _SettingsPageState extends State<SettingsPage> {
     CSWidgetStyle bugreportStyle = const CSWidgetStyle(icon: const Icon(Icons.bug_report, color: Colors.black54));
     CSWidgetStyle aboutStyle = const CSWidgetStyle(icon: const Icon(Icons.info, color: Colors.black54));
     CSWidgetStyle patronsStyle = const CSWidgetStyle(icon: const Icon(Icons.stars, color: Colors.black54));
+    CSWidgetStyle termsStyle = const CSWidgetStyle(icon: const Icon(Icons.account_balance, color: Colors.black54));
 
     var pkg = MainRepository().packageInfo;
     var version = '${pkg.version} (${pkg.buildNumber})';
@@ -73,7 +75,33 @@ class _SettingsPageState extends State<SettingsPage> {
             },
             currentSelection: MainRepository().settings.defaultView,
           ),
-          const CSHeader(''),
+          CSHeader('Paměť'),
+          CSControl(
+            nameWidget: Text('Blokovaných uživatelů'),
+            contentWidget: ValueListenableBuilder(
+                valueListenable: MainRepository().settings.box.listenable(keys: ['blockedUsers']),
+                builder: (BuildContext context, value, Widget child) {
+                  return Text(MainRepository().settings.blockedUsers.length.toString());
+                }),
+          ),
+          CSControl(
+            nameWidget: Text('Skrytých přísěvků'),
+            contentWidget: ValueListenableBuilder(
+                valueListenable: MainRepository().settings.box.listenable(keys: ['blockedPosts']),
+                builder: (BuildContext context, value, Widget child) {
+                  return Text(MainRepository().settings.blockedPosts.length.toString());
+                }),
+          ),
+          CSControl(
+            nameWidget: Text('Skrytých mailů'),
+            contentWidget: ValueListenableBuilder(
+                valueListenable: MainRepository().settings.box.listenable(keys: ['blockedMails']),
+                builder: (BuildContext context, value, Widget child) {
+                  return Text(MainRepository().settings.blockedMails.length.toString());
+                }),
+          ),
+          CSButton(CSButtonType.DESTRUCTIVE, 'Reset', () => MainRepository().settings.resetBlockedContent()),
+          const CSHeader('Informace'),
           CSButton(
             CSButtonType.DEFAULT,
             L.BACKERS,
@@ -92,6 +120,12 @@ class _SettingsPageState extends State<SettingsPage> {
             L.SETTINGS_BUGREPORT,
             () => PlatformTheme.prefillGithubIssue(L.SETTINGS_BUGREPORT_TITLE),
             style: bugreportStyle,
+          ),
+          CSButton(
+            CSButtonType.DEFAULT,
+            L.TERMS,
+            () => PlatformTheme.openLink('https://www.nyx.cz/index.php?l=terms;lang=cs'),
+            style: termsStyle,
           ),
           const CSHeader(''),
           CSButton(CSButtonType.DESTRUCTIVE, L.GENERAL_LOGOUT, () {
