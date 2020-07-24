@@ -43,6 +43,7 @@ class L {
   static String SETTINGS = 'Nastavení';
   static String ABOUT = 'O aplikaci';
   static String BACKERS = 'Podpoř vývoj!';
+  static String TERMS = 'Podmínky používání nyx.cz';
   static String SETTINGS_BUGREPORT = 'Nahlásit chybu';
   static String SETTINGS_BUGREPORT_TITLE = 'Zde popiš svůj problém...';
   static String SETTINGS_LOAD_ERROR = 'Nepodařilo se načíst data.';

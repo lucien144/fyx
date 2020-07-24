@@ -32,6 +32,7 @@ class _SettingsPageState extends State<SettingsPage> {
     CSWidgetStyle bugreportStyle = const CSWidgetStyle(icon: const Icon(Icons.bug_report, color: Colors.black54));
     CSWidgetStyle aboutStyle = const CSWidgetStyle(icon: const Icon(Icons.info, color: Colors.black54));
     CSWidgetStyle patronsStyle = const CSWidgetStyle(icon: const Icon(Icons.stars, color: Colors.black54));
+    CSWidgetStyle termsStyle = const CSWidgetStyle(icon: const Icon(Icons.account_balance, color: Colors.black54));
 
     var pkg = MainRepository().packageInfo;
     var version = '${pkg.version} (${pkg.buildNumber})';
@@ -74,27 +75,7 @@ class _SettingsPageState extends State<SettingsPage> {
             },
             currentSelection: MainRepository().settings.defaultView,
           ),
-          const CSHeader(''),
-          CSButton(
-            CSButtonType.DEFAULT,
-            L.BACKERS,
-            () => Navigator.of(context)
-                .pushNamed('/settings/info', arguments: InfoPageSettings(L.BACKERS, 'https://raw.githubusercontent.com/lucien144/fyx/feature/settings/BACKERS.md')),
-            style: patronsStyle,
-          ),
-          CSButton(
-              CSButtonType.DEFAULT,
-              L.ABOUT,
-              () => Navigator.of(context)
-                  .pushNamed('/settings/info', arguments: InfoPageSettings(L.ABOUT, 'https://raw.githubusercontent.com/lucien144/fyx/feature/settings/ABOUT.md')),
-              style: aboutStyle),
-          CSButton(
-            CSButtonType.DEFAULT,
-            L.SETTINGS_BUGREPORT,
-            () => PlatformTheme.prefillGithubIssue(L.SETTINGS_BUGREPORT_TITLE),
-            style: bugreportStyle,
-          ),
-          CSHeader('Soukromí'),
+          CSHeader('Paměť'),
           CSControl(
             nameWidget: Text('Blokovaných uživatelů'),
             contentWidget: ValueListenableBuilder(
@@ -120,6 +101,32 @@ class _SettingsPageState extends State<SettingsPage> {
                 }),
           ),
           CSButton(CSButtonType.DESTRUCTIVE, 'Reset', () => MainRepository().settings.resetBlockedContent()),
+          const CSHeader('Informace'),
+          CSButton(
+            CSButtonType.DEFAULT,
+            L.BACKERS,
+            () => Navigator.of(context)
+                .pushNamed('/settings/info', arguments: InfoPageSettings(L.BACKERS, 'https://raw.githubusercontent.com/lucien144/fyx/feature/settings/BACKERS.md')),
+            style: patronsStyle,
+          ),
+          CSButton(
+              CSButtonType.DEFAULT,
+              L.ABOUT,
+              () => Navigator.of(context)
+                  .pushNamed('/settings/info', arguments: InfoPageSettings(L.ABOUT, 'https://raw.githubusercontent.com/lucien144/fyx/feature/settings/ABOUT.md')),
+              style: aboutStyle),
+          CSButton(
+            CSButtonType.DEFAULT,
+            L.SETTINGS_BUGREPORT,
+            () => PlatformTheme.prefillGithubIssue(L.SETTINGS_BUGREPORT_TITLE),
+            style: bugreportStyle,
+          ),
+          CSButton(
+            CSButtonType.DEFAULT,
+            L.TERMS,
+            () => PlatformTheme.openLink('https://www.nyx.cz/index.php?l=terms;lang=cs'),
+            style: termsStyle,
+          ),
           const CSHeader(''),
           CSButton(CSButtonType.DESTRUCTIVE, L.GENERAL_LOGOUT, () {
             ApiController().logout();
