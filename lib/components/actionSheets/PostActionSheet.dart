@@ -24,13 +24,16 @@ class _PostActionSheetState extends State<PostActionSheet> {
   Widget build(BuildContext context) {
     return CupertinoActionSheet(
         actions: <Widget>[
-          CupertinoActionSheetAction(
-              child: Text('Blokovat uživatele ${widget.user}'),
-              isDestructiveAction: true,
-              onPressed: () {
-                MainRepository().settings.blockUser(widget.user);
-                Navigator.of(context).pop();
-              }),
+          Visibility(
+            visible: widget.user != MainRepository().credentials.nickname,
+            child: CupertinoActionSheetAction(
+                child: Text('Blokovat uživatele ${widget.user}'),
+                isDestructiveAction: true,
+                onPressed: () {
+                  MainRepository().settings.blockUser(widget.user);
+                  Navigator.of(context).pop();
+                }),
+          ),
           CupertinoActionSheetAction(
               child: Text('Skrýt příspěvek'),
               isDestructiveAction: true,
