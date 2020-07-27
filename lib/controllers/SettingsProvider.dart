@@ -1,4 +1,5 @@
 import 'package:fyx/model/Settings.dart';
+import 'package:fyx/model/enums/DefaultView.dart';
 import "package:hive/hive.dart";
 import "package:hive_flutter/hive_flutter.dart";
 
@@ -35,6 +36,7 @@ class SettingsProvider {
 
   Future<SettingsProvider> init() async {
     await Hive.initFlutter();
+    Hive.registerAdapter(DefaultViewAdapter());
     _box = await Hive.openBox('settings');
 
     _settings = new Settings();

@@ -5,7 +5,7 @@ import 'package:fyx/FyxApp.dart';
 import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
-import 'package:fyx/model/Settings.dart';
+import 'package:fyx/model/enums/DefaultView.dart';
 import 'package:fyx/pages/InfoPage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';

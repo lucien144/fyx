@@ -11,7 +11,7 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Category.dart';
 import 'package:fyx/model/Discussion.dart';
 import 'package:fyx/model/MainRepository.dart';
-import 'package:fyx/model/Settings.dart';
+import 'package:fyx/model/enums/DefaultView.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/pages/MailboxPage.dart';
 import 'package:fyx/theme/L.dart';

@@ -1,4 +1,4 @@
-enum DefaultView { history, historyUnread, bookmarks, bookmarksUnread }
+import 'package:fyx/model/enums/DefaultView.dart';
 
 class Settings {
   bool useCompactMode = false;
