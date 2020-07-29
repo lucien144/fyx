@@ -22,6 +22,7 @@ class L {
   static String GENERAL_WARNING = 'Pozor';
   static String GENERAL_LOADING = 'Načítám...';
   static String GENERAL_ERROR = 'Chyba!';
+  static String GENERAL_EMPTY = 'Wow. Such empty.';
 
   // Tutorial page
   static String TUTORIAL_SUCCESS = 'Paráda 🤘';

@@ -168,7 +168,11 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
                   .where((post) => !MainRepository().settings.isUserBlocked(post.nick))
                   .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.id > discussionResponse.discussion.lastVisit))
                   .toList();
-              var id = Post.fromJson((result as List).last, pageArguments.discussionId).id;
+
+              int id;
+              try {
+                id = Post.fromJson((result as List).last, pageArguments.discussionId).id;
+              } catch (error) {}
               return DataProviderResult(data, lastId: id);
             },
           ),
