@@ -115,7 +115,7 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
             Navigator.of(context).pop();
           },
         ),
-        middle: Text(discussionResponse.discussion['name'], overflow: TextOverflow.ellipsis),
+        middle: Text(discussionResponse.discussion.name, overflow: TextOverflow.ellipsis),
       ),
       child: Stack(
         children: [
@@ -166,7 +166,7 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
                   })
                   .where((post) => !MainRepository().settings.isPostBlocked(post.id))
                   .where((post) => !MainRepository().settings.isUserBlocked(post.nick))
-                  .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.id > int.parse(discussionResponse.discussion['last_visit'])))
+                  .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.id > discussionResponse.discussion.lastVisit))
                   .toList();
               var id = Post.fromJson((result as List).last, pageArguments.discussionId).id;
               return DataProviderResult(data, lastId: id);
