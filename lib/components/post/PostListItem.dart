@@ -49,8 +49,12 @@ class _PostListItemState extends State<PostListItem> {
           child: Icon(Icons.more_vert, color: Colors.black38),
           onTap: () => showCupertinoModalPopup(
               context: context,
-              builder: (BuildContext context) =>
-                  PostActionSheet(parentContext: context, user: _post.nick, postId: _post.id, flagPostCallback: (postId) => MainRepository().settings.blockPost(postId)))),
+              builder: (BuildContext context) => PostActionSheet(
+                  parentContext: context,
+                  user: _post.nick,
+                  postId: _post.id,
+                  shareData: ShareData(subject: '@${_post.nick}', body: _post.content.strippedContent, link: _post.link),
+                  flagPostCallback: (postId) => MainRepository().settings.blockPost(postId)))),
       bottomWidget: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
