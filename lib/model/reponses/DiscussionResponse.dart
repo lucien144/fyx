@@ -1,10 +1,11 @@
 import 'package:fyx/model/Discussion.dart';
+import 'package:fyx/model/System.dart';
 
 class DiscussionResponse {
   List _attributes;
   List _data;
   Discussion _discussion;
-  Map<String, dynamic> _system;
+  System _system;
 
   DiscussionResponse.fromJson(Map<String, dynamic> json) {
     this._attributes = json['attributes'];
@@ -18,16 +19,10 @@ class DiscussionResponse {
 //    }
 //    },
     this._discussion = Discussion.fromJson(json['discussion']);
-
-    // TODO: Populate the system with schema:
-//    "system": {
-//    "max_file_size": "10485760",
-//    "premium": ""
-//    }
-    this._system = json['system'];
+    this._system = System.fromJson(json['system']);
   }
 
-  Map<String, dynamic> get system => _system;
+  System get system => _system;
 
   Discussion get discussion => _discussion;
 

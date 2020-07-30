@@ -1,5 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'package:fyx/model/DiscussionRights.dart';
+
 class Discussion {
   int _id_klub;
   int _id_cat;
@@ -18,8 +20,10 @@ class Discussion {
   bool _has_header;
   int _id_domain;
   int _id_location;
+  DiscussionRights _rights;
 
   bool accessDenied = false;
+
   Discussion.fromJson(Map<String, dynamic> json) {
     if (json == null) {
       this.accessDenied = true;
@@ -47,6 +51,8 @@ class Discussion {
     String lastVisit = json['last_visit'] ?? '0';
     lastVisit = lastVisit == '' ? '0' : lastVisit;
     this._last_visit = int.parse(lastVisit);
+
+    this._rights = DiscussionRights.fromJson(json['rights'] ?? null);
   }
 
   int get links => _links;
@@ -58,8 +64,11 @@ class Discussion {
   int get unread => _unread;
 
   String get jmeno => _name;
+
   String get name => _name;
+
   String get nameMain => _name_main;
+
   String get nameSubtitle => _name_sub;
 
   int get idKlub => _id_klub;
@@ -79,4 +88,6 @@ class Discussion {
   int get domainId => _id_domain;
 
   int get locationId => _id_location;
+
+  DiscussionRights get rights => _rights;
 }
