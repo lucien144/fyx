@@ -95,6 +95,9 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
         future: _fetchData(pageArguments.discussionId, pageArguments.postId),
         builder: (BuildContext context, AsyncSnapshot<DiscussionResponse> snapshot) {
           if (snapshot.hasData) {
+            if (snapshot.data.discussion.accessDenied) {
+              return PlatformTheme.feedbackScreen(title: L.ACCESS_DENIED_ERROR, icon: Icons.do_not_disturb_alt, label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
+            }
             return this._createDiscussionPage(snapshot.data, pageArguments);
           } else if (snapshot.hasError) {
             return PlatformTheme.feedbackScreen(isWarning: true, title: snapshot.error.toString(), label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
@@ -115,7 +118,7 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
             Navigator.of(context).pop();
           },
         ),
-        middle: Text(discussionResponse.discussion['name'], overflow: TextOverflow.ellipsis),
+        middle: Text(discussionResponse.discussion.name, overflow: TextOverflow.ellipsis),
       ),
       child: Stack(
         children: [
@@ -166,9 +169,13 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
                   })
                   .where((post) => !MainRepository().settings.isPostBlocked(post.id))
                   .where((post) => !MainRepository().settings.isUserBlocked(post.nick))
-                  .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.id > int.parse(discussionResponse.discussion['last_visit'])))
+                  .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.id > discussionResponse.discussion.lastVisit))
                   .toList();
-              var id = Post.fromJson((result as List).last, pageArguments.discussionId).id;
+
+              int id;
+              try {
+                id = Post.fromJson((result as List).last, pageArguments.discussionId).id;
+              } catch (error) {}
               return DataProviderResult(data, lastId: id);
             },
           ),

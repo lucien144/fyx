@@ -79,7 +79,7 @@ class PlatformTheme {
     );
   }
 
-  static Widget feedbackScreen({bool isLoading = false, bool isWarning = false, String label = '', String title = '', Function onPress}) {
+  static Widget feedbackScreen({bool isLoading = false, bool isWarning = false, String label = '', String title = '', Function onPress, IconData icon = Icons.warning}) {
     return Container(
       width: double.infinity,
       color: Colors.white,
@@ -93,10 +93,10 @@ class PlatformTheme {
             ),
           ),
           Visibility(
-            visible: !isLoading && isWarning,
+            visible: (!isLoading && isWarning) || icon != Icons.warning,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Icon(Icons.warning),
+              child: Icon(icon),
             ),
           ),
           Visibility(

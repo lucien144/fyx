@@ -90,33 +90,53 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
       this.loadData();
     }
 
-    return _hasError || _slivers.length == 1
-        ? PlatformTheme.feedbackScreen(isLoading: _isLoading, onPress: loadData, label: L.GENERAL_REFRESH)
-        : CupertinoScrollbar(
-            child: Stack(
-              children: [
-                CustomScrollView(
-                  slivers: _slivers,
-                  controller: _controller,
-                ),
-                Visibility(
-                  visible: _isLoading && !_hasPulledDown, // Show only when not pulling down the list
-                  child: Positioned(
-                    top: 0,
-                    left: 0,
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: 1,
-                      child: LinearProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        backgroundColor: T.COLOR_PRIMARY,
-                      ),
-                    ),
-                  ),
-                )
-              ],
+    if (_hasError) {
+      return PlatformTheme.feedbackScreen(isLoading: _isLoading, onPress: loadData, label: L.GENERAL_REFRESH);
+    }
+
+    if (_slivers.length == 1 && !_isLoading) {
+      return Container(
+        height: double.infinity,
+        width: double.infinity,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            SizedBox(),
+            Text(
+              L.GENERAL_EMPTY,
+              textAlign: TextAlign.center,
             ),
-          );
+            Image.asset('travolta.gif')
+          ],
+        ),
+      );
+    }
+
+    return CupertinoScrollbar(
+      child: Stack(
+        children: [
+          CustomScrollView(
+            slivers: _slivers,
+            controller: _controller,
+          ),
+          Visibility(
+            visible: _isLoading && !_hasPulledDown, // Show only when not pulling down the list
+            child: Positioned(
+              top: 0,
+              left: 0,
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: 1,
+                child: LinearProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  backgroundColor: T.COLOR_PRIMARY,
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   List<Widget> buildTheList(List _data) {
@@ -170,8 +190,6 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
         _slivers.addAll(this.buildTheList(_result.data));
         setState(() => _hasError = false);
         setState(() => _lastId = _result.lastId);
-      } else {
-        setState(() => _hasError = true);
       }
     } catch (error) {
       print(error);
