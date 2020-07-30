@@ -19,7 +19,13 @@ class Discussion {
   int _id_domain;
   int _id_location;
 
+  bool accessDenied = false;
   Discussion.fromJson(Map<String, dynamic> json) {
+    if (json == null) {
+      this.accessDenied = true;
+      return;
+    }
+
     this._id_klub = int.parse(json['id_klub']);
     this._id_cat = int.parse(json['id_cat'] ?? '0');
     this._unread = int.parse(json['unread'] ?? '0');

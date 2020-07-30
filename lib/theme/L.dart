@@ -7,6 +7,7 @@ class L {
   static String INAPPBROWSER_ERROR = 'Nepodařilo se otevřít prohlížeč.';
   static String REMINDER_ERROR = 'Příspěvek se nepodařilo uložit do upomínek.';
   static String RATING_ERROR = 'Příspěvek se nepodařilo lajknout.';
+  static String ACCESS_DENIED_ERROR = 'Sem nemáš přístup.';
 
   // General
   static String GENERAL_SKIP = 'Přeskočit';
