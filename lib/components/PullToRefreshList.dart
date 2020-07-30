@@ -94,7 +94,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
       return PlatformTheme.feedbackScreen(isLoading: _isLoading, onPress: loadData, label: L.GENERAL_REFRESH);
     }
 
-    if (_slivers.length == 1) {
+    if (_slivers.length == 1 && !_isLoading) {
       return Container(
         height: double.infinity,
         width: double.infinity,
