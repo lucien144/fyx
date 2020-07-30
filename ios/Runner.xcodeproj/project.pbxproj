@@ -374,7 +374,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
-				MARKETING_VERSION = 0.3.0;
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				PRODUCT_BUNDLE_IDENTIFIER = wtf.144.fyx;
 				PRODUCT_NAME = Runner;
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -510,7 +510,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
-				MARKETING_VERSION = 0.3.0;
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				PRODUCT_BUNDLE_IDENTIFIER = wtf.144.fyx;
 				PRODUCT_NAME = Runner;
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -540,7 +540,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
-				MARKETING_VERSION = 0.3.0;
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				PRODUCT_BUNDLE_IDENTIFIER = wtf.144.fyx;
 				PRODUCT_NAME = Runner;
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
