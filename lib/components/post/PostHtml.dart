@@ -124,6 +124,15 @@ class PostHtml extends StatelessWidget {
           return;
         }
 
+        // TODO: Marketplace, ...
+
+        // Other Nyx internal links that cannot be displayed within Fyx
+        RegExp otherDeeplinkTest = new RegExp(r"^\?l=(.*)");
+        Iterable<RegExpMatch> otherDeeplinkMatches = otherDeeplinkTest.allMatches(link);
+        if (otherDeeplinkMatches.length == 1) {
+          link = 'https://www.nyx.cz/index.php$link';
+        }
+
         PlatformTheme.openLink(link);
       },
     );
