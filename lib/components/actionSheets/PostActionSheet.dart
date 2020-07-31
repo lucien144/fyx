@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fyx/PlatformTheme.dart';
+import 'package:fyx/components/TextIcon.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
@@ -38,10 +39,11 @@ class _PostActionSheetState extends State<PostActionSheet> {
           Visibility(
             visible: widget.shareData is ShareData,
             child: CupertinoActionSheetAction(
-                child: Text('Kopírovat link'),
+                child: TextIcon('Kopírovat odkaz', icon: Icons.link),
                 onPressed: () {
                   var data = ClipboardData(text: widget.shareData.link);
                   Clipboard.setData(data).then((_) {
+                    PlatformTheme.success('Zkopírováno do schránky.');
                     Navigator.pop(context);
                   });
                 }),
@@ -49,7 +51,10 @@ class _PostActionSheetState extends State<PostActionSheet> {
           Visibility(
             visible: widget.shareData is ShareData,
             child: CupertinoActionSheetAction(
-                child: Text('Sdílet'),
+                child: TextIcon(
+                  'Sdílet příspěvek',
+                  icon: Icons.share,
+                ),
                 onPressed: () {
                   final RenderBox box = context.findRenderObject();
                   Share.share(widget.shareData.body, subject: widget.shareData.subject, sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
@@ -59,7 +64,11 @@ class _PostActionSheetState extends State<PostActionSheet> {
           Visibility(
             visible: widget.user != MainRepository().credentials.nickname,
             child: CupertinoActionSheetAction(
-                child: Text('Blokovat uživatele ${widget.user}'),
+                child: TextIcon(
+                  'Blokovat ID @${widget.user}',
+                  icon: Icons.block,
+                  iconColor: Colors.redAccent,
+                ),
                 isDestructiveAction: true,
                 onPressed: () {
                   MainRepository().settings.blockUser(widget.user);
@@ -67,14 +76,22 @@ class _PostActionSheetState extends State<PostActionSheet> {
                 }),
           ),
           CupertinoActionSheetAction(
-              child: Text('Skrýt příspěvek'),
+              child: TextIcon(
+                'Skrýt příspěvek',
+                icon: Icons.visibility_off,
+                iconColor: Colors.redAccent,
+              ),
               isDestructiveAction: true,
               onPressed: () {
                 widget.flagPostCallback(widget.postId);
                 Navigator.pop(context);
               }),
           CupertinoActionSheetAction(
-              child: _reportIndicator ? Text('⚠️ Nahlašuji...') : Text('⚠️ Nahlásit nevhodný obsah'),
+              child: TextIcon(
+                _reportIndicator ? 'Nahlašuji...' : 'Nahlásit nevhodný obsah',
+                icon: Icons.warning,
+                iconColor: Colors.redAccent,
+              ),
               isDestructiveAction: true,
               onPressed: () async {
                 try {
