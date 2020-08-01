@@ -39,11 +39,11 @@ class _PostActionSheetState extends State<PostActionSheet> {
           Visibility(
             visible: widget.shareData is ShareData,
             child: CupertinoActionSheetAction(
-                child: TextIcon('Kopírovat odkaz', icon: Icons.link),
+                child: TextIcon(L.POST_SHEET_COPY_LINK, icon: Icons.link),
                 onPressed: () {
                   var data = ClipboardData(text: widget.shareData.link);
                   Clipboard.setData(data).then((_) {
-                    PlatformTheme.success('Zkopírováno do schránky.');
+                    PlatformTheme.success(L.TOAST_COPIED);
                     Navigator.pop(context);
                   });
                 }),
@@ -52,7 +52,7 @@ class _PostActionSheetState extends State<PostActionSheet> {
             visible: widget.shareData is ShareData,
             child: CupertinoActionSheetAction(
                 child: TextIcon(
-                  'Sdílet příspěvek',
+                  L.POST_SHEET_SHARE,
                   icon: Icons.share,
                 ),
                 onPressed: () {
@@ -65,30 +65,32 @@ class _PostActionSheetState extends State<PostActionSheet> {
             visible: widget.user != MainRepository().credentials.nickname,
             child: CupertinoActionSheetAction(
                 child: TextIcon(
-                  'Blokovat ID @${widget.user}',
+                  '${L.POST_SHEET_BLOCK} @${widget.user}',
                   icon: Icons.block,
                   iconColor: Colors.redAccent,
                 ),
                 isDestructiveAction: true,
                 onPressed: () {
                   MainRepository().settings.blockUser(widget.user);
+                  PlatformTheme.success(L.TOAST_USER_BLOCKED);
                   Navigator.of(context).pop();
                 }),
           ),
           CupertinoActionSheetAction(
               child: TextIcon(
-                'Skrýt příspěvek',
+                L.POST_SHEET_HIDE,
                 icon: Icons.visibility_off,
                 iconColor: Colors.redAccent,
               ),
               isDestructiveAction: true,
               onPressed: () {
                 widget.flagPostCallback(widget.postId);
+                PlatformTheme.success(L.TOAST_POST_HIDDEN);
                 Navigator.pop(context);
               }),
           CupertinoActionSheetAction(
               child: TextIcon(
-                _reportIndicator ? 'Nahlašuji...' : 'Nahlásit nevhodný obsah',
+                _reportIndicator ? L.POST_SHEET_FLAG_SAVING : L.POST_SHEET_FLAG,
                 icon: Icons.warning,
                 iconColor: Colors.redAccent,
               ),
@@ -97,9 +99,9 @@ class _PostActionSheetState extends State<PostActionSheet> {
                 try {
                   setState(() => _reportIndicator = true);
                   await ApiController().sendMail('FYXBOT', 'Inappropriate post/mail report: ID $widget.postId by user @$widget.user.');
-                  PlatformTheme.success('Příspěvek byl nahlášen. Děkujeme, budeme se tomu věnovat.');
+                  PlatformTheme.success(L.TOAST_POST_FLAGGED);
                 } catch (error) {
-                  PlatformTheme.error('Příspěvek se nepodařilo nahlásit, zkuste to znovu.');
+                  PlatformTheme.error(L.TOAST_POST_FLAG_ERROR);
                 } finally {
                   setState(() => _reportIndicator = false);
                   Navigator.pop(context);

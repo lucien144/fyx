@@ -100,7 +100,10 @@ class _SettingsPageState extends State<SettingsPage> {
                   return Text(MainRepository().settings.blockedMails.length.toString());
                 }),
           ),
-          CSButton(CSButtonType.DESTRUCTIVE, 'Reset', () => MainRepository().settings.resetBlockedContent()),
+          CSButton(CSButtonType.DESTRUCTIVE, 'Reset', () {
+            MainRepository().settings.resetBlockedContent();
+            PlatformTheme.success(L.SETTINGS_CACHE_RESET);
+          }),
           const CSHeader('Informace'),
           CSButton(
             CSButtonType.DEFAULT,
