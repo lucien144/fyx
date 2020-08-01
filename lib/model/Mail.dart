@@ -43,4 +43,6 @@ class Mail {
   String get participant => _other_nick;
 
   int get id => _id_mail;
+
+  String get link => 'https://www.nyx.cz/index.php?l=mail;wu=${this.id}';
 }
