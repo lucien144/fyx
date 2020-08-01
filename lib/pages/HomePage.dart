@@ -216,12 +216,20 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                       PullToRefreshList(
                           rebuild: _refreshData,
                           dataProvider: (lastId) async {
+                            List<DiscussionListItem> withReplies = [];
                             var result = await ApiController().loadHistory();
                             var data = result.discussions
                                 .map((discussion) => Discussion.fromJson(discussion))
                                 .where((discussion) => this._filterUnread ? discussion.unread > 0 : true)
                                 .map((discussion) => DiscussionListItem(discussion))
-                                .toList();
+                                .where((discussionListItem) {
+                              if (discussionListItem.discussion.replies > 0) {
+                                withReplies.add(discussionListItem);
+                                return false;
+                              }
+                              return true;
+                            }).toList();
+                            data.insertAll(0, withReplies);
                             return DataProviderResult(data);
                           }),
                       PullToRefreshList(
@@ -231,13 +239,21 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                             var result = await ApiController().loadBookmarks();
 
                             result.categories.forEach((_category) {
+                              List<DiscussionListItem> withReplies = [];
                               var category = Category.fromJson(_category);
                               var discussion = result.discussions
                                   .map((discussion) => Discussion.fromJson(discussion))
                                   .where((discussion) => this._filterUnread ? discussion.unread > 0 : true)
                                   .map((discussion) => DiscussionListItem(discussion))
                                   .where((discussionListItem) => discussionListItem.category == category.idCat)
-                                  .toList();
+                                  .where((discussionListItem) {
+                                if (discussionListItem.discussion.replies > 0) {
+                                  withReplies.add(discussionListItem);
+                                  return false;
+                                }
+                                return true;
+                              }).toList();
+                              discussion.insertAll(0, withReplies);
                               categories.add({'header': ListHeader(category), 'items': discussion});
                             });
                             return DataProviderResult(categories);
