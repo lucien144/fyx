@@ -110,16 +110,18 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
   Widget _createDiscussionPage(DiscussionResponse discussionResponse, DiscussionPageArguments pageArguments) {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        backgroundColor: Colors.white,
-        leading: CupertinoNavigationBarBackButton(
-          color: T.COLOR_PRIMARY,
-          onPressed: () {
-            DiscussionPage.deeplinkDepth = 0;
-            Navigator.of(context).pop();
-          },
-        ),
-        middle: Text(discussionResponse.discussion.name, overflow: TextOverflow.ellipsis),
-      ),
+          backgroundColor: Colors.white,
+          leading: CupertinoNavigationBarBackButton(
+            color: T.COLOR_PRIMARY,
+            onPressed: () {
+              DiscussionPage.deeplinkDepth = 0;
+              Navigator.of(context).pop();
+            },
+          ),
+          middle: Container(
+              alignment: Alignment.center,
+              width: MediaQuery.of(context).size.width - 120,
+              child: Text(discussionResponse.discussion.name.replaceAll('', '\u{200B}'), overflow: TextOverflow.ellipsis))),
       child: Stack(
         children: [
           PullToRefreshList(
