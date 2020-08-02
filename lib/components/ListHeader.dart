@@ -18,7 +18,7 @@ class ListHeader extends ListItemWithCategory {
     return GestureDetector(
       onTap: () => this.onTap is Function ? this.onTap() : null,
       child: Container(
-        color: PlatformTheme.of(context).primaryColor,
+        decoration: BoxDecoration(color: PlatformTheme.of(context).primaryColor, border: Border(bottom: BorderSide(width: 1, color: Colors.white38))),
         padding: EdgeInsets.all(8),
         alignment: Alignment.centerLeft,
         child: Text(
