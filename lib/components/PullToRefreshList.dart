@@ -116,6 +116,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
       child: Stack(
         children: [
           CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
             slivers: _slivers,
             controller: _controller,
           ),
