@@ -84,7 +84,30 @@ class _VideoPlayerState extends State<VideoPlayer> {
         future: initVideo(context),
         builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
           if (snapshot.hasData && snapshot.data == true) {
-            return AspectRatio(aspectRatio: videoPlayerController.value.aspectRatio, child: Chewie(controller: chewieController));
+            return Column(
+              children: <Widget>[
+                AspectRatio(aspectRatio: videoPlayerController.value.aspectRatio, child: Chewie(controller: chewieController)),
+                SizedBox(
+                  height: 8,
+                ),
+                GestureDetector(
+                  onTap: () => PlatformTheme.openLink(widget.videoUrl),
+                  child: RichText(
+                    overflow: TextOverflow.ellipsis,
+                    text: TextSpan(children: [
+                      TextSpan(text: 'Zdroj: ', style: DefaultTextStyle.of(context).style.merge(TextStyle(fontSize: 12))),
+                      TextSpan(
+                        text: widget.videoUrl.replaceAll('', '\u{200B}'),
+                        style: TextStyle(fontSize: 12, color: T.COLOR_PRIMARY, decoration: TextDecoration.underline),
+                      )
+                    ]),
+                  ),
+                ),
+                SizedBox(
+                  height: 8,
+                )
+              ],
+            );
           } else if (snapshot.hasError) {
             return PlatformTheme.somethingsWrongButton(widget.element.outerHtml);
           }
