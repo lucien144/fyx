@@ -29,7 +29,6 @@ class VideoPlayer extends StatefulWidget {
 class _VideoPlayerState extends State<VideoPlayer> {
   VideoPlayerController videoPlayerController;
   ChewieController chewieController;
-  double _aspectRatio;
 
   @override
   void initState() {
@@ -39,15 +38,19 @@ class _VideoPlayerState extends State<VideoPlayer> {
     }
 
     videoPlayerController = VideoPlayerController.network(widget.videoUrl);
-    videoPlayerController.addListener(() {
-      if (_aspectRatio == null) {
-        setState(() => _aspectRatio = videoPlayerController.value.aspectRatio);
-      }
-    });
+  }
+
+  Future<bool> initVideo(BuildContext context) async {
+    await videoPlayerController.initialize();
+
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
+    final aspectRatio = videoPlayerController.value.initialized ? videoPlayerController.value.aspectRatio : (width > height ? width / height : height / width);
 
     chewieController = ChewieController(
         videoPlayerController: videoPlayerController,
-        aspectRatio: _aspectRatio ?? 3 / 4,
+        aspectRatio: aspectRatio,
         placeholder: Container(
           color: T.COLOR_PRIMARY,
           child: Icon(
@@ -57,10 +60,6 @@ class _VideoPlayerState extends State<VideoPlayer> {
           ),
           alignment: Alignment.center,
         ));
-  }
-
-  Future<bool> initVideo() async {
-    await videoPlayerController.initialize();
     return true;
   }
 
@@ -82,10 +81,12 @@ class _VideoPlayerState extends State<VideoPlayer> {
     }
 
     return FutureBuilder(
-        future: initVideo(),
+        future: initVideo(context),
         builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
           if (snapshot.hasData && snapshot.data == true) {
             return AspectRatio(aspectRatio: videoPlayerController.value.aspectRatio, child: Chewie(controller: chewieController));
+          } else if (snapshot.hasError) {
+            return PlatformTheme.somethingsWrongButton(widget.element.outerHtml);
           }
           return Center(child: CupertinoActivityIndicator());
         });
