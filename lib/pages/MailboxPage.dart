@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/MailListItem.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
+import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Mail.dart';
 import 'package:fyx/model/MainRepository.dart';
@@ -24,6 +25,7 @@ class _MailboxPageState extends State<MailboxPage> {
   @override
   void initState() {
     _refreshData = widget.refreshData;
+    AnalyticsProvider().setScreen('Mailbox', 'MailboxPage');
     super.initState();
   }
 

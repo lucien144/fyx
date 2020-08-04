@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cupertino_settings/flutter_cupertino_settings.dart';
 import 'package:fyx/FyxApp.dart';
 import 'package:fyx/PlatformTheme.dart';
+import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
@@ -22,8 +23,8 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
-
     _compactMode = MainRepository().settings.useCompactMode;
+    AnalyticsProvider().setScreen('Settings', 'SettingsPage');
   }
 
   @override

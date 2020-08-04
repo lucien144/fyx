@@ -7,6 +7,7 @@ import 'package:fyx/components/CircleAvatar.dart' as ca;
 import 'package:fyx/components/DiscussionListItem.dart';
 import 'package:fyx/components/ListHeader.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
+import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Category.dart';
 import 'package:fyx/model/Discussion.dart';
@@ -58,6 +59,9 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
         });
       }
     });
+
+    AnalyticsProvider().setUser(MainRepository().credentials.nickname);
+    AnalyticsProvider().setScreen('Home', 'HomePage');
   }
 
   @override
