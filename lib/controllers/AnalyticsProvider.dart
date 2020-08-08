@@ -27,4 +27,12 @@ class AnalyticsProvider {
   Future<void> setUserProperty(String name, String value) async {
     await provider.setUserProperty(name: name, value: value);
   }
+
+  Future<void> logTutorialBegin() async {
+    await provider.logTutorialBegin();
+  }
+
+  Future<void> logTutorialComplete() async {
+    await provider.logTutorialComplete();
+  }
 }
