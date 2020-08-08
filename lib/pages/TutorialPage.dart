@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:fyx/PlatformTheme.dart';
+import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
@@ -27,6 +28,8 @@ class _TutorialPageState extends State<TutorialPage> {
   void initState() {
     super.initState();
     buildSlider();
+
+    AnalyticsProvider().setScreen('Tutorial', 'TutorialPage');
   }
 
   void buildSlider() {

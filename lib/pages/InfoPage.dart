@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:fyx/PlatformTheme.dart';
+import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:http/http.dart';
@@ -25,6 +26,7 @@ class _InfoPageState extends State<InfoPage> {
   @override
   void initState() {
     super.initState();
+    AnalyticsProvider().setScreen('Info', 'InfoPage');
   }
 
   @override

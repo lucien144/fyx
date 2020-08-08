@@ -61,6 +61,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     });
 
     AnalyticsProvider().setUser(MainRepository().credentials.nickname);
+    AnalyticsProvider().setUserProperty('userId', MainRepository().credentials.nickname);
     AnalyticsProvider().setScreen('Home', 'HomePage');
   }
 

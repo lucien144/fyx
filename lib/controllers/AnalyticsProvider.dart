@@ -23,4 +23,8 @@ class AnalyticsProvider {
       screenClassOverride: screenClassOverride,
     );
   }
+
+  Future<void> setUserProperty(String name, String value) async {
+    await provider.setUserProperty(name: name, value: value);
+  }
 }

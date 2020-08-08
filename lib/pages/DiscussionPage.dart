@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/components/post/PostListItem.dart';
+import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
@@ -50,6 +51,7 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    AnalyticsProvider().setScreen('Discussion', 'DiscussionPage');
   }
 
   @override
