@@ -61,7 +61,11 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     });
 
     AnalyticsProvider().setUser(MainRepository().credentials.nickname);
-    AnalyticsProvider().setUserProperty('userId', MainRepository().credentials.nickname);
+    AnalyticsProvider().setUserProperty('compactMode', MainRepository().settings.useCompactMode.toString());
+    AnalyticsProvider().setUserProperty('defaultView', MainRepository().settings.defaultView.toString());
+    AnalyticsProvider().setUserProperty('blockedMails', MainRepository().settings.blockedMails.length.toString());
+    AnalyticsProvider().setUserProperty('blockedPosts', MainRepository().settings.blockedPosts.length.toString());
+    AnalyticsProvider().setUserProperty('blockedUsers', MainRepository().settings.blockedUsers.length.toString());
     AnalyticsProvider().setScreen('Home', 'HomePage');
   }
 
