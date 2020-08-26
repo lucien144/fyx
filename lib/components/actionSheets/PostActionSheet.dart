@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/TextIcon.dart';
+import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
@@ -46,6 +47,7 @@ class _PostActionSheetState extends State<PostActionSheet> {
                     PlatformTheme.success(L.TOAST_COPIED);
                     Navigator.pop(context);
                   });
+                  AnalyticsProvider().logEvent('copyLink');
                 }),
           ),
           Visibility(
@@ -59,6 +61,7 @@ class _PostActionSheetState extends State<PostActionSheet> {
                   final RenderBox box = context.findRenderObject();
                   Share.share(widget.shareData.body, subject: widget.shareData.subject, sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
                   Navigator.pop(context);
+                  AnalyticsProvider().logEvent('shareSheet');
                 }),
           ),
           Visibility(
@@ -74,6 +77,7 @@ class _PostActionSheetState extends State<PostActionSheet> {
                   MainRepository().settings.blockUser(widget.user);
                   PlatformTheme.success(L.TOAST_USER_BLOCKED);
                   Navigator.of(context).pop();
+                  AnalyticsProvider().logEvent('blockUser');
                 }),
           ),
           CupertinoActionSheetAction(
@@ -87,6 +91,7 @@ class _PostActionSheetState extends State<PostActionSheet> {
                 widget.flagPostCallback(widget.postId);
                 PlatformTheme.success(L.TOAST_POST_HIDDEN);
                 Navigator.pop(context);
+                AnalyticsProvider().logEvent('hidePost');
               }),
           CupertinoActionSheetAction(
               child: TextIcon(
@@ -105,6 +110,7 @@ class _PostActionSheetState extends State<PostActionSheet> {
                 } finally {
                   setState(() => _reportIndicator = false);
                   Navigator.pop(context);
+                  AnalyticsProvider().logEvent('flagContent');
                 }
               }),
         ],

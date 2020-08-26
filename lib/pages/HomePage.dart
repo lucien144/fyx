@@ -126,7 +126,10 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                 Navigator.of(context).pop();
                 Navigator.of(context, rootNavigator: true).pushNamed('/settings');
               }),
-          CupertinoActionSheetAction(child: Text('⚠️ ${L.SETTINGS_BUGREPORT}'), onPressed: () => PlatformTheme.prefillGithubIssue(L.SETTINGS_BUGREPORT_TITLE)),
+          CupertinoActionSheetAction(child: Text('⚠️ ${L.SETTINGS_BUGREPORT}'), onPressed: () {
+            PlatformTheme.prefillGithubIssue(L.SETTINGS_BUGREPORT_TITLE);
+            AnalyticsProvider().logEvent('reportBug');
+          }),
         ],
         cancelButton: CupertinoActionSheetAction(
           isDefaultAction: true,

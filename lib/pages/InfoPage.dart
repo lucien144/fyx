@@ -26,7 +26,6 @@ class _InfoPageState extends State<InfoPage> {
   @override
   void initState() {
     super.initState();
-    AnalyticsProvider().setScreen('Info', 'InfoPage');
   }
 
   @override
@@ -35,6 +34,7 @@ class _InfoPageState extends State<InfoPage> {
 
     if (_response == null) {
       _response = _client.get(settings.url);
+      AnalyticsProvider().setScreen(settings.title, 'InfoPage');
     }
 
     return CupertinoPageScaffold(
