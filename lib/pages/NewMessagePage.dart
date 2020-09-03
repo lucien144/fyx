@@ -122,6 +122,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                         inputFormatters: [WhitelistingTextInputFormatter(RegExp('[a-zA-Z0-9_]'))],
                         textCapitalization: TextCapitalization.characters,
                         placeholder: 'Adresát',
+                        autofocus: _recipientController.text.length == 0,
                       )),
                   SizedBox(
                     height: 8,
@@ -129,7 +130,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                   CupertinoTextField(
                     controller: _messageController,
                     maxLines: 10,
-                    autofocus: true,
+                    autofocus: _recipientController.text.length > 0 || _settings.hasInputField != true,
                     textCapitalization: TextCapitalization.sentences,
                   ),
                   Padding(
