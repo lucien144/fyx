@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/PlatformTheme.dart';
+import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
@@ -29,6 +30,8 @@ class _LoginPageState extends State<LoginPage> {
         setState(() => _useTokenToLogin = false);
       }
     });
+
+    AnalyticsProvider().setScreen('Login', 'LoginPage');
   }
 
   @override

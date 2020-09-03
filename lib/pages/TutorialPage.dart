@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:fyx/PlatformTheme.dart';
+import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
@@ -27,12 +28,18 @@ class _TutorialPageState extends State<TutorialPage> {
   void initState() {
     super.initState();
     buildSlider();
+
+    AnalyticsProvider().setScreen('Tutorial', 'TutorialPage');
   }
 
   void buildSlider() {
     setState(() {
       _slides = [
-        this.slide(L.TUTORIAL_SUCCESS, L.TUTORIAL_WELCOME, null),
+        this.slide(L.TUTORIAL_SUCCESS, L.TUTORIAL_WELCOME,
+            slideButton(L.GENERAL_BEGIN, onTap: () {
+              AnalyticsProvider().logTutorialBegin();
+              _slider.nextPage(duration: Duration(milliseconds: 800), curve: Curves.fastOutSlowIn);
+            })),
         this.slideToken('1/6'),
         this.slideTutorial('2/6', 1, L.TUTORIAL_TOKEN),
         this.slideTutorial('3/6', 2, L.TUTORIAL_SETTINGS),
@@ -61,7 +68,12 @@ class _TutorialPageState extends State<TutorialPage> {
                       // Save the credentials for later use.
                       MainRepository().credentials = credentials;
                       // Test the authorization. If all is OK, go to /home screen...
-                      ApiController().testAuth().then((isOk) => isOk ? Navigator.of(context).pushNamed('/home') : null).catchError((error) => onError(error));
+                      ApiController().testAuth().then((isOk) {
+                        if (isOk) {
+                          Navigator.of(context).pushNamed('/home');
+                          AnalyticsProvider().logTutorialComplete();
+                        }
+                      }).catchError((error) => onError(error));
                     }).catchError((error) => onError(error));
                   })
                 : slideButton(L.TUTORIAL_NYX,

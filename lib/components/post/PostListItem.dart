@@ -5,6 +5,7 @@ import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/ContentBoxLayout.dart';
 import 'package:fyx/components/actionSheets/PostActionSheet.dart';
 import 'package:fyx/components/post/PostAvatar.dart';
+import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
@@ -180,6 +181,7 @@ class _PostListItemState extends State<PostListItem> {
                     PlatformTheme.error(L.REMINDER_ERROR);
                     setState(() => _post.hasReminder = !_post.hasReminder);
                   });
+                  AnalyticsProvider().logEvent('reminder');
                 },
               )
             ],

@@ -1,9 +1,12 @@
 import 'package:device_info/device_info.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fyx/PlatformApp.dart';
 import 'package:fyx/PlatformThemeData.dart';
+import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/model/Credentials.dart';
@@ -30,6 +33,8 @@ class FyxApp extends StatelessWidget {
 
   static get isProduction => FyxApp.env == Environment.production;
 
+  static FirebaseAnalytics analytics = FirebaseAnalytics();
+
   static RouteObserver<PageRoute> _routeObserver;
   static get routeObserver {
     if (_routeObserver == null) {
@@ -52,6 +57,8 @@ class FyxApp extends StatelessWidget {
     MainRepository().packageInfo = results[1];
     MainRepository().deviceInfo = results[2];
     MainRepository().settings = results[3];
+
+    AnalyticsProvider.provider = analytics;
   }
 
   @override
@@ -73,7 +80,7 @@ class FyxApp extends StatelessWidget {
           theme: PlatformThemeData(primaryColor: T.COLOR_PRIMARY),
           home: MainRepository().credentials is Credentials && MainRepository().credentials.isValid ? HomePage() : LoginPage(),
           debugShowCheckedModeBanner: FyxApp.isDev,
-          listNavigatorObservers: [FyxApp.routeObserver],
+          listNavigatorObservers: [FyxApp.routeObserver, FirebaseAnalyticsObserver(analytics: analytics)],
         ),
       ),
     );
