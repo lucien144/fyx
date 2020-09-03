@@ -7,6 +7,7 @@ import 'package:fyx/components/CircleAvatar.dart' as ca;
 import 'package:fyx/components/DiscussionListItem.dart';
 import 'package:fyx/components/ListHeader.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
+import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Category.dart';
 import 'package:fyx/model/Discussion.dart';
@@ -58,6 +59,14 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
         });
       }
     });
+
+    AnalyticsProvider().setUser(MainRepository().credentials.nickname);
+    AnalyticsProvider().setUserProperty('compactMode', MainRepository().settings.useCompactMode.toString());
+    AnalyticsProvider().setUserProperty('defaultView', MainRepository().settings.defaultView.toString());
+    AnalyticsProvider().setUserProperty('blockedMails', MainRepository().settings.blockedMails.length.toString());
+    AnalyticsProvider().setUserProperty('blockedPosts', MainRepository().settings.blockedPosts.length.toString());
+    AnalyticsProvider().setUserProperty('blockedUsers', MainRepository().settings.blockedUsers.length.toString());
+    AnalyticsProvider().setScreen('Home', 'HomePage');
   }
 
   @override
@@ -117,7 +126,10 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                 Navigator.of(context).pop();
                 Navigator.of(context, rootNavigator: true).pushNamed('/settings');
               }),
-          CupertinoActionSheetAction(child: Text('⚠️ ${L.SETTINGS_BUGREPORT}'), onPressed: () => PlatformTheme.prefillGithubIssue(L.SETTINGS_BUGREPORT_TITLE)),
+          CupertinoActionSheetAction(child: Text('⚠️ ${L.SETTINGS_BUGREPORT}'), onPressed: () {
+            PlatformTheme.prefillGithubIssue(L.SETTINGS_BUGREPORT_TITLE);
+            AnalyticsProvider().logEvent('reportBug');
+          }),
         ],
         cancelButton: CupertinoActionSheetAction(
           isDefaultAction: true,
