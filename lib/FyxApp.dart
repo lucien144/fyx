@@ -17,6 +17,7 @@ import 'package:fyx/pages/LoginPage.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
+import 'package:sentry/sentry.dart';
 
 enum Environment { dev, staging, production }
 
@@ -36,6 +37,7 @@ class FyxApp extends StatelessWidget {
   static FirebaseAnalytics analytics = FirebaseAnalytics();
 
   static RouteObserver<PageRoute> _routeObserver;
+
   static get routeObserver {
     if (_routeObserver == null) {
       _routeObserver = RouteObserver<PageRoute>();
@@ -47,8 +49,15 @@ class FyxApp extends StatelessWidget {
     FyxApp.env = env;
   }
 
-  static init() async {
-    WidgetsFlutterBinding.ensureInitialized();
+  static init(SentryClient sentry) async {
+    // This must be initialized after WidgetsFlutterBinding.ensureInitialized
+    FlutterError.onError = (details, {bool forceReport = false}) {
+      sentry.captureException(
+        exception: details.exception,
+        stackTrace: details.stack,
+      );
+    };
+
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
     // TODO: Move to build using FutureBuilder.
@@ -57,6 +66,7 @@ class FyxApp extends StatelessWidget {
     MainRepository().packageInfo = results[1];
     MainRepository().deviceInfo = results[2];
     MainRepository().settings = results[3];
+    MainRepository().sentry = sentry;
 
     AnalyticsProvider.provider = analytics;
   }
@@ -80,7 +90,14 @@ class FyxApp extends StatelessWidget {
           theme: PlatformThemeData(primaryColor: T.COLOR_PRIMARY),
           home: MainRepository().credentials is Credentials && MainRepository().credentials.isValid ? HomePage() : LoginPage(),
           debugShowCheckedModeBanner: FyxApp.isDev,
-          listNavigatorObservers: [FyxApp.routeObserver, FirebaseAnalyticsObserver(analytics: analytics)],
+          listNavigatorObservers: [
+            FyxApp.routeObserver,
+            FirebaseAnalyticsObserver(
+                analytics: analytics,
+                onError: (error) async => await MainRepository().sentry.captureException(
+                      exception: error,
+                    ))
+          ],
         ),
       ),
     );
