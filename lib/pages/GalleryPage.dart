@@ -58,7 +58,7 @@ class _GalleryPageState extends State<GalleryPage> {
               return PhotoViewGalleryPageOptions(imageProvider: CachedNetworkImageProvider(_arguments.images[index].image), onTapDown: (_, __, ___) => close(context));
             },
             itemCount: _arguments.images.length,
-            loadingChild: CupertinoActivityIndicator(),
+            loadingBuilder: (context, chunkEvent) => CupertinoActivityIndicator(radius: 16,),
             onPageChanged: (i) => setState(() => _page = i + 1),
           ),
         ),
@@ -76,12 +76,15 @@ class _GalleryPageState extends State<GalleryPage> {
         ),
         Positioned(
             width: MediaQuery.of(context).size.width,
-            child: Text(
-              '$_page / ${_arguments.images.length}',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white),
+            child: CupertinoButton(
+              onPressed: () => close(context),
+              child: Text(
+                '$_page / ${_arguments.images.length}',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white),
+              ),
             ),
-            bottom: 40,
+            bottom: 30,
             left: 0)
       ],
     );
