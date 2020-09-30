@@ -12,3 +12,4 @@ version=`grep 'version: ' pubspec.yaml | sed 's/version: //'`
 echo "Building version: $version"
 flutter clean
 flutter build ios -t lib/main_production.dart
+open ios/Runner.xcworkspace
