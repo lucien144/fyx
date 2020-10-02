@@ -6,9 +6,13 @@
 
 Fyx je neoficiální mobilní klient pro diskuzní server [Nyx.cz](https://nyx.cz) ve [Flutteru](https://flutter.dev/). V tuto chvíli je psaný a optimalizovaný pro iOS, ale v plánu je i Android verze.
 
+<p align="center">
+<a href="https://144.wtf/AmcGAl" target="_blank"><img src="https://144.wtf/9VRKzD+" height="60"/></a>
+</p>
+
 ---
 <p align="center">
-👍 Podpořte vývoj Fyxu na <a href="http://patreon.com/fyxapp" target="_blank">Patreonu</a>!
+👍 Podpořte vývoj Fyxu na <a href="http://patreon.com/fyxapp" target="_blank">Patreonu</a> nebo <a href="https://www.nyx.cz/index.php?l=topic;l2=2;id=24237;n=a200"  target="_blank">Nyxu</a>!
 </p>
 
 ---
@@ -67,9 +71,13 @@ Pokud jste našli chybu, pak ji nahlaste ideálně přes aplikaci. Pokud to nejd
 
   **A:** Protože je to moc práce a iOS je pro mě (Lucien) nativní prostředí. Aplikace má v sobě fragmenty přípravy pro Android (viz. [`PlatformAwareWidget`](https://github.com/lucien144/fyx/blob/develop/lib/PlatformAwareWidget.dart)), ale později jsem se rozhodl jít pro mě lehčí cestou, vydat první verzi asap a Android případně řešit s grafiky, kteří by připravili hodnotný hybridní design funkční jak na Androidu tak i na iOS.
 
-- **Q:** Kde je uživatelský profil?
+- **Q:** Proč nelze k příspěvku nahrát víc obrázků najednou?
 
-  **A:** Cílem bylo vytvořit jednoduchou a malou aplikaci - proto (v tuto chvíli) není v aplikaci např. hamburger menu nebo uživatelský profil. Předpokladem je, že toto se časem změní - záleží na uživatelské diskuzi.
+  **A:** To bohužel nepodporuje Nyx.
+  
+- **Q:** Nikde nevidím možnost smazat příspěvek.
+
+  **A:** Zatím není podporováno, ale bude - viz. [roadmapa](https://github.com/lucien144/fyx/projects/2).
 
 - **Q:** Proč je tento repozitář v češtině?
 
