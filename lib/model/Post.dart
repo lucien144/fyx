@@ -41,6 +41,8 @@ class Post {
   // ignore: unnecessary_getters_setters
   bool get hasReminder => _reminder;
 
+  String get link => 'https://www.nyx.cz/index.php?l=topic;id=${this.idKlub};wu=${this.id}';
+
   // ignore: unnecessary_getters_setters
   set hasReminder(bool value) => _reminder = value;
 }

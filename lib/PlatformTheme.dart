@@ -22,12 +22,24 @@ class PlatformTheme {
 
   static error(String message, {int duration: 7}) {
     Fluttertoast.showToast(
-        msg: message, toastLength: Toast.LENGTH_LONG, gravity: ToastGravity.TOP, timeInSecForIos: duration, backgroundColor: Colors.red, textColor: Colors.white, fontSize: 14.0);
+        msg: message,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: duration,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 14.0);
   }
 
   static success(String message, {int duration: 7}) {
     Fluttertoast.showToast(
-        msg: message, toastLength: Toast.LENGTH_LONG, gravity: ToastGravity.TOP, timeInSecForIos: duration, backgroundColor: Colors.green, textColor: Colors.white, fontSize: 14.0);
+        msg: message,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: duration,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 14.0);
   }
 
   static openLink(String link) async {
@@ -67,7 +79,7 @@ class PlatformTheme {
     );
   }
 
-  static Widget feedbackScreen({bool isLoading = false, bool isWarning = false, String label = '', String title = '', Function onPress}) {
+  static Widget feedbackScreen({bool isLoading = false, bool isWarning = false, String label = '', String title = '', Function onPress, IconData icon = Icons.warning}) {
     return Container(
       width: double.infinity,
       color: Colors.white,
@@ -81,10 +93,10 @@ class PlatformTheme {
             ),
           ),
           Visibility(
-            visible: !isLoading && isWarning,
+            visible: (!isLoading && isWarning) || icon != Icons.warning,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Icon(Icons.warning),
+              child: Icon(icon),
             ),
           ),
           Visibility(

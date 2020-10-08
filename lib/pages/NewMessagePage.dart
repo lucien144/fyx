@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker_modern/image_picker_modern.dart';
 import 'package:path/path.dart';
@@ -55,6 +56,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
   void initState() {
     _messageController.addListener(() => setState(() => _message = _messageController.text));
     _recipientController.addListener(() => setState(() => _recipient = _recipientController.text));
+    AnalyticsProvider().setScreen('New Message', 'NewMessagePage');
     super.initState();
   }
 
@@ -120,6 +122,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                         inputFormatters: [WhitelistingTextInputFormatter(RegExp('[a-zA-Z0-9_]'))],
                         textCapitalization: TextCapitalization.characters,
                         placeholder: 'Adresát',
+                        autofocus: _recipientController.text.length == 0,
                       )),
                   SizedBox(
                     height: 8,
@@ -127,7 +130,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                   CupertinoTextField(
                     controller: _messageController,
                     maxLines: 10,
-                    autofocus: true,
+                    autofocus: _recipientController.text.length > 0 || _settings.hasInputField != true,
                     textCapitalization: TextCapitalization.sentences,
                   ),
                   Padding(

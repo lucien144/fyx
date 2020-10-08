@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/components/post/PostListItem.dart';
+import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
@@ -50,6 +51,7 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    AnalyticsProvider().setScreen('Discussion', 'DiscussionPage');
   }
 
   @override
@@ -95,6 +97,9 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
         future: _fetchData(pageArguments.discussionId, pageArguments.postId),
         builder: (BuildContext context, AsyncSnapshot<DiscussionResponse> snapshot) {
           if (snapshot.hasData) {
+            if (snapshot.data.discussion.accessDenied) {
+              return PlatformTheme.feedbackScreen(title: L.ACCESS_DENIED_ERROR, icon: Icons.do_not_disturb_alt, label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
+            }
             return this._createDiscussionPage(snapshot.data, pageArguments);
           } else if (snapshot.hasError) {
             return PlatformTheme.feedbackScreen(isWarning: true, title: snapshot.error.toString(), label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
@@ -107,16 +112,18 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
   Widget _createDiscussionPage(DiscussionResponse discussionResponse, DiscussionPageArguments pageArguments) {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        backgroundColor: Colors.white,
-        leading: CupertinoNavigationBarBackButton(
-          color: T.COLOR_PRIMARY,
-          onPressed: () {
-            DiscussionPage.deeplinkDepth = 0;
-            Navigator.of(context).pop();
-          },
-        ),
-        middle: Text(discussionResponse.discussion['name'], overflow: TextOverflow.ellipsis),
-      ),
+          backgroundColor: Colors.white,
+          leading: CupertinoNavigationBarBackButton(
+            color: T.COLOR_PRIMARY,
+            onPressed: () {
+              DiscussionPage.deeplinkDepth = 0;
+              Navigator.of(context).pop();
+            },
+          ),
+          middle: Container(
+              alignment: Alignment.center,
+              width: MediaQuery.of(context).size.width - 120,
+              child: Text(discussionResponse.discussion.name.replaceAll('', '\u{200B}'), overflow: TextOverflow.ellipsis))),
       child: Stack(
         children: [
           PullToRefreshList(
@@ -166,9 +173,13 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
                   })
                   .where((post) => !MainRepository().settings.isPostBlocked(post.id))
                   .where((post) => !MainRepository().settings.isUserBlocked(post.nick))
-                  .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.id > int.parse(discussionResponse.discussion['last_visit'])))
+                  .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.id > discussionResponse.discussion.lastVisit))
                   .toList();
-              var id = Post.fromJson((result as List).last, pageArguments.discussionId).id;
+
+              int id;
+              try {
+                id = Post.fromJson((result as List).last, pageArguments.discussionId).id;
+              } catch (error) {}
               return DataProviderResult(data, lastId: id);
             },
           ),

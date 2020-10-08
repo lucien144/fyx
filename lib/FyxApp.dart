@@ -1,9 +1,12 @@
 import 'package:device_info/device_info.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fyx/PlatformApp.dart';
 import 'package:fyx/PlatformThemeData.dart';
+import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/model/Credentials.dart';
@@ -14,6 +17,7 @@ import 'package:fyx/pages/LoginPage.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
+import 'package:sentry/sentry.dart';
 
 enum Environment { dev, staging, production }
 
@@ -30,7 +34,10 @@ class FyxApp extends StatelessWidget {
 
   static get isProduction => FyxApp.env == Environment.production;
 
+  static FirebaseAnalytics analytics = FirebaseAnalytics();
+
   static RouteObserver<PageRoute> _routeObserver;
+
   static get routeObserver {
     if (_routeObserver == null) {
       _routeObserver = RouteObserver<PageRoute>();
@@ -42,8 +49,15 @@ class FyxApp extends StatelessWidget {
     FyxApp.env = env;
   }
 
-  static init() async {
-    WidgetsFlutterBinding.ensureInitialized();
+  static init(SentryClient sentry) async {
+    // This must be initialized after WidgetsFlutterBinding.ensureInitialized
+    FlutterError.onError = (details, {bool forceReport = false}) {
+      sentry.captureException(
+        exception: details.exception,
+        stackTrace: details.stack,
+      );
+    };
+
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
     // TODO: Move to build using FutureBuilder.
@@ -52,6 +66,9 @@ class FyxApp extends StatelessWidget {
     MainRepository().packageInfo = results[1];
     MainRepository().deviceInfo = results[2];
     MainRepository().settings = results[3];
+    MainRepository().sentry = sentry;
+
+    AnalyticsProvider.provider = analytics;
   }
 
   @override
@@ -73,7 +90,14 @@ class FyxApp extends StatelessWidget {
           theme: PlatformThemeData(primaryColor: T.COLOR_PRIMARY),
           home: MainRepository().credentials is Credentials && MainRepository().credentials.isValid ? HomePage() : LoginPage(),
           debugShowCheckedModeBanner: FyxApp.isDev,
-          listNavigatorObservers: [FyxApp.routeObserver],
+          listNavigatorObservers: [
+            FyxApp.routeObserver,
+            FirebaseAnalyticsObserver(
+                analytics: analytics,
+                onError: (error) async => await MainRepository().sentry.captureException(
+                      exception: error,
+                    ))
+          ],
         ),
       ),
     );

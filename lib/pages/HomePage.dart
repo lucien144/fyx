@@ -7,6 +7,7 @@ import 'package:fyx/components/CircleAvatar.dart' as ca;
 import 'package:fyx/components/DiscussionListItem.dart';
 import 'package:fyx/components/ListHeader.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
+import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Category.dart';
 import 'package:fyx/model/Discussion.dart';
@@ -34,6 +35,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
   int _pageIndex = PAGE_BOOKMARK;
   int _refreshData = 0;
   bool _filterUnread = false;
+  List<int> _toggledCategories = [];
 
   @override
   void initState() {
@@ -57,6 +59,14 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
         });
       }
     });
+
+    AnalyticsProvider().setUser(MainRepository().credentials.nickname);
+    AnalyticsProvider().setUserProperty('compactMode', MainRepository().settings.useCompactMode.toString());
+    AnalyticsProvider().setUserProperty('defaultView', MainRepository().settings.defaultView.toString());
+    AnalyticsProvider().setUserProperty('blockedMails', MainRepository().settings.blockedMails.length.toString());
+    AnalyticsProvider().setUserProperty('blockedPosts', MainRepository().settings.blockedPosts.length.toString());
+    AnalyticsProvider().setUserProperty('blockedUsers', MainRepository().settings.blockedUsers.length.toString());
+    AnalyticsProvider().setScreen('Home', 'HomePage');
   }
 
   @override
@@ -116,7 +126,10 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                 Navigator.of(context).pop();
                 Navigator.of(context, rootNavigator: true).pushNamed('/settings');
               }),
-          CupertinoActionSheetAction(child: Text('⚠️ ${L.SETTINGS_BUGREPORT}'), onPressed: () => PlatformTheme.prefillGithubIssue(L.SETTINGS_BUGREPORT_TITLE)),
+          CupertinoActionSheetAction(child: Text('⚠️ ${L.SETTINGS_BUGREPORT}'), onPressed: () {
+            PlatformTheme.prefillGithubIssue(L.SETTINGS_BUGREPORT_TITLE);
+            AnalyticsProvider().logEvent('reportBug');
+          }),
         ],
         cancelButton: CupertinoActionSheetAction(
           isDefaultAction: true,
@@ -135,7 +148,11 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
         tabBar: CupertinoTabBar(
           onTap: (index) {
             if (_pageIndex == index && index == PAGE_BOOKMARK) {
-              setState(() => _filterUnread = !_filterUnread);
+              setState(() {
+                _filterUnread = !_filterUnread;
+                // Reset the category toggle
+                _toggledCategories = [];
+              });
             }
             _pageIndex = index;
             this.refreshData();
@@ -213,17 +230,31 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                     controller: _bookmarksController,
                     pageSnapping: true,
                     children: <Widget>[
+                      // -----
+                      // HISTORY PULL TO REFRESH
+                      // -----
                       PullToRefreshList(
                           rebuild: _refreshData,
                           dataProvider: (lastId) async {
+                            List<DiscussionListItem> withReplies = [];
                             var result = await ApiController().loadHistory();
                             var data = result.discussions
                                 .map((discussion) => Discussion.fromJson(discussion))
                                 .where((discussion) => this._filterUnread ? discussion.unread > 0 : true)
                                 .map((discussion) => DiscussionListItem(discussion))
-                                .toList();
+                                .where((discussionListItem) {
+                              if (discussionListItem.discussion.replies > 0) {
+                                withReplies.add(discussionListItem);
+                                return false;
+                              }
+                              return true;
+                            }).toList();
+                            data.insertAll(0, withReplies);
                             return DataProviderResult(data);
                           }),
+                      // -----
+                      // BOOKMARKS PULL TO REFRESH
+                      // -----
                       PullToRefreshList(
                           rebuild: _refreshData,
                           dataProvider: (lastId) async {
@@ -231,14 +262,54 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                             var result = await ApiController().loadBookmarks();
 
                             result.categories.forEach((_category) {
+                              List<DiscussionListItem> withReplies = [];
                               var category = Category.fromJson(_category);
                               var discussion = result.discussions
                                   .map((discussion) => Discussion.fromJson(discussion))
-                                  .where((discussion) => this._filterUnread ? discussion.unread > 0 : true)
+                                  .where((discussion) {
+                                    // Filter by tapping on category headers
+                                    // If unread filter is ON
+                                    if (this._filterUnread) {
+                                      if (_toggledCategories.indexOf(discussion.idCat) >= 0) {
+                                        // If unread filter is ON and category toggle is ON, display discussions
+                                        return true;
+                                      } else {
+                                        // If unread filter is ON and category toggle is OFF, display unread discussions only
+                                        return discussion.unread > 0;
+                                      }
+                                    } else {
+                                      if (_toggledCategories.indexOf(discussion.idCat) >= 0) {
+                                        // If unread filter is OFF and category toggle is ON, hide discussions
+                                        return false;
+                                      }
+                                    }
+                                    // If unread filter is OFF and category toggle is OFF, show discussions
+                                    return true;
+                                  })
                                   .map((discussion) => DiscussionListItem(discussion))
                                   .where((discussionListItem) => discussionListItem.category == category.idCat)
+                                  .where((discussionListItem) {
+                                    if (discussionListItem.discussion.replies > 0) {
+                                      withReplies.add(discussionListItem);
+                                      return false;
+                                    }
+                                    return true;
+                                  })
                                   .toList();
-                              categories.add({'header': ListHeader(category), 'items': discussion});
+                              discussion.insertAll(0, withReplies);
+                              categories.add({
+                                'header': ListHeader(category, onTap: () {
+                                  if (_toggledCategories.indexOf(category.idCat) >= 0) {
+                                    // Hide discussions in the category
+                                    setState(() => _toggledCategories.remove(category.idCat));
+                                  } else {
+                                    // Show discussions in the category
+                                    setState(() => _toggledCategories.add(category.idCat));
+                                  }
+                                  this.refreshData();
+                                }),
+                                'items': discussion
+                              });
                             });
                             return DataProviderResult(categories);
                           }),

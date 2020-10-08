@@ -7,6 +7,7 @@ class L {
   static String INAPPBROWSER_ERROR = 'Nepodařilo se otevřít prohlížeč.';
   static String REMINDER_ERROR = 'Příspěvek se nepodařilo uložit do upomínek.';
   static String RATING_ERROR = 'Příspěvek se nepodařilo lajknout.';
+  static String ACCESS_DENIED_ERROR = 'Sem nemáš přístup.';
 
   // General
   static String GENERAL_SKIP = 'Přeskočit';
@@ -22,6 +23,14 @@ class L {
   static String GENERAL_WARNING = 'Pozor';
   static String GENERAL_LOADING = 'Načítám...';
   static String GENERAL_ERROR = 'Chyba!';
+  static String GENERAL_EMPTY = 'Wow. Such empty.';
+
+  // TOAST MESSAGE
+  static String TOAST_COPIED = 'Zkopírováno do schránky.';
+  static String TOAST_POST_HIDDEN = 'Příspěvek byl skryt.';
+  static String TOAST_USER_BLOCKED = 'Uživatel byl zablokován.';
+  static String TOAST_POST_FLAGGED = 'Příspěvek byl nahlášen. Děkujeme, budeme se tomu věnovat.';
+  static String TOAST_POST_FLAG_ERROR = 'Příspěvek se nepodařilo nahlásit, zkuste to znovu.';
 
   // Tutorial page
   static String TUTORIAL_SUCCESS = 'Paráda 🤘';
@@ -47,4 +56,13 @@ class L {
   static String SETTINGS_BUGREPORT = 'Nahlásit chybu';
   static String SETTINGS_BUGREPORT_TITLE = 'Zde popiš svůj problém...';
   static String SETTINGS_LOAD_ERROR = 'Nepodařilo se načíst data.';
+  static String SETTINGS_CACHE_RESET = 'Paměť byla promazána.';
+
+  // Post Action Sheet
+  static String POST_SHEET_COPY_LINK = 'Kopírovat odkaz';
+  static String POST_SHEET_SHARE = 'Sdílet příspěvek';
+  static String POST_SHEET_HIDE = 'Skrýt příspěvek';
+  static String POST_SHEET_FLAG = 'Nahlásit nevhodný obsah';
+  static String POST_SHEET_FLAG_SAVING = 'Nahlašuji...';
+  static String POST_SHEET_BLOCK = 'Blokovat';
 }

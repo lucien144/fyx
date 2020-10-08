@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_cupertino_settings/flutter_cupertino_settings.dart';
 import 'package:fyx/FyxApp.dart';
 import 'package:fyx/PlatformTheme.dart';
+import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
@@ -22,8 +23,8 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
-
     _compactMode = MainRepository().settings.useCompactMode;
+    AnalyticsProvider().setScreen('Settings', 'SettingsPage');
   }
 
   @override
@@ -100,7 +101,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   return Text(MainRepository().settings.blockedMails.length.toString());
                 }),
           ),
-          CSButton(CSButtonType.DESTRUCTIVE, 'Reset', () => MainRepository().settings.resetBlockedContent()),
+          CSButton(CSButtonType.DESTRUCTIVE, 'Reset', () {
+            MainRepository().settings.resetBlockedContent();
+            PlatformTheme.success(L.SETTINGS_CACHE_RESET);
+            AnalyticsProvider().logEvent('resetBlockedContent');
+          }),
           const CSHeader('Informace'),
           CSButton(
             CSButtonType.DEFAULT,
@@ -114,19 +119,26 @@ class _SettingsPageState extends State<SettingsPage> {
           CSButton(
             CSButtonType.DEFAULT,
             L.SETTINGS_BUGREPORT,
-            () => PlatformTheme.prefillGithubIssue(L.SETTINGS_BUGREPORT_TITLE),
+            () {
+              PlatformTheme.prefillGithubIssue(L.SETTINGS_BUGREPORT_TITLE);
+              AnalyticsProvider().logEvent('reportBug');
+            },
             style: bugreportStyle,
           ),
           CSButton(
             CSButtonType.DEFAULT,
             L.TERMS,
-            () => PlatformTheme.openLink('https://www.nyx.cz/index.php?l=terms;lang=cs'),
+            () {
+              PlatformTheme.openLink('https://www.nyx.cz/index.php?l=terms;lang=cs');
+              AnalyticsProvider().logEvent('openTerms');
+            },
             style: termsStyle,
           ),
           const CSHeader(''),
           CSButton(CSButtonType.DESTRUCTIVE, L.GENERAL_LOGOUT, () {
             ApiController().logout();
             Navigator.of(context, rootNavigator: true).pushNamed('/login');
+            AnalyticsProvider().logEvent('logout');
           }),
           Visibility(
               visible: FyxApp.isDev,

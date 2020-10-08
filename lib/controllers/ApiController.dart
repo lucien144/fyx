@@ -54,7 +54,11 @@ class ApiController {
       PlatformApp.navigatorKey.currentState.pushNamed('/login');
     };
 
-    provider.onError = (message) => PlatformTheme.error(message);
+    provider.onError = (message) {
+      if (['access denied'].indexOf(message.toLowerCase()) == -1) {
+        PlatformTheme.error(message);
+      }
+    };
 
     provider.onSystemData = (data) {
       if (_context == null) {

@@ -5,6 +5,7 @@ import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/ContentBoxLayout.dart';
 import 'package:fyx/components/actionSheets/PostActionSheet.dart';
 import 'package:fyx/components/post/PostAvatar.dart';
+import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
@@ -49,8 +50,12 @@ class _PostListItemState extends State<PostListItem> {
           child: Icon(Icons.more_vert, color: Colors.black38),
           onTap: () => showCupertinoModalPopup(
               context: context,
-              builder: (BuildContext context) =>
-                  PostActionSheet(parentContext: context, user: _post.nick, postId: _post.id, flagPostCallback: (postId) => MainRepository().settings.blockPost(postId)))),
+              builder: (BuildContext context) => PostActionSheet(
+                  parentContext: context,
+                  user: _post.nick,
+                  postId: _post.id,
+                  shareData: ShareData(subject: '@${_post.nick}', body: _post.content.strippedContent, link: _post.link),
+                  flagPostCallback: (postId) => MainRepository().settings.blockPost(postId)))),
       bottomWidget: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
@@ -176,6 +181,7 @@ class _PostListItemState extends State<PostListItem> {
                     PlatformTheme.error(L.REMINDER_ERROR);
                     setState(() => _post.hasReminder = !_post.hasReminder);
                   });
+                  AnalyticsProvider().logEvent('reminder');
                 },
               )
             ],
