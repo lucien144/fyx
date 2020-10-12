@@ -36,7 +36,10 @@ dependencies:
       url: https://github.com/fireslime/photo_view.git
       ref: master
   auto_size_text: ^2.1.0
-  image_picker_modern: ^0.4.12+3
+  image_picker:
+    git:
+      url: https://github.com/knaeckeKami/plugins.git
+      path: packages/image_picker/image_picker
   path: ^1.6.4
   image: ^2.1.14
   async: ^2.4.1
