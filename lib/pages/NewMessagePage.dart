@@ -123,6 +123,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                         textCapitalization: TextCapitalization.characters,
                         placeholder: 'Adresát',
                         autofocus: _recipientController.text.length == 0,
+                        autocorrect: false,
                       )),
                   SizedBox(
                     height: 8,
@@ -132,6 +133,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                     maxLines: 10,
                     autofocus: _recipientController.text.length > 0 || _settings.hasInputField != true,
                     textCapitalization: TextCapitalization.sentences,
+                    autocorrect: false,
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
