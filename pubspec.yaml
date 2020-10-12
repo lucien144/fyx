@@ -22,7 +22,7 @@ dependencies:
   dio: ^3.0.9
   flutter_sticky_header: ^0.4.5
   html: ^0.14.0+3
-  flutter_html: 1.0.0-pre.1
+  flutter_html: 1.0.2
   shared_preferences: ^0.5.8
   fluttertoast: ^7.1.1
   html_unescape: ^1.0.1+3
