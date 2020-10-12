@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
@@ -6,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:image/image.dart' as img;
-import 'package:image_picker_modern/image_picker_modern.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 
 typedef F = Future<bool> Function(String inputField, String message, Map<String, dynamic> attachment);
@@ -37,8 +38,9 @@ class _NewMessagePageState extends State<NewMessagePage> {
   bool _sending = false;
 
   Future getImage(ImageSource source) async {
-    var file = await ImagePicker.pickImage(source: source);
-    var image = img.decodeImage(file.readAsBytesSync());
+    final picker = ImagePicker();
+    var file = await picker.getImage(source: source);
+    var image = img.decodeImage(await file.readAsBytes());
     var big = img.copyResize(image, width: 1024);
     var thumb = img.copyResize(image, width: 50);
     var bigJpg = img.encodeJpg(big, quality: 75);
