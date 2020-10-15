@@ -8,6 +8,7 @@ install:
   - git clone --depth 1 --branch 1.22.0 https://github.com/flutter/flutter.git
   - ./flutter/bin/flutter doctor
   - gem install coveralls-lcov
+  - cp .env.example .env
 script:
   - ./flutter/bin/flutter test --coverage
 after_success:
