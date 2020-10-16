@@ -6,12 +6,13 @@ import 'package:fyx/components/TextIcon.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:share/share.dart';
 
 class ShareData {
   final String subject;
-  final String body;
+  final Content body;
   final String link;
 
   ShareData({this.subject, this.body, this.link});
@@ -58,8 +59,16 @@ class _PostActionSheetState extends State<PostActionSheet> {
                   icon: Icons.share,
                 ),
                 onPressed: () {
+                  String body = widget.shareData.body.strippedContent;
+                  if (body.isEmpty && widget.shareData.body.images.length > 0) {
+                    body = widget.shareData.body.images.fold('', (previousValue, element) => '$previousValue ${element.image}').trim();
+                  }
+                  if (body.isEmpty && widget.shareData.body.videos.length > 0) {
+                    body = widget.shareData.body.videos.fold('', (previousValue, element) => '$previousValue ${element.link}').trim();
+                  }
+
                   final RenderBox box = context.findRenderObject();
-                  Share.share(widget.shareData.body, subject: widget.shareData.subject, sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
+                  Share.share(body, subject: widget.shareData.subject, sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
                   Navigator.pop(context);
                   AnalyticsProvider().logEvent('shareSheet');
                 }),

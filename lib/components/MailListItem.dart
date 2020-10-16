@@ -48,7 +48,7 @@ class _MailListItemState extends State<MailListItem> {
                       parentContext: context,
                       user: widget.mail.participant,
                       postId: widget.mail.id,
-                      shareData: ShareData(subject: '@${widget.mail.participant}', body: widget.mail.content.strippedContent, link: widget.mail.link),
+                      shareData: ShareData(subject: '@${widget.mail.participant}', body: widget.mail.content, link: widget.mail.link),
                       flagPostCallback: (mailId) => MainRepository().settings.blockMail(mailId),
                     )),
           ),
