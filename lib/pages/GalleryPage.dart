@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/theme/T.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
 class GalleryPage extends StatefulWidget {
@@ -50,22 +51,28 @@ class _GalleryPageState extends State<GalleryPage> {
           constraints: BoxConstraints.expand(
             height: MediaQuery.of(context).size.height,
           ),
-          child: PhotoViewGallery.builder(
-            pageController: _controller,
-            backgroundDecoration: BoxDecoration(color: Colors.transparent),
-            scrollPhysics: const BouncingScrollPhysics(),
-            builder: (BuildContext context, int index) {
-              return PhotoViewGalleryPageOptions(imageProvider: CachedNetworkImageProvider(_arguments.images[index].image), onTapDown: (_, __, ___) => close(context));
-            },
-            itemCount: _arguments.images.length,
-            loadingBuilder: (context, chunkEvent) => CupertinoActivityIndicator(radius: 16,),
-            onPageChanged: (i) => setState(() => _page = i + 1),
+          child: SafeArea(
+            child: PhotoViewGallery.builder(
+              pageController: _controller,
+              backgroundDecoration: BoxDecoration(color: Colors.transparent),
+              scrollPhysics: const BouncingScrollPhysics(),
+              builder: (BuildContext context, int index) {
+                return PhotoViewGalleryPageOptions(imageProvider: CachedNetworkImageProvider(_arguments.images[index].image), onTapDown: (_, __, ___) => close(context));
+              },
+              itemCount: _arguments.images.length,
+              loadingBuilder: (context, chunkEvent) => CupertinoActivityIndicator(
+                radius: 16,
+              ),
+              onPageChanged: (i) => setState(() => _page = i + 1),
+            ),
           ),
         ),
         Positioned(
           top: 30,
-          right: 0,
+          right: 30,
           child: CupertinoButton(
+            padding: EdgeInsets.zero,
+            color: T.COLOR_PRIMARY,
             child: Icon(
               CupertinoIcons.clear_thick,
               color: Colors.white,
@@ -75,17 +82,19 @@ class _GalleryPageState extends State<GalleryPage> {
           ),
         ),
         Positioned(
-            width: MediaQuery.of(context).size.width,
+            width: 100,
+            bottom: 30,
+            left: (MediaQuery.of(context).size.width - 100) / 2,
             child: CupertinoButton(
+              color: T.COLOR_PRIMARY,
+              padding: EdgeInsets.zero,
               onPressed: () => close(context),
               child: Text(
                 '$_page / ${_arguments.images.length}',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white),
               ),
-            ),
-            bottom: 30,
-            left: 0)
+            ))
       ],
     );
   }
