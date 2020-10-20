@@ -121,7 +121,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                       visible: _settings.hasInputField == true,
                       child: CupertinoTextField(
                         controller: _recipientController,
-                        inputFormatters: [WhitelistingTextInputFormatter(RegExp('[a-zA-Z0-9_]'))],
+                        inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9_]'))],
                         textCapitalization: TextCapitalization.characters,
                         placeholder: 'Adresát',
                         autofocus: _recipientController.text.length == 0,
