@@ -47,10 +47,11 @@ class PlatformTheme {
       if (await canLaunch(link)) {
         await launch(link);
       } else {
-        PlatformTheme.error(L.INAPPBROWSER_ERROR);
+        throw('Cannot open webview. URL: ${link}');
       }
     } catch (e) {
       PlatformTheme.error(L.INAPPBROWSER_ERROR);
+      MainRepository().sentry.captureException(exception: e);
     }
   }
 
