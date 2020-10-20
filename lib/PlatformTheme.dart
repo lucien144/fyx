@@ -44,10 +44,9 @@ class PlatformTheme {
 
   static openLink(String link) async {
     try {
-      if (await canLaunch(link)) {
-        await launch(link);
-      } else {
-        throw('Cannot open webview. URL: ${link}');
+      var status = await launch(link);
+      if (status == false) {
+        throw ('Cannot open webview. URL: ${link}');
       }
     } catch (e) {
       PlatformTheme.error(L.INAPPBROWSER_ERROR);
