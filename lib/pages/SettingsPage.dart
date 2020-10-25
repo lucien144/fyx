@@ -19,17 +19,20 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   bool _compactMode;
+  bool _autocorrect;
 
   @override
   void initState() {
     super.initState();
     _compactMode = MainRepository().settings.useCompactMode;
+    _autocorrect = MainRepository().settings.useAutocorrect;
     AnalyticsProvider().setScreen('Settings', 'SettingsPage');
   }
 
   @override
   Widget build(BuildContext context) {
     CSWidgetStyle postsStyle = const CSWidgetStyle(icon: const Icon(Icons.view_compact, color: Colors.black54));
+    CSWidgetStyle autocorrectStyle = const CSWidgetStyle(icon: const Icon(Icons.spellcheck, color: Colors.black54));
     CSWidgetStyle bugreportStyle = const CSWidgetStyle(icon: const Icon(Icons.bug_report, color: Colors.black54));
     CSWidgetStyle aboutStyle = const CSWidgetStyle(icon: const Icon(Icons.info, color: Colors.black54));
     CSWidgetStyle patronsStyle = const CSWidgetStyle(icon: const Icon(Icons.stars, color: Colors.black54));
@@ -50,6 +53,16 @@ class _SettingsPageState extends State<SettingsPage> {
             )),
         child: CupertinoSettings(items: <Widget>[
           const CSHeader('Příspěvky'),
+          CSControl(
+            nameWidget: Text('Autocorrect'),
+            contentWidget: CupertinoSwitch(
+                value: _autocorrect,
+                onChanged: (bool value) {
+                  setState(() => _autocorrect = value);
+                  MainRepository().settings.useAutocorrect = value;
+                }),
+            style: autocorrectStyle,
+          ),
           CSControl(
             nameWidget: Text('Kompaktní zobrazení'),
             contentWidget: CupertinoSwitch(

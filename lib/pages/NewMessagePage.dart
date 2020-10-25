@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
@@ -125,7 +126,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                         textCapitalization: TextCapitalization.characters,
                         placeholder: 'Adresát',
                         autofocus: _recipientController.text.length == 0,
-                        autocorrect: false,
+                        autocorrect: MainRepository().settings.useAutocorrect,
                       )),
                   SizedBox(
                     height: 8,
@@ -135,7 +136,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                     maxLines: 10,
                     autofocus: _recipientController.text.length > 0 || _settings.hasInputField != true,
                     textCapitalization: TextCapitalization.sentences,
-                    autocorrect: false,
+                    autocorrect: MainRepository().settings.useAutocorrect,
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
