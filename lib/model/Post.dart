@@ -2,6 +2,7 @@
 import 'package:fyx/model/post/Content.dart';
 
 class Post {
+  final bool isCompact;
   int idKlub;
   int _id_wu;
   String _nick;
@@ -12,9 +13,9 @@ class Post {
 
   Content _content;
 
-  Post.fromJson(Map<String, dynamic> json, this.idKlub) {
+  Post.fromJson(Map<String, dynamic> json, this.idKlub, { this.isCompact }) {
     this._id_wu = int.parse(json['id_wu']);
-    this._content = Content(json['content']);
+    this._content = Content(json['content'], isCompact: this.isCompact);
     this._nick = json['nick'];
     this._time = int.parse(json['time']);
     this._wu_rating = int.parse(json['wu_rating']);

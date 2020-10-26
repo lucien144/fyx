@@ -30,7 +30,7 @@ void main() {
     var json = Map<String, dynamic>.from(_json);
     json.putIfAbsent("content", () => content);
 
-    var post = Post.fromJson(json, 1);
+    var post = Post.fromJson(json, 1, isCompact: true);
     expect(post.id, 51360794);
     expect(post.nick, 'TOMMYSHELBY');
     expect(post.avatar, 'https://i.nyx.cz/T/TOMMYSHELBY.gif');
@@ -63,7 +63,7 @@ void main() {
     var json = Map<String, dynamic>.from(_json);
     json.putIfAbsent("content", () => content);
 
-    var post = Post.fromJson(json, 1);
+    var post = Post.fromJson(json, 1, isCompact: true);
     expect(post.content.consecutiveImages, true);
     expect(post.content.images.length, 2);
     expect(post.content.images[0].image, 'http://i.nyx.cz/files/00/00/20/77/2077557_48d4a18f67ad53d7572e.jpg?name=dbk2.jpg');
@@ -107,7 +107,7 @@ void main() {
     var json = Map<String, dynamic>.from(_json);
     json.putIfAbsent("content", () => content);
 
-    var post = Post.fromJson(json, 1);
+    var post = Post.fromJson(json, 1, isCompact: true);
 
     // No consecutive images
     expect(post.content.consecutiveImages, false);
@@ -153,7 +153,7 @@ void main() {
     var json = Map<String, dynamic>.from(_json);
     json.putIfAbsent("content", () => content);
 
-    var post = Post.fromJson(json, 1);
+    var post = Post.fromJson(json, 1, isCompact: true);
     expect(post.content.body.trim(), expectedContent.trim());
     expect(post.content.strippedContent, 'Lorem ipsum dolor... sit amet :)');
   });
@@ -172,7 +172,7 @@ void main() {
     var json = Map<String, dynamic>.from(_json);
     json.putIfAbsent("content", () => content);
 
-    var post = Post.fromJson(json, 1);
+    var post = Post.fromJson(json, 1, isCompact: true);
     expect(post.content.body.trim(), 'lorem ipsum');
   });
 
@@ -186,7 +186,7 @@ void main() {
     var json = Map<String, dynamic>.from(_json);
     json.putIfAbsent("content", () => content);
 
-    var post = Post.fromJson(json, 1);
+    var post = Post.fromJson(json, 1, isCompact: true);
     expect(post.content.body, 'lorem ipsum');
   });
 
@@ -202,7 +202,7 @@ void main() {
     var json = Map<String, dynamic>.from(_json);
     json.putIfAbsent("content", () => content);
 
-    var post = Post.fromJson(json, 1);
+    var post = Post.fromJson(json, 1, isCompact: true);
     expect(post.content.consecutiveImages, true);
   });
 
@@ -219,7 +219,7 @@ void main() {
     var json = Map<String, dynamic>.from(_json);
     json.putIfAbsent("content", () => content);
 
-    var post = Post.fromJson(json, 1);
+    var post = Post.fromJson(json, 1, isCompact: true);
     expect(post.content.consecutiveImages, false);
   });
 
@@ -236,7 +236,7 @@ void main() {
     var json = Map<String, dynamic>.from(_json);
     json.putIfAbsent("content", () => content);
 
-    var post = Post.fromJson(json, 1);
+    var post = Post.fromJson(json, 1, isCompact: true);
     expect(post.content.consecutiveImages, false);
     expect(post.content.emptyLinks.length, 1);
   });
@@ -259,7 +259,7 @@ void main() {
     var json = Map<String, dynamic>.from(_json);
     json.putIfAbsent("content", () => content);
 
-    var post = Post.fromJson(json, 1);
+    var post = Post.fromJson(json, 1, isCompact: true);
     expect(post.content.body, expectedContent);
   });
 }

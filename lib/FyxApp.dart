@@ -53,10 +53,17 @@ class FyxApp extends StatelessWidget {
   static init(SentryClient sentry) async {
     // This must be initialized after WidgetsFlutterBinding.ensureInitialized
     FlutterError.onError = (details, {bool forceReport = false}) {
-      sentry.captureException(
-        exception: details.exception,
-        stackTrace: details.stack,
-      );
+      try {
+        sentry.captureException(
+          exception: details.exception,
+          stackTrace: details.stack,
+        );
+      } catch (e) {
+        print('Sending report to sentry.io failed: $e');
+      } finally {
+        // Also use Flutter's pretty error logging to the device's console.
+        FlutterError.dumpErrorToConsole(details, forceReport: forceReport);
+      }
     };
 
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);

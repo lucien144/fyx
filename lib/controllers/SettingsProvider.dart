@@ -22,6 +22,12 @@ class SettingsProvider {
     _settings.useCompactMode = mode;
   }
 
+  bool get useAutocorrect => _settings.useAutocorrect;
+  set useAutocorrect(bool autocorrect) {
+    _box.put('useAutocorrect', autocorrect);
+    _settings.useAutocorrect = autocorrect;
+  }
+
   List get blockedMails => _box.get('blockedMails', defaultValue: Settings().blockedMails);
 
   List get blockedPosts => _box.get('blockedPosts', defaultValue: Settings().blockedPosts);
@@ -42,6 +48,7 @@ class SettingsProvider {
     _settings = new Settings();
     _settings.defaultView = _box.get('defaultView', defaultValue: Settings().defaultView);
     _settings.useCompactMode = _box.get('useCompactMode', defaultValue: Settings().useCompactMode);
+    _settings.useAutocorrect = _box.get('useAutocorrect', defaultValue: Settings().useAutocorrect);
 
     return _singleton;
   }
