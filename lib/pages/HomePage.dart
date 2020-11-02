@@ -20,22 +20,29 @@ import 'package:provider/provider.dart';
 
 enum tabs { history, bookmarks }
 
+class HomePageArguments {
+  final pageIndex;
+
+  HomePageArguments(this.pageIndex);
+}
+
 class HomePage extends StatefulWidget {
+  static const int PAGE_BOOKMARK = 0;
+  static const int PAGE_MAIL = 1;
+
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObserver {
-  static const int PAGE_BOOKMARK = 0;
-  static const int PAGE_MAIL = 1;
-
   PageController _bookmarksController;
 
   tabs activeTab;
-  int _pageIndex = PAGE_BOOKMARK;
+  int _pageIndex;
   int _refreshData = 0;
   bool _filterUnread = false;
   List<int> _toggledCategories = [];
+  HomePageArguments _arguments;
 
   @override
   void initState() {
@@ -59,6 +66,9 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
         });
       }
     });
+
+    // Request for push notifications
+    MainRepository().notifications.request();
 
     AnalyticsProvider().setUser(MainRepository().credentials.nickname);
     AnalyticsProvider().setUserProperty('autocorrect', MainRepository().settings.useAutocorrect.toString());
@@ -143,12 +153,20 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   @override
   Widget build(BuildContext context) {
+    if (_arguments == null) {
+      _arguments = ModalRoute.of(context).settings.arguments as HomePageArguments;
+      _pageIndex = _arguments?.pageIndex ?? HomePage.PAGE_BOOKMARK;
+    } else {
+      _pageIndex = _arguments.pageIndex;
+    }
+
     return WillPopScope(
       onWillPop: () async => false,
       child: CupertinoTabScaffold(
         tabBar: CupertinoTabBar(
+          currentIndex: _pageIndex,
           onTap: (index) {
-            if (_pageIndex == index && index == PAGE_BOOKMARK) {
+            if (_pageIndex == index && index == HomePage.PAGE_BOOKMARK) {
               setState(() {
                 _filterUnread = !_filterUnread;
                 // Reset the category toggle
@@ -196,7 +214,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
         ),
         tabBuilder: (context, index) {
           switch (index) {
-            case PAGE_BOOKMARK:
+            case HomePage.PAGE_BOOKMARK:
               return CupertinoTabView(builder: (context) {
                 return CupertinoPageScaffold(
                   navigationBar: CupertinoNavigationBar(
@@ -318,7 +336,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                   ),
                 );
               });
-            case PAGE_MAIL:
+            case HomePage.PAGE_MAIL:
               return CupertinoTabView(builder: (context) {
                 return CupertinoPageScaffold(
                     navigationBar: CupertinoNavigationBar(

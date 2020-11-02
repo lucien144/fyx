@@ -21,6 +21,7 @@ import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry/sentry.dart';
 
+import 'controllers/NotificationsService.dar.dart';
 
 enum Environment { dev, staging, production }
 
@@ -41,6 +42,7 @@ class FyxApp extends StatefulWidget {
 
   static RouteObserver<PageRoute> _routeObserver;
 
+  static NotificationService _notificationsService;
 
   setEnv(env) {
     FyxApp.env = env;
@@ -79,10 +81,18 @@ class FyxApp extends StatefulWidget {
     MainRepository().settings = results[3];
     MainRepository().sentry = sentry;
 
-    AnalyticsProvider.provider = analytics;
+    _notificationsService = NotificationService(
+      onToken: (fcmToken) => ApiController().registerFcmToken(fcmToken), // TODO: Do not register if the token is already saved.
+      onTokenRefresh: (fcmToken) => ApiController().refreshFcmToken(fcmToken),
+    );
+    _notificationsService.onNewMail = () => PlatformApp.navigatorKey.currentState.pushReplacementNamed('/home', arguments: HomePageArguments(HomePage.PAGE_MAIL));
+    _notificationsService.onNewPost = () => PlatformApp.navigatorKey.currentState.pushReplacementNamed('/home', arguments: HomePageArguments(HomePage.PAGE_BOOKMARK));
+    _notificationsService.onError = (error) {
+      print(error);
+      MainRepository().sentry.captureException(exception: error);
+    };
+    MainRepository().notifications = _notificationsService;
 
-    FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-    _firebaseMessaging.requestNotificationPermissions();
     AnalyticsProvider.provider = analytics;
   }
 
@@ -121,5 +131,11 @@ class _FyxAppState extends State<FyxApp> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    FyxApp._notificationsService.dispose();
   }
 }
