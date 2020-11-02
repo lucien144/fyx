@@ -64,8 +64,7 @@ class _TutorialPageState extends State<TutorialPage> {
                         });
 
                     setState(() => _loggingIn = true);
-                    ApiController().provider.getCredentials().then((credentials) {
-                      // Save the credentials for later use.
+                    ApiController().getCredentials().then((credentials) {
                       MainRepository().credentials = credentials;
                       // Test the authorization. If all is OK, go to /home screen...
                       ApiController().testAuth().then((isOk) {

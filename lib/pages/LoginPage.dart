@@ -126,7 +126,7 @@ class _LoginPageState extends State<LoginPage> {
           setState(() => _isRunning = true);
 
           if (_useTokenToLogin && _tokenController.text.length > 0) {
-            ApiController().setCredentials(_loginController.text, _tokenController.text).then((Credentials credentials) {
+            ApiController().setCredentials(Credentials(_loginController.text, _tokenController.text)).then((Credentials credentials) {
               MainRepository().credentials = credentials;
               Navigator.of(context).pushNamed('/home');
             }).whenComplete(() {

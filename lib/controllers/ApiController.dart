@@ -8,6 +8,7 @@ import 'package:fyx/controllers/ApiProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/exceptions/AuthException.dart';
 import 'package:fyx/model/Credentials.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/System.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
@@ -78,26 +79,83 @@ class ApiController {
       throwAuthException(loginResponse, message: 'Cannot authorize user.');
     }
 
-    var prefs = await SharedPreferences.getInstance();
-    await Future.wait([prefs.setString('token', loginResponse.authToken), prefs.setString('nickname', nickname)]);
-    var credentials = Credentials(nickname, loginResponse.authToken);
-    provider.setCredentials(credentials);
+    await this.setCredentials(Credentials(nickname, loginResponse.authToken));
     isLoggingIn = false;
     return loginResponse;
   }
 
-  Future<Credentials> setCredentials(String nickname, String token) async {
+  Future<Credentials> setCredentials(Credentials credentials) async {
+    if (credentials.isValid) {
+      var storage = await SharedPreferences.getInstance();
+      await storage.setString('identity', jsonEncode(credentials));
+      return Future(() => credentials);
+    }
+
+    return Future(() => null);
+  }
+
+  Future<Credentials> getCredentials() async {
+    Credentials creds = provider.getCredentials();
+
+    if (creds is Credentials) {
+      return creds;
+    }
+
     var prefs = await SharedPreferences.getInstance();
-    await Future.wait([prefs.setString('token', token), prefs.setString('nickname', nickname)]);
-    var credentials = Credentials(nickname, token);
-    provider.setCredentials(credentials);
-    return credentials;
+    String identity = prefs.getString('identity');
+
+    // Breaking change fix
+    if (identity == null) {
+      creds = Credentials(prefs.getString('nickname'), prefs.getString('token'));
+      return this.provider.setCredentials(creds);
+    }
+
+    creds = Credentials.fromJson(jsonDecode(identity));
+    return this.provider.setCredentials(creds);
   }
 
   Future<bool> testAuth() async {
+    isLoggingIn = true;
     var response = await provider.testAuth();
     var json = jsonDecode(response.data);
+    isLoggingIn = false;
     return json['result'] == 'ok';
+  }
+
+  void registerFcmToken(String token) {
+    this.getCredentials().then((creds) async {
+      if (creds == null) {
+        return;
+      }
+
+      if (creds.fcmToken == null || creds.fcmToken == '') {
+        try {
+          await provider.registerFcmToken(token);
+          print('registerFcmToken');
+          this.setCredentials(creds.copyWith(fcmToken: token));
+        } catch (error) {
+          debugPrint(error);
+          MainRepository().sentry.captureException(exception: error);
+        }
+      }
+    });
+  }
+
+  void refreshFcmToken(String token) {
+    this.getCredentials().then((creds) async {
+        try {
+          if (creds == null) {
+            return;
+          }
+
+          print('refreshFcmToken');
+          await provider.registerFcmToken(token);
+          this.setCredentials(creds.copyWith(fcmToken: token));
+        } catch (error) {
+          debugPrint(error);
+          MainRepository().sentry.captureException(exception: error);
+      }
+    });
   }
 
   Future<BookmarksResponse> loadHistory() async {

@@ -10,11 +10,12 @@ abstract class IApiProvider {
   TOnAuthError onAuthError;
   TOnSystemData onSystemData;
 
-  Future<Credentials> getCredentials();
-  void setCredentials(Credentials val);
+  Credentials getCredentials();
+  Credentials setCredentials(Credentials val);
   Future<Response> login(String username);
   Future<Response> testAuth();
   Future<Response> logout();
+  Future<Response> registerFcmToken(String token);
   Future<Response> fetchBookmarks();
   Future<Response> fetchHistory();
   Future<Response> fetchDiscussion(int id, {int lastId});

@@ -6,6 +6,7 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -67,10 +68,16 @@ class ApiMock implements IApiProvider {
   }
 
   @override
-  Future<Credentials> getCredentials() {
+  Credentials getCredentials() {
     // TODO: implement getCredentials
     return null;
   }
+
+  @override
+  Credentials setCredentials(Credentials val) {
+    // TODO: implement setCredentials
+  }
+
 
   @override
   Future<Response> giveRating(int discussionId, int postId, bool add, bool confirm) {
@@ -97,11 +104,6 @@ class ApiMock implements IApiProvider {
   }
 
   @override
-  void setCredentials(Credentials val) {
-    // TODO: implement setCredentials
-  }
-
-  @override
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder) {
     // TODO: implement setPostReminder
     return null;
@@ -110,6 +112,12 @@ class ApiMock implements IApiProvider {
   @override
   Future<Response> testAuth() {
     // TODO: implement testAuth
+    return null;
+  }
+
+  @override
+  Future<Response> registerFcmToken(String token) {
+    // TODO: implement registerFcmToken
     return null;
   }
 }
@@ -144,8 +152,11 @@ void main() {
     expect(loginResponse.isAuthorized, true);
 
     var prefs = await SharedPreferences.getInstance();
-    expect(prefs.getString('nickname'), loginName);
-    expect(prefs.getString('token'), '44a3d1241830ca61a592e28df783007d');
+    String json = prefs.getString('identity');
+    var creds = Credentials.fromJson(jsonDecode(json));
+    expect(creds.nickname, loginName);
+    expect(creds.token, '44a3d1241830ca61a592e28df783007d');
+    expect(creds.fcmToken, null);
   });
 
   test('User types invalid username.', () async {
