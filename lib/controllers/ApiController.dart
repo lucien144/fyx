@@ -104,9 +104,16 @@ class ApiController {
     var prefs = await SharedPreferences.getInstance();
     String identity = prefs.getString('identity');
 
-    // Breaking change fix
+    // Breaking change fix -> old identity storage
     if (identity == null) {
+      // Load identity from old storage
       creds = Credentials(prefs.getString('nickname'), prefs.getString('token'));
+      // Save the identity into the new storage
+      this.setCredentials(creds);
+      // Remove the old fragments
+      prefs.remove('nickname');
+      prefs.remove('token');
+      // Update the provider's identity
       return this.provider.setCredentials(creds);
     }
 
