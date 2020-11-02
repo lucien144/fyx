@@ -1,0 +1,15 @@
+{
+   "Simulator Target Bundle": "wtf.144.fyx",
+   "aps":{
+       "alert": {
+           "title": "Push Notification",
+           "subtitle": "Xcode 11.4 beta is here",
+           "body": "🥰 Woohoo! Push notification in simulator! 😍",
+       },
+      "badge":1,
+      "sound":"default",
+   },
+   "data": {
+           "type": "new_mail",
+          }
+}
