@@ -1,15 +1,16 @@
 {
    "Simulator Target Bundle": "wtf.144.fyx",
+   "gcm.message_id": 1234567,
+   "google.c.sender.id": 9765431,
+   "google.c.a.e": 1,
+   "type": "new_mail",
    "aps":{
        "alert": {
-           "title": "Push Notification",
-           "subtitle": "Xcode 11.4 beta is here",
-           "body": "🥰 Woohoo! Push notification in simulator! 😍",
+           "title": "Nová zpráva",
+           "subtitle": "Máte novou zprávu v poště.",
+           "body": "Máte novou zprávu v poště.",
        },
       "badge":1,
-      "sound":"default",
-   },
-   "data": {
-           "type": "new_mail",
-          }
+      "sound":"default"
+   }
 }

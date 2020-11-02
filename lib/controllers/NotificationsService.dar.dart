@@ -50,7 +50,7 @@ class NotificationService {
   void _handleNotifications(Map<String, dynamic> message) {
     try {
       PlatformTheme.success(message.toString());
-      String type = message['data']['type'] ?? null;
+      String type = message['type'] ?? null;
       if (type == 'new_mail') {
         if (onNewMail is Function) {
           onNewMail();
