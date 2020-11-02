@@ -46,7 +46,7 @@ class PlatformTheme {
     try {
       var status = await launch(link);
       if (status == false) {
-        throw ('Cannot open webview. URL: ${link}');
+        throw ('Cannot open webview. URL: $link');
       }
     } catch (e) {
       PlatformTheme.error(L.INAPPBROWSER_ERROR);

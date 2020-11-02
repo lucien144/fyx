@@ -164,7 +164,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ApiController().logout(removeAuthrorization: false);
                 Navigator.of(context, rootNavigator: true).pushNamed('/login');
               })),
-          CSDescription('Verze: ${version}'),
+          CSDescription('Verze: $version'),
           GestureDetector(child: CSDescription('Nahlídnout pod kapotu.'), onTap: () => setState(() => _underTheHood = !_underTheHood)),
           Visibility(
             visible: _underTheHood,
