@@ -52,7 +52,5 @@
 	<string>Light</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
-	<key>FirebaseAppDelegateProxyEnabled</key>
-    <false/>
 </dict>
 </plist>
