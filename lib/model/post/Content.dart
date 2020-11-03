@@ -1,5 +1,4 @@
 import 'package:fyx/PlatformTheme.dart';
-import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/post/Image.dart';
 import 'package:fyx/model/post/Link.dart';
 import 'package:fyx/model/post/Video.dart';

@@ -1,14 +1,12 @@
 import 'dart:async';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:fyx/PlatformTheme.dart';
 import 'package:meta/meta.dart';
 
 typedef ErrorCallback = Function(dynamic error);
 typedef TokenCallback = Function(String token);
 
 class NotificationService {
-
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   StreamSubscription<String> _tokenStream;
   Function onNewMail;
@@ -18,7 +16,9 @@ class NotificationService {
   TokenCallback _onToken;
   TokenCallback _onTokenRefresh;
 
-  NotificationService({@required TokenCallback onToken, @required TokenCallback onTokenRefresh}): this._onToken = onToken, this._onTokenRefresh = onTokenRefresh {
+  NotificationService({@required TokenCallback onToken, @required TokenCallback onTokenRefresh})
+      : this._onToken = onToken,
+        this._onTokenRefresh = onTokenRefresh {
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         _handleNotifications(message);
@@ -49,7 +49,6 @@ class NotificationService {
 
   void _handleNotifications(Map<String, dynamic> message) {
     try {
-      PlatformTheme.success(message.toString());
       String type = message['type'] ?? null;
       if (type == 'new_mail') {
         if (onNewMail is Function) {
