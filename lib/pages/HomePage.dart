@@ -153,11 +153,13 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   @override
   Widget build(BuildContext context) {
-    if (_arguments == null) {
-      _arguments = ModalRoute.of(context).settings.arguments as HomePageArguments;
-      _pageIndex = _arguments?.pageIndex ?? HomePage.PAGE_BOOKMARK;
-    } else {
-      _pageIndex = _arguments.pageIndex;
+    if (_pageIndex == null) {
+      if (_arguments == null) {
+        _arguments = ModalRoute.of(context).settings.arguments as HomePageArguments;
+        _pageIndex = _arguments?.pageIndex ?? HomePage.PAGE_BOOKMARK;
+      } else {
+        _pageIndex = _arguments.pageIndex;
+      }
     }
 
     return WillPopScope(
@@ -173,7 +175,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                 _toggledCategories = [];
               });
             }
-            _pageIndex = index;
+            setState(() => _pageIndex = index);
             this.refreshData();
           },
           backgroundColor: Colors.white,
