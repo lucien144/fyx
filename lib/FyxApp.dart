@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:device_info/device_info.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
@@ -19,9 +21,11 @@ import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry/sentry.dart';
 
+import 'controllers/NotificationsService.dar.dart';
+
 enum Environment { dev, staging, production }
 
-class FyxApp extends StatelessWidget {
+class FyxApp extends StatefulWidget {
   static Environment _env;
 
   static set env(val) => FyxApp._env = val;
@@ -38,15 +42,17 @@ class FyxApp extends StatelessWidget {
 
   static RouteObserver<PageRoute> _routeObserver;
 
+  static NotificationService _notificationsService;
+
+  setEnv(env) {
+    FyxApp.env = env;
+  }
+
   static get routeObserver {
     if (_routeObserver == null) {
       _routeObserver = RouteObserver<PageRoute>();
     }
     return _routeObserver;
-  }
-
-  setEnv(env) {
-    FyxApp.env = env;
   }
 
   static init(SentryClient sentry) async {
@@ -68,16 +74,33 @@ class FyxApp extends StatelessWidget {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
     // TODO: Move to build using FutureBuilder.
-    var results = await Future.wait([ApiController().provider.getCredentials(), PackageInfo.fromPlatform(), DeviceInfoPlugin().iosInfo, SettingsProvider().init()]);
+    var results = await Future.wait([ApiController().getCredentials(), PackageInfo.fromPlatform(), DeviceInfoPlugin().iosInfo, SettingsProvider().init()]);
     MainRepository().credentials = results[0];
     MainRepository().packageInfo = results[1];
     MainRepository().deviceInfo = results[2];
     MainRepository().settings = results[3];
     MainRepository().sentry = sentry;
 
+    _notificationsService = NotificationService(
+      onToken: (fcmToken) => ApiController().registerFcmToken(fcmToken), // TODO: Do not register if the token is already saved.
+      onTokenRefresh: (fcmToken) => ApiController().refreshFcmToken(fcmToken),
+    );
+    _notificationsService.onNewMail = () => PlatformApp.navigatorKey.currentState.pushReplacementNamed('/home', arguments: HomePageArguments(HomePage.PAGE_MAIL));
+    _notificationsService.onNewPost = () => PlatformApp.navigatorKey.currentState.pushReplacementNamed('/home', arguments: HomePageArguments(HomePage.PAGE_BOOKMARK));
+    _notificationsService.onError = (error) {
+      print(error);
+      MainRepository().sentry.captureException(exception: error);
+    };
+    MainRepository().notifications = _notificationsService;
+
     AnalyticsProvider.provider = analytics;
   }
 
+  @override
+  _FyxAppState createState() => _FyxAppState();
+}
+
+class _FyxAppState extends State<FyxApp> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -100,7 +123,7 @@ class FyxApp extends StatelessWidget {
           listNavigatorObservers: [
             FyxApp.routeObserver,
             FirebaseAnalyticsObserver(
-                analytics: analytics,
+                analytics: FyxApp.analytics,
                 onError: (error) async => await MainRepository().sentry.captureException(
                       exception: error,
                     ))
@@ -108,5 +131,11 @@ class FyxApp extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    FyxApp._notificationsService.dispose();
   }
 }

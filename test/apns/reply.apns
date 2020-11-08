@@ -1,0 +1,16 @@
+{
+   "Simulator Target Bundle": "wtf.144.fyx",
+   "gcm.message_id": 1234567,
+   "google.c.sender.id": 9765431,
+   "google.c.a.e": 1,
+   "type": "reply",
+   "aps":{
+       "alert": {
+           "title": "Nová odpověď",
+           "subtitle": "Máte novou odpověď na příspěvek.",
+           "body": "Máte novou odpověď na příspěvek.",
+       },
+      "badge":1,
+      "sound":"default"
+   }
+}

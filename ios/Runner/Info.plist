@@ -28,6 +28,11 @@
 	<string>K nahrání videa se zvukem je potřeba povolit přístup k mikrofónu.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>K nahrání obrázku je potřeba povolit přístup k fotkám.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

@@ -6,7 +6,6 @@ import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:package_info/package_info.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiProvider implements IApiProvider {
   final Dio dio = Dio();
@@ -22,16 +21,19 @@ class ApiProvider implements IApiProvider {
   TOnAuthError onAuthError;
   TOnSystemData onSystemData;
 
-  getCredentials() async {
+  Credentials getCredentials() {
     if (_credentials != null && _credentials.isValid) {
-      return Future(() => _credentials);
+      return _credentials;
     }
-    var prefs = await SharedPreferences.getInstance();
-    setCredentials(Credentials(prefs.getString('nickname'), prefs.getString('token')));
-    return Future(() => _credentials);
+    return null;
   }
 
-  setCredentials(Credentials val) => _credentials = val.isValid ? val : null;
+  Credentials setCredentials(Credentials creds) {
+    if (creds != null && creds.isValid) {
+      _credentials = creds;
+    }
+    return _credentials;
+  }
 
   ApiProvider() {
     try {
@@ -50,9 +52,10 @@ class ApiProvider implements IApiProvider {
         });
     } catch (e) {}
 
-    SharedPreferences.getInstance().then((prefs) {
-      _credentials = Credentials(prefs.getString('nickname'), prefs.getString('token'));
-    });
+    // SharedPreferences.getInstance().then((prefs) {
+    //   print('api providers constructor');
+    //   _credentials = Credentials(prefs.getString('nickname'), prefs.getString('token'));
+    // });
 
     dio.interceptors.add(InterceptorsWrapper(onRequest: (RequestOptions options) async {
       print('[API] ${options.method.toUpperCase()}: ${options.uri}');
@@ -111,6 +114,11 @@ class ApiProvider implements IApiProvider {
       'l': 'help',
       'l2': 'test',
     });
+    return await dio.post(URL, data: formData, options: _options);
+  }
+
+  Future<Response> registerFcmToken(String token) async {
+    FormData formData = new FormData.fromMap({'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'gcm', 'l2': 'register', 'regid': token});
     return await dio.post(URL, data: formData, options: _options);
   }
 
