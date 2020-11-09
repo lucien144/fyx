@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
@@ -5,8 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:image/image.dart' as img;
-import 'package:image_picker_modern/image_picker_modern.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 
 typedef F = Future<bool> Function(String inputField, String message, Map<String, dynamic> attachment);
@@ -37,8 +39,9 @@ class _NewMessagePageState extends State<NewMessagePage> {
   bool _sending = false;
 
   Future getImage(ImageSource source) async {
-    var file = await ImagePicker.pickImage(source: source);
-    var image = img.decodeImage(file.readAsBytesSync());
+    final picker = ImagePicker();
+    var file = await picker.getImage(source: source);
+    var image = img.decodeImage(await file.readAsBytes());
     var big = img.copyResize(image, width: 1024);
     var thumb = img.copyResize(image, width: 50);
     var bigJpg = img.encodeJpg(big, quality: 75);
@@ -119,10 +122,11 @@ class _NewMessagePageState extends State<NewMessagePage> {
                       visible: _settings.hasInputField == true,
                       child: CupertinoTextField(
                         controller: _recipientController,
-                        inputFormatters: [WhitelistingTextInputFormatter(RegExp('[a-zA-Z0-9_]'))],
+                        inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9_]'))],
                         textCapitalization: TextCapitalization.characters,
                         placeholder: 'Adresát',
                         autofocus: _recipientController.text.length == 0,
+                        autocorrect: MainRepository().settings.useAutocorrect,
                       )),
                   SizedBox(
                     height: 8,
@@ -132,6 +136,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                     maxLines: 10,
                     autofocus: _recipientController.text.length > 0 || _settings.hasInputField != true,
                     textCapitalization: TextCapitalization.sentences,
+                    autocorrect: MainRepository().settings.useAutocorrect,
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),

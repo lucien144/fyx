@@ -61,6 +61,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     });
 
     AnalyticsProvider().setUser(MainRepository().credentials.nickname);
+    AnalyticsProvider().setUserProperty('autocorrect', MainRepository().settings.useAutocorrect.toString());
     AnalyticsProvider().setUserProperty('compactMode', MainRepository().settings.useCompactMode.toString());
     AnalyticsProvider().setUserProperty('defaultView', MainRepository().settings.defaultView.toString());
     AnalyticsProvider().setUserProperty('blockedMails', MainRepository().settings.blockedMails.length.toString());

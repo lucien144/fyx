@@ -26,7 +26,8 @@ class PostHtml extends StatelessWidget {
       data: MainRepository().settings.useCompactMode && content.consecutiveImages ? content.body : content.rawBody,
       style: {
         "html": Style.fromTextStyle(PlatformTheme.of(context).textTheme.textStyle ?? PlatformTheme.of(context).textTheme.body1),
-        ".image-link": Style(textDecoration: TextDecoration.none)
+        ".image-link": Style(textDecoration: TextDecoration.none),
+        "span.r": Style(fontWeight: FontWeight.bold),
       },
       customRender: {
         'img': (
@@ -84,10 +85,11 @@ class PostHtml extends StatelessWidget {
           Map<String, String> attributes,
           dom.Element element,
         ) {
+          // Spoiler
           if (element.classes.contains('spoiler')) {
             return Spoiler(element.text);
           }
-          return null;
+          return parsedChild;
         }
       },
       onImageTap: (String src) {

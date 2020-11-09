@@ -54,7 +54,7 @@ class _PostListItemState extends State<PostListItem> {
                   parentContext: context,
                   user: _post.nick,
                   postId: _post.id,
-                  shareData: ShareData(subject: '@${_post.nick}', body: _post.content.strippedContent, link: _post.link),
+                  shareData: ShareData(subject: '@${_post.nick}', body: _post.content, link: _post.link),
                   flagPostCallback: (postId) => MainRepository().settings.blockPost(postId)))),
       bottomWidget: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

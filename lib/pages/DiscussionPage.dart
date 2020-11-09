@@ -169,7 +169,7 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
               }
               var data = (result as List)
                   .map((post) {
-                    return Post.fromJson(post, pageArguments.discussionId);
+                    return Post.fromJson(post, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode);
                   })
                   .where((post) => !MainRepository().settings.isPostBlocked(post.id))
                   .where((post) => !MainRepository().settings.isUserBlocked(post.nick))
@@ -178,7 +178,7 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
 
               int id;
               try {
-                id = Post.fromJson((result as List).last, pageArguments.discussionId).id;
+                id = Post.fromJson((result as List).last, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode).id;
               } catch (error) {}
               return DataProviderResult(data, lastId: id);
             },

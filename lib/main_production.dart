@@ -16,10 +16,16 @@ void main() async {
       return runApp(FyxApp()..setEnv(Environment.production));
     },
     (error, stackTrace) async {
-      await sentry.captureException(
-        exception: error,
-        stackTrace: stackTrace,
-      );
+      try {
+        await sentry.captureException(
+          exception: error,
+          stackTrace: stackTrace,
+        );
+        print('Error sent to sentry.io: $error');
+      } catch (e) {
+        print('Sending report to sentry.io failed: $e');
+        print('Original error: $error');
+      }
     },
   );
 }

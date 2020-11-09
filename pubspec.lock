@@ -203,7 +203,7 @@ packages:
       name: csslib
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.16.1"
+    version: "0.16.2"
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -348,7 +348,7 @@ packages:
       name: flutter_html
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.0-pre.1"
+    version: "1.0.2"
   flutter_markdown:
     dependency: "direct main"
     description:
@@ -356,6 +356,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.2"
+  flutter_plugin_android_lifecycle:
+    dependency: transitive
+    description:
+      name: flutter_plugin_android_lifecycle
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.11"
   flutter_sticky_header:
     dependency: "direct main"
     description:
@@ -464,13 +471,22 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.14"
-  image_picker_modern:
+  image_picker:
     dependency: "direct main"
     description:
-      name: image_picker_modern
+      path: "packages/image_picker/image_picker"
+      ref: HEAD
+      resolved-ref: f0ad6f041e5cb94fb065c40e8d7c8a13bd54d831
+      url: "https://github.com/knaeckeKami/plugins.git"
+    source: git
+    version: "0.6.7+11"
+  image_picker_platform_interface:
+    dependency: transitive
+    description:
+      name: image_picker_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.4.12+3"
+    version: "1.1.1"
   intl:
     dependency: transitive
     description:
@@ -883,7 +899,7 @@ packages:
       name: url_launcher
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.6.0"
+    version: "5.7.5"
   url_launcher_linux:
     dependency: transitive
     description:
@@ -988,7 +1004,7 @@ packages:
       name: webview_flutter
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.20"
+    version: "0.3.24"
   xdg_directories:
     dependency: transitive
     description:

@@ -1,4 +1,5 @@
 import 'package:fyx/PlatformTheme.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/post/Image.dart';
 import 'package:fyx/model/post/Link.dart';
 import 'package:fyx/model/post/Video.dart';
@@ -7,6 +8,8 @@ import 'package:html/parser.dart';
 import 'package:html_unescape/html_unescape.dart';
 
 class Content {
+  final bool isCompact;
+
   String _body;
   String _rawBody;
 
@@ -19,7 +22,7 @@ class Content {
   List<Link> _emptyLinks = [];
   List<Video> _videos = [];
 
-  Content(this._body) {
+  Content(this._body, { this.isCompact }) {
     _rawBody = _body;
     _rawBody = this._tagAllImageLinks(_rawBody); // This updates the raw body.
     _body = this._tagAllImageLinks(_body); // This updates the raw body.
@@ -115,7 +118,10 @@ class Content {
         // Remove the video element from the content.
         this._videos.add(video);
 
-        el.remove();
+        // If the content should be reduced and compact, we need to remove the emebed otherwise the poster would be doubled in images.
+        if (this.isCompact == true) {
+          el.remove();
+        }
       });
       _body = document.body.innerHtml;
     } catch (error) {

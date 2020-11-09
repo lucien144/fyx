@@ -80,6 +80,7 @@ class _LoginPageState extends State<LoginPage> {
                 placeholder: 'NICKNAME',
                 controller: _loginController,
                 decoration: T.TEXTFIELD_DECORATION,
+                autocorrect: false,
               ),
               Visibility(
                 visible: _useTokenToLogin,
@@ -89,6 +90,7 @@ class _LoginPageState extends State<LoginPage> {
                   placeholder: 'TOKEN',
                   controller: _tokenController,
                   decoration: T.TEXTFIELD_DECORATION,
+                  autocorrect: false,
                 ),
               )
             ],
