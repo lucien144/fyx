@@ -7,8 +7,10 @@ class T {
   // Colors
   // Color scheme -> https://mycolor.space/?hex=%231AD592&sub=1
   static const Color COLOR_PRIMARY = Color(0xFF196378);
+  static const Color COLOR_LIGHT = Color(0xffE9F3F5);
   static const Color COLOR_SECONDARY = Color(0xff007F90);
   static const Color COLOR_BLACK = Color(0xFF282828);
+  static const Color COLOR_ACCENT = Color(0xffB60F0F);
 
   // Others
   static final BoxShadow BOX_SHADOW = BoxShadow(color: Color.fromRGBO(0, 0, 0, 0.5), offset: Offset(0, 0), blurRadius: 16);
