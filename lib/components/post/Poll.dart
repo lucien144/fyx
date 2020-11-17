@@ -20,6 +20,38 @@ class Poll extends StatefulWidget {
 class _PollState extends State<Poll> {
   bool _showColumnStats = false;
   bool _showRowStats = false;
+  TapGestureRecognizer votesRecognizer;
+  TapGestureRecognizer columnsRecognizer;
+  TapGestureRecognizer rowsRecognizer;
+
+  @override
+  void initState() {
+    votesRecognizer = TapGestureRecognizer()
+      ..onTap = () {
+        setState(() {
+          _showRowStats = false;
+          _showColumnStats = false;
+        });
+      };
+
+    columnsRecognizer = TapGestureRecognizer()
+      ..onTap = () {
+        setState(() {
+          _showRowStats = false;
+          _showColumnStats = !_showColumnStats;
+        });
+      };
+
+    rowsRecognizer = TapGestureRecognizer()
+      ..onTap = () {
+        setState(() {
+          _showRowStats = !_showRowStats;
+          _showColumnStats = false;
+        });
+      };
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,29 +82,6 @@ class _PollState extends State<Poll> {
           ) {
             // Main box element styling
             if (element.classes.contains('w-dyn')) {
-              var votesRecognizer = TapGestureRecognizer()
-                ..onTap = () {
-                  setState(() {
-                    _showRowStats = false;
-                    _showColumnStats = false;
-                  });
-                };
-
-              var columnsRecognizer = TapGestureRecognizer()
-                ..onTap = () {
-                  setState(() {
-                    _showRowStats = false;
-                    _showColumnStats = !_showColumnStats;
-                  });
-                };
-
-              var rowsRecognizer = TapGestureRecognizer()
-                ..onTap = () {
-                  setState(() {
-                    _showRowStats = !_showRowStats;
-                    _showColumnStats = false;
-                  });
-                };
               return Container(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
