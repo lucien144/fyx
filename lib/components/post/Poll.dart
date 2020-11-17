@@ -87,41 +87,44 @@ class _PollState extends State<Poll> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     parsedChild,
-                    RichText(
-                        text: TextSpan(
-                            text: 'Zobrazit %: ',
-                            style: DefaultTextStyle.of(context)
-                                .style
-                                .apply(fontSizeFactor: 0.9),
-                            children: [
-                          TextSpan(
-                              text: 'hlasy',
-                              recognizer: votesRecognizer,
-                              style: TextStyle(
-                                  decoration: TextDecoration.underline,
-                                  fontWeight:
-                                      !_showColumnStats && !_showRowStats
-                                          ? FontWeight.bold
-                                          : null)),
-                          TextSpan(text: ', '),
-                          TextSpan(
-                              text: 'sloupce',
-                              recognizer: columnsRecognizer,
-                              style: TextStyle(
-                                  decoration: TextDecoration.underline,
-                                  fontWeight: _showColumnStats && !_showRowStats
-                                      ? FontWeight.bold
-                                      : null)),
-                          TextSpan(text: ', '),
-                          TextSpan(
-                              text: 'řádky',
-                              recognizer: rowsRecognizer,
-                              style: TextStyle(
-                                  decoration: TextDecoration.underline,
-                                  fontWeight: !_showColumnStats && _showRowStats
-                                      ? FontWeight.bold
-                                      : null))
-                        ]))
+                    if (element.classes.contains('w2'))
+                      RichText(
+                          text: TextSpan(
+                              text: 'Zobrazit %: ',
+                              style: DefaultTextStyle.of(context)
+                                  .style
+                                  .apply(fontSizeFactor: 0.9),
+                              children: [
+                            TextSpan(
+                                text: 'hlasy',
+                                recognizer: votesRecognizer,
+                                style: TextStyle(
+                                    decoration: TextDecoration.underline,
+                                    fontWeight:
+                                        !_showColumnStats && !_showRowStats
+                                            ? FontWeight.bold
+                                            : null)),
+                            TextSpan(text: ', '),
+                            TextSpan(
+                                text: 'sloupce',
+                                recognizer: columnsRecognizer,
+                                style: TextStyle(
+                                    decoration: TextDecoration.underline,
+                                    fontWeight:
+                                        _showColumnStats && !_showRowStats
+                                            ? FontWeight.bold
+                                            : null)),
+                            TextSpan(text: ', '),
+                            TextSpan(
+                                text: 'řádky',
+                                recognizer: rowsRecognizer,
+                                style: TextStyle(
+                                    decoration: TextDecoration.underline,
+                                    fontWeight:
+                                        !_showColumnStats && _showRowStats
+                                            ? FontWeight.bold
+                                            : null))
+                          ]))
                   ],
                 ),
                 color: Color(0xffcde5e9),
