@@ -7,12 +7,14 @@ import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/post/Poll.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/components/post/Spoiler.dart';
+import 'package:fyx/components/post/SyntaxHighlighter.dart';
 import 'package:fyx/components/post/VideoPlayer.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/Image.dart' as post;
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:html/dom.dart' as dom;
+import 'package:html_unescape/html_unescape.dart';
 
 class PostHtml extends StatelessWidget {
   final Content content;
@@ -20,7 +22,7 @@ class PostHtml extends StatelessWidget {
 
   /// overloadRaw - if true, the content.rawBody is used to parse no matter what settings is on.
   PostHtml(this.content);
-  
+
   @override
   Widget build(BuildContext context) {
     return Html(
@@ -113,6 +115,15 @@ class PostHtml extends StatelessWidget {
           }
 
           return parsedChild;
+        },
+        'code': (
+          RenderContext renderContext,
+          Widget parsedChild,
+          Map<String, String> attributes,
+          dom.Element element,
+        ) {
+          final source = HtmlUnescape().convert(element.innerHtml);
+          return SyntaxHighlighter(source);
         }
       },
       onImageTap: (String src) {

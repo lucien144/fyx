@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/components/post/PostListItem.dart';
+import 'package:fyx/components/post/SyntaxHighlighter.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
@@ -110,6 +111,10 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
   }
 
   Widget _createDiscussionPage(DiscussionResponse discussionResponse, DiscussionPageArguments pageArguments) {
+    // Save the language context for further use
+    // TODO: Not ideal, probably better to use Provider. Or not?
+    SyntaxHighlighter.languageContext = discussionResponse.discussion.name;
+
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
           backgroundColor: Colors.white,
