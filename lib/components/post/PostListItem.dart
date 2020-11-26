@@ -21,8 +21,7 @@ class PostListItem extends StatefulWidget {
   final bool _isHighlighted;
   final Function onUpdate;
 
-  PostListItem(this.post,
-      {this.onUpdate, isPreview = false, isHighlighted = false})
+  PostListItem(this.post, {this.onUpdate, isPreview = false, isHighlighted = false})
       : _isPreview = isPreview,
         _isHighlighted = isHighlighted;
 
@@ -32,6 +31,7 @@ class PostListItem extends StatefulWidget {
 
 class _PostListItemState extends State<PostListItem> {
   Post _post;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -57,12 +57,8 @@ class _PostListItemState extends State<PostListItem> {
                   parentContext: context,
                   user: _post.nick,
                   postId: _post.id,
-                  shareData: ShareData(
-                      subject: '@${_post.nick}',
-                      body: _post.content,
-                      link: _post.link),
-                  flagPostCallback: (postId) =>
-                      MainRepository().settings.blockPost(postId)))),
+                  shareData: ShareData(subject: '@${_post.nick}', body: _post.content, link: _post.link),
+                  flagPostCallback: (postId) => MainRepository().settings.blockPost(postId)))),
       bottomWidget: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
@@ -79,21 +75,13 @@ class _PostListItemState extends State<PostListItem> {
                               isPreview: true,
                             ),
                             onClose: this.widget.onUpdate,
-                            onSubmit: (String inputField, String message,
-                                Map<String, dynamic> attachment) async {
-                              var result = await ApiController()
-                                  .postDiscussionMessage(_post.idKlub, message,
-                                      attachment: attachment, replyPost: _post);
+                            onSubmit: (String inputField, String message, Map<String, dynamic> attachment) async {
+                              var result = await ApiController().postDiscussionMessage(_post.idKlub, message, attachment: attachment, replyPost: _post);
                               return result.isOk;
                             })),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        T.ICO_REPLY,
-                        Text('Odpovědět',
-                            style:
-                                TextStyle(color: Colors.black38, fontSize: 14))
-                      ],
+                      children: <Widget>[T.ICO_REPLY, Text('Odpovědět', style: TextStyle(color: Colors.black38, fontSize: 14))],
                     )),
               ),
               Visibility(
@@ -103,27 +91,27 @@ class _PostListItemState extends State<PostListItem> {
                 ),
               ),
               GestureDetector(
-                child: Row(
-                  children: <Widget>[
-                    Icon(
-                      _post.hasReminder
-                          ? Icons.bookmark
-                          : Icons.bookmark_border,
-                      color: Colors.black38,
-                    ),
-                    Text('Uložit',
-                        style: TextStyle(color: Colors.black38, fontSize: 14))
-                  ],
+                child: FeedbackIndicator(
+                  isLoading: _isSaving,
+                  child: Row(
+                    children: <Widget>[
+                      Icon(
+                        _post.hasReminder ? Icons.bookmark : Icons.bookmark_border,
+                        color: Colors.black38,
+                      ),
+                      Text('Uložit', style: TextStyle(color: Colors.black38, fontSize: 14))
+                    ],
+                  ),
                 ),
                 onTap: () {
-                  setState(() => _post.hasReminder = !_post.hasReminder);
-                  ApiController()
-                      .setPostReminder(
-                          this._post.idKlub, this._post.id, _post.hasReminder)
-                      .catchError((error) {
+                  setState(() {
+                    _post.hasReminder = !_post.hasReminder;
+                    _isSaving = true;
+                  });
+                  ApiController().setPostReminder(this._post.idKlub, this._post.id, _post.hasReminder).catchError((error) {
                     PlatformTheme.error(L.REMINDER_ERROR);
                     setState(() => _post.hasReminder = !_post.hasReminder);
-                  });
+                  }).whenComplete(() => setState(() => _isSaving = false));
                   AnalyticsProvider().logEvent('reminder');
                 },
               )
