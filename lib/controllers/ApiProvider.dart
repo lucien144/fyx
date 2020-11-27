@@ -145,6 +145,29 @@ class ApiProvider implements IApiProvider {
     return await dio.post(URL, data: formData, options: _options);
   }
 
+  Future<Response> fetchDiscussionInfo(int id) async {
+    FormData formData = new FormData.fromMap({
+      'auth_nick': _credentials.nickname,
+      'auth_token': _credentials.token,
+      'l': 'discussion',
+      'l2': 'messages',
+      'id': id,
+      'filter_user': '&' // -> this is nonsense, it should fail and return empty (fast) result with discussion info
+    });
+    return await dio.post(URL, data: formData, options: _options);
+  }
+
+  Future<Response> fetchNotices({bool keepNew = true}) async {
+    FormData formData = new FormData.fromMap({
+      'auth_nick': _credentials.nickname,
+      'auth_token': _credentials.token,
+      'l': 'feed',
+      'l2': 'notices',
+      'keep_new': '1'
+    });
+    return await dio.post(URL, data: formData, options: _options);
+  }
+
   Future<Response> postDiscussionMessage(int id, String message, {Map<String, dynamic> attachment}) async {
     FormData formData = new FormData.fromMap({
       'auth_nick': _credentials.nickname,

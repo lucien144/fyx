@@ -13,7 +13,9 @@ import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/System.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/model/reponses/BookmarksResponse.dart';
+import 'package:fyx/model/reponses/DiscussionInfoResponse.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
+import 'package:fyx/model/reponses/FeedNoticesResponse.dart';
 import 'package:fyx/model/reponses/LoginResponse.dart';
 import 'package:fyx/model/reponses/MailResponse.dart';
 import 'package:fyx/model/reponses/PostMessageResponse.dart';
@@ -105,6 +107,7 @@ class ApiController {
     String identity = prefs.getString('identity');
 
     // Breaking change fix -> old identity storage
+    // TODO: Delete in 3/2021 ?
     if (identity == null) {
       // Load identity from old storage
       creds = Credentials(prefs.getString('nickname'), prefs.getString('token'));
@@ -178,6 +181,16 @@ class ApiController {
   Future<DiscussionResponse> loadDiscussion(int id, {int lastId}) async {
     var response = await provider.fetchDiscussion(id, lastId: lastId);
     return DiscussionResponse.fromJson(jsonDecode(response.data));
+  }
+
+  Future<DiscussionInfoResponse> getDiscussionInfo(int id) async {
+    var response = await provider.fetchDiscussionInfo(id);
+    return DiscussionInfoResponse.fromJson(jsonDecode(response.data));
+  }
+
+  Future<FeedNoticesResponse> loadFeedNotices() async {
+    var response = await provider.fetchNotices();
+    return FeedNoticesResponse.fromJson(jsonDecode(response.data));
   }
 
   Future<PostMessageResponse> postDiscussionMessage(int id, String message, {Map<String, dynamic> attachment, Post replyPost}) async {

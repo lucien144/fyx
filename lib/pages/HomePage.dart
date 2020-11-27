@@ -221,6 +221,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                 return CupertinoPageScaffold(
                   navigationBar: CupertinoNavigationBar(
                       backgroundColor: Colors.white,
+                      leading: GestureDetector(child: Icon(Icons.notifications_outlined), onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/notices')),
                       trailing: GestureDetector(
                         child: ca.CircleAvatar(
                           MainRepository().credentials.avatar,
