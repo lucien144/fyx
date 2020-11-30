@@ -112,12 +112,16 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
 
   Widget buildLikes(BuildContext context, List<NoticeThumbsUp> thumbsUp, int lastVisit) {
     var avatars = thumbsUp
-        .map((thumbUp) => Padding(
-              padding: const EdgeInsets.only(left: 5, bottom: 5),
-              child: component.CircleAvatar(
-                'https://i.nyx.cz/${thumbUp.nick.substring(0, 1)}/${thumbUp.nick}.gif',
-                size: 22,
-                isHighlighted: thumbUp.time > lastVisit,
+        .map((thumbUp) => Tooltip(
+              message: thumbUp.nick,
+              waitDuration: Duration(milliseconds: 0),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 5, bottom: 5),
+                child: component.CircleAvatar(
+                  'https://i.nyx.cz/${thumbUp.nick.substring(0, 1)}/${thumbUp.nick}.gif',
+                  size: 22,
+                  isHighlighted: thumbUp.time > lastVisit,
+                ),
               ),
             ))
         .toList();
