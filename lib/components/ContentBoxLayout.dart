@@ -21,8 +21,9 @@ class ContentBoxLayout extends StatelessWidget {
   final bool _isPreview;
   final bool _isHighlighted;
   final Map<LAYOUT_TYPES, TLayout> _layoutMap = {};
+  final Function onTap;
 
-  ContentBoxLayout({this.topLeftWidget, this.topRightWidget, this.bottomWidget, this.content, isPreview = false, isHighlighted = false})
+  ContentBoxLayout({this.topLeftWidget, this.topRightWidget, this.bottomWidget, this.content, isPreview = false, isHighlighted = false, this.onTap})
       : _isPreview = isPreview,
         _isHighlighted = isHighlighted {
     // The order here is important!
@@ -131,10 +132,21 @@ class ContentBoxLayout extends StatelessWidget {
                     children: <Widget>[topLeftWidget ?? Container(), SizedBox(), _isPreview ? Container() : (topRightWidget ?? Container())],
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-                  child: getContentWidget(),
-                ),
+                if (this.onTap == null)
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                    child: getContentWidget(),
+                  )
+                else
+                  GestureDetector(
+                    onTap: this.onTap,
+                    child: AbsorbPointer(
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                        child: getContentWidget(),
+                      ),
+                    ),
+                  ),
                 Visibility(
                   visible: content.emptyLinks.length > 0,
                   child: Padding(

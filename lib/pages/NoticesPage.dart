@@ -8,6 +8,7 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/reponses/DiscussionInfoResponse.dart';
 import 'package:fyx/model/reponses/FeedNoticesResponse.dart';
+import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 
@@ -67,6 +68,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
                 item.thumbsUp.forEach((NoticeThumbsUp thumbUp) => highlight = thumbUp.time > result.lastVisit ? true : highlight);
 
                 return ContentBoxLayout(
+                  onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(item.idKlub, postId: item.idWu)),
                   content: Content(item.content),
                   isHighlighted: highlight,
                   topRightWidget: Text(
@@ -77,11 +79,14 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
                     child: FutureBuilder(
                         builder: (BuildContext context, AsyncSnapshot<DiscussionInfoResponse> response) {
                           if (response.hasData) {
-                            return Text(
-                              response.data.discussion.name,
-                              overflow: TextOverflow.ellipsis,
-                              softWrap: false,
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            return GestureDetector(
+                              onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(item.idKlub)),
+                              child: Text(
+                                response.data.discussion.name,
+                                overflow: TextOverflow.ellipsis,
+                                softWrap: false,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
                             );
                           } else if (response.hasError) {
                             return Text('-');
