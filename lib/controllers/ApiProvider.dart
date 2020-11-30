@@ -157,13 +157,13 @@ class ApiProvider implements IApiProvider {
     return await dio.post(URL, data: formData, options: _options);
   }
 
-  Future<Response> fetchNotices({bool keepNew = true}) async {
+  Future<Response> fetchNotices({bool keepNew = false}) async {
     FormData formData = new FormData.fromMap({
       'auth_nick': _credentials.nickname,
       'auth_token': _credentials.token,
       'l': 'feed',
       'l2': 'notices',
-      'keep_new': '1'
+      'keep_new': keepNew ? '1' : '0'
     });
     return await dio.post(URL, data: formData, options: _options);
   }

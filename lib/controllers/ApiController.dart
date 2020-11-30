@@ -70,6 +70,7 @@ class ApiController {
 
       var system = System.fromJson(data);
       Provider.of<NotificationsModel>(_context, listen: false).setNewMails(system.unreadPost);
+      Provider.of<NotificationsModel>(_context, listen: false).setNewNotices(system.noticeCount);
     };
   }
 
@@ -188,8 +189,8 @@ class ApiController {
     return DiscussionInfoResponse.fromJson(jsonDecode(response.data));
   }
 
-  Future<FeedNoticesResponse> loadFeedNotices() async {
-    var response = await provider.fetchNotices();
+  Future<FeedNoticesResponse> loadFeedNotices({bool keepNew = false}) async {
+    var response = await provider.fetchNotices(keepNew: keepNew);
     return FeedNoticesResponse.fromJson(jsonDecode(response.data));
   }
 
