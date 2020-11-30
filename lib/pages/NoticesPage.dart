@@ -9,6 +9,7 @@ import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/reponses/DiscussionInfoResponse.dart';
 import 'package:fyx/model/reponses/FeedNoticesResponse.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
+import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 
@@ -144,29 +145,32 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
 
   Widget buildReplies(BuildContext context, List<NoticeReplies> replies, int lastVisit) {
     List<Widget> replyRows = replies.map((reply) {
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 5),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 5,
-            ),
-            component.CircleAvatar(
-              'https://i.nyx.cz/${reply.nick.substring(0, 1)}/${reply.nick}.gif',
-              size: 22,
-              isHighlighted: reply.time > lastVisit,
-            ),
-            SizedBox(
-              width: 5,
-            ),
-            Expanded(
-                child: Padding(
-              padding: const EdgeInsets.only(top: 6.0),
-              child: Text(reply.text, style: TextStyle(fontSize: 14, fontWeight: reply.time > lastVisit ? FontWeight.bold : FontWeight.normal)),
-            ))
-          ],
+      return GestureDetector(
+        onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(reply.idKlub, postId: reply.idWu)),
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 5),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: 5,
+              ),
+              component.CircleAvatar(
+                'https://i.nyx.cz/${reply.nick.substring(0, 1)}/${reply.nick}.gif',
+                size: 22,
+                isHighlighted: reply.time > lastVisit,
+              ),
+              SizedBox(
+                width: 5,
+              ),
+              Expanded(
+                  child: Padding(
+                padding: const EdgeInsets.only(top: 6.0),
+                child: Text(Helpers.stripHtmlTags(reply.text), style: TextStyle(fontSize: 14, fontWeight: reply.time > lastVisit ? FontWeight.bold : FontWeight.normal)),
+              ))
+            ],
+          ),
         ),
       );
     }).toList();

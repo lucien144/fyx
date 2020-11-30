@@ -128,11 +128,11 @@ class NoticeItem {
 class NoticeReplies {
   String _nick;
   int _time;
-  String _idWu;
-  String _idKlub;
+  int _idWu;
+  int _idKlub;
   String _text;
 
-  NoticeReplies({String nick, int time, String idWu, String idKlub, String text}) {
+  NoticeReplies({String nick, int time, int idWu, int idKlub, String text}) {
     this._nick = nick;
     this._time = time;
     this._idWu = idWu;
@@ -148,13 +148,13 @@ class NoticeReplies {
 
   set time(int time) => _time = time;
 
-  String get idWu => _idWu;
+  int get idWu => _idWu;
 
-  set idWu(String idWu) => _idWu = idWu;
+  set idWu(int idWu) => _idWu = idWu;
 
-  String get idKlub => _idKlub;
+  int get idKlub => _idKlub;
 
-  set idKlub(String idKlub) => _idKlub = idKlub;
+  set idKlub(int idKlub) => _idKlub = idKlub;
 
   String get text => _text;
 
@@ -163,8 +163,8 @@ class NoticeReplies {
   NoticeReplies.fromJson(Map<String, dynamic> json) {
     _nick = json['nick'];
     _time = int.parse(json['time']);
-    _idWu = json['id_wu'];
-    _idKlub = json['id_klub'];
+    _idWu = int.parse(json['id_wu']);
+    _idKlub = int.parse(json['id_klub']);
     _text = json['text'];
   }
 
