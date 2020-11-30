@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fyx/components/CircleAvatar.dart' as component;
 import 'package:fyx/components/ContentBoxLayout.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
+import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/reponses/DiscussionInfoResponse.dart';
@@ -17,7 +18,33 @@ class NoticesPage extends StatefulWidget {
   _NoticesPageState createState() => _NoticesPageState();
 }
 
-class _NoticesPageState extends State<NoticesPage> {
+class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
+  int _refreshData = 0;
+
+  refresh() {
+    setState(() => _refreshData = DateTime.now().millisecondsSinceEpoch);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    AnalyticsProvider().setScreen('Notices', 'NoticesPage');
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && ModalRoute.of(context).isCurrent) {
+      this.refresh();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
@@ -30,43 +57,52 @@ class _NoticesPageState extends State<NoticesPage> {
                 Navigator.of(context, rootNavigator: true).pop();
               },
             )),
-        child: PullToRefreshList(dataProvider: (lastId) async {
-          var result = await ApiController().loadFeedNotices();
-          var feed = result.data.map((NoticeItem item) {
-            var highlight = false;
-            item.replies.forEach((NoticeReplies reply) => highlight = reply.time > result.lastVisit ? true : highlight);
-            item.thumbsUp.forEach((NoticeThumbsUp thumbUp) => highlight = thumbUp.time > result.lastVisit ? true : highlight);
+        child: PullToRefreshList(
+            rebuild: _refreshData,
+            dataProvider: (lastId) async {
+              var result = await ApiController().loadFeedNotices();
+              var feed = result.data.map((NoticeItem item) {
+                var highlight = false;
+                item.replies.forEach((NoticeReplies reply) => highlight = reply.time > result.lastVisit ? true : highlight);
+                item.thumbsUp.forEach((NoticeThumbsUp thumbUp) => highlight = thumbUp.time > result.lastVisit ? true : highlight);
 
-            return ContentBoxLayout(
-              content: Content(item.content),
-              isHighlighted: highlight,
-              topRightWidget: Text(
-                item.wuRating > 0 ? '+${item.wuRating}' : item.wuRating.toString(),
-                style: TextStyle(fontSize: 14, color: item.wuRating > 0 ? Colors.green : (item.wuRating < 0 ? Colors.redAccent : Colors.black38)),
-              ),
-              topLeftWidget: Expanded(
-                child: FutureBuilder(
-                    builder: (BuildContext context, AsyncSnapshot<DiscussionInfoResponse> response) {
-                      if (response.hasData) {
-                        return Text(response.data.discussion.name, overflow: TextOverflow.ellipsis, softWrap: false, style: TextStyle(fontWeight: FontWeight.bold),);
-                      } else if (response.hasError) {
-                        return Text('-');
-                      }
-                      return CupertinoActivityIndicator();
-                    },
-                    future: ApiController().getDiscussionInfo(item.idKlub)),
-              ),
-              bottomWidget: Column(
-                children: [
-                  if (item.thumbsUp.length > 0) buildLikes(context, item.thumbsUp, result.lastVisit),
-                  SizedBox(height: 8,),
-                  if (item.replies.length > 0) buildReplies(context, item.replies, result.lastVisit),
-                ],
-              ),
-            );
-          }).toList();
-          return DataProviderResult(feed);
-        }));
+                return ContentBoxLayout(
+                  content: Content(item.content),
+                  isHighlighted: highlight,
+                  topRightWidget: Text(
+                    item.wuRating > 0 ? '+${item.wuRating}' : item.wuRating.toString(),
+                    style: TextStyle(fontSize: 14, color: item.wuRating > 0 ? Colors.green : (item.wuRating < 0 ? Colors.redAccent : Colors.black38)),
+                  ),
+                  topLeftWidget: Expanded(
+                    child: FutureBuilder(
+                        builder: (BuildContext context, AsyncSnapshot<DiscussionInfoResponse> response) {
+                          if (response.hasData) {
+                            return Text(
+                              response.data.discussion.name,
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: false,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            );
+                          } else if (response.hasError) {
+                            return Text('-');
+                          }
+                          return CupertinoActivityIndicator();
+                        },
+                        future: ApiController().getDiscussionInfo(item.idKlub)),
+                  ),
+                  bottomWidget: Column(
+                    children: [
+                      if (item.thumbsUp.length > 0) buildLikes(context, item.thumbsUp, result.lastVisit),
+                      SizedBox(
+                        height: 8,
+                      ),
+                      if (item.replies.length > 0) buildReplies(context, item.replies, result.lastVisit),
+                    ],
+                  ),
+                );
+              }).toList();
+              return DataProviderResult(feed);
+            }));
   }
 
   Widget buildLikes(BuildContext context, List<NoticeThumbsUp> thumbsUp, int lastVisit) {
@@ -85,7 +121,10 @@ class _NoticesPageState extends State<NoticesPage> {
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 4),
-          child: Icon(Icons.thumb_up, size: 22,),
+          child: Icon(
+            Icons.thumb_up,
+            size: 22,
+          ),
         ),
         Expanded(
           child: Wrap(children: avatars),
@@ -113,7 +152,8 @@ class _NoticesPageState extends State<NoticesPage> {
             SizedBox(
               width: 5,
             ),
-            Expanded(child: Padding(
+            Expanded(
+                child: Padding(
               padding: const EdgeInsets.only(top: 6.0),
               child: Text(reply.text, style: TextStyle(fontSize: 14, fontWeight: reply.time > lastVisit ? FontWeight.bold : FontWeight.normal)),
             ))
