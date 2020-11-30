@@ -8,6 +8,7 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+// TODO: Move some methods to Helpers?
 class PlatformTheme {
   static of(BuildContext context) {
     if (Platform.isIOS) {
