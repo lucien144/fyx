@@ -126,6 +126,18 @@ class ApiMock implements IApiProvider {
     // TODO: implement registerFcmToken
     return null;
   }
+
+  @override
+  Future<Response> fetchDiscussionInfo(int id) {
+    // TODO: implement fetchDiscussionInfo
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> fetchNotices({bool keepNew}) {
+    // TODO: implement fetchNotices
+    throw UnimplementedError();
+  }
 }
 
 void main() {
