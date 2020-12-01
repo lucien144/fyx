@@ -8,6 +8,7 @@ import 'package:fyx/pages/HomePage.dart';
 import 'package:fyx/pages/InfoPage.dart';
 import 'package:fyx/pages/LoginPage.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
+import 'package:fyx/pages/NoticesPage.dart';
 import 'package:fyx/pages/SettingsPage.dart';
 import 'package:fyx/pages/TutorialPage.dart';
 
@@ -67,14 +68,16 @@ class PlatformApp extends PlatformAwareWidget<MaterialApp, CupertinoApp> {
         return CupertinoPageRoute(builder: (_) => NewMessagePage(), settings: settings, fullscreenDialog: true);
       case '/gallery':
         print('[Router] Gallery');
-        return PageRouteBuilder(
-            transitionDuration: const Duration(milliseconds: 0), opaque: false, pageBuilder: (_, __, ___) => GalleryPage(), settings: settings, fullscreenDialog: true);
+        return PageRouteBuilder(transitionDuration: const Duration(milliseconds: 0), opaque: false, pageBuilder: (_, __, ___) => GalleryPage(), settings: settings, fullscreenDialog: true);
       case '/settings':
         print('[Router] Settings');
         return CupertinoPageRoute(builder: (_) => SettingsPage(), settings: settings);
       case '/settings/info':
         print('[Router] Settings / info');
         return CupertinoPageRoute(builder: (_) => InfoPage(), settings: settings);
+      case '/notices':
+        print('[Router] Notices');
+        return CupertinoPageRoute(builder: (_) => NoticesPage(), settings: settings);
       default:
         print('[Router] Discussion');
         return CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings);

@@ -6,6 +6,7 @@ import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/CircleAvatar.dart' as ca;
 import 'package:fyx/components/DiscussionListItem.dart';
 import 'package:fyx/components/ListHeader.dart';
+import 'package:fyx/components/NotificationBadge.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
@@ -137,10 +138,12 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                 Navigator.of(context).pop();
                 Navigator.of(context, rootNavigator: true).pushNamed('/settings');
               }),
-          CupertinoActionSheetAction(child: Text('⚠️ ${L.SETTINGS_BUGREPORT}'), onPressed: () {
-            PlatformTheme.prefillGithubIssue(L.SETTINGS_BUGREPORT_TITLE);
-            AnalyticsProvider().logEvent('reportBug');
-          }),
+          CupertinoActionSheetAction(
+              child: Text('⚠️ ${L.SETTINGS_BUGREPORT}'),
+              onPressed: () {
+                PlatformTheme.prefillGithubIssue(L.SETTINGS_BUGREPORT_TITLE);
+                AnalyticsProvider().logEvent('reportBug');
+              }),
         ],
         cancelButton: CupertinoActionSheetAction(
           isDefaultAction: true,
@@ -185,31 +188,13 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
             ),
             BottomNavigationBarItem(
               icon: Consumer<NotificationsModel>(
-                builder: (context, notifications, child) => Stack(
-                  children: <Widget>[
-                    Icon(
+                builder: (context, notifications, child) => NotificationBadge(
+                    widget: Icon(
                       CupertinoIcons.mail,
                       size: 42,
                     ),
-                    Visibility(
-                      visible: notifications.newMails > 0,
-                      child: Positioned(
-                        top: 0,
-                        right: 0,
-                        child: Container(
-                          padding: EdgeInsets.all(3),
-                          constraints: BoxConstraints(minWidth: 16),
-                          decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(16)),
-                          child: Text(
-                            notifications.newMails.toString(),
-                            style: TextStyle(color: Colors.white, fontSize: 10),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                    counter: notifications.newMails,
+                    isVisible: notifications.newMails > 0),
               ),
             ),
           ],
@@ -221,6 +206,11 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                 return CupertinoPageScaffold(
                   navigationBar: CupertinoNavigationBar(
                       backgroundColor: Colors.white,
+                      leading: Consumer<NotificationsModel>(
+                          builder: (context, notifications, child) => NotificationBadge(
+                              widget: GestureDetector(child: Icon(CupertinoIcons.bell), onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/notices')),
+                              isVisible: notifications.newNotices > 0,
+                              counter: notifications.newNotices)),
                       trailing: GestureDetector(
                         child: ca.CircleAvatar(
                           MainRepository().credentials.avatar,

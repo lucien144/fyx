@@ -2,6 +2,7 @@ import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/model/post/Image.dart';
 import 'package:fyx/model/post/Link.dart';
 import 'package:fyx/model/post/Video.dart';
+import 'package:fyx/theme/Helpers.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:html_unescape/html_unescape.dart';
@@ -37,7 +38,7 @@ class Content {
   // HTML body stripped out of all HTML elements
   // Clean text content without single HTML element.
   // Used to check if there's ANY content at all.
-  String get strippedContent => parse(parse(_body).body.text).documentElement.text.trim();
+  String get strippedContent => Helpers.stripHtmlTags(_body);
 
   String get body => _body;
 

@@ -49,6 +49,7 @@ class L {
       'Tento uživatel si nepřeje, aby bylo možné jeho příspěvky hodnotit negativně anonymně. Pokud si přejete hodnotit příspěvek neanonymně, klikněte na "Hodnotit".';
 
   // Settings page
+  static String NOTICES = 'Upozornění';
   static String SETTINGS = 'Nastavení';
   static String ABOUT = 'O aplikaci';
   static String BACKERS = 'Podpoř vývoj!';
