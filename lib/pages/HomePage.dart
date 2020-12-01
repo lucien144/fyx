@@ -184,13 +184,13 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
           backgroundColor: Colors.white,
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
-              icon: Icon(_filterUnread ? CupertinoIcons.bookmark_solid : CupertinoIcons.bookmark, size: 38),
+              icon: Icon(_filterUnread ? Icons.bookmarks : Icons.bookmarks_outlined, size: 34),
             ),
             BottomNavigationBarItem(
               icon: Consumer<NotificationsModel>(
                 builder: (context, notifications, child) => NotificationBadge(
                     widget: Icon(
-                      CupertinoIcons.mail,
+                      Icons.email_outlined,
                       size: 42,
                     ),
                     counter: notifications.newMails,
@@ -208,13 +208,14 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                       backgroundColor: Colors.white,
                       leading: Consumer<NotificationsModel>(
                           builder: (context, notifications, child) => NotificationBadge(
-                              widget: GestureDetector(child: Icon(CupertinoIcons.bell), onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/notices')),
+                              widget: GestureDetector(child: Icon(Icons.notifications_none, size: 30,), onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/notices')),
                               isVisible: notifications.newNotices > 0,
                               counter: notifications.newNotices)),
                       trailing: GestureDetector(
                         child: ca.CircleAvatar(
                           MainRepository().credentials.avatar,
                           size: 30,
+                          isHighlighted: true,
                         ),
                         onTap: () {
                           showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet(context));
