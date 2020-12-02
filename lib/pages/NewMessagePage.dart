@@ -36,6 +36,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
   String _message = '';
   String _recipient = '';
   bool _sending = false;
+  FocusNode _inputNode = FocusNode();
 
   Future getImage(ImageSource source) async {
     final picker = ImagePicker();
@@ -126,6 +127,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                         placeholder: 'Adresát',
                         autofocus: _recipientController.text.length == 0,
                         autocorrect: MainRepository().settings.useAutocorrect,
+                        focusNode: _recipientController.text.length == 0 ? _inputNode : null,
                       )),
                   SizedBox(
                     height: 8,
@@ -136,6 +138,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                     autofocus: _recipientController.text.length > 0 || _settings.hasInputField != true,
                     textCapitalization: TextCapitalization.sentences,
                     autocorrect: MainRepository().settings.useAutocorrect,
+                    focusNode: _recipientController.text.length > 0 || _settings.hasInputField != true ? _inputNode : null,
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -145,12 +148,20 @@ class _NewMessagePageState extends State<NewMessagePage> {
                         CupertinoButton(
                           padding: EdgeInsets.all(0),
                           child: Icon(Icons.camera_alt),
-                          onPressed: () => getImage(ImageSource.camera),
+                          onPressed: () async {
+                            FocusScope.of(context).unfocus();
+                            await getImage(ImageSource.camera);
+                            FocusScope.of(context).requestFocus(_inputNode);
+                          },
                         ),
                         CupertinoButton(
                           padding: EdgeInsets.all(0),
                           child: Icon(Icons.image),
-                          onPressed: () => getImage(ImageSource.gallery),
+                          onPressed: () async {
+                            FocusScope.of(context).unfocus();
+                            await getImage(ImageSource.gallery);
+                            FocusScope.of(context).requestFocus(_inputNode);
+                          },
                         ),
                         Visibility(
                           visible: _images.length > 0,
