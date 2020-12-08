@@ -27,6 +27,14 @@ class _PostRatingState extends State<PostRating> {
   }
 
   @override
+  void didUpdateWidget(PostRating oldWidget) {
+    if (oldWidget.post != widget.post) {
+      setState(() => _post = widget.post);
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return FeedbackIndicator(
       isLoading: _givingRating,
