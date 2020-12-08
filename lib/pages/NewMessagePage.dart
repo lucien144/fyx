@@ -30,29 +30,23 @@ class NewMessagePage extends StatefulWidget {
 class _NewMessagePageState extends State<NewMessagePage> {
   TextEditingController _recipientController = TextEditingController();
   TextEditingController _messageController = TextEditingController();
-  List<List<int>> _thumbs = [];
   List<Map<String, dynamic>> _images = [];
   NewMessageSettings _settings;
   String _message = '';
   String _recipient = '';
+  bool _loadingImage = false;
   bool _sending = false;
   FocusNode _inputNode = FocusNode();
 
-  Future getImage(ImageSource source) async {
+  void getImage(ImageSource source) {
     final picker = ImagePicker();
-    var file = await picker.getImage(source: source);
-    var image = img.decodeImage(await file.readAsBytes());
-    var big = img.copyResize(image, width: 1024);
-    var thumb = img.copyResize(image, width: 50);
-    var bigJpg = img.encodeJpg(big, quality: 75);
-    var thumbJpg = img.encodeJpg(thumb, quality: 40);
-
-    if (image != null) {
-      setState(() {
-        _images.insert(0, {'bytes': bigJpg, 'filename': '${basename(file.path)}.jpg'});
-        _thumbs.insert(0, thumbJpg);
-      });
-    }
+    setState(() => _loadingImage = true);
+    picker.getImage(source: source).then((file) async {
+      if (file != null) {
+        var list = await file.readAsBytes();
+        setState(() => _images.insert(0, {'uint8list': list, 'filename': '${basename(file.path)}.jpg'}));
+      }
+    }).whenComplete(() => setState(() => _loadingImage = false));
   }
 
   @override
@@ -105,8 +99,12 @@ class _NewMessagePageState extends State<NewMessagePage> {
                             ? null
                             : () async {
                                 setState(() => _sending = true);
-                                var response = await _settings.onSubmit(
-                                    _settings.hasInputField == true ? _recipientController.text : null, _messageController.text, _images.length > 0 ? _images[0] : null);
+                                _images = _images.map((image) {
+                                  var resized = img.copyResize(img.decodeImage(image['uint8list']), width: 640);
+                                  return {'uint8list': image['uint8list'], 'bytes': img.encodeJpg(resized, quality: 90), 'filename': image['filename']};
+                                }).toList();
+                                var response =
+                                    await _settings.onSubmit(_settings.hasInputField == true ? _recipientController.text : null, _messageController.text, _images.length > 0 ? _images[0] : null);
                                 if (response) {
                                   if (_settings.onClose is Function) {
                                     _settings.onClose();
@@ -148,18 +146,18 @@ class _NewMessagePageState extends State<NewMessagePage> {
                         CupertinoButton(
                           padding: EdgeInsets.all(0),
                           child: Icon(Icons.camera_alt),
-                          onPressed: () async {
+                          onPressed: () {
                             FocusScope.of(context).unfocus();
-                            await getImage(ImageSource.camera);
+                            getImage(ImageSource.camera);
                             FocusScope.of(context).requestFocus(_inputNode);
                           },
                         ),
                         CupertinoButton(
                           padding: EdgeInsets.all(0),
                           child: Icon(Icons.image),
-                          onPressed: () async {
+                          onPressed: () {
                             FocusScope.of(context).unfocus();
-                            await getImage(ImageSource.gallery);
+                            getImage(ImageSource.gallery);
                             FocusScope.of(context).requestFocus(_inputNode);
                           },
                         ),
@@ -172,24 +170,22 @@ class _NewMessagePageState extends State<NewMessagePage> {
                           ),
                         ),
                         SizedBox(width: 12),
-                        Row(
-                          // children: _thumbs.map((List<int> file) => _buildPreviewWidget(file)).toList(),
-                          children: _thumbs.length > 0
-                              ? [
-                                  _buildPreviewWidget(_thumbs[0]),
-                                  CupertinoButton(
-                                    padding: EdgeInsets.all(0),
-                                    child: Text('Smazat'),
-                                    onPressed: () {
-                                      setState(() {
-                                        _thumbs.clear();
-                                        _images.clear();
-                                      });
-                                    },
-                                  )
-                                ]
-                              : [],
-                        )
+                        if (_loadingImage)
+                          CupertinoActivityIndicator()
+                        else
+                          Row(
+                            // children: _images.map((List<int> file) => _buildPreviewWidget(file)).toList(),
+                            children: _images.length > 0
+                                ? [
+                                    _buildPreviewWidget(_images[0]['uint8list']),
+                                    CupertinoButton(
+                                      padding: EdgeInsets.all(0),
+                                      child: Text('Smazat'),
+                                      onPressed: () => setState(() => _images.clear()),
+                                    )
+                                  ]
+                                : [],
+                          )
                       ],
                     ),
                   )
@@ -203,16 +199,22 @@ class _NewMessagePageState extends State<NewMessagePage> {
     );
   }
 
-  Widget _buildPreviewWidget(List<int> file) {
+  Widget _buildPreviewWidget(List<int> bytes) {
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8),
-        child: Image.memory(
-          file,
+        child: Image(
+          image: MemoryImage(bytes),
           width: 35,
           height: 35,
           fit: BoxFit.cover,
+          frameBuilder: (BuildContext context, Widget child, int frame, bool wasSynchronouslyLoaded) {
+            if (frame == null) {
+              return CupertinoActivityIndicator();
+            }
+            return child;
+          },
         ),
       ),
     );
