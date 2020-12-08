@@ -108,7 +108,7 @@ class _PostListItemState extends State<PostListItem> {
                     _post.hasReminder = !_post.hasReminder;
                     _isSaving = true;
                   });
-                  ApiController().setPostReminder(this._post.idKlub, this._post.id, _post.hasReminder).catchError((error) {
+                  ApiController().setPostReminder(_post.idKlub, _post.id, _post.hasReminder).catchError((error) {
                     PlatformTheme.error(L.REMINDER_ERROR);
                     setState(() => _post.hasReminder = !_post.hasReminder);
                   }).whenComplete(() => setState(() => _isSaving = false));
