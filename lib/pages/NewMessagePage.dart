@@ -38,15 +38,15 @@ class _NewMessagePageState extends State<NewMessagePage> {
   bool _sending = false;
   FocusNode _inputNode = FocusNode();
 
-  void getImage(ImageSource source) {
+  Future getImage(ImageSource source) async {
     final picker = ImagePicker();
     setState(() => _loadingImage = true);
-    picker.getImage(source: source).then((file) async {
-      if (file != null) {
-        var list = await file.readAsBytes();
-        setState(() => _images.insert(0, {'uint8list': list, 'filename': '${basename(file.path)}.jpg'}));
-      }
-    }).whenComplete(() => setState(() => _loadingImage = false));
+    var file = await picker.getImage(source: source);
+    if (file != null) {
+      var list = await file.readAsBytes();
+      setState(() => _images.insert(0, {'uint8list': list, 'filename': '${basename(file.path)}.jpg'}));
+    }
+    setState(() => _loadingImage = false);
   }
 
   @override
@@ -75,7 +75,10 @@ class _NewMessagePageState extends State<NewMessagePage> {
   @override
   Widget build(BuildContext context) {
     if (_settings == null) {
-      _settings = ModalRoute.of(context).settings.arguments as NewMessageSettings;
+      _settings = ModalRoute
+          .of(context)
+          .settings
+          .arguments as NewMessageSettings;
       _recipientController.text = _settings.inputFieldPlaceholder?.toUpperCase();
     }
 
@@ -98,21 +101,25 @@ class _NewMessagePageState extends State<NewMessagePage> {
                         onPressed: _isSendDisabled()
                             ? null
                             : () async {
-                                setState(() => _sending = true);
-                                _images = _images.map((image) {
-                                  var resized = img.copyResize(img.decodeImage(image['uint8list']), width: 640);
-                                  return {'uint8list': image['uint8list'], 'bytes': img.encodeJpg(resized, quality: 90), 'filename': image['filename']};
-                                }).toList();
-                                var response =
-                                    await _settings.onSubmit(_settings.hasInputField == true ? _recipientController.text : null, _messageController.text, _images.length > 0 ? _images[0] : null);
-                                if (response) {
-                                  if (_settings.onClose is Function) {
-                                    _settings.onClose();
-                                  }
-                                  Navigator.of(context).pop();
-                                }
-                                setState(() => _sending = false);
-                              },
+                          setState(() => _sending = true);
+                          if (_images.length > 0) {
+                            // Workaround for frozen activity indicator when resizing & uploading images
+                            await Future.delayed(Duration(milliseconds: 200));
+                          }
+                          _images = _images.map((image) {
+                            var resized = img.copyResize(img.decodeImage(image['uint8list']), width: 640);
+                            return {'uint8list': image['uint8list'], 'bytes': img.encodeJpg(resized, quality: 90), 'filename': image['filename']};
+                          }).toList();
+                          var response =
+                          await _settings.onSubmit(_settings.hasInputField == true ? _recipientController.text : null, _messageController.text, _images.length > 0 ? _images[0] : null);
+                          if (response) {
+                            if (_settings.onClose is Function) {
+                              _settings.onClose();
+                            }
+                            Navigator.of(context).pop();
+                          }
+                          setState(() => _sending = false);
+                        },
                       )
                     ],
                   ),
@@ -146,18 +153,18 @@ class _NewMessagePageState extends State<NewMessagePage> {
                         CupertinoButton(
                           padding: EdgeInsets.all(0),
                           child: Icon(Icons.camera_alt),
-                          onPressed: () {
+                          onPressed: () async {
                             FocusScope.of(context).unfocus();
-                            getImage(ImageSource.camera);
+                            await getImage(ImageSource.camera);
                             FocusScope.of(context).requestFocus(_inputNode);
                           },
                         ),
                         CupertinoButton(
                           padding: EdgeInsets.all(0),
                           child: Icon(Icons.image),
-                          onPressed: () {
+                          onPressed: () async {
                             FocusScope.of(context).unfocus();
-                            getImage(ImageSource.gallery);
+                            await getImage(ImageSource.gallery);
                             FocusScope.of(context).requestFocus(_inputNode);
                           },
                         ),
@@ -177,13 +184,13 @@ class _NewMessagePageState extends State<NewMessagePage> {
                             // children: _images.map((List<int> file) => _buildPreviewWidget(file)).toList(),
                             children: _images.length > 0
                                 ? [
-                                    _buildPreviewWidget(_images[0]['uint8list']),
-                                    CupertinoButton(
-                                      padding: EdgeInsets.all(0),
-                                      child: Text('Smazat'),
-                                      onPressed: () => setState(() => _images.clear()),
-                                    )
-                                  ]
+                              _buildPreviewWidget(_images[0]['uint8list']),
+                              CupertinoButton(
+                                padding: EdgeInsets.all(0),
+                                child: Text('Smazat'),
+                                onPressed: () => setState(() => _images.clear()),
+                              )
+                            ]
                                 : [],
                           )
                       ],
