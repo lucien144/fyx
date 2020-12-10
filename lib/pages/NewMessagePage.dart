@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/theme/T.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
@@ -32,6 +33,10 @@ class _NewMessagePageState extends State<NewMessagePage> {
   TextEditingController _messageController = TextEditingController();
   List<Map<String, dynamic>> _images = [];
   NewMessageSettings _settings;
+  final List<int> widths = [640, 768, 1024, 1280];
+  int _widthIndex = 0;
+  final List<int> qualities = [60, 70, 80, 90, 100];
+  int _qualityIndex = 3;
   String _message = '';
   String _recipient = '';
   bool _loadingImage = false;
@@ -53,6 +58,8 @@ class _NewMessagePageState extends State<NewMessagePage> {
   void initState() {
     _messageController.addListener(() => setState(() => _message = _messageController.text));
     _recipientController.addListener(() => setState(() => _recipient = _recipientController.text));
+    _widthIndex = widths.indexOf(MainRepository().settings.photoWidth);
+    _qualityIndex = qualities.indexOf(MainRepository().settings.photoQuality);
     AnalyticsProvider().setScreen('New Message', 'NewMessagePage');
     super.initState();
   }
@@ -75,10 +82,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
   @override
   Widget build(BuildContext context) {
     if (_settings == null) {
-      _settings = ModalRoute
-          .of(context)
-          .settings
-          .arguments as NewMessageSettings;
+      _settings = ModalRoute.of(context).settings.arguments as NewMessageSettings;
       _recipientController.text = _settings.inputFieldPlaceholder?.toUpperCase();
     }
 
@@ -101,25 +105,25 @@ class _NewMessagePageState extends State<NewMessagePage> {
                         onPressed: _isSendDisabled()
                             ? null
                             : () async {
-                          setState(() => _sending = true);
-                          if (_images.length > 0) {
-                            // Workaround for frozen activity indicator when resizing & uploading images
-                            await Future.delayed(Duration(milliseconds: 200));
-                          }
-                          _images = _images.map((image) {
-                            var resized = img.copyResize(img.decodeImage(image['uint8list']), width: 640);
-                            return {'uint8list': image['uint8list'], 'bytes': img.encodeJpg(resized, quality: 90), 'filename': image['filename']};
-                          }).toList();
-                          var response =
-                          await _settings.onSubmit(_settings.hasInputField == true ? _recipientController.text : null, _messageController.text, _images.length > 0 ? _images[0] : null);
-                          if (response) {
-                            if (_settings.onClose is Function) {
-                              _settings.onClose();
-                            }
-                            Navigator.of(context).pop();
-                          }
-                          setState(() => _sending = false);
-                        },
+                                setState(() => _sending = true);
+                                if (_images.length > 0) {
+                                  // Workaround for frozen activity indicator when resizing & uploading images
+                                  await Future.delayed(Duration(milliseconds: 200));
+                                }
+                                _images = _images.map((image) {
+                                  var resized = img.copyResize(img.decodeImage(image['uint8list']), width: widths[_widthIndex]);
+                                  return {'uint8list': image['uint8list'], 'bytes': img.encodeJpg(resized, quality: qualities[_qualityIndex]), 'filename': image['filename']};
+                                }).toList();
+                                var response =
+                                    await _settings.onSubmit(_settings.hasInputField == true ? _recipientController.text : null, _messageController.text, _images.length > 0 ? _images[0] : null);
+                                if (response) {
+                                  if (_settings.onClose is Function) {
+                                    _settings.onClose();
+                                  }
+                                  Navigator.of(context).pop();
+                                }
+                                setState(() => _sending = false);
+                              },
                       )
                     ],
                   ),
@@ -146,7 +150,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                     focusNode: _recipientController.text.length > 0 || _settings.hasInputField != true ? _inputNode : null,
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    padding: const EdgeInsets.only(top: 8.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
@@ -184,18 +188,108 @@ class _NewMessagePageState extends State<NewMessagePage> {
                             // children: _images.map((List<int> file) => _buildPreviewWidget(file)).toList(),
                             children: _images.length > 0
                                 ? [
-                              _buildPreviewWidget(_images[0]['uint8list']),
-                              CupertinoButton(
-                                padding: EdgeInsets.all(0),
-                                child: Text('Smazat'),
-                                onPressed: () => setState(() => _images.clear()),
-                              )
-                            ]
+                                    _buildPreviewWidget(_images[0]['uint8list']),
+                                    CupertinoButton(
+                                      padding: EdgeInsets.all(0),
+                                      child: Text('Smazat'),
+                                      onPressed: () => setState(() => _images.clear()),
+                                    )
+                                  ]
                                 : [],
-                          )
+                          ),
+                        Expanded(child: Container()),
+                        CupertinoButton(
+                            padding: EdgeInsets.all(0),
+                            child: Text('${widths[_widthIndex]}px / ${qualities[_qualityIndex]}%', style: TextStyle(fontSize: 13)),
+                            onPressed: () => showCupertinoModalPopup(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return Container(
+                                    height: 250.0,
+                                    color: Colors.white,
+                                    child: Column(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 16.0),
+                                          child: Row(
+                                            children: [
+                                              Expanded(child: Text('Šířka', textAlign: TextAlign.center, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+                                              Expanded(child: Text('Kvalita', textAlign: TextAlign.center, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
+                                            ],
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text('Obrázek větší než 0.5M se zobrazí jako odkaz (příloha).', style: TextStyle(fontSize: 13, fontStyle: FontStyle.italic, color: Colors.black45)),
+                                        ),
+                                        Expanded(
+                                          child: Row(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: <Widget>[
+                                              Expanded(
+                                                child: CupertinoPicker(
+                                                    scrollController: new FixedExtentScrollController(
+                                                      initialItem: _widthIndex,
+                                                    ),
+                                                    itemExtent: 32.0,
+                                                    backgroundColor: Colors.white,
+                                                    onSelectedItemChanged: (int index) {
+                                                      setState(() {
+                                                        _widthIndex = index;
+                                                        MainRepository().settings.photoWidth = widths[_widthIndex];
+                                                      });
+                                                    },
+                                                    children: widths
+                                                        .map((width) => Center(
+                                                              child: new Text('${width}px'),
+                                                            ))
+                                                        .toList()),
+                                              ),
+                                              Expanded(
+                                                child: CupertinoPicker(
+                                                    scrollController: new FixedExtentScrollController(
+                                                      initialItem: _qualityIndex,
+                                                    ),
+                                                    itemExtent: 32.0,
+                                                    backgroundColor: Colors.white,
+                                                    onSelectedItemChanged: (int index) {
+                                                      setState(() {
+                                                        _qualityIndex = index;
+                                                        MainRepository().settings.photoQuality = qualities[_qualityIndex];
+                                                      });
+                                                    },
+                                                    children: qualities
+                                                        .map((quality) => Center(
+                                                              child: new Text('$quality%'),
+                                                            ))
+                                                        .toList()),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }))
                       ],
                     ),
-                  )
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        width: 12,
+                      ),
+                      Icon(
+                        Icons.info_outline,
+                        size: 14,
+                        color: Colors.black45,
+                      ),
+                      SizedBox(width: 4),
+                      Text('Kvůli omezením Nyxu lze nahrát pouze 1 obrázek.', style: TextStyle(fontSize: 13, fontStyle: FontStyle.italic, color: Colors.black45)),
+                    ],
+                  ),
                 ],
               ),
               _settings.replyWidget

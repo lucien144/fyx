@@ -72,6 +72,8 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     MainRepository().notifications.request();
 
     AnalyticsProvider().setUser(MainRepository().credentials.nickname);
+    AnalyticsProvider().setUserProperty('photoWidth', MainRepository().settings.photoWidth.toString());
+    AnalyticsProvider().setUserProperty('photoQuality', MainRepository().settings.photoQuality.toString());
     AnalyticsProvider().setUserProperty('autocorrect', MainRepository().settings.useAutocorrect.toString());
     AnalyticsProvider().setUserProperty('compactMode', MainRepository().settings.useCompactMode.toString());
     AnalyticsProvider().setUserProperty('defaultView', MainRepository().settings.defaultView.toString());

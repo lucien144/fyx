@@ -7,4 +7,8 @@ class Settings {
   List<int> blockedPosts = [];
   List<int> blockedMails = [];
   List<String> blockedUsers = [];
+  // Quality of uploaded image
+  int photoQuality = 90;
+  // Width of uploaded image
+  int photoWidth = 640;
 }
