@@ -1,12 +1,13 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
-import 'package:fyx/theme/T.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
@@ -79,6 +80,13 @@ class _NewMessagePageState extends State<NewMessagePage> {
     return ((_settings.hasInputField == true ? _recipient.length : 1) * (_message.length + _images.length)) == 0;
   }
 
+  static FutureOr<List<Map<String, dynamic>>> handleImages(Map<String, dynamic> args) {
+    return args['images'].map<Map<String, dynamic>>((image) {
+      var resized = img.copyResize(img.decodeImage(image['uint8list']), width: args['width']);
+      return {'uint8list': image['uint8list'], 'bytes': img.encodeJpg(resized, quality: args['quality']), 'filename': image['filename']};
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_settings == null) {
@@ -107,13 +115,8 @@ class _NewMessagePageState extends State<NewMessagePage> {
                             : () async {
                                 setState(() => _sending = true);
                                 if (_images.length > 0) {
-                                  // Workaround for frozen activity indicator when resizing & uploading images
-                                  await Future.delayed(Duration(milliseconds: 200));
+                                  _images = await compute(handleImages, {'images': _images, 'width': widths[_widthIndex], 'quality': qualities[_qualityIndex]});
                                 }
-                                _images = _images.map((image) {
-                                  var resized = img.copyResize(img.decodeImage(image['uint8list']), width: widths[_widthIndex]);
-                                  return {'uint8list': image['uint8list'], 'bytes': img.encodeJpg(resized, quality: qualities[_qualityIndex]), 'filename': image['filename']};
-                                }).toList();
                                 var response =
                                     await _settings.onSubmit(_settings.hasInputField == true ? _recipientController.text : null, _messageController.text, _images.length > 0 ? _images[0] : null);
                                 if (response) {
