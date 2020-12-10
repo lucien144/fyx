@@ -45,7 +45,9 @@ class _NewMessagePageState extends State<NewMessagePage> {
   String _recipient = '';
   bool _loadingImage = false;
   bool _sending = false;
-  FocusNode _inputNode = FocusNode();
+  FocusNode _recipientFocusNode = FocusNode();
+  FocusNode _messageFocusNode = FocusNode();
+  bool recipientHasFocus = true;
 
   Future getImage(ImageSource source) async {
     final picker = ImagePicker();
@@ -60,6 +62,8 @@ class _NewMessagePageState extends State<NewMessagePage> {
 
   @override
   void initState() {
+    _recipientFocusNode.addListener(_focusCallback);
+    _messageFocusNode.addListener(_focusCallback);
     _messageController.addListener(() => setState(() => _message = _messageController.text));
     _recipientController.addListener(() => setState(() => _recipient = _recipientController.text));
     _widthIndex = widths.indexOf(MainRepository().settings.photoWidth);
@@ -72,7 +76,19 @@ class _NewMessagePageState extends State<NewMessagePage> {
   void dispose() {
     _recipientController.dispose();
     _messageController.dispose();
+    _recipientFocusNode.removeListener(_focusCallback);
+    _messageFocusNode.removeListener(_focusCallback);
     super.dispose();
+  }
+
+  _focusCallback() {
+    if (_messageFocusNode.hasFocus) {
+      recipientHasFocus = false;
+      return;
+    }
+    if (_recipientFocusNode.hasFocus) {
+      recipientHasFocus = true;
+    }
   }
 
   _isSendDisabled() {
@@ -140,9 +156,9 @@ class _NewMessagePageState extends State<NewMessagePage> {
                         inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9_]'))],
                         textCapitalization: TextCapitalization.characters,
                         placeholder: 'Adresát',
-                        autofocus: _recipientController.text.length == 0,
+                        autofocus: _settings.hasInputField == true,
                         autocorrect: MainRepository().settings.useAutocorrect,
-                        focusNode: _recipientController.text.length == 0 ? _inputNode : null,
+                        focusNode: _recipientFocusNode,
                       )),
                   SizedBox(
                     height: 8,
@@ -150,10 +166,10 @@ class _NewMessagePageState extends State<NewMessagePage> {
                   CupertinoTextField(
                     controller: _messageController,
                     maxLines: 10,
-                    autofocus: _recipientController.text.length > 0 || _settings.hasInputField != true,
+                    autofocus: _settings.hasInputField != true,
                     textCapitalization: TextCapitalization.sentences,
                     autocorrect: MainRepository().settings.useAutocorrect,
-                    focusNode: _recipientController.text.length > 0 || _settings.hasInputField != true ? _inputNode : null,
+                    focusNode: _messageFocusNode,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
@@ -166,7 +182,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                           onPressed: () async {
                             FocusScope.of(context).unfocus();
                             await getImage(ImageSource.camera);
-                            FocusScope.of(context).requestFocus(_inputNode);
+                            FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
                           },
                         ),
                         CupertinoButton(
@@ -175,7 +191,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                           onPressed: () async {
                             FocusScope.of(context).unfocus();
                             await getImage(ImageSource.gallery);
-                            FocusScope.of(context).requestFocus(_inputNode);
+                            FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
                           },
                         ),
                         Visibility(
