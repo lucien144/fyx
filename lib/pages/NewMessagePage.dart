@@ -314,6 +314,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                   ),
                 ],
               ),
+              SizedBox(height: 16),
               _settings.replyWidget
             ].where((Object o) => o != null).toList(),
           ),
