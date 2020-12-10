@@ -7,12 +7,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 
-typedef F = Future<bool> Function(String inputField, String message, Map<String, dynamic> attachment);
+typedef F = Future<bool> Function(String inputField, String message, Map<ATTACHMENT, dynamic> attachment);
+
+enum ISOLATE_ARG { images, width, quality }
 
 class NewMessageSettings {
   String inputFieldPlaceholder;
@@ -32,7 +35,7 @@ class NewMessagePage extends StatefulWidget {
 class _NewMessagePageState extends State<NewMessagePage> {
   TextEditingController _recipientController = TextEditingController();
   TextEditingController _messageController = TextEditingController();
-  List<Map<String, dynamic>> _images = [];
+  List<Map<ATTACHMENT, dynamic>> _images = [];
   NewMessageSettings _settings;
   final List<int> widths = [640, 768, 1024, 1280];
   int _widthIndex = 0;
@@ -50,7 +53,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
     var file = await picker.getImage(source: source);
     if (file != null) {
       var list = await file.readAsBytes();
-      setState(() => _images.insert(0, {'uint8list': list, 'filename': '${basename(file.path)}.jpg'}));
+      setState(() => _images.insert(0, {ATTACHMENT.uint8list: list, ATTACHMENT.filename: '${basename(file.path)}.jpg'}));
     }
     setState(() => _loadingImage = false);
   }
@@ -80,10 +83,10 @@ class _NewMessagePageState extends State<NewMessagePage> {
     return ((_settings.hasInputField == true ? _recipient.length : 1) * (_message.length + _images.length)) == 0;
   }
 
-  static FutureOr<List<Map<String, dynamic>>> handleImages(Map<String, dynamic> args) {
-    return args['images'].map<Map<String, dynamic>>((image) {
-      var resized = img.copyResize(img.decodeImage(image['uint8list']), width: args['width']);
-      return {'uint8list': image['uint8list'], 'bytes': img.encodeJpg(resized, quality: args['quality']), 'filename': image['filename']};
+  static FutureOr<List<Map<ATTACHMENT, dynamic>>> handleImages(Map<ISOLATE_ARG, dynamic> args) {
+    return args[ISOLATE_ARG.images].map<Map<ATTACHMENT, dynamic>>((image) {
+      var resized = img.copyResize(img.decodeImage(image[ATTACHMENT.uint8list]), width: args[ISOLATE_ARG.width]);
+      return {ATTACHMENT.uint8list: image[ATTACHMENT.uint8list], ATTACHMENT.bytes: img.encodeJpg(resized, quality: args[ISOLATE_ARG.quality]), ATTACHMENT.filename: image[ATTACHMENT.filename]};
     }).toList();
   }
 
@@ -115,7 +118,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                             : () async {
                                 setState(() => _sending = true);
                                 if (_images.length > 0) {
-                                  _images = await compute(handleImages, {'images': _images, 'width': widths[_widthIndex], 'quality': qualities[_qualityIndex]});
+                                  _images = await compute(handleImages, {ISOLATE_ARG.images: _images, ISOLATE_ARG.width: widths[_widthIndex], ISOLATE_ARG.quality: qualities[_qualityIndex]});
                                 }
                                 var response =
                                     await _settings.onSubmit(_settings.hasInputField == true ? _recipientController.text : null, _messageController.text, _images.length > 0 ? _images[0] : null);
@@ -191,7 +194,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                             // children: _images.map((List<int> file) => _buildPreviewWidget(file)).toList(),
                             children: _images.length > 0
                                 ? [
-                                    _buildPreviewWidget(_images[0]['uint8list']),
+                                    _buildPreviewWidget(_images[0][ATTACHMENT.uint8list]),
                                     CupertinoButton(
                                       padding: EdgeInsets.all(0),
                                       child: Text('Smazat'),

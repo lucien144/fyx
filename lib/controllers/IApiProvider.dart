@@ -5,6 +5,8 @@ typedef TOnError = void Function(String);
 typedef TOnAuthError = void Function();
 typedef TOnSystemData = void Function(Map<String, dynamic>);
 
+enum ATTACHMENT { uint8list, bytes, filename }
+
 abstract class IApiProvider {
   TOnError onError;
   TOnAuthError onAuthError;
@@ -22,8 +24,8 @@ abstract class IApiProvider {
   Future<Response> fetchDiscussionInfo(int id);
   Future<Response> fetchMail({int lastId});
   Future<Response> fetchNotices({bool keepNew});
-  Future<Response> sendMail(String recipient, String message, {Map<String, dynamic> attachment});
-  Future<Response> postDiscussionMessage(int id, String message, {Map<String, dynamic> attachment});
+  Future<Response> sendMail(String recipient, String message, {Map<ATTACHMENT, dynamic> attachment});
+  Future<Response> postDiscussionMessage(int id, String message, {Map<ATTACHMENT, dynamic> attachment});
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder);
   Future<Response> giveRating(int discussionId, int postId, bool add, bool confirm);
 }

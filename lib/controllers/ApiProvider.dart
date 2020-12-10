@@ -168,7 +168,7 @@ class ApiProvider implements IApiProvider {
     return await dio.post(URL, data: formData, options: _options);
   }
 
-  Future<Response> postDiscussionMessage(int id, String message, {Map<String, dynamic> attachment}) async {
+  Future<Response> postDiscussionMessage(int id, String message, {Map<ATTACHMENT, dynamic> attachment}) async {
     FormData formData = new FormData.fromMap({
       'auth_nick': _credentials.nickname,
       'auth_token': _credentials.token,
@@ -176,7 +176,7 @@ class ApiProvider implements IApiProvider {
       'l2': 'send',
       'id': id,
       'message': message,
-      'attachment': attachment is Map ? MultipartFile.fromBytes(attachment['bytes'], filename: attachment['filename']) : null
+      'attachment': attachment is Map ? MultipartFile.fromBytes(attachment[ATTACHMENT.bytes], filename: attachment[ATTACHMENT.filename]) : null
     });
 
     return await dio.post(URL, data: formData, options: _options);
@@ -229,7 +229,7 @@ class ApiProvider implements IApiProvider {
     return await dio.post(URL, data: formData, options: _options);
   }
 
-  Future<Response> sendMail(String recipient, String message, {Map<String, dynamic> attachment}) async {
+  Future<Response> sendMail(String recipient, String message, {Map<ATTACHMENT, dynamic> attachment}) async {
     FormData formData = new FormData.fromMap({
       'auth_nick': _credentials.nickname,
       'auth_token': _credentials.token,
@@ -237,7 +237,7 @@ class ApiProvider implements IApiProvider {
       'l2': 'send',
       'recipient': recipient,
       'message': message,
-      'attachment': attachment is Map ? MultipartFile.fromBytes(attachment['bytes'], filename: attachment['filename']) : null
+      'attachment': attachment is Map ? MultipartFile.fromBytes(attachment[ATTACHMENT.bytes], filename: attachment[ATTACHMENT.filename]) : null
     });
     return await dio.post(URL, data: formData, options: _options);
   }

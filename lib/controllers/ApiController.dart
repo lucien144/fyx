@@ -154,17 +154,17 @@ class ApiController {
 
   void refreshFcmToken(String token) {
     this.getCredentials().then((creds) async {
-        try {
-          if (creds == null) {
-            return;
-          }
+      try {
+        if (creds == null) {
+          return;
+        }
 
-          print('refreshFcmToken');
-          await provider.registerFcmToken(token);
-          this.setCredentials(creds.copyWith(fcmToken: token));
-        } catch (error) {
-          debugPrint(error);
-          MainRepository().sentry.captureException(exception: error);
+        print('refreshFcmToken');
+        await provider.registerFcmToken(token);
+        this.setCredentials(creds.copyWith(fcmToken: token));
+      } catch (error) {
+        debugPrint(error);
+        MainRepository().sentry.captureException(exception: error);
       }
     });
   }
@@ -194,7 +194,7 @@ class ApiController {
     return FeedNoticesResponse.fromJson(jsonDecode(response.data));
   }
 
-  Future<PostMessageResponse> postDiscussionMessage(int id, String message, {Map<String, dynamic> attachment, Post replyPost}) async {
+  Future<PostMessageResponse> postDiscussionMessage(int id, String message, {Map<ATTACHMENT, dynamic> attachment, Post replyPost}) async {
     if (replyPost != null) {
       message = '{reply ${replyPost.nick}|${replyPost.id}}: $message';
     }
@@ -228,7 +228,7 @@ class ApiController {
     return MailResponse.fromJson(jsonDecode(response.data));
   }
 
-  Future<SendMailResponse> sendMail(String recipient, String message, {Map<String, dynamic> attachment}) async {
+  Future<SendMailResponse> sendMail(String recipient, String message, {Map<ATTACHMENT, dynamic> attachment}) async {
     var result = await provider.sendMail(recipient, message, attachment: attachment);
     return SendMailResponse.fromJson(jsonDecode(result.data));
   }

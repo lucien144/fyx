@@ -9,6 +9,7 @@ import 'package:fyx/components/post/PostAvatar.dart';
 import 'package:fyx/components/post/PostRating.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
@@ -75,7 +76,7 @@ class _PostListItemState extends State<PostListItem> {
                               isPreview: true,
                             ),
                             onClose: this.widget.onUpdate,
-                            onSubmit: (String inputField, String message, Map<String, dynamic> attachment) async {
+                            onSubmit: (String inputField, String message, Map<ATTACHMENT, dynamic> attachment) async {
                               var result = await ApiController().postDiscussionMessage(_post.idKlub, message, attachment: attachment, replyPost: _post);
                               return result.isOk;
                             })),

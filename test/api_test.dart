@@ -13,6 +13,7 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/exceptions/AuthException.dart';
 import 'package:fyx/model/Credentials.dart';
+import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiMock implements IApiProvider {
@@ -98,13 +99,13 @@ class ApiMock implements IApiProvider {
   }
 
   @override
-  Future<Response> postDiscussionMessage(int id, String message, {Map<String, dynamic> attachment}) {
+  Future<Response> postDiscussionMessage(int id, String message, {Map<ATTACHMENT, dynamic> attachment}) {
     // TODO: implement postDiscussionMessage
     return null;
   }
 
   @override
-  Future<Response> sendMail(String recipient, String message, {Map<String, dynamic> attachment}) {
+  Future<Response> sendMail(String recipient, String message, {Map<ATTACHMENT, dynamic> attachment}) {
     // TODO: implement sendMail
     return null;
   }

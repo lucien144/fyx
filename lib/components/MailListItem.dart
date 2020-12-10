@@ -5,6 +5,7 @@ import 'package:fyx/components/ContentBoxLayout.dart';
 import 'package:fyx/components/actionSheets/PostActionSheet.dart';
 import 'package:fyx/components/post/PostAvatar.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/Mail.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
@@ -64,7 +65,7 @@ class _MailListItemState extends State<MailListItem> {
                 ),
                 onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
                     arguments: NewMessageSettings(
-                        onSubmit: (String inputField, String message, Map<String, dynamic> attachment) async {
+                        onSubmit: (String inputField, String message, Map<ATTACHMENT, dynamic> attachment) async {
                           var response = await ApiController().sendMail(inputField, message, attachment: attachment);
                           return response.isOk;
                         },
