@@ -22,8 +22,9 @@ import '../FyxApp.dart';
 class DiscussionPageArguments {
   final int discussionId;
   final int postId;
+  final String filterByUser;
 
-  DiscussionPageArguments(this.discussionId, {this.postId});
+  DiscussionPageArguments(this.discussionId, {this.postId, this.filterByUser});
 }
 
 class DiscussionPage extends StatefulWidget {
@@ -39,9 +40,9 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
   bool _hasBackToRootButton = false;
   bool _hasInitData = false;
 
-  Future<DiscussionResponse> _fetchData(discussionId, postId) {
+  Future<DiscussionResponse> _fetchData(discussionId, postId, user) {
     return this._memoizer.runOnce(() {
-      return ApiController().loadDiscussion(discussionId, lastId: postId);
+      return ApiController().loadDiscussion(discussionId, lastId: postId, user: user);
     });
   }
 
@@ -96,7 +97,7 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
     DiscussionPageArguments pageArguments = ModalRoute.of(context).settings.arguments;
 
     return FutureBuilder<DiscussionResponse>(
-        future: _fetchData(pageArguments.discussionId, pageArguments.postId),
+        future: _fetchData(pageArguments.discussionId, pageArguments.postId, pageArguments.filterByUser),
         builder: (BuildContext context, AsyncSnapshot<DiscussionResponse> snapshot) {
           if (snapshot.hasData) {
             if (snapshot.data.discussion.accessDenied) {
@@ -159,7 +160,7 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
               var result;
               if (lastId != null) {
                 // If we load next page(s)
-                var response = await ApiController().loadDiscussion(pageArguments.discussionId, lastId: lastId);
+                var response = await ApiController().loadDiscussion(pageArguments.discussionId, lastId: lastId, user: pageArguments.filterByUser);
                 result = response.data;
               } else {
                 // If we load init data or we refresh data on pull
@@ -169,7 +170,7 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
                   this._hasInitData = true;
                 } else {
                   // If we just pull to refresh, load a fresh data
-                  var response = await ApiController().loadDiscussion(pageArguments.discussionId);
+                  var response = await ApiController().loadDiscussion(pageArguments.discussionId, user: pageArguments.filterByUser);
                   result = response.data;
                 }
               }

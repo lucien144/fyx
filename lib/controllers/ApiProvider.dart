@@ -132,7 +132,7 @@ class ApiProvider implements IApiProvider {
     return await dio.post(URL, data: formData, options: _options);
   }
 
-  Future<Response> fetchDiscussion(int id, {int lastId}) async {
+  Future<Response> fetchDiscussion(int id, {int lastId, String user}) async {
     FormData formData = new FormData.fromMap({
       'auth_nick': _credentials.nickname,
       'auth_token': _credentials.token,
@@ -140,6 +140,7 @@ class ApiProvider implements IApiProvider {
       'l2': 'messages',
       'id': id,
       'id_wu': lastId,
+      'filter_user': user,
       'direction': lastId == null ? 'newest' : 'older'
     });
     return await dio.post(URL, data: formData, options: _options);

@@ -5,7 +5,6 @@ import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/TextIcon.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
-import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:share/share.dart';
@@ -71,22 +70,6 @@ class _PostActionSheetState extends State<PostActionSheet> {
                   Share.share(body, subject: widget.shareData.subject, sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
                   Navigator.pop(context);
                   AnalyticsProvider().logEvent('shareSheet');
-                }),
-          ),
-          Visibility(
-            visible: widget.user != MainRepository().credentials.nickname,
-            child: CupertinoActionSheetAction(
-                child: TextIcon(
-                  '${L.POST_SHEET_BLOCK} @${widget.user}',
-                  icon: Icons.block,
-                  iconColor: Colors.redAccent,
-                ),
-                isDestructiveAction: true,
-                onPressed: () {
-                  MainRepository().settings.blockUser(widget.user);
-                  PlatformTheme.success(L.TOAST_USER_BLOCKED);
-                  Navigator.of(context).pop();
-                  AnalyticsProvider().logEvent('blockUser');
                 }),
           ),
           CupertinoActionSheetAction(

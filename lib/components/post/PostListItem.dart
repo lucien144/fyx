@@ -4,7 +4,9 @@ import 'package:flutter/widgets.dart';
 import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/ContentBoxLayout.dart';
 import 'package:fyx/components/FeedbackIndicator.dart';
+import 'package:fyx/components/GestureFeedback.dart';
 import 'package:fyx/components/actionSheets/PostActionSheet.dart';
+import 'package:fyx/components/actionSheets/PostAvatarActionSheet.dart';
 import 'package:fyx/components/post/PostAvatar.dart';
 import 'package:fyx/components/post/PostRating.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
@@ -45,10 +47,13 @@ class _PostListItemState extends State<PostListItem> {
     return ContentBoxLayout(
       isPreview: widget._isPreview,
       isHighlighted: widget._isHighlighted,
-      topLeftWidget: PostAvatar(
-        _post.nick,
-        isHighlighted: widget._isHighlighted,
-        description: T.parseTime(_post.time),
+      topLeftWidget: GestureFeedback(
+        onTap: () => showCupertinoModalPopup(context: context, builder: (BuildContext context) => PostAvatarActionSheet(user: _post.nick, idKlub: _post.idKlub,)),
+        child: PostAvatar(
+          _post.nick,
+          isHighlighted: widget._isHighlighted,
+          description: T.parseTime(_post.time),
+        ),
       ),
       topRightWidget: GestureDetector(
           child: Icon(Icons.more_vert, color: Colors.black38),

@@ -179,8 +179,8 @@ class ApiController {
     return BookmarksResponse.fromJson(jsonDecode(response.data));
   }
 
-  Future<DiscussionResponse> loadDiscussion(int id, {int lastId}) async {
-    var response = await provider.fetchDiscussion(id, lastId: lastId);
+  Future<DiscussionResponse> loadDiscussion(int id, {int lastId, String user}) async {
+    var response = await provider.fetchDiscussion(id, lastId: lastId, user: user);
     return DiscussionResponse.fromJson(jsonDecode(response.data));
   }
 
