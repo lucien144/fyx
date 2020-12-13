@@ -19,6 +19,7 @@ class PostAvatarActionSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoActionSheet(
+      title: Text(this.user),
       actions: [
         CupertinoActionSheetAction(
           child: TextIcon('Poslat zprávu', icon: Icons.mail),
