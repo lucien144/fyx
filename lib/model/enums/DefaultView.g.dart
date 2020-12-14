@@ -21,8 +21,10 @@ class DefaultViewAdapter extends TypeAdapter<DefaultView> {
         return DefaultView.bookmarks;
       case 3:
         return DefaultView.bookmarksUnread;
+      case 4:
+        return DefaultView.latest;
       default:
-        return null;
+        return DefaultView.history;
     }
   }
 
@@ -40,6 +42,12 @@ class DefaultViewAdapter extends TypeAdapter<DefaultView> {
         break;
       case DefaultView.bookmarksUnread:
         writer.writeByte(3);
+        break;
+      case DefaultView.latest:
+        writer.writeByte(4);
+        break;
+      default:
+        writer.writeByte(0);
         break;
     }
   }

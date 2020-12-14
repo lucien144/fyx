@@ -84,6 +84,7 @@ class _SettingsPageState extends State<SettingsPage> {
           CSHeader('Úvodní obrazovka'),
           CSSelection<DefaultView>(
             items: const <CSSelectionItem<DefaultView>>[
+              CSSelectionItem<DefaultView>(text: 'Poslední stav', value: DefaultView.latest),
               CSSelectionItem<DefaultView>(text: 'Historie (vše)', value: DefaultView.history),
               CSSelectionItem<DefaultView>(text: 'Historie (nepřečtené)', value: DefaultView.historyUnread),
               CSSelectionItem<DefaultView>(text: 'Sledované (vše)', value: DefaultView.bookmarks),
