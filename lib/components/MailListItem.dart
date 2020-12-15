@@ -25,12 +25,12 @@ class _MailListItemState extends State<MailListItem> {
   @override
   Widget build(BuildContext context) {
     return ContentBoxLayout(
+      isHighlighted: widget.mail.isNew,
       isPreview: widget.isPreview == true,
       content: widget.mail.content,
       topLeftWidget: PostAvatar(
         widget.mail.direction == MailDirection.from ? widget.mail.participant : MainRepository().credentials.nickname,
-        description: '→ ${widget.mail.direction == MailDirection.to ? widget.mail.participant : MainRepository().credentials.nickname}, ~${T.parseTime(widget.mail.time)}',
-        isHighlighted: widget.mail.isNew,
+        description: '→ ${widget.mail.direction == MailDirection.to ? widget.mail.participant : MainRepository().credentials.nickname}, ~${T.parseTime(widget.mail.time)}'
       ),
       topRightWidget: Row(
         children: <Widget>[

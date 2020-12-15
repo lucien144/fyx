@@ -11,5 +11,7 @@ enum DefaultView {
   @HiveField(2)
   bookmarks,
   @HiveField(3)
-  bookmarksUnread
+  bookmarksUnread,
+  @HiveField(4)
+  latest
 }

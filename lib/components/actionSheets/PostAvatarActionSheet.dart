@@ -19,6 +19,7 @@ class PostAvatarActionSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoActionSheet(
+      title: Text(this.user),
       actions: [
         CupertinoActionSheetAction(
           child: TextIcon('Poslat zprávu', icon: Icons.mail),
@@ -51,10 +52,29 @@ class PostAvatarActionSheet extends StatelessWidget {
               ),
               isDestructiveAction: true,
               onPressed: () {
-                MainRepository().settings.blockUser(user);
-                PlatformTheme.success(L.TOAST_USER_BLOCKED);
-                Navigator.of(context).pop();
-                AnalyticsProvider().logEvent('blockUser');
+                Navigator.of(context, rootNavigator: true).pop();
+                showCupertinoDialog(
+                    context: context,
+                    builder: (BuildContext context) => new CupertinoAlertDialog(
+                          title: Text('Blokovat uživatele?'),
+                          content: Text('Skutečně chcete blokovat ID @$user?'),
+                          actions: [
+                            CupertinoDialogAction(
+                              child: Text('Ne'),
+                              onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+                            ),
+                            CupertinoDialogAction(
+                              child: Text('Ano'),
+                              isDestructiveAction: true,
+                              onPressed: () {
+                                MainRepository().settings.blockUser(user);
+                                PlatformTheme.success(L.TOAST_USER_BLOCKED);
+                                Navigator.of(context).pop();
+                                AnalyticsProvider().logEvent('blockUser');
+                              },
+                            ),
+                          ],
+                        ));
               }),
         ),
       ],

@@ -42,6 +42,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
   int _pageIndex;
   int _refreshData = 0;
   bool _filterUnread = false;
+  DefaultView _defaultView;
   List<int> _toggledCategories = [];
   HomePageArguments _arguments;
 
@@ -50,9 +51,10 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
-    _filterUnread = [DefaultView.bookmarksUnread, DefaultView.historyUnread].indexOf(MainRepository().settings.defaultView) >= 0;
+    _defaultView = MainRepository().settings.defaultView == DefaultView.latest ? MainRepository().settings.latestView : MainRepository().settings.defaultView;
+    _filterUnread = [DefaultView.bookmarksUnread, DefaultView.historyUnread].indexOf(_defaultView) >= 0;
 
-    activeTab = [DefaultView.history, DefaultView.historyUnread].indexOf(MainRepository().settings.defaultView) >= 0 ? tabs.history : tabs.bookmarks;
+    activeTab = [DefaultView.history, DefaultView.historyUnread].indexOf(_defaultView) >= 0 ? tabs.history : tabs.bookmarks;
     if (activeTab == tabs.bookmarks) {
       _bookmarksController = PageController(initialPage: 1);
     } else {
@@ -108,7 +110,6 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   // Called when the current route has been pushed.
   void didPopNext() {
-    debugPrint("didPopNext $runtimeType");
     this.refreshData();
   }
 
@@ -178,6 +179,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                 _filterUnread = !_filterUnread;
                 // Reset the category toggle
                 _toggledCategories = [];
+                this.updateLatestView();
               });
             }
             setState(() => _pageIndex = index);
@@ -242,6 +244,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                       )),
                   child: PageView(
                     controller: _bookmarksController,
+                    onPageChanged: (int index) => this.updateLatestView(isInverted: true),
                     pageSnapping: true,
                     children: <Widget>[
                       // -----
@@ -356,5 +359,20 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
         },
       ),
     );
+  }
+
+  // isInverted
+  // Sometimes the activeTab var is changed after the listener where we call updateLatestView() finishes.
+  // Therefore, the var activeTab needs to be handled as inverted.
+  void updateLatestView({bool isInverted: false}) {
+    DefaultView latestView = activeTab == tabs.history ? DefaultView.history : DefaultView.bookmarks;
+    if (isInverted) {
+      latestView = activeTab == tabs.history ? DefaultView.bookmarks : DefaultView.history;
+    }
+
+    if (_filterUnread) {
+      latestView = latestView == DefaultView.bookmarks ? DefaultView.bookmarksUnread : DefaultView.historyUnread;
+    }
+    MainRepository().settings.latestView = latestView;
   }
 }
