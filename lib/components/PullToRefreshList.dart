@@ -20,12 +20,14 @@ typedef Future<DataProviderResult> TDataProvider(int id);
 class PullToRefreshList extends StatefulWidget {
   final TDataProvider dataProvider;
   Function sliverListBuilder;
+  bool _disabled;
   bool _isInfinite;
   int _rebuild;
 
-  PullToRefreshList({@required this.dataProvider, isInfinite = false, int rebuild = 0, this.sliverListBuilder})
+  PullToRefreshList({@required this.dataProvider, isInfinite = false, int rebuild = 0, this.sliverListBuilder, bool disabled = false})
       : _isInfinite = isInfinite,
         _rebuild = rebuild,
+        _disabled = disabled,
         assert(dataProvider != null);
 
   @override
@@ -70,7 +72,10 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
     _slivers.add(CupertinoSliverRefreshControl(
       onRefresh: () {
         setState(() => _hasPulledDown = true);
-        return this.loadData();
+        if (!widget._disabled) {
+          return this.loadData();
+        }
+        return Future.wait([]);
       },
     ));
 
