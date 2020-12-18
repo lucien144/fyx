@@ -28,7 +28,12 @@ class DiscussionPageArguments {
 }
 
 class DiscussionPage extends StatefulWidget {
+  // Number of clicks to go deeper in the discussion.
+  // Usefull to display "back to first post" button.
   static int deeplinkDepth = 0;
+
+  // True if we open inapp Safari
+  static bool browseOutside = false;
 
   @override
   _DiscussionPageState createState() => _DiscussionPageState();
@@ -37,7 +42,6 @@ class DiscussionPage extends StatefulWidget {
 class _DiscussionPageState extends State<DiscussionPage> with RouteAware, WidgetsBindingObserver {
   final AsyncMemoizer _memoizer = AsyncMemoizer<DiscussionResponse>();
   int _refreshList = 0;
-  bool _hasBackToRootButton = false;
   bool _hasInitData = false;
 
   Future<DiscussionResponse> _fetchData(discussionId, postId, user) {
@@ -67,7 +71,11 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed && ModalRoute.of(context).isCurrent) {
-      this.refresh();
+      // Only if we don't come back from inapp Safari
+      if (!DiscussionPage.browseOutside && DiscussionPage.deeplinkDepth == 0) {
+        this.refresh();
+      }
+      DiscussionPage.browseOutside = false;
     }
   }
 
@@ -81,7 +89,6 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
     if (DiscussionPage.deeplinkDepth < 0) {
       DiscussionPage.deeplinkDepth = 0;
     }
-    setState(() => _hasBackToRootButton = DiscussionPage.deeplinkDepth > 0);
   }
 
   void didPop() {
@@ -89,7 +96,6 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
     if (DiscussionPage.deeplinkDepth < 0) {
       DiscussionPage.deeplinkDepth = 0;
     }
-    setState(() => _hasBackToRootButton = DiscussionPage.deeplinkDepth > 0);
   }
 
   @override
@@ -123,7 +129,6 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
           leading: CupertinoNavigationBarBackButton(
             color: T.COLOR_PRIMARY,
             onPressed: () {
-              DiscussionPage.deeplinkDepth = 0;
               Navigator.of(context).pop();
             },
           ),
@@ -134,6 +139,7 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
       child: Stack(
         children: [
           PullToRefreshList(
+            disabled: DiscussionPage.browseOutside || DiscussionPage.deeplinkDepth > 0,
             rebuild: _refreshList,
             isInfinite: true,
             sliverListBuilder: (List data) {

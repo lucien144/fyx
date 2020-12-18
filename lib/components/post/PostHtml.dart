@@ -175,7 +175,10 @@ class PostHtml extends StatelessWidget {
           link = 'https://www.nyx.cz/index.php$link';
         }
 
-        PlatformTheme.openLink(link);
+        var opened = await PlatformTheme.openLink(link);
+        if (opened) {
+          DiscussionPage.browseOutside = true;
+        }
       },
     );
   }
