@@ -43,15 +43,17 @@ class PlatformTheme {
         fontSize: 14.0);
   }
 
-  static openLink(String link) async {
+  static Future<bool> openLink(String link) async {
     try {
       var status = await launch(link);
       if (status == false) {
         throw ('Cannot open webview. URL: $link');
       }
+      return true;
     } catch (e) {
       PlatformTheme.error(L.INAPPBROWSER_ERROR);
       MainRepository().sentry.captureException(exception: e);
+      return false;
     }
   }
 
