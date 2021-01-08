@@ -31,6 +31,8 @@ class L {
   static String TOAST_USER_BLOCKED = 'Uživatel byl zablokován.';
   static String TOAST_POST_FLAGGED = 'Příspěvek byl nahlášen. Děkujeme, budeme se tomu věnovat.';
   static String TOAST_POST_FLAG_ERROR = 'Příspěvek se nepodařilo nahlásit, zkuste to znovu.';
+  static String TOAST_IMAGE_SAVE_OK = '👌 Obrázek byl uložen.';
+  static String TOAST_IMAGE_SAVE_ERROR = '👎 Ouch. Obrázek se nepodařilo uložit.';
 
   // Tutorial page
   static String TUTORIAL_SUCCESS = 'Paráda 🤘';
