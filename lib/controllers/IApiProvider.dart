@@ -5,7 +5,7 @@ typedef TOnError = void Function(String);
 typedef TOnAuthError = void Function();
 typedef TOnSystemData = void Function(Map<String, dynamic>);
 
-enum ATTACHMENT { uint8list, bytes, filename }
+enum ATTACHMENT { bytes, filename }
 
 abstract class IApiProvider {
   TOnError onError;
