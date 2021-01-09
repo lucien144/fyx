@@ -81,6 +81,8 @@ class _NewMessagePageState extends State<NewMessagePage> {
     super.dispose();
   }
 
+  // Saving where the focus is.
+  // Gallery/Photo picker (or other action where we lose app focus) loses the input focus, therefore, we need to save latest state in order to restore it.
   _focusCallback() {
     if (_messageFocusNode.hasFocus) {
       recipientHasFocus = false;
@@ -156,7 +158,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                         inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9_]'))],
                         textCapitalization: TextCapitalization.characters,
                         placeholder: 'Adresát',
-                        autofocus: _settings.hasInputField == true,
+                        autofocus: _settings.hasInputField == true && _settings.inputFieldPlaceholder == null,
                         autocorrect: MainRepository().settings.useAutocorrect,
                         focusNode: _recipientFocusNode,
                       )),
@@ -166,7 +168,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                   CupertinoTextField(
                     controller: _messageController,
                     maxLines: 10,
-                    autofocus: _settings.hasInputField != true,
+                    autofocus: _settings.hasInputField != true || _settings.inputFieldPlaceholder != null,
                     textCapitalization: TextCapitalization.sentences,
                     autocorrect: MainRepository().settings.useAutocorrect,
                     focusNode: _messageFocusNode,
