@@ -89,6 +89,7 @@ class ApiController {
 
   Future<Credentials> setCredentials(Credentials credentials) async {
     if (credentials.isValid) {
+      provider.setCredentials(credentials);
       var storage = await SharedPreferences.getInstance();
       await storage.setString('identity', jsonEncode(credentials));
       return Future(() => credentials);

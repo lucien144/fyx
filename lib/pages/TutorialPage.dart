@@ -71,6 +71,8 @@ class _TutorialPageState extends State<TutorialPage> {
                         if (isOk) {
                           Navigator.of(context).pushNamed('/home');
                           AnalyticsProvider().logTutorialComplete();
+                        } else {
+                          throw Exception('Selhala kontrola autorizace.');
                         }
                       }).catchError((error) => onError(error));
                     }).catchError((error) => onError(error));

@@ -52,11 +52,6 @@ class ApiProvider implements IApiProvider {
         });
     } catch (e) {}
 
-    // SharedPreferences.getInstance().then((prefs) {
-    //   print('api providers constructor');
-    //   _credentials = Credentials(prefs.getString('nickname'), prefs.getString('token'));
-    // });
-
     dio.interceptors.add(InterceptorsWrapper(onRequest: (RequestOptions options) async {
       print('[API] ${options.method.toUpperCase()}: ${options.uri}');
       print('[API] -> query: ${options.queryParameters}');
