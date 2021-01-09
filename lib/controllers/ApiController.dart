@@ -13,7 +13,7 @@ import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/System.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/model/reponses/BookmarksResponse.dart';
-import 'package:fyx/model/reponses/DiscussionInfoResponse.dart';
+import 'package:fyx/model/reponses/DiscussionHomeResponse.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/model/reponses/FeedNoticesResponse.dart';
 import 'package:fyx/model/reponses/LoginResponse.dart';
@@ -184,9 +184,9 @@ class ApiController {
     return DiscussionResponse.fromJson(jsonDecode(response.data));
   }
 
-  Future<DiscussionInfoResponse> getDiscussionInfo(int id) async {
-    var response = await provider.fetchDiscussionInfo(id);
-    return DiscussionInfoResponse.fromJson(jsonDecode(response.data));
+  Future<DiscussionHomeResponse> getDiscussionHome(int id) async {
+    var response = await provider.fetchDiscussionHome(id);
+    return DiscussionHomeResponse.fromJson(jsonDecode(response.data));
   }
 
   Future<FeedNoticesResponse> loadFeedNotices({bool keepNew = false}) async {

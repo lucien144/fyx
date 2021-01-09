@@ -6,7 +6,7 @@ import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/post/Content.dart';
-import 'package:fyx/model/reponses/DiscussionInfoResponse.dart';
+import 'package:fyx/model/reponses/DiscussionHomeResponse.dart';
 import 'package:fyx/model/reponses/FeedNoticesResponse.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/theme/Helpers.dart';
@@ -78,7 +78,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
                   ),
                   topLeftWidget: Expanded(
                     child: FutureBuilder(
-                        builder: (BuildContext context, AsyncSnapshot<DiscussionInfoResponse> response) {
+                        builder: (BuildContext context, AsyncSnapshot<DiscussionHomeResponse> response) {
                           if (response.hasData) {
                             return GestureDetector(
                               onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(item.idKlub)),
@@ -94,7 +94,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
                           }
                           return CupertinoActivityIndicator();
                         },
-                        future: ApiController().getDiscussionInfo(item.idKlub)),
+                        future: ApiController().getDiscussionHome(item.idKlub)),
                   ),
                   bottomWidget: Column(
                     children: [

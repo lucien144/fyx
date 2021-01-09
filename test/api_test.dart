@@ -129,7 +129,7 @@ class ApiMock implements IApiProvider {
   }
 
   @override
-  Future<Response> fetchDiscussionInfo(int id) {
+  Future<Response> fetchDiscussionHome(int id) {
     // TODO: implement fetchDiscussionInfo
     throw UnimplementedError();
   }

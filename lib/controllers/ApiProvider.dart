@@ -71,7 +71,8 @@ class ApiProvider implements IApiProvider {
 
       // All seems ok.
       // Endpoints: Auth + pulling data
-      if (data.containsKey('data')) {
+      // Getting data for home/header does not return data key.
+      if (data.containsKey('data') || data.containsKey('home') || data.containsKey('header')) {
         return response;
       }
 
@@ -146,14 +147,13 @@ class ApiProvider implements IApiProvider {
     return await dio.post(URL, data: formData, options: _options);
   }
 
-  Future<Response> fetchDiscussionInfo(int id) async {
+  Future<Response> fetchDiscussionHome(int id) async {
     FormData formData = new FormData.fromMap({
       'auth_nick': _credentials.nickname,
       'auth_token': _credentials.token,
       'l': 'discussion',
-      'l2': 'messages',
-      'id': id,
-      'filter_user': '&' // -> this is nonsense, it should fail and return empty (fast) result with discussion info
+      'l2': 'home',
+      'id_klub': id
     });
     return await dio.post(URL, data: formData, options: _options);
   }
