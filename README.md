@@ -99,32 +99,32 @@ Pokud jste našli chybu, pak ji nahlaste ideálně přes aplikaci. Pokud to nejd
 <table>
 	<tr>
 		<th width="33%">
-			<p><a title="show-whitespace"></a> Výpis historie
-			<p><img src="https://user-images.githubusercontent.com/5161085/104580475-a1b6ef80-565d-11eb-8003-a412416e5d14.PNG">
+			<p><a title="history"></a> Výpis historie
+			<p><kbd><img src="https://user-images.githubusercontent.com/5161085/104580475-a1b6ef80-565d-11eb-8003-a412416e5d14.PNG">
 		<th width="33%">
-			<p><a title="resolve-conflicts"></a> Výpis diskuzí
-			<p><img src="https://user-images.githubusercontent.com/5161085/104580503-a9769400-565d-11eb-90bf-8ff1865d8385.PNG">
+			<p><a title="bookmarks"></a> Výpis diskuzí
+			<p><kbd><img src="https://user-images.githubusercontent.com/5161085/104580503-a9769400-565d-11eb-90bf-8ff1865d8385.PNG">
     <th width="33%">
-			<p><a title="reactions-avatars"></a> Detail diskuze (v kompaktním módu)
-			<p><img src="https://user-images.githubusercontent.com/5161085/104580520-ad0a1b00-565d-11eb-9571-2326ee2dfad7.PNG">
+			<p><a title="detail"></a> Detail diskuze (v kompaktním módu)
+			<p><kbd><img src="https://user-images.githubusercontent.com/5161085/104580520-ad0a1b00-565d-11eb-9571-2326ee2dfad7.PNG">
 	<tr>
 		<th width="33%">
-			<p><a title="wait-for-build"></a> Galerie (náhled obrázku v příspěvku)
-			<p><img src="https://user-images.githubusercontent.com/5161085/104580526-ae3b4800-565d-11eb-870e-acc8e764965f.PNG">
+			<p><a title="gallery"></a> Galerie (náhled obrázku v příspěvku)
+			<p><kbd><img src="https://user-images.githubusercontent.com/5161085/104580526-ae3b4800-565d-11eb-870e-acc8e764965f.PNG">
 		<th width="33%">
-			<p><a title="linkify-code"></a> Anketa
-			<p><img src="https://user-images.githubusercontent.com/5161085/104580528-af6c7500-565d-11eb-9b2e-59852aa182b5.PNG">
+			<p><a title="poll"></a> Anketa
+			<p><kbd><img src="https://user-images.githubusercontent.com/5161085/104580528-af6c7500-565d-11eb-9b2e-59852aa182b5.PNG">
 		<th width="33%">
-			<p><a title="restore-file"></a> Zvýraznění syntaxe
-			<p><img src="https://user-images.githubusercontent.com/5161085/104580530-b0050b80-565d-11eb-9ec6-2ed9376814c0.PNG">
+			<p><a title="syntax"></a> Zvýraznění syntaxe
+			<p><kbd><img src="https://user-images.githubusercontent.com/5161085/104580530-b0050b80-565d-11eb-9ec6-2ed9376814c0.PNG">
   <tr>
 		<th width="33%">
-			<p><a title="wait-for-build"></a> Spoilery
-			<p><img src="https://user-images.githubusercontent.com/5161085/104580531-b0050b80-565d-11eb-9130-a44cfe19ab56.PNG">
+			<p><a title="spoiler"></a> Spoilery
+			<p><kbd><img src="https://user-images.githubusercontent.com/5161085/104580531-b0050b80-565d-11eb-9130-a44cfe19ab56.PNG">
 		<th width="33%">
-			<p><a title="linkify-code"></a> Psaní odpovědi
-			<p><img src="https://user-images.githubusercontent.com/5161085/104581181-83052880-565e-11eb-8ff0-d1baa088886f.PNG">
+			<p><a title="reply"></a> Psaní odpovědi
+			<p><kbd><img src="https://user-images.githubusercontent.com/5161085/104581181-83052880-565e-11eb-8ff0-d1baa088886f.PNG">
 		<th width="33%">
-			<p><a title="restore-file"></a> Nastavení
-			<p><img src="https://user-images.githubusercontent.com/5161085/104581195-87314600-565e-11eb-9e2a-6cc20ebf743a.PNG">
+			<p><a title="settings"></a> Nastavení
+			<p><kbd><img src="https://user-images.githubusercontent.com/5161085/104581195-87314600-565e-11eb-9e2a-6cc20ebf743a.PNG">
 </table>
