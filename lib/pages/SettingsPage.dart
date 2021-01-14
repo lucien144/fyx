@@ -139,7 +139,7 @@ class _SettingsPageState extends State<SettingsPage> {
             CSButtonType.DEFAULT,
             L.SETTINGS_BUGREPORT,
             () {
-              PlatformTheme.prefillGithubIssue(L.SETTINGS_BUGREPORT_TITLE);
+              PlatformTheme.prefillGithubIssue(appContext: MainRepository(), user: MainRepository().credentials.nickname);
               AnalyticsProvider().logEvent('reportBug');
             },
             style: bugreportStyle,

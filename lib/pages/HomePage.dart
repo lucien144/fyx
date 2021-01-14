@@ -144,7 +144,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
           CupertinoActionSheetAction(
               child: Text('⚠️ ${L.SETTINGS_BUGREPORT}'),
               onPressed: () {
-                PlatformTheme.prefillGithubIssue(L.SETTINGS_BUGREPORT_TITLE);
+                PlatformTheme.prefillGithubIssue(appContext: MainRepository(), user: MainRepository().credentials.nickname);
                 AnalyticsProvider().logEvent('reportBug');
               }),
         ],
