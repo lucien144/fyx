@@ -15,6 +15,7 @@ import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
+import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 
@@ -51,7 +52,7 @@ class _PostListItemState extends State<PostListItem> {
         onTap: () => showCupertinoModalPopup(context: context, builder: (BuildContext context) => PostAvatarActionSheet(user: _post.nick, idKlub: _post.idKlub,)),
         child: PostAvatar(
           _post.nick,
-          description: T.parseTime(_post.time),
+          description: Helpers.parseTime(_post.time),
         ),
       ),
       topRightWidget: GestureDetector(

@@ -9,6 +9,7 @@ import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/Mail.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
+import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/T.dart';
 
 class MailListItem extends StatefulWidget {
@@ -30,7 +31,7 @@ class _MailListItemState extends State<MailListItem> {
       content: widget.mail.content,
       topLeftWidget: PostAvatar(
         widget.mail.direction == MailDirection.from ? widget.mail.participant : MainRepository().credentials.nickname,
-        description: '→ ${widget.mail.direction == MailDirection.to ? widget.mail.participant : MainRepository().credentials.nickname}, ~${T.parseTime(widget.mail.time)}'
+        description: '→ ${widget.mail.direction == MailDirection.to ? widget.mail.participant : MainRepository().credentials.nickname}, ~${Helpers.parseTime(widget.mail.time)}'
       ),
       topRightWidget: Row(
         children: <Widget>[

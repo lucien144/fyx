@@ -24,6 +24,7 @@ class L {
   static String GENERAL_LOADING = 'Načítám...';
   static String GENERAL_ERROR = 'Chyba!';
   static String GENERAL_EMPTY = 'Wow. Such empty.';
+  static String GENERAL_NOW = 'Teď';
 
   // TOAST MESSAGE
   static String TOAST_COPIED = 'Zkopírováno do schránky.';
