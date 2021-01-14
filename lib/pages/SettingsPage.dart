@@ -105,7 +105,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 }),
           ),
           CSControl(
-            nameWidget: Text('Skrytých přísěvků'),
+            nameWidget: Text('Skrytých příspěvků'),
             contentWidget: ValueListenableBuilder(
                 valueListenable: MainRepository().settings.box.listenable(keys: ['blockedPosts']),
                 builder: (BuildContext context, value, Widget child) {
