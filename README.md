@@ -18,40 +18,52 @@ Fyx je neoficiální mobilní klient pro diskuzní server [Nyx.cz](https://nyx.c
 ---
 
 ## Funkce
-- Tutoriál k autorizaci
-- Kluby
-  - Historie (+ zobrazení prémiových ikon: odkazy, obrázky)
-  - Sledované
-  - Palcování
-  - Uložení do připomínek
-  - Skrytí spoilerů
-  - Galerie obrázků pokud jich je v příspěvku více
-  - Kompaktní zobrazení příspěvků
-  - In-app browser
-  - In-app video player
-  - Psaní příspěvků (+ odesílání obrázků)
-  - Nastavení (výchozí stránka a další...)
-- Pošta
-  - Odesílání
-  - Přečteno / Nepřečteno
-  - Badge nepřečtených
+
+Fyx nabízí oproti [oficiálnímu klientovi](https://apps.apple.com/cz/app/nyx/id920743962) několik výhod, ale v něčem také ztrácí. 
+Zde je přehled funkcí pro lepší představu.
+
+| Funkce | Fyx | Nyx |
+|-|:-:|:-:|
+| iOS | ✅ | ✅ |
+| Android | 🛠 | ✅ |
+| Notifikace | ✅ | ✅ |
+| Výpis klubů | ✅ | ✅ |
+| Historie | ✅ | ✅ |
+| Filtr přečtených klubů/historie | ✅ | ✅ |
+| Nástěnka / záhlaví klubu | ❌ | ✅ |
+| Ukládání do sledovaných | ❌ | ✅ |
+| Psaní příspěvků | ✅ | ✅ |
+| Mazání příspěvků | ❌ | ✅ |
+| Kompaktní mód příspěvku | ✅ | ❌ |
+| Nahrávání obrázků | ✅ | ✅ |
+| Galerie více obrázků | ✅ | ❌ |
+| Ukládání obrázků | ✅ | ✅ |
+| Palečkování | ✅ | ✅ |
+| Uložení do upomínek | ✅ | ✅ |
+| Videa v příspěvku | ✅ | ❌ |
+| Spoilery | ✅ | ❌ |
+| Zobrazování anket | ✅ | ❌ |
+| Zobrazování zdrojáků | ✅ | ❌ |
+| Zobrazování videí | ✅ | ❌ |
+| Dark mode | ❌ | ✅ |
+| Pošta | ✅ | ✅ |
+| Hledání | ❌ | ✅ |
+| Tržiště | ❌ | ✅ |
+| Upozornění | ✅ | ✅ |
+| Landscape zobrazení | ❌ | ✅ |
 
 ## Roadmap
 
-👉 [Zde.](https://github.com/lucien144/fyx/projects/2)
-
-### Priority mimo roadmapu
-
-*Toto se pravděpodobně přidá prioritně někam do roadmapy, záleží na diskuzi.*
-
-1. Android verze s hybridnínm designem
-1. Darkmode
+Pokud vás zajímá plán vývoje a přidáváné nových funkcí, pak se podívejte do [roadmapy](https://github.com/lucien144/fyx/projects/2).
 
 ## Jak se zapojit
 
 ### Finanční podpora
 
-Pokud chcete vývoj Fyxu, který je nabízen zdarma, finančně podpořit, pak můžete skrz [Patreon účet](http://patreon.com/fyxapp).
+Pokud chcete vývoj Fyxu, který je nabízen zdarma, finančně podpořit, pak můžete skrz [Patreon účet](http://patreon.com/fyxapp). Příspěvky také můžete posílat bankou - [více informací na nástěnce](https://www.nyx.cz/index.php?l=topic;l2=2;id=24237;n=6162) Fyxu v patřičném [klubu na Nyxu](https://www.nyx.cz/index.php?l=topic;l2=2;id=24237;n=6162).
+
+- [Patreon](http://patreon.com/fyxapp)
+- [Bankovní spojení](https://www.nyx.cz/index.php?l=topic;l2=2;id=24237;n=6162)
 
 ### Vývoj
 
@@ -67,21 +79,21 @@ Pokud jste našli chybu, pak ji nahlaste ideálně přes aplikaci. Pokud to nejd
 
 ## FAQ
 
-- **Q:** Proč není podporovaný i Android?
+- **Proč není podporovaný i Android?**
 
-  **A:** Protože je to moc práce a iOS je pro mě (Lucien) nativní prostředí. Aplikace má v sobě fragmenty přípravy pro Android (viz. [`PlatformAwareWidget`](https://github.com/lucien144/fyx/blob/develop/lib/PlatformAwareWidget.dart)), ale později jsem se rozhodl jít pro mě lehčí cestou, vydat první verzi asap a Android případně řešit s grafiky, kteří by připravili hodnotný hybridní design funkční jak na Androidu tak i na iOS.
+  Na Androidu se pracuje. Předpoklad je přelom Q2 a Q3 2021.
 
-- **Q:** Proč nelze k příspěvku nahrát víc obrázků najednou?
+- **Proč nelze k příspěvku nahrát víc obrázků najednou?**
 
-  **A:** To bohužel nepodporuje Nyx.
+  To bohužel nepodporuje Nyx.
   
-- **Q:** Nikde nevidím možnost smazat příspěvek.
+- **Nikde nevidím možnost smazat příspěvek.**
 
-  **A:** Zatím není podporováno, ale bude - viz. [roadmapa](https://github.com/lucien144/fyx/projects/2).
+  Zatím není podporováno, ale bude - viz. [roadmapa](https://github.com/lucien144/fyx/projects/2).
 
-- **Q:** Proč je tento repozitář v češtině?
+- **Proč je tento repozitář v češtině?**
 
-  **A:** Vzhledem k tomu, že [klub na Nyxu](https://www.nyx.cz/index.php?l=topic;id=24237;n=23dd) věnující se novému klientovi vznikl v češtině, rozhodl jsem se (Lucien) vést tento repozitář také v češtině. Naproti tomu kód a komentáře v kódu jsou v angličtině, protože to je pro mě přiřozené. Dále by měly [Issues](https://github.com/lucien144/fyx/issues) sloužit jako centrální hub pro vedení veškerých chyb a připomínek, což se mi zdá opět lepší vést v češtině pro běžné uživatele. Nicméně, změně na kompletně anglické repo se po diskuzi nebráním...
+  Vzhledem k tomu, že [klub na Nyxu](https://www.nyx.cz/index.php?l=topic;id=24237;n=23dd) věnující se novému klientovi vznikl v češtině, rozhodl jsem se (Lucien) vést tento repozitář také v češtině. Naproti tomu kód a komentáře v kódu jsou v angličtině, protože to je pro mě přiřozené. Dále by měly [Issues](https://github.com/lucien144/fyx/issues) sloužit jako centrální hub pro vedení veškerých chyb a připomínek, což se mi zdá opět lepší vést v češtině pro běžné uživatele. Nicméně, změně na kompletně anglické repo se po diskuzi nebráním...
 
 ## Náhledy
 
