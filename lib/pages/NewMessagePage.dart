@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -10,6 +11,9 @@ import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
+import 'package:image/image.dart' as img;
+
+enum ISOLATE_ARG { images, width, quality }
 
 typedef F = Future<bool> Function(String inputField, String message, Map<ATTACHMENT, dynamic> attachment);
 
@@ -97,6 +101,13 @@ class _NewMessagePageState extends State<NewMessagePage> {
     return ((_settings.hasInputField == true ? _recipient.length : 1) * (_message.length + _images.length)) == 0;
   }
 
+  static FutureOr<List<Map<ATTACHMENT, dynamic>>> handleImages(List<Map<ATTACHMENT, dynamic>> images) {
+    return images.map<Map<ATTACHMENT, dynamic>>((image) {
+      var baked = img.bakeOrientation(img.decodeImage(image[ATTACHMENT.bytes]));
+      return {ATTACHMENT.bytes: img.encodeJpg(baked), ATTACHMENT.filename: image[ATTACHMENT.filename]};
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_settings == null) {
@@ -124,6 +135,9 @@ class _NewMessagePageState extends State<NewMessagePage> {
                             ? null
                             : () async {
                                 setState(() => _sending = true);
+                                if (_images.length > 0) {
+                                  _images = await compute(handleImages, _images);
+                                }
                                 var response =
                                     await _settings.onSubmit(_settings.hasInputField == true ? _recipientController.text : null, _messageController.text, _images.length > 0 ? _images[0] : null);
                                 if (response) {
