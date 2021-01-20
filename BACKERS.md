@@ -17,6 +17,7 @@ Díky.
 - ID **CPT_PLESARD** ($7)
 - ID **PISKVOR** ($7)
 - ID **WOJTISHEK** ($7)
+- ID **SKAFF** (~$4)
 - ID **ADMIX** ($3)
 - ID **BARTOLOMEJ** ($3)
 - ID **BEEBLEBROX** ($3)
