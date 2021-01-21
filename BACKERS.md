@@ -19,6 +19,7 @@ Díky.
 - ID **WOJTISHEK** ($7)
 - ID **SKAFF** (~$4)
 - ID **ADMIX** ($3)
+- ID **ARAON** ($3)
 - ID **BARTOLOMEJ** ($3)
 - ID **BEEBLEBROX** ($3)
 - ID **BINARY_PARANOIC** ($3)
