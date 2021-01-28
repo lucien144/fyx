@@ -16,27 +16,27 @@ Díky.
 
 ### Měsíčně
 
-- ID **ID YMLADRIS** ($12)
-- ID **ID TOMAN** ($11)
-- ID **ID CPT_PLESARD** ($7)
-- ID **ID ISCH** ($7)
-- ID **ID PISKVOR** ($7)
-- ID **ID WOJTISHEK** ($7)
-- ID **ID ADMIX** ($3)
-- ID **ID ARAON** ($3)
-- ID **ID BARTOLOMEJ** ($3)
-- ID **ID BEEBLEBROX** ($3)
-- ID **ID BINARY_PARANOIC** ($3)
-- ID **ID CROSS** ($3)
-- ID **ID FRK_R23** ($3)
-- ID **ID MADBANANA** ($3)
-- ID **ID SPAULDING** ($3)
+- ID **YMLADRIS** ($12)
+- ID **TOMAN** ($11)
+- ID **CPT_PLESARD** ($7)
+- ID **ISCH** ($7)
+- ID **PISKVOR** ($7)
+- ID **WOJTISHEK** ($7)
+- ID **ADMIX** ($3)
+- ID **ARAON** ($3)
+- ID **BARTOLOMEJ** ($3)
+- ID **BEEBLEBROX** ($3)
+- ID **BINARY_PARANOIC** ($3)
+- ID **CROSS** ($3)
+- ID **FRK_R23** ($3)
+- ID **MADBANANA** ($3)
+- ID **SPAULDING** ($3)
 
 ## Jednorázově
-- ID **ID SKAFF** (~$4)
-- ID **ID ADITU** (~$3)
-- ID **ID DANYSEK** (~$3)
-- ID **ID LAUNCHER** (~$3)
+- ID **SKAFF** (~$4)
+- ID **ADITU** (~$3)
+- ID **DANYSEK** (~$3)
+- ID **LAUNCHER** (~$3)
 
 Dárci pod $1 jsou uvedeni na nástěnce klubu na Nyxu.
 
