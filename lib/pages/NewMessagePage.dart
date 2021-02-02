@@ -38,9 +38,9 @@ class _NewMessagePageState extends State<NewMessagePage> {
   List<Map<ATTACHMENT, dynamic>> _images = [];
   NewMessageSettings _settings;
   final List<int> widths = [640, 768, 1024, 1280];
-  int _widthIndex = 0;
+  int _widthIndex = 2;
   final List<int> qualities = [60, 70, 80, 90, 100];
-  int _qualityIndex = 3;
+  int _qualityIndex = 1;
   String _message = '';
   String _recipient = '';
   bool _loadingImage = false;
