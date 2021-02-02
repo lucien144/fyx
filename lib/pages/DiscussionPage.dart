@@ -5,8 +5,10 @@ import 'package:flutter/widgets.dart';
 import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/components/post/PostListItem.dart';
+import 'package:fyx/components/post/SyntaxHighlighter.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
@@ -20,12 +22,18 @@ import '../FyxApp.dart';
 class DiscussionPageArguments {
   final int discussionId;
   final int postId;
+  final String filterByUser;
 
-  DiscussionPageArguments(this.discussionId, {this.postId});
+  DiscussionPageArguments(this.discussionId, {this.postId, this.filterByUser});
 }
 
 class DiscussionPage extends StatefulWidget {
+  // Number of clicks to go deeper in the discussion.
+  // Usefull to display "back to first post" button.
   static int deeplinkDepth = 0;
+
+  // True if we open inapp Safari
+  static bool browseOutside = false;
 
   @override
   _DiscussionPageState createState() => _DiscussionPageState();
@@ -34,12 +42,11 @@ class DiscussionPage extends StatefulWidget {
 class _DiscussionPageState extends State<DiscussionPage> with RouteAware, WidgetsBindingObserver {
   final AsyncMemoizer _memoizer = AsyncMemoizer<DiscussionResponse>();
   int _refreshList = 0;
-  bool _hasBackToRootButton = false;
   bool _hasInitData = false;
 
-  Future<DiscussionResponse> _fetchData(discussionId, postId) {
+  Future<DiscussionResponse> _fetchData(discussionId, postId, user) {
     return this._memoizer.runOnce(() {
-      return ApiController().loadDiscussion(discussionId, lastId: postId);
+      return ApiController().loadDiscussion(discussionId, lastId: postId, user: user);
     });
   }
 
@@ -64,7 +71,11 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed && ModalRoute.of(context).isCurrent) {
-      this.refresh();
+      // Only if we don't come back from inapp Safari
+      if (!DiscussionPage.browseOutside && DiscussionPage.deeplinkDepth == 0) {
+        this.refresh();
+      }
+      DiscussionPage.browseOutside = false;
     }
   }
 
@@ -78,7 +89,6 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
     if (DiscussionPage.deeplinkDepth < 0) {
       DiscussionPage.deeplinkDepth = 0;
     }
-    setState(() => _hasBackToRootButton = DiscussionPage.deeplinkDepth > 0);
   }
 
   void didPop() {
@@ -86,7 +96,6 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
     if (DiscussionPage.deeplinkDepth < 0) {
       DiscussionPage.deeplinkDepth = 0;
     }
-    setState(() => _hasBackToRootButton = DiscussionPage.deeplinkDepth > 0);
   }
 
   @override
@@ -94,7 +103,7 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
     DiscussionPageArguments pageArguments = ModalRoute.of(context).settings.arguments;
 
     return FutureBuilder<DiscussionResponse>(
-        future: _fetchData(pageArguments.discussionId, pageArguments.postId),
+        future: _fetchData(pageArguments.discussionId, pageArguments.postId, pageArguments.filterByUser),
         builder: (BuildContext context, AsyncSnapshot<DiscussionResponse> snapshot) {
           if (snapshot.hasData) {
             if (snapshot.data.discussion.accessDenied) {
@@ -110,13 +119,16 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
   }
 
   Widget _createDiscussionPage(DiscussionResponse discussionResponse, DiscussionPageArguments pageArguments) {
+    // Save the language context for further use
+    // TODO: Not ideal, probably better to use Provider. Or not?
+    SyntaxHighlighter.languageContext = discussionResponse.discussion.name;
+
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
           backgroundColor: Colors.white,
           leading: CupertinoNavigationBarBackButton(
             color: T.COLOR_PRIMARY,
             onPressed: () {
-              DiscussionPage.deeplinkDepth = 0;
               Navigator.of(context).pop();
             },
           ),
@@ -127,6 +139,7 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
       child: Stack(
         children: [
           PullToRefreshList(
+            disabled: DiscussionPage.browseOutside || DiscussionPage.deeplinkDepth > 0,
             rebuild: _refreshList,
             isInfinite: true,
             sliverListBuilder: (List data) {
@@ -153,7 +166,7 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
               var result;
               if (lastId != null) {
                 // If we load next page(s)
-                var response = await ApiController().loadDiscussion(pageArguments.discussionId, lastId: lastId);
+                var response = await ApiController().loadDiscussion(pageArguments.discussionId, lastId: lastId, user: pageArguments.filterByUser);
                 result = response.data;
               } else {
                 // If we load init data or we refresh data on pull
@@ -163,7 +176,7 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
                   this._hasInitData = true;
                 } else {
                   // If we just pull to refresh, load a fresh data
-                  var response = await ApiController().loadDiscussion(pageArguments.discussionId);
+                  var response = await ApiController().loadDiscussion(pageArguments.discussionId, user: pageArguments.filterByUser);
                   result = response.data;
                 }
               }
@@ -193,7 +206,7 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
                 onPressed: () => Navigator.of(context).pushNamed('/new-message',
                     arguments: NewMessageSettings(
                         onClose: this.refresh,
-                        onSubmit: (String inputField, String message, Map<String, dynamic> attachment) async {
+                        onSubmit: (String inputField, String message, Map<ATTACHMENT, dynamic> attachment) async {
                           var result = await ApiController().postDiscussionMessage(pageArguments.discussionId, message, attachment: attachment);
                           return result.isOk;
                         })),

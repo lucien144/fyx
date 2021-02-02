@@ -2,8 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/MailListItem.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
+import 'package:fyx/components/post/SyntaxHighlighter.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/Mail.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
@@ -43,6 +45,10 @@ class _MailboxPageState extends State<MailboxPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Reset the language context.
+    // TODO: Not ideal. Get rid of the static.
+    SyntaxHighlighter.languageContext = '';
+
     return Stack(children: [
       PullToRefreshList(
           rebuild: _refreshData,
@@ -88,7 +94,7 @@ class _MailboxPageState extends State<MailboxPage> {
             onPressed: () => Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
                 arguments: NewMessageSettings(
                     hasInputField: true,
-                    onSubmit: (String inputField, String message, Map<String, dynamic> attachment) async {
+                    onSubmit: (String inputField, String message, Map<ATTACHMENT, dynamic> attachment) async {
                       var response = await ApiController().sendMail(inputField, message, attachment: attachment);
                       return response.isOk;
                     })),

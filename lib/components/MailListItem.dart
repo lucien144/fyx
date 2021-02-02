@@ -5,9 +5,11 @@ import 'package:fyx/components/ContentBoxLayout.dart';
 import 'package:fyx/components/actionSheets/PostActionSheet.dart';
 import 'package:fyx/components/post/PostAvatar.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/Mail.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
+import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/T.dart';
 
 class MailListItem extends StatefulWidget {
@@ -24,12 +26,12 @@ class _MailListItemState extends State<MailListItem> {
   @override
   Widget build(BuildContext context) {
     return ContentBoxLayout(
+      isHighlighted: widget.mail.isNew,
       isPreview: widget.isPreview == true,
       content: widget.mail.content,
       topLeftWidget: PostAvatar(
         widget.mail.direction == MailDirection.from ? widget.mail.participant : MainRepository().credentials.nickname,
-        description: '→ ${widget.mail.direction == MailDirection.to ? widget.mail.participant : MainRepository().credentials.nickname}, ~${T.parseTime(widget.mail.time)}',
-        isHighlighted: widget.mail.isNew,
+        description: '→ ${widget.mail.direction == MailDirection.to ? widget.mail.participant : MainRepository().credentials.nickname}, ~${Helpers.parseTime(widget.mail.time)}'
       ),
       topRightWidget: Row(
         children: <Widget>[
@@ -64,7 +66,7 @@ class _MailListItemState extends State<MailListItem> {
                 ),
                 onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
                     arguments: NewMessageSettings(
-                        onSubmit: (String inputField, String message, Map<String, dynamic> attachment) async {
+                        onSubmit: (String inputField, String message, Map<ATTACHMENT, dynamic> attachment) async {
                           var response = await ApiController().sendMail(inputField, message, attachment: attachment);
                           return response.isOk;
                         },

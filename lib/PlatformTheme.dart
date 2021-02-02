@@ -8,6 +8,7 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+// TODO: Move some methods to Helpers?
 class PlatformTheme {
   static of(BuildContext context) {
     if (Platform.isIOS) {
@@ -42,33 +43,42 @@ class PlatformTheme {
         fontSize: 14.0);
   }
 
-  static openLink(String link) async {
+  static Future<bool> openLink(String link) async {
     try {
       var status = await launch(link);
       if (status == false) {
-        throw ('Cannot open webview. URL: ${link}');
+        throw ('Cannot open webview. URL: $link');
       }
+      return true;
     } catch (e) {
       PlatformTheme.error(L.INAPPBROWSER_ERROR);
       MainRepository().sentry.captureException(exception: e);
+      return false;
     }
   }
 
-  static prefillGithubIssue(String body, {String title = ''}) async {
-    var pkg = MainRepository().packageInfo;
-    var device = MainRepository().deviceInfo;
-    var version = '${pkg.version} (${pkg.buildNumber})';
-    var system = '${device.systemName} ${device.systemVersion} ${device.localizedModel}';
+  static prefillGithubIssue({MainRepository appContext, String title = '', String body = '', String user = '-', String url = ''}) async {
+    var version = '-';
+    var system = '-';
+    var phone = '-';
+    if (appContext != null) {
+      var pkg = appContext.packageInfo;
+      var device = appContext.deviceInfo;
+      version = Uri.encodeComponent('${pkg.version} (${pkg.buildNumber})');
+      system = Uri.encodeComponent('${device.systemName} ${device.systemVersion}');
+      phone = Uri.encodeComponent(device.localizedModel);
+    }
 
-    var _body = Uri.encodeComponent('$body\n\n---\n*Verze: $version\niOS: $system*');
-    var _title = Uri.encodeFull(title);
-    var url = 'https://github.com/lucien144/fyx/issues/new?title=$_title&body=$_body&labels=user+report';
-    PlatformTheme.openLink(url);
+    var _body = Uri.encodeComponent(body);
+    var _title = Uri.encodeComponent(title);
+    var _url = Uri.encodeComponent(url);
+    var link = 'https://docs.google.com/forms/d/e/1FAIpQLSdbUIaF8IFd-ybZVXARRmtdgIGbSuYg7Vs1HDCYUJrJFInV8w/viewform?entry.76077276=$_title&entry.1416760014=$_body&entry.1520830537=$version&entry.931510077=$user&entry.594008397=$system&entry.1758179395=$phone&entry.17618653=$_url';
+    PlatformTheme.openLink(link);
   }
 
-  static Widget somethingsWrongButton(String content) {
+  static Widget somethingsWrongButton(String content, {String url = ''}) {
     return GestureDetector(
-      onTap: () => PlatformTheme.prefillGithubIssue('**Zdroj:**\n```$content```', title: 'Chyba zobrazení příspěvku'),
+      onTap: () => PlatformTheme.prefillGithubIssue(title: 'Chyba zobrazení příspěvku', body: '**Zdroj:**\n```$content```', user: MainRepository().credentials.nickname, url: url, appContext: MainRepository()),
       child: Column(children: <Widget>[
         Icon(Icons.warning),
         Text(

@@ -24,7 +24,7 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
 
     _loginController.addListener(() {
-      if (_loginController.text.toUpperCase() == 'FYXBOT') {
+      if (RegExp(r"FYXBOT|LUCIEN", caseSensitive: false).hasMatch(_loginController.text)) {
         setState(() => _useTokenToLogin = true);
       } else {
         setState(() => _useTokenToLogin = false);
@@ -126,7 +126,9 @@ class _LoginPageState extends State<LoginPage> {
           setState(() => _isRunning = true);
 
           if (_useTokenToLogin && _tokenController.text.length > 0) {
-            ApiController().setCredentials(_loginController.text, _tokenController.text).then((Credentials credentials) {
+            ApiController().setCredentials(Credentials(_loginController.text, _tokenController.text)).then((Credentials credentials) {
+              // TODO: Refactor 👇? This is edge case usage...
+              ApiController().provider.setCredentials(credentials);
               MainRepository().credentials = credentials;
               Navigator.of(context).pushNamed('/home');
             }).whenComplete(() {

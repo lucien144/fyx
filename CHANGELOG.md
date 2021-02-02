@@ -3,6 +3,24 @@
 Tento soubor vychází z [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 verzování z [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2020/11/09
+
+### Nové
+- Vypnout autocorrect (nově nastavitelné) #109
+
+### Opraveno
+- nelze otvirat odkazy #111
+- nefunguje sharesheet pokud jsou u příspěvku pouze obrázky #110
+- galerie - obrazek jde pres notch #82
+- náhled YT vide je po rozkliknutí prázdný #100
+- občas se nezobrazuje jméno v odpovedi #102
+- crash: opětovné přidání fotky #107
+- WYSIWYG parser odsazuje text #101 
+- opravena implementace Sentry
+
+### Změněno
+- zvýrazněné stránkování a zavření v galerii
+
 ## [0.4.0] - 2020/10/08
 
 ### Nové

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:device_info/device_info.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
@@ -19,9 +21,12 @@ import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry/sentry.dart';
 
+import 'PlatformTheme.dart';
+import 'controllers/NotificationsService.dar.dart';
+
 enum Environment { dev, staging, production }
 
-class FyxApp extends StatelessWidget {
+class FyxApp extends StatefulWidget {
   static Environment _env;
 
   static set env(val) => FyxApp._env = val;
@@ -38,15 +43,17 @@ class FyxApp extends StatelessWidget {
 
   static RouteObserver<PageRoute> _routeObserver;
 
+  static NotificationService _notificationsService;
+
+  setEnv(env) {
+    FyxApp.env = env;
+  }
+
   static get routeObserver {
     if (_routeObserver == null) {
       _routeObserver = RouteObserver<PageRoute>();
     }
     return _routeObserver;
-  }
-
-  setEnv(env) {
-    FyxApp.env = env;
   }
 
   static init(SentryClient sentry) async {
@@ -65,19 +72,52 @@ class FyxApp extends StatelessWidget {
       }
     };
 
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+    ErrorWidget.builder = (FlutterErrorDetails details) {
+      String stack = '${DateTime.now()}: ${details.exceptionAsString()}';
+      return PlatformTheme.somethingsWrongButton(stack);
+    };
+
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
     // TODO: Move to build using FutureBuilder.
-    var results = await Future.wait([ApiController().provider.getCredentials(), PackageInfo.fromPlatform(), DeviceInfoPlugin().iosInfo, SettingsProvider().init()]);
+    var results = await Future.wait([
+      ApiController().getCredentials(),
+      PackageInfo.fromPlatform(),
+      DeviceInfoPlugin().iosInfo,
+      SettingsProvider().init()
+    ]);
     MainRepository().credentials = results[0];
     MainRepository().packageInfo = results[1];
     MainRepository().deviceInfo = results[2];
     MainRepository().settings = results[3];
     MainRepository().sentry = sentry;
 
+    _notificationsService = NotificationService(
+      onToken: (fcmToken) => ApiController().registerFcmToken(fcmToken),
+      // TODO: Do not register if the token is already saved.
+      onTokenRefresh: (fcmToken) => ApiController().refreshFcmToken(fcmToken),
+    );
+    _notificationsService.onNewMail = () =>
+        PlatformApp.navigatorKey.currentState.pushReplacementNamed('/home',
+            arguments: HomePageArguments(HomePage.PAGE_MAIL));
+    _notificationsService.onNewPost = () =>
+        PlatformApp.navigatorKey.currentState.pushReplacementNamed('/home',
+            arguments: HomePageArguments(HomePage.PAGE_BOOKMARK));
+    _notificationsService.onError = (error) {
+      print(error);
+      MainRepository().sentry.captureException(exception: error);
+    };
+    MainRepository().notifications = _notificationsService;
+
     AnalyticsProvider.provider = analytics;
   }
 
+  @override
+  _FyxAppState createState() => _FyxAppState();
+}
+
+class _FyxAppState extends State<FyxApp> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -90,23 +130,34 @@ class FyxApp extends StatelessWidget {
       },
       child: MultiProvider(
         providers: [
-          ChangeNotifierProvider<NotificationsModel>(create: (context) => NotificationsModel()),
+          ChangeNotifierProvider<NotificationsModel>(
+              create: (context) => NotificationsModel()),
         ],
         child: PlatformApp(
           title: 'Fyx',
           theme: PlatformThemeData(primaryColor: T.COLOR_PRIMARY),
-          home: MainRepository().credentials is Credentials && MainRepository().credentials.isValid ? HomePage() : LoginPage(),
+          home: MainRepository().credentials is Credentials &&
+                  MainRepository().credentials.isValid
+              ? HomePage()
+              : LoginPage(),
           debugShowCheckedModeBanner: FyxApp.isDev,
           listNavigatorObservers: [
             FyxApp.routeObserver,
             FirebaseAnalyticsObserver(
-                analytics: analytics,
-                onError: (error) async => await MainRepository().sentry.captureException(
-                      exception: error,
-                    ))
+                analytics: FyxApp.analytics,
+                onError: (error) async =>
+                    await MainRepository().sentry.captureException(
+                          exception: error,
+                        ))
           ],
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    FyxApp._notificationsService.dispose();
   }
 }

@@ -13,11 +13,32 @@ Díky.
 *Mimochodem - Fyx má ke dni 18. 6. 2020 cca 4218 řádků kódu, resp. 141 746 znaků. To jsem pro vás napsal. Jen tak za pár plusíků.* 
 
 ## Podporovatelé
-- ID CPT_PLESARD ($7)
-- ID ADMIX ($3)
-- ID BARTOLOMEJ ($3)
-- ID BEEBLEBROX ($3)
-- ID BINARY_PARANOIC ($3)
-- ID CROSS ($3)
-- ID MADBANANA ($3)
-- ID SPAULDING ($3)
+
+### Měsíčně
+
+- ID **YMLADRIS** ($12)
+- ID **TOMAN** ($11)
+- ID **CPT_PLESARD** ($7)
+- ID **ISCH** ($7)
+- ID **PISKVOR** ($7)
+- ID **WOJTISHEK** ($7)
+- ID **ADMIX** ($3)
+- ID **ARAON** ($3)
+- ID **BARTOLOMEJ** ($3)
+- ID **BEEBLEBROX** ($3)
+- ID **BINARY_PARANOIC** ($3)
+- ID **CROSS** ($3)
+- ID **FRK_R23** ($3)
+- ID **MADBANANA** ($3)
+- ID **MR_PREWEET** ($3)
+- ID **SPAULDING** ($3)
+
+## Jednorázově
+- ID **SKAFF** (~$4)
+- ID **ADITU** (~$3)
+- ID **DANYSEK** (~$3)
+- ID **LAUNCHER** (~$3)
+
+Dárci pod $1 jsou uvedeni na nástěnce klubu na Nyxu.
+
+Děkuji všem!

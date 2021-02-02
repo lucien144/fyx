@@ -16,6 +16,12 @@ class SettingsProvider {
     _settings.defaultView = view;
   }
 
+  DefaultView get latestView => _settings.latestView;
+  set latestView(DefaultView view) {
+    _box.put('latestView', view);
+    _settings.latestView = view;
+  }
+
   bool get useCompactMode => _settings.useCompactMode;
   set useCompactMode(bool mode) {
     _box.put('useCompactMode', mode);
@@ -34,6 +40,18 @@ class SettingsProvider {
 
   List get blockedUsers => _box.get('blockedUsers', defaultValue: Settings().blockedUsers);
 
+  int get photoQuality => _box.get('photoQuality', defaultValue: Settings().photoQuality);
+  set photoQuality(int quality) {
+    _box.put('photoQuality', quality);
+    _settings.photoQuality = quality;
+  }
+
+  int get photoWidth => _box.get('photoWidth', defaultValue: Settings().photoWidth);
+  set photoWidth(int width) {
+    _box.put('photoWidth', width);
+    _settings.photoWidth = width;
+  }
+
   factory SettingsProvider() {
     return _singleton;
   }
@@ -47,8 +65,11 @@ class SettingsProvider {
 
     _settings = new Settings();
     _settings.defaultView = _box.get('defaultView', defaultValue: Settings().defaultView);
+    _settings.latestView = _box.get('latestView', defaultValue: Settings().latestView);
     _settings.useCompactMode = _box.get('useCompactMode', defaultValue: Settings().useCompactMode);
     _settings.useAutocorrect = _box.get('useAutocorrect', defaultValue: Settings().useAutocorrect);
+    _settings.photoQuality = _box.get('photoQuality', defaultValue: Settings().photoQuality);
+    _settings.photoWidth = _box.get('photoWidth', defaultValue: Settings().photoWidth);
 
     return _singleton;
   }

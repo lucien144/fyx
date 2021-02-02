@@ -8,7 +8,7 @@ import 'package:sentry/sentry.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await DotEnv().load('.env');
-  final sentry = SentryClient(dsn: DotEnv().env['SENTRY_KEY']);
+  final sentry = SentryClient(dsn: DotEnv().env['SENTRY_KEY'], environmentAttributes: const Event(environment: 'development'));
 
   runZonedGuarded(
     () async {

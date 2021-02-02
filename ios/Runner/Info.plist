@@ -27,7 +27,14 @@
 	<key>NSMicrophoneUsageDescription</key>
 	<string>K nahrání videa se zvukem je potřeba povolit přístup k mikrofónu.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>K nahrání obrázku je potřeba povolit přístup k fotkám.</string>
+	<string>K nahrání nebo uložení obrázku je potřeba povolit přístup k fotkám.</string>
+	<key>K nahrání nebo uložení obrázku je potřeba povolit přístup k fotkám.</key>
+    	<string>Light</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

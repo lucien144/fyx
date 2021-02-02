@@ -1,9 +1,17 @@
+import 'dart:collection';
+import 'dart:typed_data';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
 class GalleryPage extends StatefulWidget {
@@ -14,6 +22,7 @@ class GalleryPage extends StatefulWidget {
 class _GalleryPageState extends State<GalleryPage> {
   GalleryArguments _arguments;
   int _page = 1;
+  bool _saving = false;
   final _controller = PageController();
 
   @override
@@ -57,10 +66,14 @@ class _GalleryPageState extends State<GalleryPage> {
               backgroundDecoration: BoxDecoration(color: Colors.transparent),
               scrollPhysics: const BouncingScrollPhysics(),
               builder: (BuildContext context, int index) {
-                return PhotoViewGalleryPageOptions(imageProvider: CachedNetworkImageProvider(_arguments.images[index].image), onTapDown: (_, __, ___) => close(context));
+                return PhotoViewGalleryPageOptions(
+                    imageProvider: CachedNetworkImageProvider(
+                        _arguments.images[index].image),
+                    onTapDown: (_, __, ___) => close(context));
               },
               itemCount: _arguments.images.length,
-              loadingBuilder: (context, chunkEvent) => CupertinoActivityIndicator(
+              loadingBuilder: (context, chunkEvent) =>
+                  CupertinoActivityIndicator(
                 radius: 16,
               ),
               onPageChanged: (i) => setState(() => _page = i + 1),
@@ -94,6 +107,46 @@ class _GalleryPageState extends State<GalleryPage> {
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white),
               ),
+            )),
+        Positioned(
+            bottom: 30,
+            right: 30,
+            child: CupertinoButton(
+              padding: EdgeInsets.zero,
+              color: T.COLOR_PRIMARY,
+              child: _saving
+                  ? CupertinoActivityIndicator()
+                  : Icon(
+                      Icons.save_alt_rounded,
+                      color: Colors.white,
+                      size: 32,
+                    ),
+              onPressed: () async {
+                if (_saving) {
+                  return;
+                }
+
+                setState(() => _saving = true);
+                try {
+                  var response = await Dio().get(
+                      _arguments.images[_page - 1].image,
+                      options: Options(responseType: ResponseType.bytes));
+                  final result = await ImageGallerySaver.saveImage(
+                      Uint8List.fromList(response.data),
+                      quality: 100);
+                  final resultMap = Map<String, dynamic>.from(result);
+                  if (!resultMap['isSuccess']) {
+                    throw Exception(resultMap['errorMessage']);
+                  }
+
+                  PlatformTheme.success(L.TOAST_IMAGE_SAVE_OK);
+                } catch (error) {
+                  PlatformTheme.error(L.TOAST_IMAGE_SAVE_ERROR);
+                  MainRepository().sentry.captureException(exception: error);
+                } finally {
+                  setState(() => _saving = false);
+                }
+              },
             ))
       ],
     );

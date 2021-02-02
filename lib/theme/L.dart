@@ -24,6 +24,7 @@ class L {
   static String GENERAL_LOADING = 'Načítám...';
   static String GENERAL_ERROR = 'Chyba!';
   static String GENERAL_EMPTY = 'Wow. Such empty.';
+  static String GENERAL_NOW = 'Teď';
 
   // TOAST MESSAGE
   static String TOAST_COPIED = 'Zkopírováno do schránky.';
@@ -31,6 +32,8 @@ class L {
   static String TOAST_USER_BLOCKED = 'Uživatel byl zablokován.';
   static String TOAST_POST_FLAGGED = 'Příspěvek byl nahlášen. Děkujeme, budeme se tomu věnovat.';
   static String TOAST_POST_FLAG_ERROR = 'Příspěvek se nepodařilo nahlásit, zkuste to znovu.';
+  static String TOAST_IMAGE_SAVE_OK = '👌 Obrázek byl uložen.';
+  static String TOAST_IMAGE_SAVE_ERROR = '👎 Ouch. Obrázek se nepodařilo uložit.';
 
   // Tutorial page
   static String TUTORIAL_SUCCESS = 'Paráda 🤘';
@@ -49,12 +52,12 @@ class L {
       'Tento uživatel si nepřeje, aby bylo možné jeho příspěvky hodnotit negativně anonymně. Pokud si přejete hodnotit příspěvek neanonymně, klikněte na "Hodnotit".';
 
   // Settings page
+  static String NOTICES = 'Upozornění';
   static String SETTINGS = 'Nastavení';
   static String ABOUT = 'O aplikaci';
   static String BACKERS = 'Podpoř vývoj!';
   static String TERMS = 'Podmínky používání nyx.cz';
   static String SETTINGS_BUGREPORT = 'Nahlásit chybu';
-  static String SETTINGS_BUGREPORT_TITLE = 'Zde popiš svůj problém...';
   static String SETTINGS_LOAD_ERROR = 'Nepodařilo se načíst data.';
   static String SETTINGS_CACHE_RESET = 'Paměť byla promazána.';
 

@@ -1,5 +1,7 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_cupertino_settings/flutter_cupertino_settings.dart';
 import 'package:fyx/FyxApp.dart';
 import 'package:fyx/PlatformTheme.dart';
@@ -19,12 +21,15 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   bool _compactMode;
+  bool _underTheHood;
   bool _autocorrect;
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
   @override
   void initState() {
     super.initState();
     _compactMode = MainRepository().settings.useCompactMode;
+    _underTheHood = false;
     _autocorrect = MainRepository().settings.useAutocorrect;
     AnalyticsProvider().setScreen('Settings', 'SettingsPage');
   }
@@ -79,6 +84,7 @@ class _SettingsPageState extends State<SettingsPage> {
           CSHeader('Úvodní obrazovka'),
           CSSelection<DefaultView>(
             items: const <CSSelectionItem<DefaultView>>[
+              CSSelectionItem<DefaultView>(text: 'Poslední stav', value: DefaultView.latest),
               CSSelectionItem<DefaultView>(text: 'Historie (vše)', value: DefaultView.history),
               CSSelectionItem<DefaultView>(text: 'Historie (nepřečtené)', value: DefaultView.historyUnread),
               CSSelectionItem<DefaultView>(text: 'Sledované (vše)', value: DefaultView.bookmarks),
@@ -99,7 +105,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 }),
           ),
           CSControl(
-            nameWidget: Text('Skrytých přísěvků'),
+            nameWidget: Text('Skrytých příspěvků'),
             contentWidget: ValueListenableBuilder(
                 valueListenable: MainRepository().settings.box.listenable(keys: ['blockedPosts']),
                 builder: (BuildContext context, value, Widget child) {
@@ -133,7 +139,7 @@ class _SettingsPageState extends State<SettingsPage> {
             CSButtonType.DEFAULT,
             L.SETTINGS_BUGREPORT,
             () {
-              PlatformTheme.prefillGithubIssue(L.SETTINGS_BUGREPORT_TITLE);
+              PlatformTheme.prefillGithubIssue(appContext: MainRepository(), user: MainRepository().credentials.nickname);
               AnalyticsProvider().logEvent('reportBug');
             },
             style: bugreportStyle,
@@ -159,7 +165,31 @@ class _SettingsPageState extends State<SettingsPage> {
                 ApiController().logout(removeAuthrorization: false);
                 Navigator.of(context, rootNavigator: true).pushNamed('/login');
               })),
-          CSDescription('Verze: ${version}')
+          CSDescription('Verze: $version'),
+          GestureDetector(child: CSDescription('Nahlídnout pod kapotu.'), onTap: () => setState(() => _underTheHood = !_underTheHood)),
+          Visibility(
+            visible: _underTheHood,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                GestureDetector(
+                    child: CSDescription('API token: ${MainRepository().credentials.token}'),
+                    onTap: () => Clipboard.setData(ClipboardData(text: MainRepository().credentials.token))),
+                FutureBuilder<String>(
+                    future: _firebaseMessaging.getToken(),
+                    builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                      if (snapshot.hasData) {
+                        return GestureDetector(
+                            child: CSDescription('FCM token: ${snapshot.data.substring(0, 30)}...'), onTap: () => Clipboard.setData(ClipboardData(text: snapshot.data)));
+                      }
+                      if (snapshot.hasError) {
+                        return CSDescription('FCM token: error :(');
+                      }
+                      return CSDescription('FCM token: načítám...');
+                    }),
+              ],
+            ),
+          ),
         ]));
   }
 }

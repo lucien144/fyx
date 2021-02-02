@@ -8,11 +8,14 @@ import 'package:fyx/controllers/ApiProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/exceptions/AuthException.dart';
 import 'package:fyx/model/Credentials.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/System.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/model/reponses/BookmarksResponse.dart';
+import 'package:fyx/model/reponses/DiscussionHomeResponse.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
+import 'package:fyx/model/reponses/FeedNoticesResponse.dart';
 import 'package:fyx/model/reponses/LoginResponse.dart';
 import 'package:fyx/model/reponses/MailResponse.dart';
 import 'package:fyx/model/reponses/PostMessageResponse.dart';
@@ -67,6 +70,7 @@ class ApiController {
 
       var system = System.fromJson(data);
       Provider.of<NotificationsModel>(_context, listen: false).setNewMails(system.unreadPost);
+      Provider.of<NotificationsModel>(_context, listen: false).setNewNotices(system.noticeCount);
     };
   }
 
@@ -78,26 +82,92 @@ class ApiController {
       throwAuthException(loginResponse, message: 'Cannot authorize user.');
     }
 
-    var prefs = await SharedPreferences.getInstance();
-    await Future.wait([prefs.setString('token', loginResponse.authToken), prefs.setString('nickname', nickname)]);
-    var credentials = Credentials(nickname, loginResponse.authToken);
-    provider.setCredentials(credentials);
+    await this.setCredentials(Credentials(nickname, loginResponse.authToken));
     isLoggingIn = false;
     return loginResponse;
   }
 
-  Future<Credentials> setCredentials(String nickname, String token) async {
+  Future<Credentials> setCredentials(Credentials credentials) async {
+    if (credentials.isValid) {
+      provider.setCredentials(credentials);
+      var storage = await SharedPreferences.getInstance();
+      await storage.setString('identity', jsonEncode(credentials));
+      return Future(() => credentials);
+    }
+
+    return Future(() => null);
+  }
+
+  Future<Credentials> getCredentials() async {
+    Credentials creds = provider.getCredentials();
+
+    if (creds is Credentials) {
+      return creds;
+    }
+
     var prefs = await SharedPreferences.getInstance();
-    await Future.wait([prefs.setString('token', token), prefs.setString('nickname', nickname)]);
-    var credentials = Credentials(nickname, token);
-    provider.setCredentials(credentials);
-    return credentials;
+    String identity = prefs.getString('identity');
+
+    // Breaking change fix -> old identity storage
+    // TODO: Delete in 3/2021 ?
+    if (identity == null) {
+      // Load identity from old storage
+      creds = Credentials(prefs.getString('nickname'), prefs.getString('token'));
+      // Save the identity into the new storage
+      this.setCredentials(creds);
+      // Remove the old fragments
+      prefs.remove('nickname');
+      prefs.remove('token');
+      // Update the provider's identity
+      return this.provider.setCredentials(creds);
+    }
+
+    creds = Credentials.fromJson(jsonDecode(identity));
+    return this.provider.setCredentials(creds);
   }
 
   Future<bool> testAuth() async {
+    isLoggingIn = true;
     var response = await provider.testAuth();
     var json = jsonDecode(response.data);
+    isLoggingIn = false;
     return json['result'] == 'ok';
+  }
+
+  void registerFcmToken(String token) {
+    this.getCredentials().then((creds) async {
+      if (creds == null) {
+        return;
+      }
+
+      if (creds.fcmToken == null || creds.fcmToken == '') {
+        try {
+          await provider.registerFcmToken(token);
+          print('registerFcmToken');
+          this.setCredentials(creds.copyWith(fcmToken: token));
+        } catch (error) {
+          debugPrint(error);
+          MainRepository().sentry.captureException(exception: error);
+        }
+      }
+    });
+  }
+
+  void refreshFcmToken(String token) {
+    this.getCredentials().then((creds) async {
+      try {
+        if (creds == null) {
+          return;
+        }
+
+        print('refreshFcmToken');
+        await provider.registerFcmToken(token);
+        this.setCredentials(creds.copyWith(fcmToken: token));
+      } catch (error) {
+        debugPrint(error);
+        MainRepository().sentry.captureException(exception: error);
+      }
+    });
   }
 
   Future<BookmarksResponse> loadHistory() async {
@@ -110,12 +180,22 @@ class ApiController {
     return BookmarksResponse.fromJson(jsonDecode(response.data));
   }
 
-  Future<DiscussionResponse> loadDiscussion(int id, {int lastId}) async {
-    var response = await provider.fetchDiscussion(id, lastId: lastId);
+  Future<DiscussionResponse> loadDiscussion(int id, {int lastId, String user}) async {
+    var response = await provider.fetchDiscussion(id, lastId: lastId, user: user);
     return DiscussionResponse.fromJson(jsonDecode(response.data));
   }
 
-  Future<PostMessageResponse> postDiscussionMessage(int id, String message, {Map<String, dynamic> attachment, Post replyPost}) async {
+  Future<DiscussionHomeResponse> getDiscussionHome(int id) async {
+    var response = await provider.fetchDiscussionHome(id);
+    return DiscussionHomeResponse.fromJson(jsonDecode(response.data));
+  }
+
+  Future<FeedNoticesResponse> loadFeedNotices({bool keepNew = false}) async {
+    var response = await provider.fetchNotices(keepNew: keepNew);
+    return FeedNoticesResponse.fromJson(jsonDecode(response.data));
+  }
+
+  Future<PostMessageResponse> postDiscussionMessage(int id, String message, {Map<ATTACHMENT, dynamic> attachment, Post replyPost}) async {
     if (replyPost != null) {
       message = '{reply ${replyPost.nick}|${replyPost.id}}: $message';
     }
@@ -149,7 +229,7 @@ class ApiController {
     return MailResponse.fromJson(jsonDecode(response.data));
   }
 
-  Future<SendMailResponse> sendMail(String recipient, String message, {Map<String, dynamic> attachment}) async {
+  Future<SendMailResponse> sendMail(String recipient, String message, {Map<ATTACHMENT, dynamic> attachment}) async {
     var result = await provider.sendMail(recipient, message, attachment: attachment);
     return SendMailResponse.fromJson(jsonDecode(result.data));
   }

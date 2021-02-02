@@ -13,14 +13,17 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/exceptions/AuthException.dart';
 import 'package:fyx/model/Credentials.dart';
+import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiMock implements IApiProvider {
   final String loginJsonResponse;
   TOnError onError;
   TOnAuthError onAuthError;
+  Credentials _credentials;
+  final bool emptyCredentials;
 
-  ApiMock(this.loginJsonResponse);
+  ApiMock(this.loginJsonResponse, {this.emptyCredentials = false});
 
   @override
   Future<Response> login(String username) {
@@ -55,7 +58,7 @@ class ApiMock implements IApiProvider {
   var onSystemData;
 
   @override
-  Future<Response> fetchDiscussion(int id, {int lastId}) {
+  Future<Response> fetchDiscussion(int id, {int lastId, String user}) {
     // TODO: implement fetchDiscussion
     return null;
   }
@@ -67,10 +70,21 @@ class ApiMock implements IApiProvider {
   }
 
   @override
-  Future<Credentials> getCredentials() {
-    // TODO: implement getCredentials
+  Credentials getCredentials() {
+    if (_credentials != null && _credentials.isValid) {
+      return _credentials;
+    }
     return null;
   }
+
+  @override
+  Credentials setCredentials(Credentials creds) {
+    if (creds != null && creds.isValid) {
+      _credentials = creds;
+    }
+    return _credentials;
+  }
+
 
   @override
   Future<Response> giveRating(int discussionId, int postId, bool add, bool confirm) {
@@ -85,20 +99,15 @@ class ApiMock implements IApiProvider {
   }
 
   @override
-  Future<Response> postDiscussionMessage(int id, String message, {Map<String, dynamic> attachment}) {
+  Future<Response> postDiscussionMessage(int id, String message, {Map<ATTACHMENT, dynamic> attachment}) {
     // TODO: implement postDiscussionMessage
     return null;
   }
 
   @override
-  Future<Response> sendMail(String recipient, String message, {Map<String, dynamic> attachment}) {
+  Future<Response> sendMail(String recipient, String message, {Map<ATTACHMENT, dynamic> attachment}) {
     // TODO: implement sendMail
     return null;
-  }
-
-  @override
-  void setCredentials(Credentials val) {
-    // TODO: implement setCredentials
   }
 
   @override
@@ -111,6 +120,24 @@ class ApiMock implements IApiProvider {
   Future<Response> testAuth() {
     // TODO: implement testAuth
     return null;
+  }
+
+  @override
+  Future<Response> registerFcmToken(String token) {
+    // TODO: implement registerFcmToken
+    return null;
+  }
+
+  @override
+  Future<Response> fetchDiscussionHome(int id) {
+    // TODO: implement fetchDiscussionInfo
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> fetchNotices({bool keepNew}) {
+    // TODO: implement fetchNotices
+    throw UnimplementedError();
   }
 }
 
@@ -143,9 +170,41 @@ void main() {
     expect(loginResponse.authState, 'AUTH_NEW');
     expect(loginResponse.isAuthorized, true);
 
+    var creds = await api.getCredentials();
+    expect(creds.nickname, loginName);
+    expect(creds.token, '44a3d1241830ca61a592e28df783007d');
+    expect(creds.fcmToken, null);
+  });
+
+  test('User is logged in and uses old identity storage.', () async {
+    var loginName = 'TOMMYSHELBY';
+
+    var api = ApiController();
+    api.provider = ApiMock(
+        '{"result": "error", "code": "401", "error": "Not Authorized", "auth_state": "AUTH_NEW", "auth_token": "44a3d1241830ca61a592e28df783007d", "auth_code": "6f9a10647d", "auth_dev_comment": "Direct user to PERSONAL \/ SETTINGS \/ AUTHORIZATIONS and tell him to accept request from this app. He will have to confirm it by transcribing passcode from [auth_code]. After confirming it, access using [token] should be working."}',
+      emptyCredentials: true // 👀 👈
+    );
+
     var prefs = await SharedPreferences.getInstance();
-    expect(prefs.getString('nickname'), loginName);
-    expect(prefs.getString('token'), '44a3d1241830ca61a592e28df783007d');
+    String identity = prefs.getString('identity');
+    expect(identity, null);
+
+    // Set the old storage manually.
+    await Future.wait([prefs.setString('nickname', loginName), prefs.setString('token', '44a3d1241830ca61a592e28df783007d')]);
+
+    // Load the credentials
+    var creds = await api.getCredentials();
+
+    // Check the identity object
+    expect(creds.nickname, loginName);
+    expect(creds.token, '44a3d1241830ca61a592e28df783007d');
+    expect(creds.fcmToken, null);
+
+    // Reload the prefs
+    prefs = await SharedPreferences.getInstance();
+    expect(prefs.getString('identity'), '{"nickname":"TOMMYSHELBY","token":"44a3d1241830ca61a592e28df783007d","fcmToken":null}');
+    expect(prefs.getString('nickname'), null);
+    expect(prefs.getString('token'), null);
   });
 
   test('User types invalid username.', () async {
