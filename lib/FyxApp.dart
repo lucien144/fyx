@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:device_info/device_info.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -11,6 +12,7 @@ import 'package:fyx/PlatformThemeData.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
+import 'package:fyx/libs/DeviceInfo.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
@@ -84,7 +86,7 @@ class FyxApp extends StatefulWidget {
     var results = await Future.wait([
       ApiController().getCredentials(),
       PackageInfo.fromPlatform(),
-      DeviceInfoPlugin().iosInfo,
+      DeviceInfo.init(),
       SettingsProvider().init()
     ]);
     MainRepository().credentials = results[0];
