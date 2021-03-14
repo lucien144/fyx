@@ -323,7 +323,7 @@ class _HomePageState extends State<HomePage>
 
                             result.bookmarks.forEach((_bookmark) {
                               List<DiscussionListItem> withReplies = [];
-                              var discussion = _bookmark.bookmarks
+                              var discussion = _bookmark.discussions
                                   .where((discussion) {
                                     // Filter by tapping on category headers
                                     // If unread filter is ON
