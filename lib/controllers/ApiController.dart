@@ -12,7 +12,8 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/System.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
-import 'package:fyx/model/reponses/BookmarksResponse.dart';
+import 'package:fyx/model/reponses/BookmarksAllResponse.dart';
+import 'package:fyx/model/reponses/BookmarksHistoryResponse.dart';
 import 'package:fyx/model/reponses/DiscussionHomeResponse.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/model/reponses/FeedNoticesResponse.dart';
@@ -46,14 +47,14 @@ class ApiController {
   ApiController._init() {
     provider = ApiProvider();
 
-    provider.onAuthError = () {
+    provider.onAuthError = (String message) {
       // API returns the same error on authorization as well as on normal data request. Therefore this "workaround".
       if (isLoggingIn) {
         return;
       }
 
       this.logout(removeAuthrorization: false);
-      PlatformTheme.error(L.AUTH_ERROR);
+      PlatformTheme.error(message == '' ? L.AUTH_ERROR : message);
       PlatformApp.navigatorKey.currentState.pushNamed('/login');
     };
 
@@ -77,7 +78,7 @@ class ApiController {
   Future<LoginResponse> login(String nickname) async {
     isLoggingIn = true;
     Response response = await provider.login(nickname);
-    var loginResponse = LoginResponse.fromJson(jsonDecode(response.data));
+    var loginResponse = LoginResponse.fromJson(response.data);
     if (!loginResponse.isAuthorized) {
       throwAuthException(loginResponse, message: 'Cannot authorize user.');
     }
@@ -126,14 +127,6 @@ class ApiController {
     return this.provider.setCredentials(creds);
   }
 
-  Future<bool> testAuth() async {
-    isLoggingIn = true;
-    var response = await provider.testAuth();
-    var json = jsonDecode(response.data);
-    isLoggingIn = false;
-    return json['result'] == 'ok';
-  }
-
   void registerFcmToken(String token) {
     this.getCredentials().then((creds) async {
       if (creds == null) {
@@ -170,29 +163,29 @@ class ApiController {
     });
   }
 
-  Future<BookmarksResponse> loadHistory() async {
+  Future<BookmarksHistoryResponse> loadHistory() async {
     var response = await provider.fetchHistory();
-    return BookmarksResponse.fromJson(jsonDecode(response.data));
+    return BookmarksHistoryResponse.fromJson(response.data);
   }
 
-  Future<BookmarksResponse> loadBookmarks() async {
+  Future<BookmarksAllResponse> loadBookmarks() async {
     var response = await provider.fetchBookmarks();
-    return BookmarksResponse.fromJson(jsonDecode(response.data));
+    return BookmarksAllResponse.fromJson(response.data);
   }
 
   Future<DiscussionResponse> loadDiscussion(int id, {int lastId, String user}) async {
     var response = await provider.fetchDiscussion(id, lastId: lastId, user: user);
-    return DiscussionResponse.fromJson(jsonDecode(response.data));
+    return DiscussionResponse.fromJson(response.data);
   }
 
   Future<DiscussionHomeResponse> getDiscussionHome(int id) async {
     var response = await provider.fetchDiscussionHome(id);
-    return DiscussionHomeResponse.fromJson(jsonDecode(response.data));
+    return DiscussionHomeResponse.fromJson(response.data);
   }
 
   Future<FeedNoticesResponse> loadFeedNotices({bool keepNew = false}) async {
     var response = await provider.fetchNotices(keepNew: keepNew);
-    return FeedNoticesResponse.fromJson(jsonDecode(response.data));
+    return FeedNoticesResponse.fromJson(response.data);
   }
 
   Future<PostMessageResponse> postDiscussionMessage(int id, String message, {Map<ATTACHMENT, dynamic> attachment, Post replyPost}) async {
@@ -209,7 +202,7 @@ class ApiController {
 
   Future<RatingResponse> giveRating(int discussionId, int postId, {bool positive = true, bool confirm = false}) async {
     Response response = await provider.giveRating(discussionId, postId, positive, confirm);
-    var data = jsonDecode(response.data);
+    var data = response.data;
     return RatingResponse(
         isGiven: data['result'] == 'RATING_GIVEN',
         needsConfirmation: data['result'] == 'RATING_NEEDS_CONFIRMATION',
@@ -226,7 +219,7 @@ class ApiController {
 
   Future<MailResponse> loadMail({int lastId}) async {
     var response = await provider.fetchMail(lastId: lastId);
-    return MailResponse.fromJson(jsonDecode(response.data));
+    return MailResponse.fromJson(response.data);
   }
 
   Future<SendMailResponse> sendMail(String recipient, String message, {Map<ATTACHMENT, dynamic> attachment}) async {
@@ -235,27 +228,8 @@ class ApiController {
   }
 
   throwAuthException(LoginResponse loginResponse, {String message: ''}) {
-    var state = AUTH_STATES.values.firstWhere((state) => state.toString() == 'AUTH_STATES.${loginResponse.authState}', orElse: () => null);
-    if (state != null) {
-      switch (state) {
-        case AUTH_STATES.AUTH_EXISTING:
-          throw AuthException('Je mi líto, ale autorizace se nezdařila. Zkuste si vyresetovat autorizaci v nastavení nyxu.');
-          break;
-        case AUTH_STATES.AUTH_INVALID_USERNAME:
-          throw AuthException('Špatné uživatelské jméno nebo heslo.');
-          break;
-        case AUTH_STATES.AUTH_NEW:
-          // This is valid!
-          break;
-      }
-    }
-
-    if (loginResponse.authDevComment.isNotEmpty) {
-      throw AuthException(loginResponse.authDevComment);
-    }
-
-    if (loginResponse.error.isNotEmpty) {
-      throw AuthException(loginResponse.error);
+    if (loginResponse.error) {
+      throw AuthException(loginResponse.message);
     }
 
     throw AuthException(message);

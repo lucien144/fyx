@@ -1,6 +1,6 @@
 class Credentials {
   String _nickname;
-  String _token;
+  String _token = '';
   String _fcmToken;
 
   Credentials(this._nickname, this._token, {fcmToken}) : this._fcmToken = fcmToken;

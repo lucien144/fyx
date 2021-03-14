@@ -66,15 +66,7 @@ class _TutorialPageState extends State<TutorialPage> {
                     setState(() => _loggingIn = true);
                     ApiController().getCredentials().then((credentials) {
                       MainRepository().credentials = credentials;
-                      // Test the authorization. If all is OK, go to /home screen...
-                      ApiController().testAuth().then((isOk) {
-                        if (isOk) {
-                          Navigator.of(context).pushNamed('/home');
-                          AnalyticsProvider().logTutorialComplete();
-                        } else {
-                          throw Exception('Selhala kontrola autorizace.');
-                        }
-                      }).catchError((error) => onError(error));
+                      Navigator.of(context).pushNamed('/home');
                     }).catchError((error) => onError(error));
                   })
                 : slideButton(L.TUTORIAL_NYX,

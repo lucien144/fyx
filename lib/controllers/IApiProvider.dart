@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:fyx/model/Credentials.dart';
 
 typedef TOnError = void Function(String);
-typedef TOnAuthError = void Function();
+typedef TOnAuthError = void Function(String);
 typedef TOnSystemData = void Function(Map<String, dynamic>);
 
 enum ATTACHMENT { bytes, filename }
@@ -15,7 +15,6 @@ abstract class IApiProvider {
   Credentials getCredentials();
   Credentials setCredentials(Credentials val);
   Future<Response> login(String username);
-  Future<Response> testAuth();
   Future<Response> logout();
   Future<Response> registerFcmToken(String token);
   Future<Response> fetchBookmarks();

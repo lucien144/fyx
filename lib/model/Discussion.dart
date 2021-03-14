@@ -30,29 +30,29 @@ class Discussion {
       return;
     }
 
-    this._id_klub = int.parse(json['id_klub']);
-    this._id_cat = int.parse(json['id_cat'] ?? '0');
-    this._unread = int.parse(json['unread'] ?? '0');
-    this._replies = int.parse(json['replies'] ?? '0'); // Premium
-    this._images = int.parse(json['images'] ?? '0'); // Premium
-    this._links = int.parse(json['links'] ?? '0'); // Premium
+    this._id_klub = json['discussion_id'];
+    // this._id_cat = int.parse(json['id_cat'] ?? '0');
+    this._unread = json['new_posts_count'] ?? 0;
+    this._replies = json['new_replies_count'] ?? 0; // Premium
+    this._images = json['new_images_count'] ?? 0; // Premium
+    this._links = json['new_links_count'] ?? 0; // Premium
 
     // Discussion detail has different options
-    this._booked = int.parse(json['booked'] ?? '0') == 1;
-    this._owner = int.parse(json['owner'] ?? '0') == 1;
-    this._name = json['jmeno'] ?? (json['name'] ?? '');
-    this._name_main = json['name_main'] ?? '';
-    this._name_sub = json['name_sub'] ?? '';
-    this._has_home = int.parse(json['has_home'] ?? '0') == 1;
-    this._has_header = int.parse(json['has_header'] ?? '0') == 1;
-    this._id_domain = int.parse(json['id_domain'] ?? '0');
-    this._id_location = int.parse(json['id_location'] ?? '0');
+    // TODO: New API
+    // this._booked = int.parse(json['booked'] ?? '0') == 1;
+    // this._owner = int.parse(json['owner'] ?? '0') == 1;
+    this._name = json['full_name'] ?? (json['full_name'] ?? '');
+    // this._name_main = json['name_main'] ?? '';
+    // this._name_sub = json['name_sub'] ?? '';
+    // this._has_home = int.parse(json['has_home'] ?? '0') == 1;
+    // this._has_header = int.parse(json['has_header'] ?? '0') == 1;
+    // this._id_domain = int.parse(json['id_domain'] ?? '0');
+    // this._id_location = int.parse(json['id_location'] ?? '0');
 
-    String lastVisit = json['last_visit'] ?? '0';
-    lastVisit = lastVisit == '' ? '0' : lastVisit;
-    this._last_visit = int.parse(lastVisit);
+    this._last_visit = DateTime.parse(json['last_visited_at'] ?? '0').millisecondsSinceEpoch;
 
-    this._rights = DiscussionRights.fromJson(json['rights'] ?? null);
+    // TODO: New API
+    // this._rights = DiscussionRights.fromJson(json['rights'] ?? null);
   }
 
   int get links => _links;

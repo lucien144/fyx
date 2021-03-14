@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:device_info/device_info.dart';
 import 'package:dio/dio.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
@@ -11,7 +9,7 @@ class ApiProvider implements IApiProvider {
   final Dio dio = Dio();
 
   // ignore: non_constant_identifier_names
-  final URL = 'https://www.nyx.cz/api.php';
+  final URL = 'https://alpha.nyx.cz/api';
 
   Options _options = Options(headers: {'user-agent': 'Fyx'});
 
@@ -43,50 +41,30 @@ class ApiProvider implements IApiProvider {
           PackageInfo.fromPlatform().then((info) {
             // Basic sanitize due to the Xr unicode character and others...
             // TODO: Perhaps, solve Czech characters too...
-            var deviceName = iosInfo.name.replaceAll(RegExp(r'[ʀ]', caseSensitive: false), 'r');
-            deviceName = deviceName.replaceAll(RegExp(r'[^\w _\-]', caseSensitive: false), '_');
-            _options.headers['user-agent'] = '${_options.headers['user-agent']} | ${iosInfo.systemName} | ${info.version} (${info.buildNumber}) | $deviceName';
+            var deviceName = iosInfo.name
+                .replaceAll(RegExp(r'[ʀ]', caseSensitive: false), 'r');
+            deviceName = deviceName.replaceAll(
+                RegExp(r'[^\w _\-]', caseSensitive: false), '_');
+            _options.headers['user-agent'] =
+                '${_options.headers['user-agent']} | ${iosInfo.systemName} | ${info.version} (${info.buildNumber}) | $deviceName';
           });
         }).catchError((error) {
-          _options.headers['user-agent'] = '${_options.headers['user-agent']} | Fyx';
+          _options.headers['user-agent'] =
+              '${_options.headers['user-agent']} | Fyx';
         });
     } catch (e) {}
 
-    dio.interceptors.add(InterceptorsWrapper(onRequest: (RequestOptions options) async {
+    dio.interceptors
+        .add(InterceptorsWrapper(onRequest: (RequestOptions options) async {
       print('[API] ${options.method.toUpperCase()}: ${options.uri}');
-      print('[API] -> query: ${options.queryParameters}');
-      print('[API] -> query: ${(options.data as FormData).fields}');
+      if (_credentials != null && _credentials.isValid) {
+        print('[API] -> Bearer: ${_credentials.token}');
+        options.headers['Authorization'] = 'Bearer ${_credentials.token}';
+      }
       return options;
     }, onResponse: (Response response) async {
-      Map data = jsonDecode(response.data);
-
-      if (data.containsKey('system')) {
-        onSystemData(data['system']);
-      }
-
       // All seems ok.
-      // Endpoints: Auth + pulling data
-      // Getting data for home/header does not return data key.
-      if (data.containsKey('data') || data.containsKey('home') || data.containsKey('header')) {
-        return response;
-      }
-
-      // All seems ok.
-      // Endpoints: Send new message.
-      // Endpoints: Rating given/removed.
-      if (data.containsKey('result') && ['ok', 'RATING_GIVEN', 'RATING_REMOVED', 'RATING_NEEDS_CONFIRMATION', 'RATING_CHANGED'].indexOf(data['result']) > -1) {
-        return response;
-      }
-
-      // Not Authorized
-      if (data['result'] == 'error' && data['code'] == '401') {
-        onAuthError();
-        return response;
-      }
-
-      // Other problem
-      if (data['result'] == 'error') {
-        onError(data['error']);
+      if (response.statusCode == 200) {
         return response;
       }
 
@@ -94,38 +72,38 @@ class ApiProvider implements IApiProvider {
       onError(L.API_ERROR);
       return response;
     }, onError: (DioError e) async {
+      // Not Authorized
+      if (e.response?.statusCode == 401) {
+        return e.response;
+      }
+
+      // Other problem
+      if (e.response?.statusCode == 400) {
+        onError(e.response.data['message']);
+        return e.response;
+      }
+
       onError(e.message);
     }));
   }
 
   Future<Response> login(String username) async {
-    FormData formData = new FormData.fromMap({'auth_nick': username});
-    return await dio.post(URL, data: formData, options: _options);
-  }
-
-  Future<Response> testAuth() async {
-    FormData formData = new FormData.fromMap({
-      'auth_nick': _credentials.nickname,
-      'auth_token': _credentials.token,
-      'l': 'help',
-      'l2': 'test',
-    });
-    return await dio.post(URL, data: formData, options: _options);
+    return await dio.post('$URL/create_token/$username', options: _options);
   }
 
   Future<Response> registerFcmToken(String token) async {
-    FormData formData = new FormData.fromMap({'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'gcm', 'l2': 'register', 'regid': token});
-    return await dio.post(URL, data: formData, options: _options);
+    String client = 'Fyx';
+    return await dio.post(
+        '$URL/register_for_notifications/${_credentials.token}/$client/$token',
+        options: _options);
   }
 
   Future<Response> fetchBookmarks() async {
-    FormData formData = new FormData.fromMap({'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'bookmarks', 'l2': 'all'});
-    return await dio.post(URL, data: formData, options: _options);
+    return await dio.get('$URL/bookmarks/all', options: _options);
   }
 
   Future<Response> fetchHistory() async {
-    FormData formData = new FormData.fromMap({'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'bookmarks', 'l2': 'history', 'more_results': 1});
-    return await dio.post(URL, data: formData, options: _options);
+    return await dio.get('$URL/bookmarks/history/more', options: _options);
   }
 
   Future<Response> fetchDiscussion(int id, {int lastId, String user}) async {
@@ -164,7 +142,8 @@ class ApiProvider implements IApiProvider {
     return await dio.post(URL, data: formData, options: _options);
   }
 
-  Future<Response> postDiscussionMessage(int id, String message, {Map<ATTACHMENT, dynamic> attachment}) async {
+  Future<Response> postDiscussionMessage(int id, String message,
+      {Map<ATTACHMENT, dynamic> attachment}) async {
     FormData formData = new FormData.fromMap({
       'auth_nick': _credentials.nickname,
       'auth_token': _credentials.token,
@@ -172,13 +151,17 @@ class ApiProvider implements IApiProvider {
       'l2': 'send',
       'id': id,
       'message': message,
-      'attachment': attachment is Map ? MultipartFile.fromBytes(attachment[ATTACHMENT.bytes], filename: attachment[ATTACHMENT.filename]) : null
+      'attachment': attachment is Map
+          ? MultipartFile.fromBytes(attachment[ATTACHMENT.bytes],
+              filename: attachment[ATTACHMENT.filename])
+          : null
     });
 
     return await dio.post(URL, data: formData, options: _options);
   }
 
-  Future<Response> setPostReminder(int discussionId, int postId, bool setReminder) async {
+  Future<Response> setPostReminder(
+      int discussionId, int postId, bool setReminder) async {
     FormData formData = new FormData.fromMap({
       'auth_nick': _credentials.nickname,
       'auth_token': _credentials.token,
@@ -192,7 +175,8 @@ class ApiProvider implements IApiProvider {
     return await dio.post(URL, data: formData, options: _options);
   }
 
-  Future<Response> giveRating(int discussionId, int postId, bool positive, bool confirm) async {
+  Future<Response> giveRating(
+      int discussionId, int postId, bool positive, bool confirm) async {
     FormData formData = new FormData.fromMap({
       'auth_nick': _credentials.nickname,
       'auth_token': _credentials.token,
@@ -220,12 +204,19 @@ class ApiProvider implements IApiProvider {
   }
 
   Future<Response> fetchMail({int lastId}) async {
-    FormData formData = new FormData.fromMap(
-        {'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'mail', 'l2': 'messages', 'id_mail': lastId, 'direction': lastId == null ? 'newest' : 'older'});
+    FormData formData = new FormData.fromMap({
+      'auth_nick': _credentials.nickname,
+      'auth_token': _credentials.token,
+      'l': 'mail',
+      'l2': 'messages',
+      'id_mail': lastId,
+      'direction': lastId == null ? 'newest' : 'older'
+    });
     return await dio.post(URL, data: formData, options: _options);
   }
 
-  Future<Response> sendMail(String recipient, String message, {Map<ATTACHMENT, dynamic> attachment}) async {
+  Future<Response> sendMail(String recipient, String message,
+      {Map<ATTACHMENT, dynamic> attachment}) async {
     FormData formData = new FormData.fromMap({
       'auth_nick': _credentials.nickname,
       'auth_token': _credentials.token,
@@ -233,7 +224,10 @@ class ApiProvider implements IApiProvider {
       'l2': 'send',
       'recipient': recipient,
       'message': message,
-      'attachment': attachment is Map ? MultipartFile.fromBytes(attachment[ATTACHMENT.bytes], filename: attachment[ATTACHMENT.filename]) : null
+      'attachment': attachment is Map
+          ? MultipartFile.fromBytes(attachment[ATTACHMENT.bytes],
+              filename: attachment[ATTACHMENT.filename])
+          : null
     });
     return await dio.post(URL, data: formData, options: _options);
   }
