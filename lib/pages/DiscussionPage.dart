@@ -167,17 +167,17 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
               if (lastId != null) {
                 // If we load next page(s)
                 var response = await ApiController().loadDiscussion(pageArguments.discussionId, lastId: lastId, user: pageArguments.filterByUser);
-                result = response.data;
+                result = response.posts;
               } else {
                 // If we load init data or we refresh data on pull
                 if (!this._hasInitData) {
                   // If we load init data, use the data from FutureBuilder
-                  result = discussionResponse.data;
+                  result = discussionResponse.posts;
                   this._hasInitData = true;
                 } else {
                   // If we just pull to refresh, load a fresh data
                   var response = await ApiController().loadDiscussion(pageArguments.discussionId, user: pageArguments.filterByUser);
-                  result = response.data;
+                  result = response.posts;
                 }
               }
               var data = (result as List)

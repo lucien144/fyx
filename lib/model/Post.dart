@@ -8,24 +8,24 @@ class Post {
   String _nick;
   int _time;
   int _wu_rating;
-  int _wu_type;
+  String _wu_type;
   bool _reminder;
 
   Content _content;
 
   Post.fromJson(Map<String, dynamic> json, this.idKlub, { this.isCompact }) {
-    this._id_wu = int.parse(json['id_wu']);
+    this._id_wu = json['id'];
     this._content = Content(json['content'], isCompact: this.isCompact);
-    this._nick = json['nick'];
-    this._time = int.parse(json['time']);
-    this._wu_rating = int.parse(json['wu_rating']);
-    this._wu_type = int.parse(json['wu_type']);
+    this._nick = json['username'];
+    this._time = DateTime.parse(json['inserted_at'] ?? '0').millisecondsSinceEpoch;
+    this._wu_rating = json['rating'] ?? 0;
+    this._wu_type = json['type'];
     this._reminder = (json['reminder'] ?? 'no') == 'yes';
   }
 
   Content get content => _content;
 
-  int get type => _wu_type;
+  String get type => _wu_type;
 
   int get rating => _wu_rating;
 

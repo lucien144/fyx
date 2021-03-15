@@ -10,6 +10,7 @@ import 'package:fyx/components/NotificationBadge.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/model/BookmarkedDiscussion.dart';
 import 'package:fyx/model/Discussion.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
@@ -296,7 +297,7 @@ class _HomePageState extends State<HomePage>
                             var result = await ApiController().loadHistory();
                             var data = result.discussions
                                 .map((discussion) =>
-                                    Discussion.fromJson(discussion))
+                                    BookmarkedDiscussion.fromJson(discussion))
                                 .where((discussion) => this._filterUnread
                                     ? discussion.unread > 0
                                     : true)

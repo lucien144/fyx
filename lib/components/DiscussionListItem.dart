@@ -3,16 +3,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/PlatformTheme.dart';
-import 'package:fyx/model/Discussion.dart';
+import 'package:fyx/model/BookmarkedDiscussion.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 
 class DiscussionListItem extends StatelessWidget {
-  final Discussion discussion;
+  final BookmarkedDiscussion discussion;
 
   DiscussionListItem(this.discussion);
-
-  @override
-  int get category => this.discussion.idCat;
 
   @override
   Widget build(BuildContext context) {

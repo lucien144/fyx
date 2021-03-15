@@ -107,18 +107,24 @@ class ApiProvider implements IApiProvider {
     return await dio.get('$URL/bookmarks/history/more', options: _options);
   }
 
-  Future<Response> fetchDiscussion(int id, {int lastId, String user}) async {
-    FormData formData = new FormData.fromMap({
-      'auth_nick': _credentials.nickname,
-      'auth_token': _credentials.token,
-      'l': 'discussion',
-      'l2': 'messages',
-      'id': id,
-      'id_wu': lastId,
-      'filter_user': user,
-      'direction': lastId == null ? 'newest' : 'older'
-    });
-    return await dio.post(URL, data: formData, options: _options);
+  Future<Response> fetchDiscussion(int discussionId, {int lastId, String user}) async {
+    // FormData formData = new FormData.fromMap({
+    //   'auth_nick': _credentials.nickname,
+    //   'auth_token': _credentials.token,
+    //   'l': 'discussion',
+    //   'l2': 'messages',
+    //   'id': id,
+    //   'id_wu': lastId,
+    //   'filter_user': user,
+    //   'direction': lastId == null ? 'newest' : 'older'
+    // });
+
+    Map<String, dynamic> params = {
+      'order': lastId == null ? 'newest' : 'older_than',
+      'from_id': lastId,
+      'user': user
+    };
+    return await dio.get('$URL/discussion/$discussionId', queryParameters: params, options: _options);
   }
 
   Future<Response> fetchDiscussionHome(int id) async {
