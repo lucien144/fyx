@@ -74,6 +74,7 @@ class ApiProvider implements IApiProvider {
     }, onError: (DioError e) async {
       // Not Authorized
       if (e.response?.statusCode == 401) {
+        onAuthError(e.response.data['message']);
         return e.response;
       }
 
@@ -92,7 +93,7 @@ class ApiProvider implements IApiProvider {
   }
 
   Future<Response> registerFcmToken(String token) async {
-    String client = 'Fyx';
+    String client = 'fyx';
     return await dio.post(
         '$URL/register_for_notifications/${_credentials.token}/$client/$token',
         options: _options);
