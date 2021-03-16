@@ -138,13 +138,13 @@ class Content {
     RegExp reg = RegExp(r'^((?!<img).)*(((<a([^>]*?)>)?(\s*)<img([^>]*?)>(\s*)(<\/\s*a\s*>)?(\s*(\s*<\s*br\s*\/?\s*>\s*)*\s*))*)$', caseSensitive: false, dotAll: true);
     _consecutiveImages = reg.hasMatch(_body);
 
-    document.querySelectorAll('a > img[src]').forEach((Element el) {
-      var thumb = el.attributes['src'];
-      var image = el.parent.attributes['href'];
+    document.querySelectorAll('img[src]').forEach((Element el) {
+      var image = el.attributes['src'];
+      var thumb = el.attributes['data-thumb'];
       _images.add(Image(image, thumb));
 
       if (_consecutiveImages) {
-        el.parent.remove();
+        el.remove();
       }
     });
     _body = document.body.innerHtml;
@@ -152,7 +152,7 @@ class Content {
 
   String _tagAllImageLinks(String source) {
     Document document = parse(source);
-    document.querySelectorAll('a > img').forEach((Element el) {
+    document.querySelectorAll('img').forEach((Element el) {
       el.parent.classes.add('image-link');
     });
     return document.body.innerHtml;
