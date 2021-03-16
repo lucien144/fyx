@@ -75,13 +75,13 @@ class _MailboxPageState extends State<MailboxPage> {
           },
           dataProvider: (lastId) async {
             var result = await ApiController().loadMail(lastId: lastId);
-            var mails = result.data
+            var mails = result.mails
                 .map((_mail) => Mail.fromJson(_mail, isCompact: MainRepository().settings.useCompactMode))
                 .where((mail) => !MainRepository().settings.isMailBlocked(mail.id))
                 .where((mail) => !MainRepository().settings.isUserBlocked(mail.participant))
                 .map((mail) => MailListItem(mail))
                 .toList();
-            var id = Mail.fromJson(result.data.last, isCompact: MainRepository().settings.useCompactMode).id;
+            var id = Mail.fromJson(result.mails.last, isCompact: MainRepository().settings.useCompactMode).id;
             return DataProviderResult(mails, lastId: id);
           }),
       Positioned(
