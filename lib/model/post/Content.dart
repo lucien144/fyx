@@ -105,15 +105,16 @@ class Content {
       var youtubes = document.querySelectorAll('div[data-embed-type="youtube"]');
       youtubes.forEach((el) {
         // If the video does not have preview, it's invalid Nyx attachment, therefore we skip it and handle it as a normal post.
-        if (el.querySelector('img') == null) {
+        Element img = el.querySelector('img');
+        if (img == null) {
           return;
         }
 
         var video = Video(
             id: el.attributes['data-embed-value'],
             type: Video.findVideoType(el.attributes['data-embed-type']),
-            image: el.querySelector('a').attributes['href'],
-            thumb: el.querySelector('img').attributes['src']);
+            image: img.attributes['src'],
+            thumb: img.attributes['data-thumb']);
 
         // Remove the video element from the content.
         this._videos.add(video);

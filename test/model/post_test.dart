@@ -100,9 +100,7 @@ void main() {
           http:\/\/www.youtube.com\/watch?v=B1_gcCu0-oI
         <\/a><br \/>\n
         <div class=\"embed-wrapper\" data-embed-type=\"youtube\" data-embed-value=\"B1_gcCu0-oI\" data-embed-hd=\"1\">
-          <a href=\"http:\/\/img.youtube.com\/vi\/B1_gcCu0-oI\/0.jpg\">
-            <img src=\"http:\/\/www.nyx.cz\/i\/t\/e8464b77ee2b7a726f174be309201ade.png?url=http%3A%2F%2Fimg.youtube.com%2Fvi%2FB1_gcCu0-oI%2F0.jpg\" class=\"thumb\">
-          <\/a>
+            <img src=\"http:\/\/img.youtube.com\/vi\/B1_gcCu0-oI\/0.jpg\" data-thumb=\"http:\/\/www.nyx.cz\/i\/t\/e8464b77ee2b7a726f174be309201ade.png?url=http%3A%2F%2Fimg.youtube.com%2Fvi%2FB1_gcCu0-oI%2F0.jpg\">
         <\/div>
         <br \/>\n\r<br \/>\n\r<br \/>\n
         Na tom videu je nav\u00edc moc p\u011bkn\u011b vid\u011bt, jak d\u016fle\u017eit\u00fd je \u00fahel pohledu.
