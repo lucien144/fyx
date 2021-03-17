@@ -11,6 +11,9 @@ class Post {
   String _wu_type;
   String myRating;
   bool _reminder;
+  bool _canBeRated;
+  bool _canBeDeleted;
+  bool _canBeReminded;
 
   Content _content;
 
@@ -23,6 +26,9 @@ class Post {
     this._wu_type = json['type'];
     this.myRating = json['my_rating'] ?? 'none'; // positive / negative / negative_visible / none TODO: enums
     this._reminder = json['reminder'] ?? false;
+    this._canBeRated = json['can_be_rated'] ?? false;
+    this._canBeDeleted = json['can_be_deleted'] ?? false;
+    this._canBeReminded = json['can_be_reminded'] ?? false;
   }
 
   Content get content => _content;
@@ -48,4 +54,10 @@ class Post {
 
   // ignore: unnecessary_getters_setters
   set hasReminder(bool value) => _reminder = value;
+
+  bool get canBeReminded => _canBeReminded;
+
+  bool get canBeDeleted => _canBeDeleted;
+
+  bool get canBeRated => _canBeRated;
 }

@@ -96,7 +96,7 @@ class _PostListItemState extends State<PostListItem> {
                   width: 16,
                 ),
               ),
-              GestureDetector(
+              if (_post.canBeReminded) GestureDetector(
                 child: FeedbackIndicator(
                   isLoading: _isSaving,
                   child: Row(

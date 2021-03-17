@@ -41,7 +41,7 @@ class _PostRatingState extends State<PostRating> {
       child: Row(
         children: <Widget>[
           Visibility(
-            visible: MainRepository().credentials.nickname != _post.nick,
+            visible: _post.canBeRated,
             child: GestureDetector(
               child: Icon(
                 Icons.thumb_up,
@@ -80,7 +80,7 @@ class _PostRatingState extends State<PostRating> {
             width: 4,
           ),
           Visibility(
-            visible: MainRepository().credentials.nickname != _post.nick,
+            visible: _post.canBeRated,
             child: GestureDetector(
               child: Icon(
                 Icons.thumb_down,
