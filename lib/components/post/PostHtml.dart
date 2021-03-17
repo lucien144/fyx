@@ -140,11 +140,9 @@ class PostHtml extends StatelessWidget {
         }
 
         // Click through to another discussion
-        RegExp topicTest = new RegExp(r"^\?l=topic;id=([0-9]+)$");
-        Iterable<RegExpMatch> topicMatches = topicTest.allMatches(link);
-        if (topicMatches.length == 1) {
-          var id = int.parse(topicMatches.elementAt(0).group(1));
-          var arguments = DiscussionPageArguments(id);
+        var parserResult = Helpers.parseDiscussionUri(link);
+        if (parserResult.isNotEmpty) {
+          var arguments = DiscussionPageArguments(parserResult[INTERNAL_URI_PARSER.discussionId]);
           DiscussionPage.deeplinkDepth++;
           Navigator.of(context, rootNavigator: true)
               .pushNamed('/discussion', arguments: arguments);
@@ -152,7 +150,7 @@ class PostHtml extends StatelessWidget {
         }
 
         // Click through to another discussion with message deeplink
-        var parserResult = Helpers.parseDiscussionUri(link);
+        parserResult = Helpers.parseDiscussionPostUri(link);
         if (parserResult.isNotEmpty) {
           var arguments = DiscussionPageArguments(parserResult[INTERNAL_URI_PARSER.discussionId], postId: parserResult[INTERNAL_URI_PARSER.postId]);
           DiscussionPage.deeplinkDepth++;

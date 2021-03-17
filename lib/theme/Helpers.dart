@@ -36,17 +36,30 @@ class Helpers {
     return '${years}Y';
   }
 
-  static Map<INTERNAL_URI_PARSER, int> parseDiscussionUri(String uri) {
-    RegExp topicDeeplinkTest = new RegExp(r"^(\?l=topic;id=([0-9]+);wu=([0-9]+))|(/discussion/([0-9]+)/id/([0-9]+))$");
-    Iterable<RegExpMatch> topicDeeplinkMatches = topicDeeplinkTest.allMatches(uri);
-    if (topicDeeplinkMatches.length == 1) {
-      int discussionId = int.parse(topicDeeplinkMatches.elementAt(0).group(2) ?? '0');
-      int postId = int.parse(topicDeeplinkMatches.elementAt(0).group(3) ?? '0');
+  static Map<INTERNAL_URI_PARSER, int> parseDiscussionPostUri(String uri) {
+    RegExp test = new RegExp(r"^(\?l=topic;id=([0-9]+);wu=([0-9]+))|(/discussion/([0-9]+)/id/([0-9]+))$");
+    Iterable<RegExpMatch> matches = test.allMatches(uri);
+    if (matches.length == 1) {
+      int discussionId = int.parse(matches.elementAt(0).group(2) ?? '0');
+      int postId = int.parse(matches.elementAt(0).group(3) ?? '0');
       if (discussionId == 0 && postId == 0) {
-        discussionId = int.parse(topicDeeplinkMatches.elementAt(0).group(5) ?? '0');
-        postId = int.parse(topicDeeplinkMatches.elementAt(0).group(6) ?? '0');
+        discussionId = int.parse(matches.elementAt(0).group(5) ?? '0');
+        postId = int.parse(matches.elementAt(0).group(6) ?? '0');
       }
       return {INTERNAL_URI_PARSER.discussionId: discussionId, INTERNAL_URI_PARSER.postId: postId};
+    }
+    return {};
+  }
+
+  static Map<INTERNAL_URI_PARSER, int> parseDiscussionUri(String uri) {
+    RegExp test = new RegExp(r"^(\?l=topic;id=([0-9]+))|(/discussion/([0-9]+))$");
+    Iterable<RegExpMatch> matches = test.allMatches(uri);
+    if (matches.length == 1) {
+      int discussionId = int.parse(matches.elementAt(0).group(2) ?? '0');
+      if (discussionId == 0) {
+        discussionId = int.parse(matches.elementAt(0).group(4) ?? '0');
+      }
+      return {INTERNAL_URI_PARSER.discussionId: discussionId};
     }
     return {};
   }
