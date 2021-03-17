@@ -186,7 +186,7 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
                   })
                   .where((post) => !MainRepository().settings.isPostBlocked(post.id))
                   .where((post) => !MainRepository().settings.isUserBlocked(post.nick))
-                  .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.id > discussionResponse.discussion.lastVisit))
+                  .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.time > discussionResponse.discussion.lastVisit))
                   .toList();
 
               int id;
