@@ -22,7 +22,7 @@ class Post {
     this._wu_rating = json['rating'] ?? 0;
     this._wu_type = json['type'];
     this.myRating = json['my_rating'] ?? 'none'; // positive / negative / negative_visible / none TODO: enums
-    this._reminder = (json['reminder'] ?? 'no') == 'yes';
+    this._reminder = json['reminder'] ?? false;
   }
 
   Content get content => _content;
