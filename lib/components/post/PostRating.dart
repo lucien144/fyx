@@ -45,14 +45,17 @@ class _PostRatingState extends State<PostRating> {
             child: GestureDetector(
               child: Icon(
                 Icons.thumb_up,
-                color: _post.rating > 0 ? Colors.green : Colors.black38,
+                color: _post.myRating == 'positive' ? Colors.green : Colors.black38,
               ),
               onTap: _givingRating
                   ? null
                   : () {
                       setState(() => _givingRating = true);
-                      ApiController().giveRating(_post.idKlub, _post.id).then((response) {
-                        setState(() => _post.rating = response.currentRating);
+                      ApiController().giveRating(_post.idKlub, _post.id, remove: _post.myRating != 'none').then((response) {
+                        setState(() {
+                          _post.rating = response.currentRating;
+                          _post.myRating = response.myRating;
+                        });
                       }).catchError((error) {
                         print(error);
                         PlatformTheme.error(L.RATING_ERROR);
@@ -81,13 +84,13 @@ class _PostRatingState extends State<PostRating> {
             child: GestureDetector(
               child: Icon(
                 Icons.thumb_down,
-                color: _post.rating < 0 ? Colors.redAccent : Colors.black38,
+                color: ['negative', 'negative_visible'].contains(_post.myRating) ? Colors.redAccent : Colors.black38,
               ),
               onTap: _givingRating
                   ? null
                   : () {
                       setState(() => _givingRating = true);
-                      ApiController().giveRating(_post.idKlub, _post.id, positive: false).then((response) {
+                      ApiController().giveRating(_post.idKlub, _post.id, positive: false, remove: _post.myRating != 'none').then((response) {
                         if (response.needsConfirmation) {
                           showCupertinoDialog(
                             context: context,
@@ -105,10 +108,13 @@ class _PostRatingState extends State<PostRating> {
                                 CupertinoDialogAction(
                                     isDefaultAction: true,
                                     isDestructiveAction: true,
-                                    child: new Text("Hodnotit"),
+                                    child: new Text('Hodnotit'),
                                     onPressed: () {
-                                      ApiController().giveRating(_post.idKlub, _post.id, positive: false, confirm: true).then((response) {
-                                        setState(() => _post.rating = response.currentRating);
+                                      ApiController().giveRating(_post.idKlub, _post.id, positive: false, confirm: true, remove: _post.myRating != 'none').then((response) {
+                                        setState(() {
+                                          _post.rating = response.currentRating;
+                                          _post.myRating = response.myRating;
+                                        });
                                       }).catchError((error) {
                                         print(error);
                                         PlatformTheme.error(L.RATING_ERROR);
@@ -121,11 +127,13 @@ class _PostRatingState extends State<PostRating> {
                             ),
                           );
                         } else {
-                          setState(() => _post.rating = response.currentRating);
-                          setState(() => _givingRating = false);
+                          setState(() {
+                            _post.rating = response.currentRating;
+                            _post.myRating = response.myRating;
+                            _givingRating = false;
+                          });
                         }
                       }).catchError((error) {
-                        print(error);
                         setState(() => _givingRating = false);
                         PlatformTheme.error(L.RATING_ERROR);
                       });

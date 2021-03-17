@@ -200,14 +200,14 @@ class ApiController {
     return provider.setPostReminder(discussionId, postId, setReminder);
   }
 
-  Future<RatingResponse> giveRating(int discussionId, int postId, {bool positive = true, bool confirm = false}) async {
-    Response response = await provider.giveRating(discussionId, postId, positive, confirm);
+  Future<RatingResponse> giveRating(int discussionId, int postId, {bool positive = true, bool confirm = false, bool remove = false}) async {
+    Response response = await provider.giveRating(discussionId, postId, positive, confirm, remove);
     var data = response.data;
     return RatingResponse(
-        isGiven: data['result'] == 'RATING_GIVEN',
-        needsConfirmation: data['result'] == 'RATING_NEEDS_CONFIRMATION',
-        currentRating: int.parse(data['current_rating']),
-        currentRatingStep: int.parse(data['current_rating_step']));
+        isGiven: data['error'] ?? true,
+        needsConfirmation: data['code'] == 'NeedsConfirmation',
+        currentRating: data['rating'] ?? 0,
+        myRating: data['my_rating'] ?? 'none');
   }
 
   void logout({bool removeAuthrorization = true}) {

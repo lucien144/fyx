@@ -84,6 +84,11 @@ class ApiProvider implements IApiProvider {
         return e.response;
       }
 
+      // Negative rating confirmation
+      if (e.response?.statusCode == 403) {
+        return e.response;
+      }
+
       onError(e.message);
     }));
   }
@@ -108,17 +113,6 @@ class ApiProvider implements IApiProvider {
   }
 
   Future<Response> fetchDiscussion(int discussionId, {int lastId, String user}) async {
-    // FormData formData = new FormData.fromMap({
-    //   'auth_nick': _credentials.nickname,
-    //   'auth_token': _credentials.token,
-    //   'l': 'discussion',
-    //   'l2': 'messages',
-    //   'id': id,
-    //   'id_wu': lastId,
-    //   'filter_user': user,
-    //   'direction': lastId == null ? 'newest' : 'older'
-    // });
-
     Map<String, dynamic> params = {
       'order': lastId == null ? 'newest' : 'older_than',
       'from_id': lastId,
@@ -183,31 +177,15 @@ class ApiProvider implements IApiProvider {
   }
 
   Future<Response> giveRating(
-      int discussionId, int postId, bool positive, bool confirm) async {
-    FormData formData = new FormData.fromMap({
-      'auth_nick': _credentials.nickname,
-      'auth_token': _credentials.token,
-      'l': 'discussion',
-      'l2': 'rating_give',
-      'id_klub': discussionId,
-      'id_wu': postId,
-      'rating': positive ? 'positive' : 'negative',
-      'toggle': 1,
-      'neg_confirmation': confirm ? 1 : 0
-    });
-
-    return await dio.post(URL, data: formData, options: _options);
+      int discussionId, int postId, bool positive, bool confirm, bool remove) async {
+    String action = positive ? 'positive' : 'negative';
+    action = remove ? 'remove' : action;
+    action = confirm ? 'negative_visible' : action;
+    return await dio.post('$URL/discussion/$discussionId/rating/$postId/$action', options: _options);
   }
 
   Future<Response> logout() async {
-    FormData formData = new FormData.fromMap({
-      'auth_nick': _credentials.nickname,
-      'auth_token': _credentials.token,
-      'l': 'util',
-      'l2': 'remove_authorization',
-    });
-
-    return await dio.post(URL, data: formData, options: _options);
+    return await dio.delete('$URL/profile/delete_token/${_credentials.token}', options: _options);
   }
 
   Future<Response> fetchMail({int lastId, String username}) async {

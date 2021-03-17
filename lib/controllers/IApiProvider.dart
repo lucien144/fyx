@@ -26,5 +26,5 @@ abstract class IApiProvider {
   Future<Response> sendMail(String recipient, String message, {Map<ATTACHMENT, dynamic> attachment});
   Future<Response> postDiscussionMessage(int id, String message, {Map<ATTACHMENT, dynamic> attachment});
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder);
-  Future<Response> giveRating(int discussionId, int postId, bool add, bool confirm);
+  Future<Response> giveRating(int discussionId, int postId, bool add, bool confirm, bool remove);
 }

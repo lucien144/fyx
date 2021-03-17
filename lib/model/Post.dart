@@ -9,6 +9,7 @@ class Post {
   int _time;
   int _wu_rating;
   String _wu_type;
+  String myRating;
   bool _reminder;
 
   Content _content;
@@ -20,6 +21,7 @@ class Post {
     this._time = DateTime.parse(json['inserted_at'] ?? '0').millisecondsSinceEpoch;
     this._wu_rating = json['rating'] ?? 0;
     this._wu_type = json['type'];
+    this.myRating = json['my_rating'] ?? 'none'; // positive / negative / negative_visible / none TODO: enums
     this._reminder = (json['reminder'] ?? 'no') == 'yes';
   }
 
