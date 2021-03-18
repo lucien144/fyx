@@ -1,17 +1,14 @@
-import 'package:device_info/device_info.dart';
 import 'package:dio/dio.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/Credentials.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
-import 'package:package_info/package_info.dart';
 
 class ApiProvider implements IApiProvider {
   final Dio dio = Dio();
 
   // ignore: non_constant_identifier_names
   final URL = 'https://alpha.nyx.cz/api';
-
-  Options _options = Options(headers: {'user-agent': 'Fyx'});
 
   Credentials _credentials;
 
@@ -34,29 +31,26 @@ class ApiProvider implements IApiProvider {
   }
 
   ApiProvider() {
-    try {
-      // TODO: Use the MainRepository() to obtain this info... or not?
-      DeviceInfoPlugin()
-        ..iosInfo.then((iosInfo) {
-          PackageInfo.fromPlatform().then((info) {
-            // Basic sanitize due to the Xr unicode character and others...
-            // TODO: Perhaps, solve Czech characters too...
-            var deviceName = iosInfo.name
-                .replaceAll(RegExp(r'[ʀ]', caseSensitive: false), 'r');
-            deviceName = deviceName.replaceAll(
-                RegExp(r'[^\w _\-]', caseSensitive: false), '_');
-            _options.headers['user-agent'] =
-                '${_options.headers['user-agent']} | ${iosInfo.systemName} | ${info.version} (${info.buildNumber}) | $deviceName';
-          });
-        }).catchError((error) {
-          _options.headers['user-agent'] =
-              '${_options.headers['user-agent']} | Fyx';
-        });
-    } catch (e) {}
-
     dio.interceptors
         .add(InterceptorsWrapper(onRequest: (RequestOptions options) async {
+      try {
+        // TODO: Perhaps, solve Czech characters too...
+        // TODO: Get rid of MainRepository()
+        var deviceName = MainRepository()
+            .deviceInfo
+            .name
+            .replaceAll(RegExp(r'[ʀ]', caseSensitive: false), 'r');
+        deviceName = deviceName.replaceAll(
+            RegExp(r'[^\w _\-]', caseSensitive: false), '_');
+        options.headers['user-agent'] =
+            'Fyx | ${MainRepository().deviceInfo.systemName} | ${MainRepository().packageInfo.version} (${MainRepository().packageInfo.buildNumber}) | $deviceName';
+      } catch (e) {
+        options.headers['user-agent'] = 'Fyx';
+      }
+
+      print('[API] UA: ${options.headers['user-agent']}');
       print('[API] ${options.method.toUpperCase()}: ${options.uri}');
+
       if (_credentials != null && _credentials.isValid) {
         print('[API] -> Bearer: ${_credentials.token}');
         options.headers['Authorization'] = 'Bearer ${_credentials.token}';
@@ -94,31 +88,32 @@ class ApiProvider implements IApiProvider {
   }
 
   Future<Response> login(String username) async {
-    return await dio.post('$URL/create_token/$username', options: _options);
+    return await dio.post('$URL/create_token/$username');
   }
 
   Future<Response> registerFcmToken(String token) async {
     String client = 'fyx';
     return await dio.post(
-        '$URL/register_for_notifications/${_credentials.token}/$client/$token',
-        options: _options);
+        '$URL/register_for_notifications/${_credentials.token}/$client/$token');
   }
 
   Future<Response> fetchBookmarks() async {
-    return await dio.get('$URL/bookmarks/all', options: _options);
+    return await dio.get('$URL/bookmarks/all');
   }
 
   Future<Response> fetchHistory() async {
-    return await dio.get('$URL/bookmarks/history/more', options: _options);
+    return await dio.get('$URL/bookmarks/history/more');
   }
 
-  Future<Response> fetchDiscussion(int discussionId, {int lastId, String user}) async {
+  Future<Response> fetchDiscussion(int discussionId,
+      {int lastId, String user}) async {
     Map<String, dynamic> params = {
       'order': lastId == null ? 'newest' : 'older_than',
       'from_id': lastId,
       'user': user
     };
-    return await dio.get('$URL/discussion/$discussionId', queryParameters: params, options: _options);
+    return await dio.get('$URL/discussion/$discussionId',
+        queryParameters: params);
   }
 
   Future<Response> fetchDiscussionHome(int id) async {
@@ -129,7 +124,7 @@ class ApiProvider implements IApiProvider {
       'l2': 'home',
       'id_klub': id
     });
-    return await dio.post(URL, data: formData, options: _options);
+    return await dio.post(URL, data: formData);
   }
 
   Future<Response> fetchNotices({bool keepNew = false}) async {
@@ -140,7 +135,7 @@ class ApiProvider implements IApiProvider {
       'l2': 'notices',
       'keep_new': keepNew ? '1' : '0'
     });
-    return await dio.post(URL, data: formData, options: _options);
+    return await dio.post(URL, data: formData);
   }
 
   Future<Response> postDiscussionMessage(int id, String message,
@@ -158,24 +153,26 @@ class ApiProvider implements IApiProvider {
           : null
     });
 
-    return await dio.post(URL, data: formData, options: _options);
+    return await dio.post(URL, data: formData);
   }
 
   Future<Response> setPostReminder(
       int discussionId, int postId, bool setReminder) async {
-    return await dio.post('$URL/discussion/$discussionId/reminder/$postId/$setReminder', options: _options);
+    return await dio
+        .post('$URL/discussion/$discussionId/reminder/$postId/$setReminder');
   }
 
-  Future<Response> giveRating(
-      int discussionId, int postId, bool positive, bool confirm, bool remove) async {
+  Future<Response> giveRating(int discussionId, int postId, bool positive,
+      bool confirm, bool remove) async {
     String action = positive ? 'positive' : 'negative';
     action = remove ? 'remove' : action;
     action = confirm ? 'negative_visible' : action;
-    return await dio.post('$URL/discussion/$discussionId/rating/$postId/$action', options: _options);
+    return await dio
+        .post('$URL/discussion/$discussionId/rating/$postId/$action');
   }
 
   Future<Response> logout() async {
-    return await dio.delete('$URL/profile/delete_token/${_credentials.token}', options: _options);
+    return await dio.delete('$URL/profile/delete_token/${_credentials.token}');
   }
 
   Future<Response> fetchMail({int lastId, String username}) async {
@@ -184,7 +181,7 @@ class ApiProvider implements IApiProvider {
       'from_id': lastId,
       'user': username
     };
-    return await dio.get('$URL/mail', queryParameters: params, options: _options);
+    return await dio.get('$URL/mail', queryParameters: params);
   }
 
   Future<Response> sendMail(String recipient, String message,
@@ -201,6 +198,6 @@ class ApiProvider implements IApiProvider {
               filename: attachment[ATTACHMENT.filename])
           : null
     });
-    return await dio.post(URL, data: formData, options: _options);
+    return await dio.post(URL, data: formData);
   }
 }
