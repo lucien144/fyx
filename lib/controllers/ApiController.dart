@@ -19,9 +19,8 @@ import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/model/reponses/FeedNoticesResponse.dart';
 import 'package:fyx/model/reponses/LoginResponse.dart';
 import 'package:fyx/model/reponses/MailResponse.dart';
-import 'package:fyx/model/reponses/PostMessageResponse.dart';
+import 'package:fyx/model/reponses/OkResponse.dart';
 import 'package:fyx/model/reponses/RatingResponse.dart';
-import 'package:fyx/model/reponses/SendMailResponse.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -188,12 +187,12 @@ class ApiController {
     return FeedNoticesResponse.fromJson(response.data);
   }
 
-  Future<PostMessageResponse> postDiscussionMessage(int id, String message, {Map<ATTACHMENT, dynamic> attachment, Post replyPost}) async {
+  Future<OkResponse> postDiscussionMessage(int id, String message, {Map<ATTACHMENT, dynamic> attachment, Post replyPost}) async {
     if (replyPost != null) {
       message = '{reply ${replyPost.nick}|${replyPost.id}}: $message';
     }
     var result = await provider.postDiscussionMessage(id, message, attachment: attachment);
-    return PostMessageResponse.fromJson(result.data);
+    return OkResponse.fromJson(result.data);
   }
 
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder) {
@@ -222,9 +221,9 @@ class ApiController {
     return MailResponse.fromJson(response.data);
   }
 
-  Future<SendMailResponse> sendMail(String recipient, String message, {Map<ATTACHMENT, dynamic> attachment}) async {
+  Future<OkResponse> sendMail(String recipient, String message, {Map<ATTACHMENT, dynamic> attachment}) async {
     var result = await provider.sendMail(recipient, message, attachment: attachment);
-    return SendMailResponse.fromJson(jsonDecode(result.data));
+    return OkResponse.fromJson(result.data);
   }
 
   throwAuthException(LoginResponse loginResponse, {String message: ''}) {
