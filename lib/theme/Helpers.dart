@@ -63,4 +63,15 @@ class Helpers {
     }
     return {};
   }
+
+  static String fileExtension(String filePath) {
+    final regexp = RegExp(r'\.(?<ext>[a-z]{3,})$', caseSensitive: false);
+    final matches = regexp.allMatches(filePath);
+
+    if (matches.isNotEmpty) {
+      return matches.last.namedGroup('ext');
+    }
+
+    throw Exception('Unknown file type');
+  }
 }

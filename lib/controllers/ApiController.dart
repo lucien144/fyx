@@ -193,7 +193,7 @@ class ApiController {
       message = '{reply ${replyPost.nick}|${replyPost.id}}: $message';
     }
     var result = await provider.postDiscussionMessage(id, message, attachment: attachment);
-    return PostMessageResponse.fromJson(jsonDecode(result.data));
+    return PostMessageResponse.fromJson(result.data);
   }
 
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder) {

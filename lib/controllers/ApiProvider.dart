@@ -2,7 +2,9 @@ import 'package:dio/dio.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/reponses/FileUploadResponse.dart';
 import 'package:fyx/theme/L.dart';
+import 'package:http_parser/http_parser.dart';
 
 class ApiProvider implements IApiProvider {
   final Dio dio = Dio();
@@ -31,60 +33,61 @@ class ApiProvider implements IApiProvider {
   }
 
   ApiProvider() {
-    dio.interceptors
-        .add(InterceptorsWrapper(onRequest: (RequestOptions options) async {
-      try {
-        // TODO: Perhaps, solve Czech characters too...
-        // TODO: Get rid of MainRepository()
-        var deviceName = MainRepository()
-            .deviceInfo
-            .name
-            .replaceAll(RegExp(r'[ʀ]', caseSensitive: false), 'r');
-        deviceName = deviceName.replaceAll(
-            RegExp(r'[^\w _\-]', caseSensitive: false), '_');
-        options.headers['user-agent'] =
-            'Fyx | ${MainRepository().deviceInfo.systemName} | ${MainRepository().packageInfo.version} (${MainRepository().packageInfo.buildNumber}) | $deviceName';
-      } catch (e) {
-        options.headers['user-agent'] = 'Fyx';
-      }
+    dio.interceptors.add(
+        InterceptorsWrapper(onRequest: (RequestOptions options) async {
+          try {
+            // TODO: Perhaps, solve Czech characters too...
+            // TODO: Get rid of MainRepository()
+            var deviceName = MainRepository().deviceInfo.name.replaceAll(
+                RegExp(r'[ʀ]', caseSensitive: false), 'r');
+            deviceName = deviceName.replaceAll(
+                RegExp(r'[^\w _\-]', caseSensitive: false), '_');
+            options.headers['user-agent'] =
+            'Fyx | ${MainRepository().deviceInfo
+                .systemName} | ${MainRepository().packageInfo
+                .version} (${MainRepository().packageInfo
+                .buildNumber}) | $deviceName';
+          } catch (e) {
+            options.headers['user-agent'] = 'Fyx';
+          }
 
-      print('[API] UA: ${options.headers['user-agent']}');
-      print('[API] ${options.method.toUpperCase()}: ${options.uri}');
+          print('[API] UA: ${options.headers['user-agent']}');
+          print('[API] ${options.method.toUpperCase()}: ${options.uri}');
 
-      if (_credentials != null && _credentials.isValid) {
-        print('[API] -> Bearer: ${_credentials.token}');
-        options.headers['Authorization'] = 'Bearer ${_credentials.token}';
-      }
-      return options;
-    }, onResponse: (Response response) async {
-      // All seems ok.
-      if (response.statusCode == 200) {
-        return response;
-      }
+          if (_credentials != null && _credentials.isValid) {
+            print('[API] -> Bearer: ${_credentials.token}');
+            options.headers['Authorization'] = 'Bearer ${_credentials.token}';
+          }
+          return options;
+        }, onResponse: (Response response) async {
+          // All seems ok.
+          if (response.statusCode == 200) {
+            return response;
+          }
 
-      // Malformed response
-      onError(L.API_ERROR);
-      return response;
-    }, onError: (DioError e) async {
-      // Not Authorized
-      if (e.response?.statusCode == 401) {
-        onAuthError(e.response.data['message']);
-        return e.response;
-      }
+          // Malformed response
+          onError(L.API_ERROR);
+          return response;
+        }, onError: (DioError e) async {
+          // Not Authorized
+          if (e.response?.statusCode == 401) {
+            onAuthError(e.response.data['message']);
+            return e.response;
+          }
 
-      // Other problem
-      if (e.response?.statusCode == 400) {
-        onError(e.response.data['message']);
-        return e.response;
-      }
+          // Other problem
+          if (e.response?.statusCode == 400) {
+            onError(e.response.data['message']);
+            return e.response;
+          }
 
-      // Negative rating confirmation
-      if (e.response?.statusCode == 403) {
-        return e.response;
-      }
+          // Negative rating confirmation
+          if (e.response?.statusCode == 403) {
+            return e.response;
+          }
 
-      onError(e.message);
-    }));
+          onError(e.message);
+        }));
   }
 
   Future<Response> login(String username) async {
@@ -112,8 +115,8 @@ class ApiProvider implements IApiProvider {
       'from_id': lastId,
       'user': user
     };
-    return await dio.get('$URL/discussion/$discussionId',
-        queryParameters: params);
+    return await dio.get(
+        '$URL/discussion/$discussionId', queryParameters: params);
   }
 
   Future<Response> fetchDiscussionHome(int id) async {
@@ -140,26 +143,39 @@ class ApiProvider implements IApiProvider {
 
   Future<Response> postDiscussionMessage(int id, String message,
       {Map<ATTACHMENT, dynamic> attachment}) async {
-    FormData formData = new FormData.fromMap({
-      'auth_nick': _credentials.nickname,
-      'auth_token': _credentials.token,
-      'l': 'discussion',
-      'l2': 'send',
-      'id': id,
-      'message': message,
-      'attachment': attachment is Map
-          ? MultipartFile.fromBytes(attachment[ATTACHMENT.bytes],
-              filename: attachment[ATTACHMENT.filename])
-          : null
-    });
 
-    return await dio.post(URL, data: formData);
+    // Upload image
+    if (attachment is Map) {
+      FormData fileData = new FormData.fromMap({
+        'file': MultipartFile.fromBytes(attachment[ATTACHMENT.bytes], filename: attachment[ATTACHMENT.filename], contentType: attachment[ATTACHMENT.mediatype]),
+        'file_type': 'discussion_attachment',
+        'id_specific': id
+      });
+      try {
+        var uploadResponse = await dio.put('$URL/file/upload', data: fileData);
+        var uploadData = FileUploadResponse.fromJson(uploadResponse.data);
+
+        if (uploadData.isImage && !uploadData.imageEmbed) {
+          try {
+            await dio.post('$URL/file/embed/${uploadData.id}/true');
+          } catch (error) {
+            onError('Obrázek se nepodařilo vložit s náhledem.');
+          }
+        }
+      } catch (error) {
+        onError('Obrázek se nepodařilo nahrát.');
+      }
+    }
+
+    return await dio.post('$URL/discussion/$id/send/text',
+        data: {'content': message, 'format': 'text'},
+        options: Options(contentType: Headers.formUrlEncodedContentType));
   }
 
-  Future<Response> setPostReminder(
-      int discussionId, int postId, bool setReminder) async {
-    return await dio
-        .post('$URL/discussion/$discussionId/reminder/$postId/$setReminder');
+  Future<Response> setPostReminder(int discussionId, int postId,
+      bool setReminder) async {
+    return await dio.post(
+        '$URL/discussion/$discussionId/reminder/$postId/$setReminder');
   }
 
   Future<Response> giveRating(int discussionId, int postId, bool positive,
@@ -167,8 +183,8 @@ class ApiProvider implements IApiProvider {
     String action = positive ? 'positive' : 'negative';
     action = remove ? 'remove' : action;
     action = confirm ? 'negative_visible' : action;
-    return await dio
-        .post('$URL/discussion/$discussionId/rating/$postId/$action');
+    return await dio.post(
+        '$URL/discussion/$discussionId/rating/$postId/$action');
   }
 
   Future<Response> logout() async {
@@ -193,10 +209,9 @@ class ApiProvider implements IApiProvider {
       'l2': 'send',
       'recipient': recipient,
       'message': message,
-      'attachment': attachment is Map
-          ? MultipartFile.fromBytes(attachment[ATTACHMENT.bytes],
-              filename: attachment[ATTACHMENT.filename])
-          : null
+      'attachment': attachment is Map ? MultipartFile.fromBytes(
+          attachment[ATTACHMENT.bytes],
+          filename: attachment[ATTACHMENT.filename]) : null
     });
     return await dio.post(URL, data: formData);
   }
