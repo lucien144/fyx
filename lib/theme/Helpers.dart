@@ -10,7 +10,7 @@ class Helpers {
   }
 
   static String parseTime(int time) {
-    var duration = Duration(seconds: ((DateTime.now().millisecondsSinceEpoch / 1000).floor() - time));
+    var duration = Duration(milliseconds: ((DateTime.now().millisecondsSinceEpoch).floor() - time));
     if (duration.inSeconds <= 0) {
       return L.GENERAL_NOW;
     }
