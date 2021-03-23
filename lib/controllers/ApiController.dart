@@ -182,8 +182,8 @@ class ApiController {
     return DiscussionHomeResponse.fromJson(response.data);
   }
 
-  Future<FeedNoticesResponse> loadFeedNotices({bool keepNew = false}) async {
-    var response = await provider.fetchNotices(keepNew: keepNew);
+  Future<FeedNoticesResponse> loadFeedNotices() async {
+    var response = await provider.fetchNotices();
     return FeedNoticesResponse.fromJson(response.data);
   }
 

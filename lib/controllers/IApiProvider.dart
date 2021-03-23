@@ -22,7 +22,7 @@ abstract class IApiProvider {
   Future<Response> fetchDiscussion(int id, {int lastId, String user});
   Future<Response> fetchDiscussionHome(int id);
   Future<Response> fetchMail({int lastId});
-  Future<Response> fetchNotices({bool keepNew});
+  Future<Response> fetchNotices();
   Future<Response> sendMail(String recipient, String message, {Map<ATTACHMENT, dynamic> attachment});
   Future<Response> postDiscussionMessage(int id, String message, {Map<ATTACHMENT, dynamic> attachment});
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder);

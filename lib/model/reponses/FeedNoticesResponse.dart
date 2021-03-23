@@ -2,209 +2,156 @@ import 'package:fyx/model/System.dart';
 
 class FeedNoticesResponse {
   List<NoticeItem> _data = [];
-  System _system;
   int lastVisit;
 
   List<NoticeItem> get data => _data;
 
   set data(List<NoticeItem> data) => _data = data;
 
-  System get system => _system;
-
-  set system(System system) => _system = system;
-
   FeedNoticesResponse.fromJson(Map<String, dynamic> json) {
     _data = List();
-    json['data']['items'].forEach((v) {
+    json['notifications'].forEach((v) {
       _data.add(new NoticeItem.fromJson(v));
     });
-    _system = json['system'] != null ? new System.fromJson(json['system']) : null;
-    lastVisit = int.parse(json['data']['notice_last_visit']);
+    // TODO: New API -> create context model
+    lastVisit = DateTime.parse(json['context']['user']['notifications_last_visit'] ?? '0').millisecondsSinceEpoch;
   }
 }
 
 class NoticeItem {
-  String _section;
-  int _idWu;
-  int _idKlub;
-  String _nick;
-  int _time;
-  int _wuRating;
+  int _domain_id;
+  int _id;
+  int _discussion_id;
+  String _discussion_name;
+  String _username;
+  String _post_type;
+  bool _reminder;
+  int _inserted_at;
+  int _rating;
   String _content;
   List<NoticeReplies> _replies;
   List<NoticeThumbsUp> _thumbsUp;
 
-  NoticeItem({String section, int idWu, int idKlub, String nick, int time, int wuRating, String content, List<NoticeReplies> replies, List<NoticeThumbsUp> thumbsUp}) {
-    this._section = section;
-    this._idWu = idWu;
-    this._idKlub = idKlub;
-    this._nick = nick;
-    this._time = time;
-    this._wuRating = wuRating;
-    this._content = content;
-    this._replies = replies;
-    this._thumbsUp = thumbsUp;
-  }
+  int get domainId => _domain_id;
 
-  String get section => _section;
+  int get idWu => _id;
 
-  set section(String section) => _section = section;
+  int get idKlub => _discussion_id;
 
-  int get idWu => _idWu;
+  String get discussionName => _discussion_name;
 
-  set idWu(int idWu) => _idWu = idWu;
+  String get nick => _username;
 
-  int get idKlub => _idKlub;
+  int get time => _inserted_at;
 
-  set idKlub(int idKlub) => _idKlub = idKlub;
+  int get wuRating => _rating;
 
-  String get nick => _nick;
+  bool get reminder => _reminder;
 
-  set nick(String nick) => _nick = nick;
-
-  int get time => _time;
-
-  set time(int time) => _time = time;
-
-  int get wuRating => _wuRating;
-
-  set wuRating(int wuRating) => _wuRating = wuRating;
+  String get postType => _post_type;
 
   String get content => _content;
 
-  set content(String content) => _content = content;
-
   List<NoticeReplies> get replies => _replies;
-
-  set replies(List<NoticeReplies> replies) => _replies = replies;
 
   List<NoticeThumbsUp> get thumbsUp => _thumbsUp;
 
   set thumbsUp(List<NoticeThumbsUp> thumbsUp) => _thumbsUp = thumbsUp;
 
   NoticeItem.fromJson(Map<String, dynamic> json) {
-    _section = json['section'];
-    _idWu = int.parse(json['id_wu']);
-    _idKlub = int.parse(json['id_klub']);
-    _nick = json['nick'];
-    _time = int.parse(json['time']);
-    _wuRating = int.parse(json['wu_rating']);
-    _content = json['content'];
+    _domain_id = json['data']['domain_id'] ?? 0;
+    _id = json['data']['id'] ?? 0;
+    _discussion_id = json['data']['discussion_id'] ?? 0;
+    _discussion_name = json['data']['discussion_name'];
+    _username = json['data']['username'];
+    _inserted_at = DateTime.parse(json['data']['inserted_at'] ?? '0').millisecondsSinceEpoch;;
+    _rating = json['data']['rating'] ?? 0;
+    _content = json['data']['content'];
+    _post_type = json['data']['post_type'];
+    _reminder = json['data']['reminder'];
 
     _replies = new List<NoticeReplies>();
-    if (json['replies'] != null) {
-      json['replies'].forEach((v) {
+    if (json['details']['replies'] != null) {
+      json['details']['replies'].forEach((v) {
         _replies.add(new NoticeReplies.fromJson(v));
       });
     }
 
     _thumbsUp = new List<NoticeThumbsUp>();
-    if (json['thumbs_up'] != null) {
-      json['thumbs_up'].forEach((v) {
+    if (json['details']['thumbs_up'] != null) {
+      json['details']['thumbs_up'].forEach((v) {
         _thumbsUp.add(new NoticeThumbsUp.fromJson(v));
       });
     }
   }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['section'] = this._section;
-    data['id_wu'] = this._idWu;
-    data['id_klub'] = this._idKlub;
-    data['nick'] = this._nick;
-    data['time'] = this._time;
-    data['wu_rating'] = this._wuRating;
-    data['content'] = this._content;
-    if (this._replies != null) {
-      data['replies'] = this._replies.map((v) => v.toJson()).toList();
-    }
-    if (this._thumbsUp != null) {
-      data['thumbs_up'] = this._thumbsUp.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
 }
 
 class NoticeReplies {
-  String _nick;
-  int _time;
-  int _idWu;
-  int _idKlub;
-  String _text;
+  String _username;
+  int _inserted_at;
+  int _id;
+  int _discussion_id;
+  String _content;
 
-  NoticeReplies({String nick, int time, int idWu, int idKlub, String text}) {
-    this._nick = nick;
-    this._time = time;
-    this._idWu = idWu;
-    this._idKlub = idKlub;
-    this._text = text;
+  NoticeReplies({String username, int inserted_at, int id, int discussion_id, String content}) {
+    this._username = username;
+    this._inserted_at = inserted_at;
+    this._id = id;
+    this._discussion_id = discussion_id;
+    this._content = content;
   }
 
-  String get nick => _nick;
+  String get nick => _username;
 
-  set nick(String nick) => _nick = nick;
+  int get time => _inserted_at;
 
-  int get time => _time;
+  int get idWu => _id;
 
-  set time(int time) => _time = time;
+  int get idKlub => _discussion_id;
 
-  int get idWu => _idWu;
-
-  set idWu(int idWu) => _idWu = idWu;
-
-  int get idKlub => _idKlub;
-
-  set idKlub(int idKlub) => _idKlub = idKlub;
-
-  String get text => _text;
-
-  set text(String text) => _text = text;
+  String get text => _content;
 
   NoticeReplies.fromJson(Map<String, dynamic> json) {
-    _nick = json['nick'];
-    _time = int.parse(json['time']);
-    _idWu = int.parse(json['id_wu']);
-    _idKlub = int.parse(json['id_klub']);
-    _text = json['text'];
+    this._username = json['username'];
+    this._inserted_at = DateTime.parse(json['inserted_at'] ?? '0').millisecondsSinceEpoch;
+    this._id = json['id'] ?? 0;
+    this._discussion_id = json['discussion_id'] ?? 0;
+    this._content = json['content'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['nick'] = this._nick;
-    data['time'] = this._time;
-    data['id_wu'] = this._idWu;
-    data['id_klub'] = this._idKlub;
-    data['text'] = this._text;
+    data['nick'] = this._username;
+    data['time'] = this._inserted_at;
+    data['id_wu'] = this._id;
+    data['id_klub'] = this._discussion_id;
+    data['text'] = this._content;
     return data;
   }
 }
 
 class NoticeThumbsUp {
-  String _nick;
-  int _time;
+  String _username;
+  int _inserted_at;
 
-  NoticeThumbsUp({String nick, int time}) {
-    this._nick = nick;
-    this._time = time;
+  NoticeThumbsUp({String username, int inserted_at}) {
+    this._username = username;
+    this._inserted_at = inserted_at;
   }
 
-  String get nick => _nick;
+  String get nick => _username;
 
-  set nick(String nick) => _nick = nick;
-
-  int get time => _time;
-
-  set time(int time) => _time = time;
+  int get time => _inserted_at;
 
   NoticeThumbsUp.fromJson(Map<String, dynamic> json) {
-    _nick = json['nick'];
-    _time = int.parse(json['time']);
+    this._username = json['username'];
+    this._inserted_at = DateTime.parse(json['inserted_at'] ?? '0').millisecondsSinceEpoch;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['nick'] = this._nick;
-    data['time'] = this._time;
+    data['nick'] = this._username;
+    data['time'] = this._inserted_at;
     return data;
   }
 }

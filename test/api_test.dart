@@ -135,7 +135,7 @@ class ApiMock implements IApiProvider {
   }
 
   @override
-  Future<Response> fetchNotices({bool keepNew}) {
+  Future<Response> fetchNotices() {
     // TODO: implement fetchNotices
     throw UnimplementedError();
   }

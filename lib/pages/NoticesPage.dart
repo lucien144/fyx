@@ -77,24 +77,15 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
                     style: TextStyle(fontSize: 14, color: item.wuRating > 0 ? Colors.green : (item.wuRating < 0 ? Colors.redAccent : Colors.black38)),
                   ),
                   topLeftWidget: Expanded(
-                    child: FutureBuilder(
-                        builder: (BuildContext context, AsyncSnapshot<DiscussionHomeResponse> response) {
-                          if (response.hasData) {
-                            return GestureDetector(
-                              onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(item.idKlub)),
-                              child: Text(
-                                response.data.discussion.name,
-                                overflow: TextOverflow.ellipsis,
-                                softWrap: false,
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            );
-                          } else if (response.hasError) {
-                            return Text('-');
-                          }
-                          return CupertinoActivityIndicator();
-                        },
-                        future: ApiController().getDiscussionHome(item.idKlub)),
+                    child: GestureDetector(
+                      onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(item.idKlub)),
+                      child: Text(
+                        item.discussionName,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   ),
                   bottomWidget: Column(
                     children: [
