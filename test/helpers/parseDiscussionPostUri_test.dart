@@ -2,6 +2,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fyx/theme/Helpers.dart';
 
 void main() {
+  test('Should parse OLD absolute internal deeplinks', () {
+    int id = 1234;
+    int wu = 5678;
+    var result = Helpers.parseDiscussionPostUri('https://www.nyx.cz/index.php?l=topic;id=$id;wu=$wu');
+    expect(result[INTERNAL_URI_PARSER.discussionId], id);
+    expect(result[INTERNAL_URI_PARSER.postId], wu);
+  });
+
   test('Should parse OLD internal deeplinks', () {
     int id = 1234;
     int wu = 5678;

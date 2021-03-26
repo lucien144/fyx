@@ -37,7 +37,7 @@ class Helpers {
   }
 
   static Map<INTERNAL_URI_PARSER, int> parseDiscussionPostUri(String uri) {
-    RegExp test = new RegExp(r"^(\?l=topic;id=([0-9]+);wu=([0-9]+))|(/discussion/([0-9]+)/id/([0-9]+))$");
+    RegExp test = new RegExp(r"(\?l=topic;id=([0-9]+);wu=([0-9]+))|(/discussion/([0-9]+)/id/([0-9]+))$");
     Iterable<RegExpMatch> matches = test.allMatches(uri);
     if (matches.length == 1) {
       int discussionId = int.parse(matches.elementAt(0).group(2) ?? '0');
@@ -52,7 +52,7 @@ class Helpers {
   }
 
   static Map<INTERNAL_URI_PARSER, int> parseDiscussionUri(String uri) {
-    RegExp test = new RegExp(r"^(\?l=topic;id=([0-9]+))|(/discussion/([0-9]+))$");
+    RegExp test = new RegExp(r"(\?l=topic;id=([0-9]+))|(/discussion/([0-9]+))$");
     Iterable<RegExpMatch> matches = test.allMatches(uri);
     if (matches.length == 1) {
       int discussionId = int.parse(matches.elementAt(0).group(2) ?? '0');
