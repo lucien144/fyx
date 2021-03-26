@@ -10,6 +10,13 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 
+class TutorialPageArguments {
+  final String token;
+  final String username;
+
+  TutorialPageArguments({this.token, this.username});
+}
+
 class TutorialPage extends StatefulWidget {
   @override
   _TutorialPageState createState() => _TutorialPageState();
@@ -22,13 +29,11 @@ class _TutorialPageState extends State<TutorialPage> {
   bool _loggingIn = false;
   bool _hasOpenedNyx = false;
   bool _isLastSlide = false;
-  String _token = '';
+  TutorialPageArguments _arguments;
 
   @override
   void initState() {
     super.initState();
-    buildSlider();
-
     AnalyticsProvider().setScreen('Tutorial', 'TutorialPage');
   }
 
@@ -76,7 +81,7 @@ class _TutorialPageState extends State<TutorialPage> {
                       size: 16,
                     ), onTap: () async {
                     setState(() => _hasOpenedNyx = true);
-                    const url = 'https://www.nyx.cz/index.php?l=user;l2=2;section=authorizations;n=1ba4';
+                    String url = 'https://www.nyx.cz/profile/${_arguments.username}/settings/authorizations';
                     PlatformTheme.openLink(url);
                   }))
       ];
@@ -103,10 +108,11 @@ class _TutorialPageState extends State<TutorialPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_token == '') {
-      _token = ModalRoute.of(context).settings.arguments;
+    if (_arguments == null) {
+      _arguments = ModalRoute.of(context).settings.arguments;
     }
 
+    // TODO: Refactor -> Get rid of this, performance issue, it keeps rebuilding the slider during each swipe.
     buildSlider();
 
     return CupertinoPageScaffold(
@@ -205,7 +211,7 @@ class _TutorialPageState extends State<TutorialPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
                     SelectableText(
-                      _token,
+                      _arguments.token,
                       textAlign: TextAlign.center,
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
                     ),
@@ -222,7 +228,7 @@ class _TutorialPageState extends State<TutorialPage> {
               color: T.COLOR_SECONDARY,
               size: 16,
             ), onTap: () {
-          var data = ClipboardData(text: _token);
+          var data = ClipboardData(text: _arguments.token);
           Clipboard.setData(data).then((_) {
             _slider.nextPage(duration: Duration(milliseconds: 800), curve: Curves.fastOutSlowIn);
           });
