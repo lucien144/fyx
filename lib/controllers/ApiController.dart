@@ -173,7 +173,7 @@ class ApiController {
   }
 
   Future<DiscussionResponse> loadDiscussion(int id, {int lastId, String user}) async {
-    var response = await provider.fetchDiscussion(id, lastId: lastId, user: user);
+    var response = await provider.fetchDiscussion(id, lastId: lastId == null ? null : lastId + 1, user: user);
     return DiscussionResponse.fromJson(response.data);
   }
 
