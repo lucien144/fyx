@@ -161,12 +161,13 @@ class PostHtml extends StatelessWidget {
 
         // TODO: Marketplace, ...
 
+        // TODO: New API
         // Other Nyx internal links that cannot be displayed within Fyx
-        RegExp otherDeeplinkTest = new RegExp(r"^\?l=(.*)");
+        RegExp otherDeeplinkTest = new RegExp(r"^/(.*)");
         Iterable<RegExpMatch> otherDeeplinkMatches =
             otherDeeplinkTest.allMatches(link);
         if (otherDeeplinkMatches.length == 1) {
-          link = 'https://www.nyx.cz/index.php$link';
+          link = 'https://www.nyx.cz$link';
         }
 
         var opened = await PlatformTheme.openLink(link);

@@ -45,5 +45,5 @@ class Mail {
 
   int get id => _id_mail;
 
-  String get link => 'https://www.nyx.cz/index.php?l=mail;wu=${this.id}';
+  String get link => 'https://www.nyx.cz/mail/id/${this.id}';
 }
