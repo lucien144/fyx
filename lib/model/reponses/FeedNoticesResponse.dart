@@ -1,19 +1,22 @@
-import 'package:fyx/model/System.dart';
+import 'package:fyx/model/ResponseContext.dart';
 
 class FeedNoticesResponse {
   List<NoticeItem> _data = [];
   int lastVisit;
+  ResponseContext _context;
 
   List<NoticeItem> get data => _data;
 
   set data(List<NoticeItem> data) => _data = data;
+
+  ResponseContext get context => _context;
 
   FeedNoticesResponse.fromJson(Map<String, dynamic> json) {
     _data = List();
     json['notifications'].forEach((v) {
       _data.add(new NoticeItem.fromJson(v));
     });
-    // TODO: New API -> create context model
+    _context = ResponseContext.fromJson(json['context']);
     lastVisit = DateTime.parse(json['context']['user']['notifications_last_visit'] ?? '0').millisecondsSinceEpoch;
   }
 }

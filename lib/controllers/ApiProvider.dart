@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/Credentials.dart';
@@ -16,7 +18,7 @@ class ApiProvider implements IApiProvider {
 
   TOnError onError;
   TOnAuthError onAuthError;
-  TOnSystemData onSystemData;
+  TOnContextData onContextData;
 
   Credentials getCredentials() {
     if (_credentials != null && _credentials.isValid) {
@@ -59,6 +61,11 @@ class ApiProvider implements IApiProvider {
       }
       return options;
     }, onResponse: (Response response) async {
+
+      if (response.data.containsKey('context')) {
+        onContextData(response.data['context']);
+      }
+
       // All seems ok.
       if (response.statusCode == 200) {
         return response;

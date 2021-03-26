@@ -55,7 +55,7 @@ class ApiMock implements IApiProvider {
   }
 
   @override
-  var onSystemData;
+  var onContextData;
 
   @override
   Future<Response> fetchDiscussion(int id, {int lastId, String user}) {

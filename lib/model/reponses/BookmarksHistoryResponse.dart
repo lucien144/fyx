@@ -1,20 +1,19 @@
-import 'package:fyx/model/System.dart';
+import 'package:fyx/model/ResponseContext.dart';
 
 class BookmarksHistoryResponse {
   List<dynamic> _discussions = [];
   List<dynamic> _categories = [];
-  System _system;
+  ResponseContext _context;
 
   BookmarksHistoryResponse.fromJson(Map<String, dynamic> json) {
     if (json.containsKey('discussions') && json['discussions'] is List) {
       _discussions = json['discussions'];
       _categories = json['categories'];
-      // TODO: New API
-      //_system = System.fromJson(json['system']);
+      _context = ResponseContext.fromJson(json['context']);
     }
   }
 
-  System get system => _system;
+  ResponseContext get context => _context;
 
   List<dynamic> get discussions => _discussions;
 

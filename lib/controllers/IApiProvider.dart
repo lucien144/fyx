@@ -3,14 +3,14 @@ import 'package:fyx/model/Credentials.dart';
 
 typedef TOnError = void Function(String);
 typedef TOnAuthError = void Function(String);
-typedef TOnSystemData = void Function(Map<String, dynamic>);
+typedef TOnContextData = void Function(Map<String, dynamic>);
 
 enum ATTACHMENT { bytes, filename, mime, extension, mediatype }
 
 abstract class IApiProvider {
   TOnError onError;
   TOnAuthError onAuthError;
-  TOnSystemData onSystemData;
+  TOnContextData onContextData;
 
   Credentials getCredentials();
   Credentials setCredentials(Credentials val);

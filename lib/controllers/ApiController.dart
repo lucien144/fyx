@@ -10,7 +10,7 @@ import 'package:fyx/exceptions/AuthException.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
-import 'package:fyx/model/System.dart';
+import 'package:fyx/model/ResponseContext.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/model/reponses/BookmarksAllResponse.dart';
 import 'package:fyx/model/reponses/BookmarksHistoryResponse.dart';
@@ -63,14 +63,14 @@ class ApiController {
       }
     };
 
-    provider.onSystemData = (data) {
+    provider.onContextData = (data) {
       if (_context == null) {
         return;
       }
 
-      var system = System.fromJson(data);
-      Provider.of<NotificationsModel>(_context, listen: false).setNewMails(system.unreadPost);
-      Provider.of<NotificationsModel>(_context, listen: false).setNewNotices(system.noticeCount);
+      ResponseContext responseContext = ResponseContext.fromJson(data);
+      Provider.of<NotificationsModel>(_context, listen: false).setNewMails(responseContext.user.mailUnread);
+      Provider.of<NotificationsModel>(_context, listen: false).setNewNotices(responseContext.user.notificationsUnread);
     };
   }
 
