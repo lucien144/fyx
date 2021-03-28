@@ -1,12 +1,8 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
-import 'package:fyx/model/reponses/FileUploadResponse.dart';
 import 'package:fyx/theme/L.dart';
-import 'package:http_parser/http_parser.dart';
 
 class ApiProvider implements IApiProvider {
   final Dio dio = Dio();
@@ -35,17 +31,12 @@ class ApiProvider implements IApiProvider {
   }
 
   ApiProvider() {
-    dio.interceptors
-        .add(InterceptorsWrapper(onRequest: (RequestOptions options) async {
+    dio.interceptors.add(InterceptorsWrapper(onRequest: (RequestOptions options) async {
       try {
         // TODO: Perhaps, solve Czech characters too...
         // TODO: Get rid of MainRepository()
-        var deviceName = MainRepository()
-            .deviceInfo
-            .name
-            .replaceAll(RegExp(r'[ʀ]', caseSensitive: false), 'r');
-        deviceName = deviceName.replaceAll(
-            RegExp(r'[^\w _\-]', caseSensitive: false), '_');
+        var deviceName = MainRepository().deviceInfo.name.replaceAll(RegExp(r'[ʀ]', caseSensitive: false), 'r');
+        deviceName = deviceName.replaceAll(RegExp(r'[^\w _\-]', caseSensitive: false), '_');
         options.headers['user-agent'] =
             'Fyx | ${MainRepository().deviceInfo.systemName} | ${MainRepository().packageInfo.version} (${MainRepository().packageInfo.buildNumber}) | $deviceName';
       } catch (e) {
@@ -61,7 +52,6 @@ class ApiProvider implements IApiProvider {
       }
       return options;
     }, onResponse: (Response response) async {
-
       if (response.data.containsKey('context')) {
         onContextData(response.data['context']);
       }
@@ -102,8 +92,7 @@ class ApiProvider implements IApiProvider {
 
   Future<Response> registerFcmToken(String token) async {
     String client = 'fyx';
-    return await dio.post(
-        '$URL/register_for_notifications/${_credentials.token}/$client/$token');
+    return await dio.post('$URL/register_for_notifications/${_credentials.token}/$client/$token');
   }
 
   Future<Response> fetchBookmarks() async {
@@ -114,25 +103,13 @@ class ApiProvider implements IApiProvider {
     return await dio.get('$URL/bookmarks/history/more');
   }
 
-  Future<Response> fetchDiscussion(int discussionId,
-      {int lastId, String user}) async {
-    Map<String, dynamic> params = {
-      'order': lastId == null ? 'newest' : 'older_than',
-      'from_id': lastId,
-      'user': user
-    };
-    return await dio.get('$URL/discussion/$discussionId',
-        queryParameters: params);
+  Future<Response> fetchDiscussion(int discussionId, {int lastId, String user}) async {
+    Map<String, dynamic> params = {'order': lastId == null ? 'newest' : 'older_than', 'from_id': lastId, 'user': user};
+    return await dio.get('$URL/discussion/$discussionId', queryParameters: params);
   }
 
   Future<Response> fetchDiscussionHome(int id) async {
-    FormData formData = new FormData.fromMap({
-      'auth_nick': _credentials.nickname,
-      'auth_token': _credentials.token,
-      'l': 'discussion',
-      'l2': 'home',
-      'id_klub': id
-    });
+    FormData formData = new FormData.fromMap({'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'discussion', 'l2': 'home', 'id_klub': id});
     return await dio.post(URL, data: formData);
   }
 
@@ -140,8 +117,7 @@ class ApiProvider implements IApiProvider {
     return await dio.get('$URL/notifications');
   }
 
-  Future<Response> postDiscussionMessage(int postId, String message,
-      {List<Map<ATTACHMENT, dynamic>> attachments}) async {
+  Future<Response> postDiscussionMessage(int postId, String message, {List<Map<ATTACHMENT, dynamic>> attachments}) async {
     // Upload image
     if (attachments is List) {
       try {
@@ -151,24 +127,18 @@ class ApiProvider implements IApiProvider {
       }
     }
 
-    return await dio.post('$URL/discussion/$postId/send/text',
-        data: {'content': message, 'format': 'text'},
-        options: Options(contentType: Headers.formUrlEncodedContentType));
+    return await dio.post('$URL/discussion/$postId/send/text', data: {'content': message, 'format': 'text'}, options: Options(contentType: Headers.formUrlEncodedContentType));
   }
 
-  Future<Response> setPostReminder(
-      int discussionId, int postId, bool setReminder) async {
-    return await dio
-        .post('$URL/discussion/$discussionId/reminder/$postId/$setReminder');
+  Future<Response> setPostReminder(int discussionId, int postId, bool setReminder) async {
+    return await dio.post('$URL/discussion/$discussionId/reminder/$postId/$setReminder');
   }
 
-  Future<Response> giveRating(int discussionId, int postId, bool positive,
-      bool confirm, bool remove) async {
+  Future<Response> giveRating(int discussionId, int postId, bool positive, bool confirm, bool remove) async {
     String action = positive ? 'positive' : 'negative';
     action = remove ? 'remove' : action;
     action = confirm ? 'negative_visible' : action;
-    return await dio
-        .post('$URL/discussion/$discussionId/rating/$postId/$action');
+    return await dio.post('$URL/discussion/$discussionId/rating/$postId/$action');
   }
 
   Future<Response> logout() async {
@@ -176,33 +146,24 @@ class ApiProvider implements IApiProvider {
   }
 
   Future<Response> fetchMail({int lastId, String username}) async {
-    Map<String, dynamic> params = {
-      'order': lastId == null ? 'newest' : 'older_than',
-      'from_id': lastId,
-      'user': username
-    };
+    Map<String, dynamic> params = {'order': lastId == null ? 'newest' : 'older_than', 'from_id': lastId, 'user': username};
     return await dio.get('$URL/mail', queryParameters: params);
   }
 
-  Future<Response> sendMail(String recipient, String message,
-      {List<Map<ATTACHMENT, dynamic>> attachments}) async {
+  Future<Response> sendMail(String recipient, String message, {List<Map<ATTACHMENT, dynamic>> attachments}) async {
     // Upload image
     if (attachments is List) {
       await uploadFile(attachments);
     }
 
-    return await dio.post('$URL/mail/send',
-        data: {'recipient': recipient, 'message': message, 'format': 'text'},
-        options: Options(contentType: Headers.formUrlEncodedContentType));
+    return await dio.post('$URL/mail/send', data: {'recipient': recipient, 'message': message, 'format': 'text'}, options: Options(contentType: Headers.formUrlEncodedContentType));
   }
 
   Future uploadFile(List<Map<ATTACHMENT, dynamic>> attachments, {int id: 0}) async {
     List<Future> uploads = [];
     for (Map<ATTACHMENT, dynamic> attachment in attachments) {
       FormData fileData = new FormData.fromMap({
-        'file': MultipartFile.fromBytes(attachment[ATTACHMENT.bytes],
-            filename: attachment[ATTACHMENT.filename],
-            contentType: attachment[ATTACHMENT.mediatype]),
+        'file': MultipartFile.fromBytes(attachment[ATTACHMENT.bytes], filename: attachment[ATTACHMENT.filename], contentType: attachment[ATTACHMENT.mediatype]),
         'file_type': id == 0 ? 'mail_attachment' : 'discussion_attachment',
         'id_specific': id
       });
