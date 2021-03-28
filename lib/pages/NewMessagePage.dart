@@ -19,7 +19,7 @@ import 'package:image/image.dart' as img;
 enum ISOLATE_ARG { images, width, quality }
 
 typedef F = Future<bool> Function(
-    String inputField, String message, Map<ATTACHMENT, dynamic> attachment);
+    String inputField, String message, List<Map<ATTACHMENT, dynamic>> attachment);
 
 class NewMessageSettings {
   String inputFieldPlaceholder;
@@ -74,7 +74,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
 
       final list = await file.readAsBytes();
       final mime = lookupMimeType(file.path);
-      setState(() => _images.insert(0, {
+      setState(() => _images.add({
             ATTACHMENT.bytes: list,
             ATTACHMENT.filename: '${basename(file.path)}.$ext',
             ATTACHMENT.mime: mime,
@@ -188,7 +188,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                                         ? _recipientController.text
                                         : null,
                                     _messageController.text,
-                                    _images.length > 0 ? _images[0] : null);
+                                    _images.length > 0 ? _images : null);
                                 if (response) {
                                   if (_settings.onClose is Function) {
                                     _settings.onClose();
@@ -269,19 +269,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                           CupertinoActivityIndicator()
                         else
                           Row(
-                            // children: _images.map((List<int> file) => _buildPreviewWidget(file)).toList(),
-                            children: _images.length > 0
-                                ? [
-                                    _buildPreviewWidget(
-                                        _images[0][ATTACHMENT.bytes]),
-                                    CupertinoButton(
-                                      padding: EdgeInsets.all(0),
-                                      child: Text('Smazat'),
-                                      onPressed: () =>
-                                          setState(() => _images.clear()),
-                                    )
-                                  ]
-                                : [],
+                            children: _images.map((Map<ATTACHMENT, dynamic> image) => _buildPreviewWidget(image[ATTACHMENT.bytes])).toList(),
                           ),
                         Expanded(child: Container()),
                         CupertinoButton(
@@ -400,26 +388,6 @@ class _NewMessagePageState extends State<NewMessagePage> {
                       ],
                     ),
                   ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        width: 12,
-                      ),
-                      Icon(
-                        Icons.info_outline,
-                        size: 14,
-                        color: Colors.black45,
-                      ),
-                      SizedBox(width: 4),
-                      Text('Kvůli omezením Nyxu lze nahrát pouze 1 obrázek.',
-                          style: TextStyle(
-                              fontSize: 13,
-                              fontStyle: FontStyle.italic,
-                              color: Colors.black45)),
-                    ],
-                  ),
                 ],
               ),
               SizedBox(height: 16),
@@ -434,20 +402,23 @@ class _NewMessagePageState extends State<NewMessagePage> {
   Widget _buildPreviewWidget(List<int> bytes) {
     return Padding(
       padding: const EdgeInsets.only(right: 8),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: Image(
-          image: MemoryImage(bytes),
-          width: 35,
-          height: 35,
-          fit: BoxFit.cover,
-          frameBuilder: (BuildContext context, Widget child, int frame,
-              bool wasSynchronouslyLoaded) {
-            if (frame == null) {
-              return CupertinoActivityIndicator();
-            }
-            return child;
-          },
+      child: GestureDetector(
+        onTap: () => setState(() => _images.removeWhere((image) => image[ATTACHMENT.bytes] == bytes)),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Image(
+            image: MemoryImage(bytes),
+            width: 35,
+            height: 35,
+            fit: BoxFit.cover,
+            frameBuilder: (BuildContext context, Widget child, int frame,
+                bool wasSynchronouslyLoaded) {
+              if (frame == null) {
+                return CupertinoActivityIndicator();
+              }
+              return child;
+            },
+          ),
         ),
       ),
     );

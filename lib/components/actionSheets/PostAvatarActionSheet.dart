@@ -29,8 +29,8 @@ class PostAvatarActionSheet extends StatelessWidget {
                 arguments: NewMessageSettings(
                     hasInputField: true,
                     inputFieldPlaceholder: this.user,
-                    onSubmit: (String inputField, String message, Map<ATTACHMENT, dynamic> attachment) async {
-                      var response = await ApiController().sendMail(inputField, message, attachment: attachment);
+                    onSubmit: (String inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                      var response = await ApiController().sendMail(inputField, message, attachments: attachments);
                       return response.isOk;
                     }));
           },

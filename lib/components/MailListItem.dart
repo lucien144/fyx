@@ -66,8 +66,8 @@ class _MailListItemState extends State<MailListItem> {
                 ),
                 onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
                     arguments: NewMessageSettings(
-                        onSubmit: (String inputField, String message, Map<ATTACHMENT, dynamic> attachment) async {
-                          var response = await ApiController().sendMail(inputField, message, attachment: attachment);
+                        onSubmit: (String inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                          var response = await ApiController().sendMail(inputField, message, attachments: attachments);
                           return response.isOk;
                         },
                         inputFieldPlaceholder: widget.mail.participant,

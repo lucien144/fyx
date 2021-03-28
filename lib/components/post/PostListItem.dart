@@ -81,8 +81,8 @@ class _PostListItemState extends State<PostListItem> {
                               isPreview: true,
                             ),
                             onClose: this.widget.onUpdate,
-                            onSubmit: (String inputField, String message, Map<ATTACHMENT, dynamic> attachment) async {
-                              var result = await ApiController().postDiscussionMessage(_post.idKlub, message, attachment: attachment, replyPost: _post);
+                            onSubmit: (String inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                              var result = await ApiController().postDiscussionMessage(_post.idKlub, message, attachments: attachments, replyPost: _post);
                               return result.isOk;
                             })),
                     child: Row(

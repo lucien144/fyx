@@ -187,11 +187,11 @@ class ApiController {
     return FeedNoticesResponse.fromJson(response.data);
   }
 
-  Future<OkResponse> postDiscussionMessage(int id, String message, {Map<ATTACHMENT, dynamic> attachment, Post replyPost}) async {
+  Future<OkResponse> postDiscussionMessage(int id, String message, {List<Map<ATTACHMENT, dynamic>> attachments, Post replyPost}) async {
     if (replyPost != null) {
       message = '{reply ${replyPost.nick}|${replyPost.id}}: $message';
     }
-    var result = await provider.postDiscussionMessage(id, message, attachment: attachment);
+    var result = await provider.postDiscussionMessage(id, message, attachments: attachments);
     return OkResponse.fromJson(result.data);
   }
 
@@ -221,8 +221,8 @@ class ApiController {
     return MailResponse.fromJson(response.data);
   }
 
-  Future<OkResponse> sendMail(String recipient, String message, {Map<ATTACHMENT, dynamic> attachment}) async {
-    var result = await provider.sendMail(recipient, message, attachment: attachment);
+  Future<OkResponse> sendMail(String recipient, String message, {List<Map<ATTACHMENT, dynamic>> attachments}) async {
+    var result = await provider.sendMail(recipient, message, attachments: attachments);
     return OkResponse.fromJson(result.data);
   }
 

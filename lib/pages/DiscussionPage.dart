@@ -206,8 +206,8 @@ class _DiscussionPageState extends State<DiscussionPage> with RouteAware, Widget
                 onPressed: () => Navigator.of(context).pushNamed('/new-message',
                     arguments: NewMessageSettings(
                         onClose: this.refresh,
-                        onSubmit: (String inputField, String message, Map<ATTACHMENT, dynamic> attachment) async {
-                          var result = await ApiController().postDiscussionMessage(pageArguments.discussionId, message, attachment: attachment);
+                        onSubmit: (String inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                          var result = await ApiController().postDiscussionMessage(pageArguments.discussionId, message, attachments: attachments);
                           return result.isOk;
                         })),
               ),

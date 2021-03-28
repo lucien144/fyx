@@ -141,10 +141,14 @@ class ApiProvider implements IApiProvider {
   }
 
   Future<Response> postDiscussionMessage(int postId, String message,
-      {Map<ATTACHMENT, dynamic> attachment}) async {
+      {List<Map<ATTACHMENT, dynamic>> attachments}) async {
     // Upload image
-    if (attachment is Map) {
-      uploadFile(attachment, id: postId);
+    if (attachments is List) {
+      try {
+        await uploadFile(attachments, id: postId);
+      } catch (error) {
+        onError('👎 Nějakteré z obrázků se nepodařilo nahrát.');
+      }
     }
 
     return await dio.post('$URL/discussion/$postId/send/text',
@@ -181,10 +185,10 @@ class ApiProvider implements IApiProvider {
   }
 
   Future<Response> sendMail(String recipient, String message,
-      {Map<ATTACHMENT, dynamic> attachment}) async {
+      {List<Map<ATTACHMENT, dynamic>> attachments}) async {
     // Upload image
-    if (attachment is Map) {
-      uploadFile(attachment);
+    if (attachments is List) {
+      await uploadFile(attachments);
     }
 
     return await dio.post('$URL/mail/send',
@@ -192,27 +196,18 @@ class ApiProvider implements IApiProvider {
         options: Options(contentType: Headers.formUrlEncodedContentType));
   }
 
-  void uploadFile(Map<ATTACHMENT, dynamic> attachment, {int id: 0}) async {
-    FormData fileData = new FormData.fromMap({
-      'file': MultipartFile.fromBytes(attachment[ATTACHMENT.bytes],
-          filename: attachment[ATTACHMENT.filename],
-          contentType: attachment[ATTACHMENT.mediatype]),
-      'file_type': id == 0 ? 'mail_attachment' : 'discussion_attachment',
-      'id_specific': id
-    });
-    try {
-      var uploadResponse = await dio.put('$URL/file/upload', data: fileData);
-      var uploadData = FileUploadResponse.fromJson(uploadResponse.data);
-
-      if (uploadData.isImage && !uploadData.imageEmbed) {
-        try {
-          await dio.post('$URL/file/embed/${uploadData.id}/true');
-        } catch (error) {
-          onError('Obrázek se nepodařilo vložit s náhledem.');
-        }
-      }
-    } catch (error) {
-      onError('Obrázek se nepodařilo nahrát.');
+  Future uploadFile(List<Map<ATTACHMENT, dynamic>> attachments, {int id: 0}) async {
+    List<Future> uploads = [];
+    for (Map<ATTACHMENT, dynamic> attachment in attachments) {
+      FormData fileData = new FormData.fromMap({
+        'file': MultipartFile.fromBytes(attachment[ATTACHMENT.bytes],
+            filename: attachment[ATTACHMENT.filename],
+            contentType: attachment[ATTACHMENT.mediatype]),
+        'file_type': id == 0 ? 'mail_attachment' : 'discussion_attachment',
+        'id_specific': id
+      });
+      uploads.add(dio.put('$URL/file/upload', data: fileData));
     }
+    return Future.wait(uploads);
   }
 }
