@@ -117,16 +117,7 @@ class ApiProvider implements IApiProvider {
     return await dio.get('$URL/notifications');
   }
 
-  Future<Response> postDiscussionMessage(int postId, String message, {List<Map<ATTACHMENT, dynamic>> attachments}) async {
-    // Upload image
-    if (attachments is List) {
-      try {
-        await uploadFile(attachments, id: postId);
-      } catch (error) {
-        onError('👎 Nějakteré z obrázků se nepodařilo nahrát.');
-      }
-    }
-
+  Future<Response> postDiscussionMessage(int postId, String message) async {
     return await dio.post('$URL/discussion/$postId/send/text', data: {'content': message, 'format': 'text'}, options: Options(contentType: Headers.formUrlEncodedContentType));
   }
 
@@ -150,16 +141,23 @@ class ApiProvider implements IApiProvider {
     return await dio.get('$URL/mail', queryParameters: params);
   }
 
-  Future<Response> sendMail(String recipient, String message, {List<Map<ATTACHMENT, dynamic>> attachments}) async {
-    // Upload image
-    if (attachments is List) {
-      await uploadFile(attachments);
-    }
-
+  Future<Response> sendMail(String recipient, String message) async {
     return await dio.post('$URL/mail/send', data: {'recipient': recipient, 'message': message, 'format': 'text'}, options: Options(contentType: Headers.formUrlEncodedContentType));
   }
 
-  Future uploadFile(List<Map<ATTACHMENT, dynamic>> attachments, {int id: 0}) async {
+  Future<Response> deleteFile(int id) async {
+    return await dio.delete('$URL/file/delete/$id');
+  }
+
+  Future<Response> fetchMailWaitingFiles() async {
+    return await dio.get('$URL/mail/waiting_files');
+  }
+
+  Future<Response> fetchDiscussionWaitingFiles(int id) async {
+    return await dio.get('$URL/discussion/$id/waiting_files');
+  }
+
+  Future<List> uploadFile(List<Map<ATTACHMENT, dynamic>> attachments, {int id: 0}) async {
     List<Future> uploads = [];
     for (Map<ATTACHMENT, dynamic> attachment in attachments) {
       FormData fileData = new FormData.fromMap({

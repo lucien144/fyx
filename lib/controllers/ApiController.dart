@@ -17,10 +17,12 @@ import 'package:fyx/model/reponses/BookmarksHistoryResponse.dart';
 import 'package:fyx/model/reponses/DiscussionHomeResponse.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/model/reponses/FeedNoticesResponse.dart';
+import 'package:fyx/model/reponses/FileUploadResponse.dart';
 import 'package:fyx/model/reponses/LoginResponse.dart';
 import 'package:fyx/model/reponses/MailResponse.dart';
 import 'package:fyx/model/reponses/OkResponse.dart';
 import 'package:fyx/model/reponses/RatingResponse.dart';
+import 'package:fyx/model/reponses/WaitingFilesResponse.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -58,9 +60,7 @@ class ApiController {
     };
 
     provider.onError = (message) {
-      if (['access denied'].indexOf(message.toLowerCase()) == -1) {
-        PlatformTheme.error(message);
-      }
+      PlatformTheme.error(message);
     };
 
     provider.onContextData = (data) {
@@ -138,7 +138,7 @@ class ApiController {
           print('registerFcmToken');
           this.setCredentials(creds.copyWith(fcmToken: token));
         } catch (error) {
-          debugPrint(error);
+          debugPrint(error.toString());
           MainRepository().sentry.captureException(exception: error);
         }
       }
@@ -156,7 +156,7 @@ class ApiController {
         await provider.registerFcmToken(token);
         this.setCredentials(creds.copyWith(fcmToken: token));
       } catch (error) {
-        debugPrint(error);
+        debugPrint(error.toString());
         MainRepository().sentry.captureException(exception: error);
       }
     });
@@ -188,10 +188,28 @@ class ApiController {
   }
 
   Future<OkResponse> postDiscussionMessage(int id, String message, {List<Map<ATTACHMENT, dynamic>> attachments, Post replyPost}) async {
+    if (attachments is List) {
+      try {
+        WaitingFilesResponse waitingFilesResponse = await this.fetchDiscussionWaitingFiles(id);
+        await this.deleteAllWaitingFiles(waitingFilesResponse.files);
+      } catch (error) {
+        debugPrint(error.toString());
+        MainRepository().sentry.captureException(exception: error);
+        // TODO: Notify user?
+      }
+
+      try {
+        await provider.uploadFile(attachments, id: id);
+      } catch (error) {
+        provider.onError('👎 Nějakteré z obrázků se nepodařilo nahrát.');
+      }
+    }
+
     if (replyPost != null) {
       message = '{reply ${replyPost.nick}|${replyPost.id}}: $message';
     }
-    var result = await provider.postDiscussionMessage(id, message, attachments: attachments);
+
+    var result = await provider.postDiscussionMessage(id, message);
     return OkResponse.fromJson(result.data);
   }
 
@@ -203,10 +221,7 @@ class ApiController {
     Response response = await provider.giveRating(discussionId, postId, positive, confirm, remove);
     var data = response.data;
     return RatingResponse(
-        isGiven: data['error'] ?? true,
-        needsConfirmation: data['code'] == 'NeedsConfirmation',
-        currentRating: data['rating'] ?? 0,
-        myRating: data['my_rating'] ?? 'none');
+        isGiven: data['error'] ?? true, needsConfirmation: data['code'] == 'NeedsConfirmation', currentRating: data['rating'] ?? 0, myRating: data['my_rating'] ?? 'none');
   }
 
   void logout({bool removeAuthrorization = true}) {
@@ -221,9 +236,44 @@ class ApiController {
     return MailResponse.fromJson(response.data);
   }
 
+  Future<List> deleteAllWaitingFiles(List<FileUploadResponse> files) async {
+    List<Future> deletes = [];
+    for (FileUploadResponse file in files) {
+      deletes.add(provider.deleteFile(file.id));
+    }
+    return await Future.wait(deletes);
+  }
+
   Future<OkResponse> sendMail(String recipient, String message, {List<Map<ATTACHMENT, dynamic>> attachments}) async {
-    var result = await provider.sendMail(recipient, message, attachments: attachments);
+    // Upload image
+    if (attachments is List) {
+      try {
+        WaitingFilesResponse waitingFilesResponse = await this.fetchMailWaitingFiles();
+        await this.deleteAllWaitingFiles(waitingFilesResponse.files);
+      } catch (error) {
+        debugPrint(error.toString());
+        MainRepository().sentry.captureException(exception: error);
+        // TODO: Notify user?
+      }
+      try {
+        await provider.uploadFile(attachments);
+      } catch (error) {
+        provider.onError('👎 Nějakteré z obrázků se nepodařilo nahrát.');
+      }
+    }
+
+    var result = await provider.sendMail(recipient, message);
     return OkResponse.fromJson(result.data);
+  }
+
+  Future<WaitingFilesResponse> fetchDiscussionWaitingFiles(int id) async {
+    Response response = await provider.fetchDiscussionWaitingFiles(id);
+    return WaitingFilesResponse.fromJson(response.data);
+  }
+
+  Future<WaitingFilesResponse> fetchMailWaitingFiles() async {
+    Response response = await provider.fetchMailWaitingFiles();
+    return WaitingFilesResponse.fromJson(response.data);
   }
 
   throwAuthException(LoginResponse loginResponse, {String message: ''}) {
