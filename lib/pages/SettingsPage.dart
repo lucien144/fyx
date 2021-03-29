@@ -126,12 +126,12 @@ class _SettingsPageState extends State<SettingsPage> {
             AnalyticsProvider().logEvent('resetBlockedContent');
           }),
           const CSHeader('Informace'),
-          CSButton(
-            CSButtonType.DEFAULT,
-            L.BACKERS,
-            () => Navigator.of(context).pushNamed('/settings/info', arguments: InfoPageSettings(L.BACKERS, 'https://raw.githubusercontent.com/lucien144/fyx/develop/BACKERS.md')),
-            style: patronsStyle,
-          ),
+          // CSButton(
+          //   CSButtonType.DEFAULT,
+          //   L.BACKERS,
+          //   () => Navigator.of(context).pushNamed('/settings/info', arguments: InfoPageSettings(L.BACKERS, 'https://raw.githubusercontent.com/lucien144/fyx/develop/BACKERS.md')),
+          //   style: patronsStyle,
+          // ),
           CSButton(CSButtonType.DEFAULT, L.ABOUT,
               () => Navigator.of(context).pushNamed('/settings/info', arguments: InfoPageSettings(L.ABOUT, 'https://raw.githubusercontent.com/lucien144/fyx/develop/ABOUT.md')),
               style: aboutStyle),
