@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/PlatformTheme.dart';
-import 'package:fyx/components/ListItemWithCategory.dart';
-import 'package:fyx/model/Category.dart';
 
-class ListHeader extends ListItemWithCategory {
-  final Category header;
+class ListHeader extends StatelessWidget {
+  final String label;
   final Function onTap;
 
-  ListHeader(this.header, {this.onTap});
-
-  @override
-  int get category => header.idCat;
+  ListHeader(this.label, {this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +17,7 @@ class ListHeader extends ListItemWithCategory {
         padding: EdgeInsets.all(8),
         alignment: Alignment.centerLeft,
         child: Text(
-          header.jmeno,
+          label,
           style: const TextStyle(color: Colors.white),
         ),
       ),

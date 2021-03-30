@@ -6,7 +6,7 @@ class Active {
   String _location_url;
 
   Active.fromJson(Map<String, dynamic> json) {
-    _time = int.parse(json['time']);
+    _time = DateTime.parse(json['last_activity'] ?? '0').millisecondsSinceEpoch;
     _location = json['location'];
     _location_url = json['location_url'];
   }

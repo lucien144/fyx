@@ -105,15 +105,16 @@ class Content {
       var youtubes = document.querySelectorAll('div[data-embed-type="youtube"]');
       youtubes.forEach((el) {
         // If the video does not have preview, it's invalid Nyx attachment, therefore we skip it and handle it as a normal post.
-        if (el.querySelector('img') == null) {
+        Element img = el.querySelector('img');
+        if (img == null) {
           return;
         }
 
         var video = Video(
             id: el.attributes['data-embed-value'],
             type: Video.findVideoType(el.attributes['data-embed-type']),
-            image: el.querySelector('a').attributes['href'],
-            thumb: el.querySelector('img').attributes['src']);
+            image: img.attributes['src'],
+            thumb: img.attributes['data-thumb']);
 
         // Remove the video element from the content.
         this._videos.add(video);
@@ -138,13 +139,13 @@ class Content {
     RegExp reg = RegExp(r'^((?!<img).)*(((<a([^>]*?)>)?(\s*)<img([^>]*?)>(\s*)(<\/\s*a\s*>)?(\s*(\s*<\s*br\s*\/?\s*>\s*)*\s*))*)$', caseSensitive: false, dotAll: true);
     _consecutiveImages = reg.hasMatch(_body);
 
-    document.querySelectorAll('a > img[src]').forEach((Element el) {
-      var thumb = el.attributes['src'];
-      var image = el.parent.attributes['href'];
+    document.querySelectorAll('img[src]').forEach((Element el) {
+      var image = el.attributes['src'];
+      var thumb = el.attributes['data-thumb'];
       _images.add(Image(image, thumb));
 
       if (_consecutiveImages) {
-        el.parent.remove();
+        el.remove();
       }
     });
     _body = document.body.innerHtml;
@@ -152,7 +153,7 @@ class Content {
 
   String _tagAllImageLinks(String source) {
     Document document = parse(source);
-    document.querySelectorAll('a > img').forEach((Element el) {
+    document.querySelectorAll('img').forEach((Element el) {
       el.parent.classes.add('image-link');
     });
     return document.body.innerHtml;
