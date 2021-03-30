@@ -1,5 +1,6 @@
 // ignore_for_file: non_constant_identifier_names
 import 'package:fyx/model/post/Content.dart';
+import 'package:fyx/model/post/PostContentRaw.dart';
 import 'package:fyx/theme/Helpers.dart';
 
 class Post {
@@ -17,6 +18,7 @@ class Post {
   bool _canBeReminded;
 
   Content _content;
+  PostContentRaw _contentRaw;
 
   Post.fromJson(Map<String, dynamic> json, this.idKlub, { this.isCompact }) {
     this._id_wu = json['id'];
@@ -30,6 +32,10 @@ class Post {
     this._canBeRated = json['can_be_rated'] ?? false;
     this._canBeDeleted = json['can_be_deleted'] ?? false;
     this._canBeReminded = json['can_be_reminded'] ?? false;
+
+    if (json['content_raw'] != null) {
+      this._contentRaw = PostContentRaw.fromJson(json['content_raw']);
+    }
   }
 
   Content get content => _content;
