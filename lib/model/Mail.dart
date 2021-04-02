@@ -10,34 +10,34 @@ class Mail {
   int _id_mail;
   String _other_nick;
   int _time;
-  String _direction;
+  bool _direction;
   Content _content;
-  String _message_status;
-  String _new;
+  MailStatus _message_status;
+  bool _new;
   Map<String, dynamic> _active;
 
   Mail.fromJson(Map<String, dynamic> json, {this.isCompact}) {
-    _id_mail = int.parse(json['id_mail']);
-    _other_nick = json['other_nick'];
-    _time = int.parse(json['time']);
-    _direction = json['direction'];
+    _id_mail = json['id'];
+    _other_nick = json['username'];
+    _time = DateTime.parse(json['inserted_at'] ?? '0').millisecondsSinceEpoch;
+    _direction = json['incoming'] ?? false;
     _content = Content(json['content'], isCompact: this.isCompact);
-    _message_status = (json['message_status'] ?? 'unknown');
-    _new = json['new'] ?? 'no';
-    _active = json['active'];
+    _message_status = (json['unread'] ?? false) ? MailStatus.unread : MailStatus.read;
+    _new = json['new'] ?? false;
+    _active = json['activity'];
   }
 
   bool get isUnread => status == MailStatus.unread;
 
-  bool get isNew => _new == 'yes';
+  bool get isNew => _new;
 
   Active get active => _active == null ? null : Active.fromJson(_active);
 
-  MailStatus get status => MailStatus.values.firstWhere((MailStatus s) => s.toString() == 'MailStatus.$_message_status');
+  MailStatus get status => _message_status;
 
   Content get content => _content;
 
-  MailDirection get direction => _direction == 'from' ? MailDirection.from : MailDirection.to;
+  MailDirection get direction => _direction ? MailDirection.from : MailDirection.from;
 
   int get time => _time;
 
@@ -45,5 +45,5 @@ class Mail {
 
   int get id => _id_mail;
 
-  String get link => 'https://www.nyx.cz/index.php?l=mail;wu=${this.id}';
+  String get link => 'https://www.nyx.cz/mail/id/${this.id}';
 }

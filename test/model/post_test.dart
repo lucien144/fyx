@@ -6,24 +6,30 @@ import 'package:fyx/model/post/Video.dart';
 import 'package:html/parser.dart';
 
 void main() {
-  const _json = {"id_wu": "51360794", "nick": "TOMMYSHELBY", "time": "1573934376", "wu_rating": "8", "wu_type": "0"};
+  const _json = {
+    "id": 43695891,
+    "discussion_id": 17739,
+    "username": "HYPNOGEN",
+    "rating": 7,
+    "my_rating": "positive",
+    "inserted_at": "2015-03-08T22:36:07",
+    "can_be_deleted": true,
+    "can_be_rated": true,
+    "can_be_reminded": true
+  };
 
   test('Post has one internal image and one internal link.', () {
     var content = """
           James Caan on set of The Godfather.<br><br>
           <!-- http,img,attachment -->
-          <a href="http://i.nyx.cz/files/00/00/20/68/2068213_7dde4d7aa8e3021dd610.jpg?name=11.jpg">
-          <img src="http://www.nyx.cz/i/t/b0ccf0fde73a5840dea9f0dbc5d18e6d.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F68%2F2068213_7dde4d7aa8e3021dd610.jpg%3Fname%3D11.jpg" class="thumb">
-          </a>
+          <img src="http://i.nyx.cz/files/00/00/20/68/2068213_7dde4d7aa8e3021dd610.jpg?name=11.jpg" data-thumb="http://www.nyx.cz/i/t/b0ccf0fde73a5840dea9f0dbc5d18e6d.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F68%2F2068213_7dde4d7aa8e3021dd610.jpg%3Fname%3D11.jpg">
           <a href="?l=topic;id=14158;wu=51447388" class="r" data-link-topic="14158" data-link-wu="51447388" data-reply-to="replytoJAKKILLER">JAKKILLER</a>: 
           ale jo, to patri, ale o tom ten muj post nebyl. Vsechno jde udelat vkusne a nebo hnusne. O tom to je. Na ty budejarne MNE OSOBNE prijdou ty reklamy jako pest na oko...""";
 
     var rawContent = """
           James Caan on set of The Godfather.<br><br>
           <!-- http,img,attachment -->
-          <a href="http://i.nyx.cz/files/00/00/20/68/2068213_7dde4d7aa8e3021dd610.jpg?name=11.jpg" class="image-link">
-          <img src="http://www.nyx.cz/i/t/b0ccf0fde73a5840dea9f0dbc5d18e6d.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F68%2F2068213_7dde4d7aa8e3021dd610.jpg%3Fname%3D11.jpg" class="thumb">
-          </a>
+          <img src="http://i.nyx.cz/files/00/00/20/68/2068213_7dde4d7aa8e3021dd610.jpg?name=11.jpg" data-thumb="http://www.nyx.cz/i/t/b0ccf0fde73a5840dea9f0dbc5d18e6d.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F68%2F2068213_7dde4d7aa8e3021dd610.jpg%3Fname%3D11.jpg">
           <a href="?l=topic;id=14158;wu=51447388" class="r" data-link-topic="14158" data-link-wu="51447388" data-reply-to="replytoJAKKILLER">JAKKILLER</a>: 
           ale jo, to patri, ale o tom ten muj post nebyl. Vsechno jde udelat vkusne a nebo hnusne. O tom to je. Na ty budejarne MNE OSOBNE prijdou ty reklamy jako pest na oko...""";
 
@@ -31,15 +37,14 @@ void main() {
     json.putIfAbsent("content", () => content);
 
     var post = Post.fromJson(json, 1, isCompact: true);
-    expect(post.id, 51360794);
-    expect(post.nick, 'TOMMYSHELBY');
-    expect(post.avatar, 'https://i.nyx.cz/T/TOMMYSHELBY.gif');
-    expect(post.time, 1573934376);
-    expect(post.rating, 8);
-    expect(post.type, 0);
+    expect(post.id, 43695891);
+    expect(post.nick, 'HYPNOGEN');
+    expect(post.avatar, 'https://i.nyx.cz/H/HYPNOGEN.gif');
+    expect(post.time, 1425850567000);
+    expect(post.rating, 7);
     expect(post.content.rawBody, rawContent.trim());
-    expect(parse(post.content.body).querySelectorAll('a > img').length, 1, reason: 'No consecutive image, therefore image not removed.');
-    expect(2, parse(post.content.body).querySelectorAll('a').length, reason: 'Both links remains');
+    expect(parse(post.content.body).querySelectorAll('img').length, 1, reason: 'No consecutive image, therefore image not removed.');
+    expect(1, parse(post.content.body).querySelectorAll('a').length, reason: 'Both links remains');
 
     var imagesMatcher = [
       Image('http://i.nyx.cz/files/00/00/20/68/2068213_7dde4d7aa8e3021dd610.jpg?name=11.jpg',
@@ -47,17 +52,17 @@ void main() {
     ];
 
     Function deepEq = const DeepCollectionEquality().equals;
-    expect(deepEq(post.content.images, imagesMatcher), true);
+    expect(post.content.images[0].image, 'http://i.nyx.cz/files/00/00/20/68/2068213_7dde4d7aa8e3021dd610.jpg?name=11.jpg');
 
     expect(post.content.emptyLinks.length, 0, reason: 'Internal link is not treated as attachment.');
   });
 
   test('Post has more internal images', () {
     var content = """
-    sem ned\u00e1vno \u0161el ve\u010der kolem DBK, v\u017edycky m\u011b ta budova fascinovala sv\u00fdm brutalismem, jen mn\u011b na n\u00ed v\u017edycky serou ty reklamy, \u00fapln\u011b to kaz\u00ed ten \u00fa\u017easnej potenci\u00e1l minimalistick\u00fd dekorace... 
+    sem ned\u00e1vno \u0161el ve\u010der kolem DBK, v\u017edycky m\u011b ta budova fascinovala sv\u00fdm brutalismem, jen mn\u011b na n\u00ed v\u017edycky serou ty reklamy, \u00fapln\u011b to kaz\u00ed ten \u00fa\u017easnej potenci\u00e1l minimalistick\u00fd dekorace...
     tak sem to narychlo umazal, vypadalo by to super! Jak n\u011bjakej bar\u00e1k z Bladerunnera :)<br><br>
-    <!-- http,img,attachment --><a href="http://i.nyx.cz/files/00/00/20/77/2077557_48d4a18f67ad53d7572e.jpg?name=dbk2.jpg"><img src="http://www.nyx.cz/i/t/6a6f8dae07571ecfb1510c18e6dd6d0a.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F77%2F2077557_48d4a18f67ad53d7572e.jpg%3Fname%3Ddbk2.jpg" class="thumb"></a><br><br>
-    <!-- http,img,attachment --><a href="http://i.nyx.cz/files/00/00/20/77/2077556_45259e39b491933bb483.jpg?name=dbk.jpg"><img src="http://www.nyx.cz/i/t/8697a44511a1664f7adc53b39821ce7c.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F77%2F2077556_45259e39b491933bb483.jpg%3Fname%3Ddbk.jpg" class="thumb"></a>
+    <!-- http,img,attachment --><img src="http://i.nyx.cz/files/00/00/20/77/2077557_48d4a18f67ad53d7572e.jpg?name=dbk2.jpg" data-thumb="http://www.nyx.cz/i/t/6a6f8dae07571ecfb1510c18e6dd6d0a.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F77%2F2077557_48d4a18f67ad53d7572e.jpg%3Fname%3Ddbk2.jpg"><br><br>
+    <!-- http,img,attachment --><img src="http://i.nyx.cz/files/00/00/20/77/2077556_45259e39b491933bb483.jpg?name=dbk.jpg" data-thumb="http://www.nyx.cz/i/t/8697a44511a1664f7adc53b39821ce7c.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F77%2F2077556_45259e39b491933bb483.jpg%3Fname%3Ddbk.jpg">
     """;
 
     var json = Map<String, dynamic>.from(_json);
@@ -73,7 +78,7 @@ void main() {
     expect(post.content.images[1].thumb,
         'http://www.nyx.cz/i/t/8697a44511a1664f7adc53b39821ce7c.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F77%2F2077556_45259e39b491933bb483.jpg%3Fname%3Ddbk.jpg');
     expect(post.content.emptyLinks.length, 0);
-    expect(0, parse(post.content.body).querySelectorAll('a > img').length);
+    expect(0, parse(post.content.body).querySelectorAll('img').length);
   });
 
   test('Post is mixed vide Youtube, links and images', () {
@@ -95,9 +100,7 @@ void main() {
           http:\/\/www.youtube.com\/watch?v=B1_gcCu0-oI
         <\/a><br \/>\n
         <div class=\"embed-wrapper\" data-embed-type=\"youtube\" data-embed-value=\"B1_gcCu0-oI\" data-embed-hd=\"1\">
-          <a href=\"http:\/\/img.youtube.com\/vi\/B1_gcCu0-oI\/0.jpg\">
-            <img src=\"http:\/\/www.nyx.cz\/i\/t\/e8464b77ee2b7a726f174be309201ade.png?url=http%3A%2F%2Fimg.youtube.com%2Fvi%2FB1_gcCu0-oI%2F0.jpg\" class=\"thumb\">
-          <\/a>
+            <img src=\"http:\/\/img.youtube.com\/vi\/B1_gcCu0-oI\/0.jpg\" data-thumb=\"http:\/\/www.nyx.cz\/i\/t\/e8464b77ee2b7a726f174be309201ade.png?url=http%3A%2F%2Fimg.youtube.com%2Fvi%2FB1_gcCu0-oI%2F0.jpg\">
         <\/div>
         <br \/>\n\r<br \/>\n\r<br \/>\n
         Na tom videu je nav\u00edc moc p\u011bkn\u011b vid\u011bt, jak d\u016fle\u017eit\u00fd je \u00fahel pohledu.
@@ -142,8 +145,8 @@ void main() {
   test('Content is stripped for unnecessary <br> tags and comments from attached images', () {
     var content = """
     Lorem ipsum dolor... sit amet :)<br><br>
-    <a href="http://i.nyx.cz/files/00/00/20/77/2077557_48d4a18f67ad53d7572e.jpg?name=dbk2.jpg"><img src="http://www.nyx.cz/i/t/6a6f8dae07571ecfb1510c18e6dd6d0a.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F77%2F2077557_48d4a18f67ad53d7572e.jpg%3Fname%3Ddbk2.jpg" class="thumb"></a><br><br>
-    <a href="http://i.nyx.cz/files/00/00/20/77/2077556_45259e39b491933bb483.jpg?name=dbk.jpg"><img src="http://www.nyx.cz/i/t/8697a44511a1664f7adc53b39821ce7c.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F77%2F2077556_45259e39b491933bb483.jpg%3Fname%3Ddbk.jpg" class="thumb"></a><br>
+    <img src="http://i.nyx.cz/files/00/00/20/77/2077557_48d4a18f67ad53d7572e.jpg?name=dbk2.jpg" data-thumb="http://www.nyx.cz/i/t/6a6f8dae07571ecfb1510c18e6dd6d0a.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F77%2F2077557_48d4a18f67ad53d7572e.jpg%3Fname%3Ddbk2.jpg"></a><br><br>
+    <img src="http://i.nyx.cz/files/00/00/20/77/2077556_45259e39b491933bb483.jpg?name=dbk.jpg" data-thumb="http://www.nyx.cz/i/t/8697a44511a1664f7adc53b39821ce7c.png?url=http%3A%2F%2Fi.nyx.cz%2Ffiles%2F00%2F00%2F20%2F77%2F2077556_45259e39b491933bb483.jpg%3Fname%3Ddbk.jpg"></a><br>
     """;
 
     var expectedContent = """

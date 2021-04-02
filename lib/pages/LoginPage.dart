@@ -6,6 +6,8 @@ import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/reponses/LoginResponse.dart';
+import 'package:fyx/pages/TutorialPage.dart';
 import 'package:fyx/theme/T.dart';
 
 class LoginPage extends StatefulWidget {
@@ -137,11 +139,10 @@ class _LoginPageState extends State<LoginPage> {
             return;
           }
 
-          ApiController().login(_loginController.text).then((response) {
-            setState(() {
-              Navigator.of(context).pushNamed('/token', arguments: response.authCode);
-            });
+          ApiController().login(_loginController.text).then((LoginResponse response) {
+            Navigator.of(context).pushNamed('/token', arguments: new TutorialPageArguments(token: response.authCode, username: _loginController.text));
           }).catchError((error) {
+            print(error);
             PlatformTheme.error(error.toString());
           }).whenComplete(() => setState(() => _isRunning = false));
         },

@@ -8,6 +8,7 @@ import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/model/post/Link.dart';
 import 'package:fyx/model/post/Video.dart';
+import 'package:fyx/pages/GalleryPage.dart';
 
 class GalleryArguments {
   final String imageUrl;
@@ -39,7 +40,7 @@ class PostHeroAttachment extends StatelessWidget {
             _onTap();
           }
           if (_openGallery) {
-            Navigator.of(context).pushNamed('/gallery', arguments: GalleryArguments((attachment as model.Image).image, images: content.images));
+            Navigator.of(context, rootNavigator: true).pushNamed('/gallery', arguments: GalleryArguments((attachment as model.Image).image, images: content.images));
           }
         },
         child: ClipRRect(

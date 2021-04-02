@@ -11,7 +11,7 @@ description: A new Flutter project.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 0.5.0+19
+version: 0.6.0+3
 
 environment:
   sdk: ">=2.2.2 <3.0.0"
@@ -57,6 +57,11 @@ dependencies:
   firebase_messaging: ^7.0.2
   flutter_highlight: ^0.6.0
   image_gallery_saver: ^1.6.7
+
+  # Dart-lang core plugins 👇
+  http_parser: ^3.1.4
+  mime: ^0.9.7
+
   flutter:
     sdk: flutter
 

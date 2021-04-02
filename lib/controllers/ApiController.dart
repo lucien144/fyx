@@ -10,17 +10,19 @@ import 'package:fyx/exceptions/AuthException.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
-import 'package:fyx/model/System.dart';
+import 'package:fyx/model/ResponseContext.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
-import 'package:fyx/model/reponses/BookmarksResponse.dart';
+import 'package:fyx/model/reponses/BookmarksAllResponse.dart';
+import 'package:fyx/model/reponses/BookmarksHistoryResponse.dart';
 import 'package:fyx/model/reponses/DiscussionHomeResponse.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/model/reponses/FeedNoticesResponse.dart';
+import 'package:fyx/model/reponses/FileUploadResponse.dart';
 import 'package:fyx/model/reponses/LoginResponse.dart';
 import 'package:fyx/model/reponses/MailResponse.dart';
-import 'package:fyx/model/reponses/PostMessageResponse.dart';
+import 'package:fyx/model/reponses/OkResponse.dart';
 import 'package:fyx/model/reponses/RatingResponse.dart';
-import 'package:fyx/model/reponses/SendMailResponse.dart';
+import 'package:fyx/model/reponses/WaitingFilesResponse.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -46,38 +48,36 @@ class ApiController {
   ApiController._init() {
     provider = ApiProvider();
 
-    provider.onAuthError = () {
+    provider.onAuthError = (String message) {
       // API returns the same error on authorization as well as on normal data request. Therefore this "workaround".
       if (isLoggingIn) {
         return;
       }
 
       this.logout(removeAuthrorization: false);
-      PlatformTheme.error(L.AUTH_ERROR);
+      PlatformTheme.error(message == '' ? L.AUTH_ERROR : message);
       PlatformApp.navigatorKey.currentState.pushNamed('/login');
     };
 
     provider.onError = (message) {
-      if (['access denied'].indexOf(message.toLowerCase()) == -1) {
-        PlatformTheme.error(message);
-      }
+      PlatformTheme.error(message);
     };
 
-    provider.onSystemData = (data) {
+    provider.onContextData = (data) {
       if (_context == null) {
         return;
       }
 
-      var system = System.fromJson(data);
-      Provider.of<NotificationsModel>(_context, listen: false).setNewMails(system.unreadPost);
-      Provider.of<NotificationsModel>(_context, listen: false).setNewNotices(system.noticeCount);
+      ResponseContext responseContext = ResponseContext.fromJson(data);
+      Provider.of<NotificationsModel>(_context, listen: false).setNewMails(responseContext.user.mailUnread);
+      Provider.of<NotificationsModel>(_context, listen: false).setNewNotices(responseContext.user.notificationsUnread);
     };
   }
 
   Future<LoginResponse> login(String nickname) async {
     isLoggingIn = true;
     Response response = await provider.login(nickname);
-    var loginResponse = LoginResponse.fromJson(jsonDecode(response.data));
+    var loginResponse = LoginResponse.fromJson(response.data);
     if (!loginResponse.isAuthorized) {
       throwAuthException(loginResponse, message: 'Cannot authorize user.');
     }
@@ -126,14 +126,6 @@ class ApiController {
     return this.provider.setCredentials(creds);
   }
 
-  Future<bool> testAuth() async {
-    isLoggingIn = true;
-    var response = await provider.testAuth();
-    var json = jsonDecode(response.data);
-    isLoggingIn = false;
-    return json['result'] == 'ok';
-  }
-
   void registerFcmToken(String token) {
     this.getCredentials().then((creds) async {
       if (creds == null) {
@@ -146,7 +138,7 @@ class ApiController {
           print('registerFcmToken');
           this.setCredentials(creds.copyWith(fcmToken: token));
         } catch (error) {
-          debugPrint(error);
+          debugPrint(error.toString());
           MainRepository().sentry.captureException(exception: error);
         }
       }
@@ -164,57 +156,72 @@ class ApiController {
         await provider.registerFcmToken(token);
         this.setCredentials(creds.copyWith(fcmToken: token));
       } catch (error) {
-        debugPrint(error);
+        debugPrint(error.toString());
         MainRepository().sentry.captureException(exception: error);
       }
     });
   }
 
-  Future<BookmarksResponse> loadHistory() async {
+  Future<BookmarksHistoryResponse> loadHistory() async {
     var response = await provider.fetchHistory();
-    return BookmarksResponse.fromJson(jsonDecode(response.data));
+    return BookmarksHistoryResponse.fromJson(response.data);
   }
 
-  Future<BookmarksResponse> loadBookmarks() async {
+  Future<BookmarksAllResponse> loadBookmarks() async {
     var response = await provider.fetchBookmarks();
-    return BookmarksResponse.fromJson(jsonDecode(response.data));
+    return BookmarksAllResponse.fromJson(response.data);
   }
 
   Future<DiscussionResponse> loadDiscussion(int id, {int lastId, String user}) async {
-    var response = await provider.fetchDiscussion(id, lastId: lastId, user: user);
-    return DiscussionResponse.fromJson(jsonDecode(response.data));
+    var response = await provider.fetchDiscussion(id, lastId: lastId == null ? null : lastId + 1, user: user);
+    return DiscussionResponse.fromJson(response.data);
   }
 
   Future<DiscussionHomeResponse> getDiscussionHome(int id) async {
     var response = await provider.fetchDiscussionHome(id);
-    return DiscussionHomeResponse.fromJson(jsonDecode(response.data));
+    return DiscussionHomeResponse.fromJson(response.data);
   }
 
-  Future<FeedNoticesResponse> loadFeedNotices({bool keepNew = false}) async {
-    var response = await provider.fetchNotices(keepNew: keepNew);
-    return FeedNoticesResponse.fromJson(jsonDecode(response.data));
+  Future<FeedNoticesResponse> loadFeedNotices() async {
+    var response = await provider.fetchNotices();
+    return FeedNoticesResponse.fromJson(response.data);
   }
 
-  Future<PostMessageResponse> postDiscussionMessage(int id, String message, {Map<ATTACHMENT, dynamic> attachment, Post replyPost}) async {
+  Future<OkResponse> postDiscussionMessage(int id, String message, {List<Map<ATTACHMENT, dynamic>> attachments, Post replyPost}) async {
+    if (attachments is List) {
+      try {
+        WaitingFilesResponse waitingFilesResponse = await this.fetchDiscussionWaitingFiles(id);
+        await this.deleteAllWaitingFiles(waitingFilesResponse.files);
+      } catch (error) {
+        debugPrint(error.toString());
+        MainRepository().sentry.captureException(exception: error);
+        // TODO: Notify user?
+      }
+
+      try {
+        await provider.uploadFile(attachments, id: id);
+      } catch (error) {
+        provider.onError('👎 Nějakteré z obrázků se nepodařilo nahrát.');
+      }
+    }
+
     if (replyPost != null) {
       message = '{reply ${replyPost.nick}|${replyPost.id}}: $message';
     }
-    var result = await provider.postDiscussionMessage(id, message, attachment: attachment);
-    return PostMessageResponse.fromJson(jsonDecode(result.data));
+
+    var result = await provider.postDiscussionMessage(id, message);
+    return OkResponse.fromJson(result.data);
   }
 
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder) {
     return provider.setPostReminder(discussionId, postId, setReminder);
   }
 
-  Future<RatingResponse> giveRating(int discussionId, int postId, {bool positive = true, bool confirm = false}) async {
-    Response response = await provider.giveRating(discussionId, postId, positive, confirm);
-    var data = jsonDecode(response.data);
+  Future<RatingResponse> giveRating(int discussionId, int postId, {bool positive = true, bool confirm = false, bool remove = false}) async {
+    Response response = await provider.giveRating(discussionId, postId, positive, confirm, remove);
+    var data = response.data;
     return RatingResponse(
-        isGiven: data['result'] == 'RATING_GIVEN',
-        needsConfirmation: data['result'] == 'RATING_NEEDS_CONFIRMATION',
-        currentRating: int.parse(data['current_rating']),
-        currentRatingStep: int.parse(data['current_rating_step']));
+        isGiven: data['error'] ?? true, needsConfirmation: data['code'] == 'NeedsConfirmation', currentRating: data['rating'] ?? 0, myRating: data['my_rating'] ?? 'none');
   }
 
   void logout({bool removeAuthrorization = true}) {
@@ -226,36 +233,52 @@ class ApiController {
 
   Future<MailResponse> loadMail({int lastId}) async {
     var response = await provider.fetchMail(lastId: lastId);
-    return MailResponse.fromJson(jsonDecode(response.data));
+    return MailResponse.fromJson(response.data);
   }
 
-  Future<SendMailResponse> sendMail(String recipient, String message, {Map<ATTACHMENT, dynamic> attachment}) async {
-    var result = await provider.sendMail(recipient, message, attachment: attachment);
-    return SendMailResponse.fromJson(jsonDecode(result.data));
+  Future<List> deleteAllWaitingFiles(List<FileUploadResponse> files) async {
+    List<Future> deletes = [];
+    for (FileUploadResponse file in files) {
+      deletes.add(provider.deleteFile(file.id));
+    }
+    return await Future.wait(deletes);
   }
 
-  throwAuthException(LoginResponse loginResponse, {String message: ''}) {
-    var state = AUTH_STATES.values.firstWhere((state) => state.toString() == 'AUTH_STATES.${loginResponse.authState}', orElse: () => null);
-    if (state != null) {
-      switch (state) {
-        case AUTH_STATES.AUTH_EXISTING:
-          throw AuthException('Je mi líto, ale autorizace se nezdařila. Zkuste si vyresetovat autorizaci v nastavení nyxu.');
-          break;
-        case AUTH_STATES.AUTH_INVALID_USERNAME:
-          throw AuthException('Špatné uživatelské jméno nebo heslo.');
-          break;
-        case AUTH_STATES.AUTH_NEW:
-          // This is valid!
-          break;
+  Future<OkResponse> sendMail(String recipient, String message, {List<Map<ATTACHMENT, dynamic>> attachments}) async {
+    // Upload image
+    if (attachments is List) {
+      try {
+        WaitingFilesResponse waitingFilesResponse = await this.fetchMailWaitingFiles();
+        await this.deleteAllWaitingFiles(waitingFilesResponse.files);
+      } catch (error) {
+        debugPrint(error.toString());
+        MainRepository().sentry.captureException(exception: error);
+        // TODO: Notify user?
+      }
+      try {
+        await provider.uploadFile(attachments);
+      } catch (error) {
+        provider.onError('👎 Nějakteré z obrázků se nepodařilo nahrát.');
       }
     }
 
-    if (loginResponse.authDevComment.isNotEmpty) {
-      throw AuthException(loginResponse.authDevComment);
-    }
+    var result = await provider.sendMail(recipient, message);
+    return OkResponse.fromJson(result.data);
+  }
 
-    if (loginResponse.error.isNotEmpty) {
-      throw AuthException(loginResponse.error);
+  Future<WaitingFilesResponse> fetchDiscussionWaitingFiles(int id) async {
+    Response response = await provider.fetchDiscussionWaitingFiles(id);
+    return WaitingFilesResponse.fromJson(response.data);
+  }
+
+  Future<WaitingFilesResponse> fetchMailWaitingFiles() async {
+    Response response = await provider.fetchMailWaitingFiles();
+    return WaitingFilesResponse.fromJson(response.data);
+  }
+
+  throwAuthException(LoginResponse loginResponse, {String message: ''}) {
+    if (loginResponse.error) {
+      throw AuthException(loginResponse.message);
     }
 
     throw AuthException(message);

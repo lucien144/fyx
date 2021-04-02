@@ -8,24 +8,32 @@ class Post {
   String _nick;
   int _time;
   int _wu_rating;
-  int _wu_type;
+  String _wu_type;
+  String myRating;
   bool _reminder;
+  bool _canBeRated;
+  bool _canBeDeleted;
+  bool _canBeReminded;
 
   Content _content;
 
   Post.fromJson(Map<String, dynamic> json, this.idKlub, { this.isCompact }) {
-    this._id_wu = int.parse(json['id_wu']);
+    this._id_wu = json['id'];
     this._content = Content(json['content'], isCompact: this.isCompact);
-    this._nick = json['nick'];
-    this._time = int.parse(json['time']);
-    this._wu_rating = int.parse(json['wu_rating']);
-    this._wu_type = int.parse(json['wu_type']);
-    this._reminder = (json['reminder'] ?? 'no') == 'yes';
+    this._nick = json['username'];
+    this._time = DateTime.parse(json['inserted_at'] ?? '0').millisecondsSinceEpoch;
+    this._wu_rating = json['rating'] ?? 0;
+    this._wu_type = json['type'];
+    this.myRating = json['my_rating'] ?? 'none'; // positive / negative / negative_visible / none TODO: enums
+    this._reminder = json['reminder'] ?? false;
+    this._canBeRated = json['can_be_rated'] ?? false;
+    this._canBeDeleted = json['can_be_deleted'] ?? false;
+    this._canBeReminded = json['can_be_reminded'] ?? false;
   }
 
   Content get content => _content;
 
-  int get type => _wu_type;
+  String get type => _wu_type;
 
   int get rating => _wu_rating;
 
@@ -42,8 +50,14 @@ class Post {
   // ignore: unnecessary_getters_setters
   bool get hasReminder => _reminder;
 
-  String get link => 'https://www.nyx.cz/index.php?l=topic;id=${this.idKlub};wu=${this.id}';
+  String get link => 'https://www.nyx.cz/discussion/${this.idKlub}/id/${this.id}';
 
   // ignore: unnecessary_getters_setters
   set hasReminder(bool value) => _reminder = value;
+
+  bool get canBeReminded => _canBeReminded;
+
+  bool get canBeDeleted => _canBeDeleted;
+
+  bool get canBeRated => _canBeRated;
 }

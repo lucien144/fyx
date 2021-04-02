@@ -1,25 +1,20 @@
-import 'dart:convert';
-
-import 'package:device_info/device_info.dart';
 import 'package:dio/dio.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/Credentials.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
-import 'package:package_info/package_info.dart';
 
 class ApiProvider implements IApiProvider {
   final Dio dio = Dio();
 
   // ignore: non_constant_identifier_names
-  final URL = 'https://www.nyx.cz/api.php';
-
-  Options _options = Options(headers: {'user-agent': 'Fyx'});
+  final URL = 'https://alpha.nyx.cz/api';
 
   Credentials _credentials;
 
   TOnError onError;
   TOnAuthError onAuthError;
-  TOnSystemData onSystemData;
+  TOnContextData onContextData;
 
   Credentials getCredentials() {
     if (_credentials != null && _credentials.isValid) {
@@ -36,57 +31,33 @@ class ApiProvider implements IApiProvider {
   }
 
   ApiProvider() {
-    try {
-      // TODO: Use the MainRepository() to obtain this info... or not?
-      DeviceInfoPlugin()
-        ..iosInfo.then((iosInfo) {
-          PackageInfo.fromPlatform().then((info) {
-            // Basic sanitize due to the Xr unicode character and others...
-            // TODO: Perhaps, solve Czech characters too...
-            var deviceName = iosInfo.name.replaceAll(RegExp(r'[ʀ]', caseSensitive: false), 'r');
-            deviceName = deviceName.replaceAll(RegExp(r'[^\w _\-]', caseSensitive: false), '_');
-            _options.headers['user-agent'] = '${_options.headers['user-agent']} | ${iosInfo.systemName} | ${info.version} (${info.buildNumber}) | $deviceName';
-          });
-        }).catchError((error) {
-          _options.headers['user-agent'] = '${_options.headers['user-agent']} | Fyx';
-        });
-    } catch (e) {}
-
     dio.interceptors.add(InterceptorsWrapper(onRequest: (RequestOptions options) async {
+      try {
+        // TODO: Perhaps, solve Czech characters too...
+        // TODO: Get rid of MainRepository()
+        var deviceName = MainRepository().deviceInfo.name.replaceAll(RegExp(r'[ʀ]', caseSensitive: false), 'r');
+        deviceName = deviceName.replaceAll(RegExp(r'[^\w _\-]', caseSensitive: false), '_');
+        options.headers['user-agent'] =
+            'Fyx | ${MainRepository().deviceInfo.systemName} | ${MainRepository().packageInfo.version} (${MainRepository().packageInfo.buildNumber}) | $deviceName';
+      } catch (e) {
+        options.headers['user-agent'] = 'Fyx';
+      }
+
+      print('[API] UA: ${options.headers['user-agent']}');
       print('[API] ${options.method.toUpperCase()}: ${options.uri}');
-      print('[API] -> query: ${options.queryParameters}');
-      print('[API] -> query: ${(options.data as FormData).fields}');
+
+      if (_credentials != null && _credentials.isValid) {
+        print('[API] -> Bearer: ${_credentials.token}');
+        options.headers['Authorization'] = 'Bearer ${_credentials.token}';
+      }
       return options;
     }, onResponse: (Response response) async {
-      Map data = jsonDecode(response.data);
-
-      if (data.containsKey('system')) {
-        onSystemData(data['system']);
+      if (response.data.containsKey('context')) {
+        onContextData(response.data['context']);
       }
 
       // All seems ok.
-      // Endpoints: Auth + pulling data
-      // Getting data for home/header does not return data key.
-      if (data.containsKey('data') || data.containsKey('home') || data.containsKey('header')) {
-        return response;
-      }
-
-      // All seems ok.
-      // Endpoints: Send new message.
-      // Endpoints: Rating given/removed.
-      if (data.containsKey('result') && ['ok', 'RATING_GIVEN', 'RATING_REMOVED', 'RATING_NEEDS_CONFIRMATION', 'RATING_CHANGED'].indexOf(data['result']) > -1) {
-        return response;
-      }
-
-      // Not Authorized
-      if (data['result'] == 'error' && data['code'] == '401') {
-        onAuthError();
-        return response;
-      }
-
-      // Other problem
-      if (data['result'] == 'error') {
-        onError(data['error']);
+      if (response.statusCode == 200) {
         return response;
       }
 
@@ -94,147 +65,108 @@ class ApiProvider implements IApiProvider {
       onError(L.API_ERROR);
       return response;
     }, onError: (DioError e) async {
+      // Not Authorized
+      if (e.response?.statusCode == 401) {
+        onAuthError(e.response.data['message']);
+        return e.response;
+      }
+
+      // Other problem
+      if (e.response?.statusCode == 400) {
+        onError(e.response.data['message']);
+        return e.response;
+      }
+
+      // Negative rating confirmation
+      if (e.response?.statusCode == 403) {
+        return e.response;
+      }
+
       onError(e.message);
     }));
   }
 
   Future<Response> login(String username) async {
-    FormData formData = new FormData.fromMap({'auth_nick': username});
-    return await dio.post(URL, data: formData, options: _options);
-  }
-
-  Future<Response> testAuth() async {
-    FormData formData = new FormData.fromMap({
-      'auth_nick': _credentials.nickname,
-      'auth_token': _credentials.token,
-      'l': 'help',
-      'l2': 'test',
-    });
-    return await dio.post(URL, data: formData, options: _options);
+    return await dio.post('$URL/create_token/$username');
   }
 
   Future<Response> registerFcmToken(String token) async {
-    FormData formData = new FormData.fromMap({'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'gcm', 'l2': 'register', 'regid': token});
-    return await dio.post(URL, data: formData, options: _options);
+    String client = 'fyx';
+    return await dio.post('$URL/register_for_notifications/${_credentials.token}/$client/$token');
   }
 
   Future<Response> fetchBookmarks() async {
-    FormData formData = new FormData.fromMap({'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'bookmarks', 'l2': 'all'});
-    return await dio.post(URL, data: formData, options: _options);
+    return await dio.get('$URL/bookmarks/all');
   }
 
   Future<Response> fetchHistory() async {
-    FormData formData = new FormData.fromMap({'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'bookmarks', 'l2': 'history', 'more_results': 1});
-    return await dio.post(URL, data: formData, options: _options);
+    return await dio.get('$URL/bookmarks/history/more');
   }
 
-  Future<Response> fetchDiscussion(int id, {int lastId, String user}) async {
-    FormData formData = new FormData.fromMap({
-      'auth_nick': _credentials.nickname,
-      'auth_token': _credentials.token,
-      'l': 'discussion',
-      'l2': 'messages',
-      'id': id,
-      'id_wu': lastId,
-      'filter_user': user,
-      'direction': lastId == null ? 'newest' : 'older'
-    });
-    return await dio.post(URL, data: formData, options: _options);
+  Future<Response> fetchDiscussion(int discussionId, {int lastId, String user}) async {
+    Map<String, dynamic> params = {'order': lastId == null ? 'newest' : 'older_than', 'from_id': lastId, 'user': user};
+    return await dio.get('$URL/discussion/$discussionId', queryParameters: params);
   }
 
   Future<Response> fetchDiscussionHome(int id) async {
-    FormData formData = new FormData.fromMap({
-      'auth_nick': _credentials.nickname,
-      'auth_token': _credentials.token,
-      'l': 'discussion',
-      'l2': 'home',
-      'id_klub': id
-    });
-    return await dio.post(URL, data: formData, options: _options);
+    FormData formData = new FormData.fromMap({'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'discussion', 'l2': 'home', 'id_klub': id});
+    return await dio.post(URL, data: formData);
   }
 
-  Future<Response> fetchNotices({bool keepNew = false}) async {
-    FormData formData = new FormData.fromMap({
-      'auth_nick': _credentials.nickname,
-      'auth_token': _credentials.token,
-      'l': 'feed',
-      'l2': 'notices',
-      'keep_new': keepNew ? '1' : '0'
-    });
-    return await dio.post(URL, data: formData, options: _options);
+  Future<Response> fetchNotices() async {
+    return await dio.get('$URL/notifications');
   }
 
-  Future<Response> postDiscussionMessage(int id, String message, {Map<ATTACHMENT, dynamic> attachment}) async {
-    FormData formData = new FormData.fromMap({
-      'auth_nick': _credentials.nickname,
-      'auth_token': _credentials.token,
-      'l': 'discussion',
-      'l2': 'send',
-      'id': id,
-      'message': message,
-      'attachment': attachment is Map ? MultipartFile.fromBytes(attachment[ATTACHMENT.bytes], filename: attachment[ATTACHMENT.filename]) : null
-    });
-
-    return await dio.post(URL, data: formData, options: _options);
+  Future<Response> postDiscussionMessage(int postId, String message) async {
+    return await dio.post('$URL/discussion/$postId/send/text', data: {'content': message, 'format': 'text'}, options: Options(contentType: Headers.formUrlEncodedContentType));
   }
 
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder) async {
-    FormData formData = new FormData.fromMap({
-      'auth_nick': _credentials.nickname,
-      'auth_token': _credentials.token,
-      'l': 'discussion',
-      'l2': 'reminder',
-      'id_klub': discussionId,
-      'id_wu': postId,
-      'reminder': setReminder ? 1 : 0
-    });
-
-    return await dio.post(URL, data: formData, options: _options);
+    return await dio.post('$URL/discussion/$discussionId/reminder/$postId/$setReminder');
   }
 
-  Future<Response> giveRating(int discussionId, int postId, bool positive, bool confirm) async {
-    FormData formData = new FormData.fromMap({
-      'auth_nick': _credentials.nickname,
-      'auth_token': _credentials.token,
-      'l': 'discussion',
-      'l2': 'rating_give',
-      'id_klub': discussionId,
-      'id_wu': postId,
-      'rating': positive ? 'positive' : 'negative',
-      'toggle': 1,
-      'neg_confirmation': confirm ? 1 : 0
-    });
-
-    return await dio.post(URL, data: formData, options: _options);
+  Future<Response> giveRating(int discussionId, int postId, bool positive, bool confirm, bool remove) async {
+    String action = positive ? 'positive' : 'negative';
+    action = remove ? 'remove' : action;
+    action = confirm ? 'negative_visible' : action;
+    return await dio.post('$URL/discussion/$discussionId/rating/$postId/$action');
   }
 
   Future<Response> logout() async {
-    FormData formData = new FormData.fromMap({
-      'auth_nick': _credentials.nickname,
-      'auth_token': _credentials.token,
-      'l': 'util',
-      'l2': 'remove_authorization',
-    });
-
-    return await dio.post(URL, data: formData, options: _options);
+    return await dio.delete('$URL/profile/delete_token/${_credentials.token}');
   }
 
-  Future<Response> fetchMail({int lastId}) async {
-    FormData formData = new FormData.fromMap(
-        {'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'mail', 'l2': 'messages', 'id_mail': lastId, 'direction': lastId == null ? 'newest' : 'older'});
-    return await dio.post(URL, data: formData, options: _options);
+  Future<Response> fetchMail({int lastId, String username}) async {
+    Map<String, dynamic> params = {'order': lastId == null ? 'newest' : 'older_than', 'from_id': lastId, 'user': username};
+    return await dio.get('$URL/mail', queryParameters: params);
   }
 
-  Future<Response> sendMail(String recipient, String message, {Map<ATTACHMENT, dynamic> attachment}) async {
-    FormData formData = new FormData.fromMap({
-      'auth_nick': _credentials.nickname,
-      'auth_token': _credentials.token,
-      'l': 'mail',
-      'l2': 'send',
-      'recipient': recipient,
-      'message': message,
-      'attachment': attachment is Map ? MultipartFile.fromBytes(attachment[ATTACHMENT.bytes], filename: attachment[ATTACHMENT.filename]) : null
-    });
-    return await dio.post(URL, data: formData, options: _options);
+  Future<Response> sendMail(String recipient, String message) async {
+    return await dio.post('$URL/mail/send', data: {'recipient': recipient, 'message': message, 'format': 'text'}, options: Options(contentType: Headers.formUrlEncodedContentType));
+  }
+
+  Future<Response> deleteFile(int id) async {
+    return await dio.delete('$URL/file/delete/$id');
+  }
+
+  Future<Response> fetchMailWaitingFiles() async {
+    return await dio.get('$URL/mail/waiting_files');
+  }
+
+  Future<Response> fetchDiscussionWaitingFiles(int id) async {
+    return await dio.get('$URL/discussion/$id/waiting_files');
+  }
+
+  Future<List> uploadFile(List<Map<ATTACHMENT, dynamic>> attachments, {int id: 0}) async {
+    List<Future> uploads = [];
+    for (Map<ATTACHMENT, dynamic> attachment in attachments) {
+      FormData fileData = new FormData.fromMap({
+        'file': MultipartFile.fromBytes(attachment[ATTACHMENT.bytes], filename: attachment[ATTACHMENT.filename], contentType: attachment[ATTACHMENT.mediatype]),
+        'file_type': id == 0 ? 'mail_attachment' : 'discussion_attachment',
+        'id_specific': id
+      });
+      uploads.add(dio.put('$URL/file/upload', data: fileData));
+    }
+    return Future.wait(uploads);
   }
 }

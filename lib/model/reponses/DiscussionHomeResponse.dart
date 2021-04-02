@@ -1,9 +1,9 @@
 import 'package:fyx/model/Discussion.dart';
-import 'package:fyx/model/System.dart';
+import 'package:fyx/model/ResponseContext.dart';
 
 class DiscussionHomeResponse {
   Discussion _discussion;
-  System _system;
+  ResponseContext _context;
   List<String> _home;
   List<String> _header;
 
@@ -11,10 +11,10 @@ class DiscussionHomeResponse {
     this._home = List<String>.from(json['home'] ?? []);
     this._header = List<String>.from(json['header'] ?? []);
     this._discussion = Discussion.fromJson(json['discussion']);
-    this._system = System.fromJson(json['system']);
+    this._context = ResponseContext.fromJson(json['context']);
   }
 
-  System get system => _system;
+  ResponseContext get context => _context;
 
   Discussion get discussion => _discussion;
 
