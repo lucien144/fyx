@@ -25,7 +25,7 @@ Zde je přehled funkcí pro lepší představu.
 | Funkce | Fyx | Nyx |
 |-|:-:|:-:|
 | iOS | ✅ | ✅ |
-| Android | 🛠 | ✅ |
+| Android | 🛠 | ❌ |
 | Notifikace | ✅ | ✅ |
 | Výpis klubů | ✅ | ✅ |
 | Historie | ✅ | ✅ |

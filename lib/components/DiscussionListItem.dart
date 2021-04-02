@@ -3,17 +3,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/PlatformTheme.dart';
-import 'package:fyx/components/ListItemWithCategory.dart';
-import 'package:fyx/model/Discussion.dart';
+import 'package:fyx/model/BookmarkedDiscussion.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 
-class DiscussionListItem extends ListItemWithCategory {
-  final Discussion discussion;
+class DiscussionListItem extends StatelessWidget {
+  final BookmarkedDiscussion discussion;
 
   DiscussionListItem(this.discussion);
-
-  @override
-  int get category => this.discussion.idCat;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +43,7 @@ class DiscussionListItem extends ListItemWithCategory {
             ),
             Expanded(
                 child: Text(
-              discussion.jmeno,
+              discussion.name,
               overflow: TextOverflow.ellipsis,
             )),
             Visibility(visible: discussion.links > 0, child: Icon(Icons.link)),

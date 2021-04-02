@@ -69,7 +69,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
                 item.thumbsUp.forEach((NoticeThumbsUp thumbUp) => highlight = thumbUp.time > result.lastVisit ? true : highlight);
 
                 return ContentBoxLayout(
-                  onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(item.idKlub, postId: item.idWu + 1)),
+                  onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(item.idKlub, postId: item.idWu)),
                   content: Content(item.content),
                   isHighlighted: highlight,
                   topRightWidget: Text(
@@ -77,24 +77,15 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
                     style: TextStyle(fontSize: 14, color: item.wuRating > 0 ? Colors.green : (item.wuRating < 0 ? Colors.redAccent : Colors.black38)),
                   ),
                   topLeftWidget: Expanded(
-                    child: FutureBuilder(
-                        builder: (BuildContext context, AsyncSnapshot<DiscussionHomeResponse> response) {
-                          if (response.hasData) {
-                            return GestureDetector(
-                              onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(item.idKlub)),
-                              child: Text(
-                                response.data.discussion.name,
-                                overflow: TextOverflow.ellipsis,
-                                softWrap: false,
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            );
-                          } else if (response.hasError) {
-                            return Text('-');
-                          }
-                          return CupertinoActivityIndicator();
-                        },
-                        future: ApiController().getDiscussionHome(item.idKlub)),
+                    child: GestureDetector(
+                      onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(item.idKlub)),
+                      child: Text(
+                        item.discussionName,
+                        overflow: TextOverflow.ellipsis,
+                        softWrap: false,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   ),
                   bottomWidget: Column(
                     children: [
@@ -146,7 +137,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
   Widget buildReplies(BuildContext context, List<NoticeReplies> replies, int lastVisit) {
     List<Widget> replyRows = replies.map((reply) {
       return GestureDetector(
-        onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(reply.idKlub, postId: reply.idWu + 1)),
+        onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(reply.idKlub, postId: reply.idWu)),
         child: Padding(
           padding: const EdgeInsets.only(bottom: 5),
           child: Row(

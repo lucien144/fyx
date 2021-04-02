@@ -4,6 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:fyx/PlatformTheme.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 
@@ -198,9 +199,11 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
         setState(() => _lastId = _result.lastId);
       }
     } catch (error) {
-      print(error);
-      print(StackTrace.current);
       setState(() => _hasError = true);
+
+      print('[PullToRefresh error]: $error');
+      print(StackTrace.current);
+      MainRepository().sentry.captureException(exception: error);
     } finally {
       setState(() {
         _hasPulledDown = false;
