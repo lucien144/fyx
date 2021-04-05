@@ -83,16 +83,10 @@ class FyxApp extends StatefulWidget {
       return T.somethingsWrongButton(stack);
     };
 
-    SystemChrome.setPreferredOrientations(
-        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
     // TODO: Move to build using FutureBuilder.
-    var results = await Future.wait([
-      ApiController().getCredentials(),
-      PackageInfo.fromPlatform(),
-      DeviceInfo.init(),
-      SettingsProvider().init()
-    ]);
+    var results = await Future.wait([ApiController().getCredentials(), PackageInfo.fromPlatform(), DeviceInfo.init(), SettingsProvider().init()]);
     MainRepository().credentials = results[0];
     MainRepository().packageInfo = results[1];
     MainRepository().deviceInfo = results[2];
@@ -104,12 +98,8 @@ class FyxApp extends StatefulWidget {
       // TODO: Do not register if the token is already saved.
       onTokenRefresh: (fcmToken) => ApiController().refreshFcmToken(fcmToken),
     );
-    _notificationsService.onNewMail = () =>
-        FyxApp.navigatorKey.currentState.pushReplacementNamed('/home',
-            arguments: HomePageArguments(HomePage.PAGE_MAIL));
-    _notificationsService.onNewPost = () =>
-        FyxApp.navigatorKey.currentState.pushReplacementNamed('/home',
-            arguments: HomePageArguments(HomePage.PAGE_BOOKMARK));
+    _notificationsService.onNewMail = () => FyxApp.navigatorKey.currentState.pushReplacementNamed('/home', arguments: HomePageArguments(HomePage.PAGE_MAIL));
+    _notificationsService.onNewPost = () => FyxApp.navigatorKey.currentState.pushReplacementNamed('/home', arguments: HomePageArguments(HomePage.PAGE_BOOKMARK));
     _notificationsService.onError = (error) {
       print(error);
       MainRepository().sentry.captureException(exception: error);
@@ -172,8 +162,7 @@ class _FyxAppState extends State<FyxApp> {
       },
       child: MultiProvider(
         providers: [
-          ChangeNotifierProvider<NotificationsModel>(
-              create: (context) => NotificationsModel()),
+          ChangeNotifierProvider<NotificationsModel>(create: (context) => NotificationsModel()),
         ],
         child: CupertinoApp(
           title: 'Fyx',
@@ -181,10 +170,7 @@ class _FyxAppState extends State<FyxApp> {
               primaryColor: T.COLOR_PRIMARY,
               brightness: Brightness.light,
               textTheme: CupertinoTextThemeData(primaryColor: Colors.white, textStyle: TextStyle(color: T.COLOR_BLACK, fontSize: 16))),
-          home: MainRepository().credentials is Credentials &&
-                  MainRepository().credentials.isValid
-              ? HomePage()
-              : LoginPage(),
+          home: MainRepository().credentials is Credentials && MainRepository().credentials.isValid ? HomePage() : LoginPage(),
           debugShowCheckedModeBanner: FyxApp.isDev,
           onUnknownRoute: (RouteSettings settings) => CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings),
           onGenerateRoute: routes,
@@ -193,10 +179,9 @@ class _FyxAppState extends State<FyxApp> {
             FyxApp.routeObserver,
             FirebaseAnalyticsObserver(
                 analytics: FyxApp.analytics,
-                onError: (error) async =>
-                    await MainRepository().sentry.captureException(
-                          exception: error,
-                        ))
+                onError: (error) async => await MainRepository().sentry.captureException(
+                      exception: error,
+                    ))
           ],
         ),
       ),
