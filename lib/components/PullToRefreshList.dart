@@ -1,21 +1,14 @@
+import 'dart:io';
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
-import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
-
-class DataProviderResult {
-  final List data;
-  final dynamic lastId;
-
-  DataProviderResult(this.data, {this.lastId});
-}
-
-typedef Future<DataProviderResult> TDataProvider(int id);
 
 // ignore: must_be_immutable
 class PullToRefreshList extends StatefulWidget {
@@ -71,6 +64,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
 
     // Add the refresh control on first position
     _slivers.add(CupertinoSliverRefreshControl(
+      builder: Platform.isIOS ? CupertinoSliverRefreshControl.buildRefreshIndicator : buildAndroidRefreshIndicator,
       onRefresh: () {
         setState(() => _hasPulledDown = true);
         if (!widget._disabled) {
@@ -97,7 +91,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
     }
 
     if (_hasError) {
-      return PlatformTheme.feedbackScreen(isLoading: _isLoading, onPress: loadData, label: L.GENERAL_REFRESH);
+      return T.feedbackScreen(isLoading: _isLoading, onPress: loadData, label: L.GENERAL_REFRESH);
     }
 
     if (_slivers.length == 1 && !_isLoading) {
@@ -122,7 +116,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
       child: Stack(
         children: [
           CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
+            physics: Platform.isIOS ? const AlwaysScrollableScrollPhysics() : const RefreshScrollPhysics(),
             slivers: _slivers,
             controller: _controller,
           ),
@@ -211,4 +205,57 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
       });
     }
   }
+
+  Widget buildAndroidRefreshIndicator(
+    BuildContext context,
+    RefreshIndicatorMode refreshState,
+    double pulledExtent,
+    double refreshTriggerPullDistance,
+    double refreshIndicatorExtent,
+  ) {
+    const Curve opacityCurve = const Interval(0.4, 0.8, curve: Curves.easeInOut);
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 16.0),
+        child: refreshState == RefreshIndicatorMode.drag
+            ? Opacity(
+                opacity: opacityCurve.transform(min(pulledExtent / refreshTriggerPullDistance, 1.0)),
+                child: const Icon(
+                  Icons.arrow_downward,
+                  color: CupertinoColors.inactiveGray,
+                  size: 24.0,
+                ),
+              )
+            : Opacity(
+                opacity: opacityCurve.transform(min(pulledExtent / refreshIndicatorExtent, 1.0)),
+                child: CircularProgressIndicator(strokeWidth: 2.0, valueColor: AlwaysStoppedAnimation<Color>(T.COLOR_PRIMARY)),
+              ),
+      ),
+    );
+  }
 }
+
+class RefreshScrollPhysics extends BouncingScrollPhysics {
+  const RefreshScrollPhysics({ScrollPhysics parent}) : super(parent: parent);
+
+  @override
+  RefreshScrollPhysics applyTo(ScrollPhysics ancestor) {
+    return RefreshScrollPhysics(parent: buildParent(ancestor));
+  }
+
+  @override
+  bool shouldAcceptUserOffset(ScrollMetrics position) {
+    return true;
+  }
+}
+
+class DataProviderResult {
+  final List data;
+  final dynamic lastId;
+
+  DataProviderResult(this.data, {this.lastId});
+}
+
+typedef Future<DataProviderResult> TDataProvider(int id);
+
