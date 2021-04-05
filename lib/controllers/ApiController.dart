@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fyx/PlatformApp.dart';
+import 'package:fyx/FyxApp.dart';
 import 'package:fyx/controllers/ApiProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/exceptions/AuthException.dart';
@@ -56,7 +56,7 @@ class ApiController {
 
       this.logout(removeAuthrorization: false);
       T.error(message == '' ? L.AUTH_ERROR : message);
-      PlatformApp.navigatorKey.currentState.pushNamed('/login');
+      FyxApp.navigatorKey.currentState.pushNamed('/login');
     };
 
     provider.onError = (message) {
