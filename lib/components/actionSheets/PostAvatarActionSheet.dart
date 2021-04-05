@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/TextIcon.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
@@ -9,6 +8,7 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/L.dart';
+import 'package:fyx/theme/T.dart';
 
 class PostAvatarActionSheet extends StatelessWidget {
   final String user;
@@ -68,7 +68,7 @@ class PostAvatarActionSheet extends StatelessWidget {
                               isDestructiveAction: true,
                               onPressed: () {
                                 MainRepository().settings.blockUser(user);
-                                PlatformTheme.success(L.TOAST_USER_BLOCKED);
+                                T.success(L.TOAST_USER_BLOCKED);
                                 Navigator.of(context).pop();
                                 AnalyticsProvider().logEvent('blockUser');
                               },

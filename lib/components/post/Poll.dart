@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_html/html_parser.dart';
 import 'package:flutter_html/style.dart';
-import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:html/dom.dart' as dom;
 
@@ -219,7 +218,7 @@ class _PollState extends State<Poll> {
           }
         },
         onLinkTap: (String link) {
-          PlatformTheme.openLink(link);
+          T.openLink(link);
         });
   }
 }

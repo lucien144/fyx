@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
@@ -51,10 +50,10 @@ class _InfoPageState extends State<InfoPage> {
             future: _response,
             builder: (BuildContext context, AsyncSnapshot<Response> snapshot) {
               if (snapshot.hasData) {
-                return Markdown(data: snapshot.data.body, onTapLink: (String url) => PlatformTheme.openLink(url));
+                return Markdown(data: snapshot.data.body, onTapLink: (String url) => T.openLink(url));
               }
               if (snapshot.hasError) {
-                return PlatformTheme.feedbackScreen(
+                return T.feedbackScreen(
                     label: L.GENERAL_REFRESH,
                     isWarning: true,
                     title: L.GENERAL_ERROR,
@@ -62,7 +61,7 @@ class _InfoPageState extends State<InfoPage> {
                       setState(() => _response = _client.get(settings.url));
                     });
               }
-              return PlatformTheme.feedbackScreen(isLoading: true);
+              return T.feedbackScreen(isLoading: true);
             }));
   }
 }

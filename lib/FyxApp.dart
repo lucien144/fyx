@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:device_info/device_info.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/cupertino.dart';
@@ -23,7 +21,6 @@ import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry/sentry.dart';
 
-import 'PlatformTheme.dart';
 import 'controllers/NotificationsService.dar.dart';
 
 enum Environment { dev, staging, production }
@@ -76,7 +73,7 @@ class FyxApp extends StatefulWidget {
 
     ErrorWidget.builder = (FlutterErrorDetails details) {
       String stack = '${DateTime.now()}: ${details.exceptionAsString()}';
-      return PlatformTheme.somethingsWrongButton(stack);
+      return T.somethingsWrongButton(stack);
     };
 
     SystemChrome.setPreferredOrientations(

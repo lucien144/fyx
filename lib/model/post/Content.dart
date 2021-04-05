@@ -1,8 +1,8 @@
-import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/model/post/Image.dart';
 import 'package:fyx/model/post/Link.dart';
 import 'package:fyx/model/post/Video.dart';
 import 'package:fyx/theme/Helpers.dart';
+import 'package:fyx/theme/T.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:html_unescape/html_unescape.dart';
@@ -126,7 +126,7 @@ class Content {
       });
       _body = document.body.innerHtml;
     } catch (error) {
-      PlatformTheme.error(error.toString());
+      T.error(error.toString());
     }
   }
 

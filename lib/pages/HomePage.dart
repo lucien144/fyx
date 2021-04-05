@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/FyxApp.dart';
-import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/CircleAvatar.dart' as ca;
 import 'package:fyx/components/DiscussionListItem.dart';
 import 'package:fyx/components/ListHeader.dart';
@@ -11,12 +10,12 @@ import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/BookmarkedDiscussion.dart';
-import 'package:fyx/model/Discussion.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/pages/MailboxPage.dart';
 import 'package:fyx/theme/L.dart';
+import 'package:fyx/theme/T.dart';
 import 'package:provider/provider.dart';
 
 enum tabs { history, bookmarks }
@@ -164,7 +163,7 @@ class _HomePageState extends State<HomePage>
           CupertinoActionSheetAction(
               child: Text('⚠️ ${L.SETTINGS_BUGREPORT}'),
               onPressed: () {
-                PlatformTheme.prefillGithubIssue(
+                T.prefillGithubIssue(
                     appContext: MainRepository(),
                     user: MainRepository().credentials.nickname);
                 AnalyticsProvider().logEvent('reportBug');

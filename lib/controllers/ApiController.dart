@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/PlatformApp.dart';
-import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/controllers/ApiProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/exceptions/AuthException.dart';
@@ -24,6 +23,7 @@ import 'package:fyx/model/reponses/OkResponse.dart';
 import 'package:fyx/model/reponses/RatingResponse.dart';
 import 'package:fyx/model/reponses/WaitingFilesResponse.dart';
 import 'package:fyx/theme/L.dart';
+import 'package:fyx/theme/T.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -55,12 +55,12 @@ class ApiController {
       }
 
       this.logout(removeAuthrorization: false);
-      PlatformTheme.error(message == '' ? L.AUTH_ERROR : message);
+      T.error(message == '' ? L.AUTH_ERROR : message);
       PlatformApp.navigatorKey.currentState.pushNamed('/login');
     };
 
     provider.onError = (message) {
-      PlatformTheme.error(message);
+      T.error(message);
     };
 
     provider.onContextData = (data) {
