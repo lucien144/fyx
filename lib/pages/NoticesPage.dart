@@ -110,7 +110,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
               child: Padding(
                 padding: const EdgeInsets.only(left: 5, bottom: 5),
                 child: component.CircleAvatar(
-                  'https://i.nyx.cz/${thumbUp.nick.substring(0, 1)}/${thumbUp.nick}.gif',
+                  Helpers.avatarUrl(thumbUp.nick),
                   size: 22,
                   isHighlighted: thumbUp.time > lastVisit,
                 ),
@@ -148,7 +148,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
                 width: 5,
               ),
               component.CircleAvatar(
-                'https://i.nyx.cz/${reply.nick.substring(0, 1)}/${reply.nick}.gif',
+                Helpers.avatarUrl(reply.nick),
                 size: 22,
                 isHighlighted: reply.time > lastVisit,
               ),
