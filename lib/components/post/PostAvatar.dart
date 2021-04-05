@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart' as material;
 import 'package:flutter/widgets.dart';
 import 'package:fyx/components/CircleAvatar.dart';
+import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/T.dart';
 
 class PostAvatar extends StatelessWidget {
@@ -8,7 +9,7 @@ class PostAvatar extends StatelessWidget {
   final String description;
   final bool isHighlighted;
 
-  String get image => 'https://i.nyx.cz/${nick.substring(0, 1)}/$nick.gif';
+  String get image => Helpers.avatarUrl(nick);
 
   PostAvatar(this.nick, {this.isHighlighted = false, this.description = ''});
 

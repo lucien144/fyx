@@ -1,5 +1,6 @@
 // ignore_for_file: non_constant_identifier_names
 import 'package:fyx/model/post/Content.dart';
+import 'package:fyx/theme/Helpers.dart';
 
 class Post {
   final bool isCompact;
@@ -41,7 +42,7 @@ class Post {
 
   int get time => _time;
 
-  String get avatar => 'https://i.nyx.cz/${this.nick.substring(0, 1)}/${this.nick}.gif';
+  String get avatar => Helpers.avatarUrl(nick);
 
   String get nick => _nick.toUpperCase();
 

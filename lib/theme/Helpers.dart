@@ -74,4 +74,8 @@ class Helpers {
 
     throw Exception('Unknown file type');
   }
+
+  static String avatarUrl(String username) {
+    return 'https://nyx.cz/${username.substring(0, 1)}/$username.gif';
+  }
 }
