@@ -21,9 +21,10 @@ class NotificationService {
       : this._onToken = onToken,
         this._onTokenRefresh = onTokenRefresh {
     _firebaseMessaging.configure(
-      onMessage: (Map<String, dynamic> message) async {
-        _handleNotifications(message);
-      },
+      // This is triggered when the app is in foreground (active)
+      // onMessage: (Map<String, dynamic> message) async {
+      //   _handleNotifications(message);
+      // },
       onLaunch: (Map<String, dynamic> message) async {
         _handleNotifications(message);
       },
