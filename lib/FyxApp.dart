@@ -14,6 +14,7 @@ import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
+import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/pages/HomePage.dart';
 import 'package:fyx/pages/LoginPage.dart';
 import 'package:fyx/theme/T.dart';
@@ -22,7 +23,7 @@ import 'package:provider/provider.dart';
 import 'package:sentry/sentry.dart';
 
 import 'PlatformTheme.dart';
-import 'controllers/NotificationsService.dar.dart';
+import 'controllers/NotificationsService.dart';
 
 enum Environment { dev, staging, production }
 
@@ -101,9 +102,15 @@ class FyxApp extends StatefulWidget {
     _notificationsService.onNewMail = () =>
         PlatformApp.navigatorKey.currentState.pushReplacementNamed('/home',
             arguments: HomePageArguments(HomePage.PAGE_MAIL));
-    _notificationsService.onNewPost = () =>
-        PlatformApp.navigatorKey.currentState.pushReplacementNamed('/home',
-            arguments: HomePageArguments(HomePage.PAGE_BOOKMARK));
+    _notificationsService.onNewPost = ({discussionId, postId}) {
+      if (discussionId > 0 && postId > 0) {
+        PlatformApp.navigatorKey.currentState.pushNamed('/discussion', arguments: DiscussionPageArguments(discussionId, postId: postId));
+      } else if (discussionId > 0) {
+        PlatformApp.navigatorKey.currentState.pushNamed('/discussion', arguments: DiscussionPageArguments(discussionId));
+      } else {
+        PlatformApp.navigatorKey.currentState.pushReplacementNamed('/home', arguments: HomePageArguments(HomePage.PAGE_BOOKMARK));
+      }
+    };
     _notificationsService.onError = (error) {
       print(error);
       MainRepository().sentry.captureException(exception: error);

@@ -1,5 +1,5 @@
 import 'package:device_info/device_info.dart';
-import 'package:fyx/controllers/NotificationsService.dar.dart';
+import 'package:fyx/controllers/NotificationsService.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:package_info/package_info.dart';
