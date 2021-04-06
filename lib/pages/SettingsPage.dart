@@ -148,8 +148,7 @@ class _SettingsPageState extends State<SettingsPage> {
             CSButtonType.DEFAULT,
             L.TERMS,
             () {
-              // TODO: New API
-              PlatformTheme.openLink('https://www.nyx.cz/index.php?l=terms;lang=cs');
+              PlatformTheme.openLink('https://nyx.cz/terms');
               AnalyticsProvider().logEvent('openTerms');
             },
             style: termsStyle,
