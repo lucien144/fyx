@@ -20,6 +20,7 @@ import 'package:fyx/theme/L.dart';
 import 'package:provider/provider.dart';
 
 enum tabs { history, bookmarks }
+enum ERefreshData { bookmarks, mail, all }
 
 class HomePageArguments {
   final pageIndex;
@@ -40,7 +41,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   tabs activeTab;
   int _pageIndex;
-  int _refreshData = 0;
+  Map<String, int> _refreshData = {'bookmarks': 0, 'mail': 0};
   bool _filterUnread = false;
   DefaultView _defaultView;
   List<int> _toggledCategories = [];
@@ -98,7 +99,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     // If we omit the Route check, there's very rare issue during authorization
     // See: https://github.com/lucien144/fyx/issues/57
     if (state == AppLifecycleState.resumed && ModalRoute.of(context).isCurrent) {
-      this.refreshData();
+      this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? ERefreshData.mail : ERefreshData.bookmarks);
     }
   }
 
@@ -110,7 +111,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   // Called when the current route has been pushed.
   void didPopNext() {
-    this.refreshData();
+    this.refreshData(ERefreshData.bookmarks);
   }
 
   void didPush() {
@@ -125,9 +126,20 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     // Called when a new route has been pushed, and the current route is no longer visible.
   }
 
-  void refreshData() {
+  void refreshData(ERefreshData type) {
     setState(() {
-      _refreshData = DateTime.now().millisecondsSinceEpoch;
+      switch (type) {
+        case ERefreshData.bookmarks:
+          _refreshData['bookmarks'] = DateTime.now().millisecondsSinceEpoch;
+          break;
+        case ERefreshData.mail:
+          _refreshData['mail'] = DateTime.now().millisecondsSinceEpoch;
+          break;
+        default:
+          _refreshData['bookmarks'] = DateTime.now().millisecondsSinceEpoch;
+          _refreshData['mail'] = DateTime.now().millisecondsSinceEpoch;
+          break;
+      }
     });
   }
 
@@ -183,7 +195,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
               });
             }
             setState(() => _pageIndex = index);
-            this.refreshData();
+            this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? ERefreshData.mail : ERefreshData.bookmarks);
           },
           backgroundColor: Colors.white,
           items: <BottomNavigationBarItem>[
@@ -233,7 +245,6 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                       middle: CupertinoSegmentedControl(
                         groupValue: activeTab,
                         onValueChanged: (value) {
-                          setState(() => _refreshData = 0);
                           _bookmarksController.animateToPage(tabs.values.indexOf(value), duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
                         },
                         children: {
@@ -256,7 +267,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                       // HISTORY PULL TO REFRESH
                       // -----
                       PullToRefreshList(
-                          rebuild: _refreshData,
+                          rebuild: _refreshData['bookmarks'],
                           dataProvider: (lastId) async {
                             List<DiscussionListItem> withReplies = [];
                             var result = await ApiController().loadHistory();
@@ -278,7 +289,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                       // BOOKMARKS PULL TO REFRESH
                       // -----
                       PullToRefreshList(
-                          rebuild: _refreshData,
+                          rebuild: _refreshData['bookmarks'],
                           dataProvider: (lastId) async {
                             var categories = [];
                             var result = await ApiController().loadBookmarks();
@@ -325,7 +336,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                                     // Show discussions in the category
                                     setState(() => _toggledCategories.add(_bookmark.categoryId));
                                   }
-                                  this.refreshData();
+                                  this.refreshData(ERefreshData.bookmarks);
                                 }),
                                 'items': discussion
                               });
@@ -352,7 +363,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                         ),
                         middle: Text('Pošta')),
                     child: MailboxPage(
-                      refreshData: _refreshData,
+                      refreshData: _refreshData['mail'],
                     ));
               });
             default:
