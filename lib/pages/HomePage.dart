@@ -35,8 +35,7 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage>
-    with RouteAware, WidgetsBindingObserver {
+class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObserver {
   PageController _bookmarksController;
 
   tabs activeTab;
@@ -52,18 +51,10 @@ class _HomePageState extends State<HomePage>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
 
-    _defaultView = MainRepository().settings.defaultView == DefaultView.latest
-        ? MainRepository().settings.latestView
-        : MainRepository().settings.defaultView;
-    _filterUnread = [DefaultView.bookmarksUnread, DefaultView.historyUnread]
-            .indexOf(_defaultView) >=
-        0;
+    _defaultView = MainRepository().settings.defaultView == DefaultView.latest ? MainRepository().settings.latestView : MainRepository().settings.defaultView;
+    _filterUnread = [DefaultView.bookmarksUnread, DefaultView.historyUnread].indexOf(_defaultView) >= 0;
 
-    activeTab = [DefaultView.history, DefaultView.historyUnread]
-                .indexOf(_defaultView) >=
-            0
-        ? tabs.history
-        : tabs.bookmarks;
+    activeTab = [DefaultView.history, DefaultView.historyUnread].indexOf(_defaultView) >= 0 ? tabs.history : tabs.bookmarks;
     if (activeTab == tabs.bookmarks) {
       _bookmarksController = PageController(initialPage: 1);
     } else {
@@ -72,8 +63,7 @@ class _HomePageState extends State<HomePage>
 
     _bookmarksController.addListener(() {
       // If the CupertinoTabView is sliding and the animation is finished, change the active tab
-      if (_bookmarksController.page % 1 == 0 &&
-          activeTab != tabs.values[_bookmarksController.page.toInt()]) {
+      if (_bookmarksController.page % 1 == 0 && activeTab != tabs.values[_bookmarksController.page.toInt()]) {
         setState(() {
           activeTab = tabs.values[_bookmarksController.page.toInt()];
         });
@@ -84,22 +74,14 @@ class _HomePageState extends State<HomePage>
     MainRepository().notifications.request();
 
     AnalyticsProvider().setUser(MainRepository().credentials.nickname);
-    AnalyticsProvider().setUserProperty(
-        'photoWidth', MainRepository().settings.photoWidth.toString());
-    AnalyticsProvider().setUserProperty(
-        'photoQuality', MainRepository().settings.photoQuality.toString());
-    AnalyticsProvider().setUserProperty(
-        'autocorrect', MainRepository().settings.useAutocorrect.toString());
-    AnalyticsProvider().setUserProperty(
-        'compactMode', MainRepository().settings.useCompactMode.toString());
-    AnalyticsProvider().setUserProperty(
-        'defaultView', MainRepository().settings.defaultView.toString());
-    AnalyticsProvider().setUserProperty('blockedMails',
-        MainRepository().settings.blockedMails.length.toString());
-    AnalyticsProvider().setUserProperty('blockedPosts',
-        MainRepository().settings.blockedPosts.length.toString());
-    AnalyticsProvider().setUserProperty('blockedUsers',
-        MainRepository().settings.blockedUsers.length.toString());
+    AnalyticsProvider().setUserProperty('photoWidth', MainRepository().settings.photoWidth.toString());
+    AnalyticsProvider().setUserProperty('photoQuality', MainRepository().settings.photoQuality.toString());
+    AnalyticsProvider().setUserProperty('autocorrect', MainRepository().settings.useAutocorrect.toString());
+    AnalyticsProvider().setUserProperty('compactMode', MainRepository().settings.useCompactMode.toString());
+    AnalyticsProvider().setUserProperty('defaultView', MainRepository().settings.defaultView.toString());
+    AnalyticsProvider().setUserProperty('blockedMails', MainRepository().settings.blockedMails.length.toString());
+    AnalyticsProvider().setUserProperty('blockedPosts', MainRepository().settings.blockedPosts.length.toString());
+    AnalyticsProvider().setUserProperty('blockedUsers', MainRepository().settings.blockedUsers.length.toString());
     AnalyticsProvider().setScreen('Home', 'HomePage');
   }
 
@@ -115,8 +97,7 @@ class _HomePageState extends State<HomePage>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // If we omit the Route check, there's very rare issue during authorization
     // See: https://github.com/lucien144/fyx/issues/57
-    if (state == AppLifecycleState.resumed &&
-        ModalRoute.of(context).isCurrent) {
+    if (state == AppLifecycleState.resumed && ModalRoute.of(context).isCurrent) {
       this.refreshData();
     }
   }
@@ -158,15 +139,12 @@ class _HomePageState extends State<HomePage>
               child: Text(L.SETTINGS),
               onPressed: () {
                 Navigator.of(context).pop();
-                Navigator.of(context, rootNavigator: true)
-                    .pushNamed('/settings');
+                Navigator.of(context, rootNavigator: true).pushNamed('/settings');
               }),
           CupertinoActionSheetAction(
               child: Text('⚠️ ${L.SETTINGS_BUGREPORT}'),
               onPressed: () {
-                PlatformTheme.prefillGithubIssue(
-                    appContext: MainRepository(),
-                    user: MainRepository().credentials.nickname);
+                PlatformTheme.prefillGithubIssue(appContext: MainRepository(), user: MainRepository().credentials.nickname);
                 AnalyticsProvider().logEvent('reportBug');
               }),
         ],
@@ -183,8 +161,7 @@ class _HomePageState extends State<HomePage>
   Widget build(BuildContext context) {
     if (_pageIndex == null) {
       if (_arguments == null) {
-        _arguments =
-            ModalRoute.of(context).settings.arguments as HomePageArguments;
+        _arguments = ModalRoute.of(context).settings.arguments as HomePageArguments;
         _pageIndex = _arguments?.pageIndex ?? HomePage.PAGE_BOOKMARK;
       } else {
         _pageIndex = _arguments.pageIndex;
@@ -211,9 +188,7 @@ class _HomePageState extends State<HomePage>
           backgroundColor: Colors.white,
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
-              icon: Icon(
-                  _filterUnread ? Icons.bookmarks : Icons.bookmarks_outlined,
-                  size: 34),
+              icon: Icon(_filterUnread ? Icons.bookmarks : Icons.bookmarks_outlined, size: 34),
             ),
             BottomNavigationBarItem(
               icon: Consumer<NotificationsModel>(
@@ -236,18 +211,15 @@ class _HomePageState extends State<HomePage>
                   navigationBar: CupertinoNavigationBar(
                       backgroundColor: Colors.white,
                       leading: Consumer<NotificationsModel>(
-                          builder: (context, notifications, child) =>
-                              NotificationBadge(
-                                  widget: GestureDetector(
-                                      child: Icon(
-                                        Icons.notifications_none,
-                                        size: 30,
-                                      ),
-                                      onTap: () => Navigator.of(context,
-                                              rootNavigator: true)
-                                          .pushNamed('/notices')),
-                                  isVisible: notifications.newNotices > 0,
-                                  counter: notifications.newNotices)),
+                          builder: (context, notifications, child) => NotificationBadge(
+                              widget: GestureDetector(
+                                  child: Icon(
+                                    Icons.notifications_none,
+                                    size: 30,
+                                  ),
+                                  onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/notices')),
+                              isVisible: notifications.newNotices > 0,
+                              counter: notifications.newNotices)),
                       trailing: GestureDetector(
                         child: ca.CircleAvatar(
                           MainRepository().credentials.avatar,
@@ -255,20 +227,14 @@ class _HomePageState extends State<HomePage>
                           isHighlighted: true,
                         ),
                         onTap: () {
-                          showCupertinoModalPopup(
-                              context: context,
-                              builder: (BuildContext context) =>
-                                  actionSheet(context));
+                          showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet(context));
                         },
                       ),
                       middle: CupertinoSegmentedControl(
                         groupValue: activeTab,
                         onValueChanged: (value) {
                           setState(() => _refreshData = 0);
-                          _bookmarksController.animateToPage(
-                              tabs.values.indexOf(value),
-                              duration: Duration(milliseconds: 300),
-                              curve: Curves.easeInOut);
+                          _bookmarksController.animateToPage(tabs.values.indexOf(value), duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
                         },
                         children: {
                           tabs.history: Padding(
@@ -283,8 +249,7 @@ class _HomePageState extends State<HomePage>
                       )),
                   child: PageView(
                     controller: _bookmarksController,
-                    onPageChanged: (int index) =>
-                        this.updateLatestView(isInverted: true),
+                    onPageChanged: (int index) => this.updateLatestView(isInverted: true),
                     pageSnapping: true,
                     children: <Widget>[
                       // -----
@@ -296,13 +261,9 @@ class _HomePageState extends State<HomePage>
                             List<DiscussionListItem> withReplies = [];
                             var result = await ApiController().loadHistory();
                             var data = result.discussions
-                                .map((discussion) =>
-                                    BookmarkedDiscussion.fromJson(discussion))
-                                .where((discussion) => this._filterUnread
-                                    ? discussion.unread > 0
-                                    : true)
-                                .map((discussion) =>
-                                    DiscussionListItem(discussion))
+                                .map((discussion) => BookmarkedDiscussion.fromJson(discussion))
+                                .where((discussion) => this._filterUnread ? discussion.unread > 0 : true)
+                                .map((discussion) => DiscussionListItem(discussion))
                                 .where((discussionListItem) {
                               if (discussionListItem.discussion.replies > 0) {
                                 withReplies.add(discussionListItem);
@@ -329,9 +290,7 @@ class _HomePageState extends State<HomePage>
                                     // Filter by tapping on category headers
                                     // If unread filter is ON
                                     if (this._filterUnread) {
-                                      if (_toggledCategories
-                                              .indexOf(_bookmark.categoryId) >=
-                                          0) {
+                                      if (_toggledCategories.indexOf(_bookmark.categoryId) >= 0) {
                                         // If unread filter is ON and category toggle is ON, display discussions
                                         return true;
                                       } else {
@@ -339,9 +298,7 @@ class _HomePageState extends State<HomePage>
                                         return discussion.unread > 0;
                                       }
                                     } else {
-                                      if (_toggledCategories
-                                              .indexOf(_bookmark.categoryId) >=
-                                          0) {
+                                      if (_toggledCategories.indexOf(_bookmark.categoryId) >= 0) {
                                         // If unread filter is OFF and category toggle is ON, hide discussions
                                         return false;
                                       }
@@ -349,11 +306,9 @@ class _HomePageState extends State<HomePage>
                                     // If unread filter is OFF and category toggle is OFF, show discussions
                                     return true;
                                   })
-                                  .map((discussion) =>
-                                      DiscussionListItem(discussion))
+                                  .map((discussion) => DiscussionListItem(discussion))
                                   .where((discussionListItem) {
-                                    if (discussionListItem.discussion.replies >
-                                        0) {
+                                    if (discussionListItem.discussion.replies > 0) {
                                       withReplies.add(discussionListItem);
                                       return false;
                                     }
@@ -362,18 +317,13 @@ class _HomePageState extends State<HomePage>
                                   .toList();
                               discussion.insertAll(0, withReplies);
                               categories.add({
-                                'header': ListHeader(_bookmark.categoryName,
-                                    onTap: () {
-                                  if (_toggledCategories
-                                          .indexOf(_bookmark.categoryId) >=
-                                      0) {
+                                'header': ListHeader(_bookmark.categoryName, onTap: () {
+                                  if (_toggledCategories.indexOf(_bookmark.categoryId) >= 0) {
                                     // Hide discussions in the category
-                                    setState(() => _toggledCategories
-                                        .remove(_bookmark.categoryId));
+                                    setState(() => _toggledCategories.remove(_bookmark.categoryId));
                                   } else {
                                     // Show discussions in the category
-                                    setState(() => _toggledCategories
-                                        .add(_bookmark.categoryId));
+                                    setState(() => _toggledCategories.add(_bookmark.categoryId));
                                   }
                                   this.refreshData();
                                 }),
@@ -397,10 +347,7 @@ class _HomePageState extends State<HomePage>
                             size: 30,
                           ),
                           onTap: () {
-                            showCupertinoModalPopup(
-                                context: context,
-                                builder: (BuildContext context) =>
-                                    actionSheet(context));
+                            showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet(context));
                           },
                         ),
                         middle: Text('Pošta')),
@@ -420,18 +367,13 @@ class _HomePageState extends State<HomePage>
   // Sometimes the activeTab var is changed after the listener where we call updateLatestView() finishes.
   // Therefore, the var activeTab needs to be handled as inverted.
   void updateLatestView({bool isInverted: false}) {
-    DefaultView latestView =
-        activeTab == tabs.history ? DefaultView.history : DefaultView.bookmarks;
+    DefaultView latestView = activeTab == tabs.history ? DefaultView.history : DefaultView.bookmarks;
     if (isInverted) {
-      latestView = activeTab == tabs.history
-          ? DefaultView.bookmarks
-          : DefaultView.history;
+      latestView = activeTab == tabs.history ? DefaultView.bookmarks : DefaultView.history;
     }
 
     if (_filterUnread) {
-      latestView = latestView == DefaultView.bookmarks
-          ? DefaultView.bookmarksUnread
-          : DefaultView.historyUnread;
+      latestView = latestView == DefaultView.bookmarks ? DefaultView.bookmarksUnread : DefaultView.historyUnread;
     }
     MainRepository().settings.latestView = latestView;
   }
