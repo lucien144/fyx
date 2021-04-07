@@ -143,7 +143,6 @@ class PostHtml extends StatelessWidget {
         var parserResult = Helpers.parseDiscussionUri(link);
         if (parserResult.isNotEmpty) {
           var arguments = DiscussionPageArguments(parserResult[INTERNAL_URI_PARSER.discussionId]);
-          DiscussionPage.deeplinkDepth++;
           Navigator.of(context, rootNavigator: true)
               .pushNamed('/discussion', arguments: arguments);
           return;
@@ -153,7 +152,6 @@ class PostHtml extends StatelessWidget {
         parserResult = Helpers.parseDiscussionPostUri(link);
         if (parserResult.isNotEmpty) {
           var arguments = DiscussionPageArguments(parserResult[INTERNAL_URI_PARSER.discussionId], postId: parserResult[INTERNAL_URI_PARSER.postId]);
-          DiscussionPage.deeplinkDepth++;
           Navigator.of(context, rootNavigator: true)
               .pushNamed('/discussion', arguments: arguments);
           return;
@@ -170,10 +168,7 @@ class PostHtml extends StatelessWidget {
           link = 'https://www.nyx.cz$link';
         }
 
-        var opened = await PlatformTheme.openLink(link);
-        if (opened) {
-          DiscussionPage.browseOutside = true;
-        }
+        PlatformTheme.openLink(link);
       },
     );
   }
