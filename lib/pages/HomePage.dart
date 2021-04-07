@@ -11,7 +11,6 @@ import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/BookmarkedDiscussion.dart';
-import 'package:fyx/model/Discussion.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
@@ -19,7 +18,7 @@ import 'package:fyx/pages/MailboxPage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:provider/provider.dart';
 
-enum tabs { history, bookmarks }
+enum ETabs { history, bookmarks }
 enum ERefreshData { bookmarks, mail, all }
 
 class HomePageArguments {
@@ -39,7 +38,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObserver {
   PageController _bookmarksController;
 
-  tabs activeTab;
+  ETabs activeTab;
   int _pageIndex;
   Map<String, int> _refreshData = {'bookmarks': 0, 'mail': 0};
   bool _filterUnread = false;
@@ -55,8 +54,8 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     _defaultView = MainRepository().settings.defaultView == DefaultView.latest ? MainRepository().settings.latestView : MainRepository().settings.defaultView;
     _filterUnread = [DefaultView.bookmarksUnread, DefaultView.historyUnread].indexOf(_defaultView) >= 0;
 
-    activeTab = [DefaultView.history, DefaultView.historyUnread].indexOf(_defaultView) >= 0 ? tabs.history : tabs.bookmarks;
-    if (activeTab == tabs.bookmarks) {
+    activeTab = [DefaultView.history, DefaultView.historyUnread].indexOf(_defaultView) >= 0 ? ETabs.history : ETabs.bookmarks;
+    if (activeTab == ETabs.bookmarks) {
       _bookmarksController = PageController(initialPage: 1);
     } else {
       _bookmarksController = PageController(initialPage: 0);
@@ -64,9 +63,9 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
     _bookmarksController.addListener(() {
       // If the CupertinoTabView is sliding and the animation is finished, change the active tab
-      if (_bookmarksController.page % 1 == 0 && activeTab != tabs.values[_bookmarksController.page.toInt()]) {
+      if (_bookmarksController.page % 1 == 0 && activeTab != ETabs.values[_bookmarksController.page.toInt()]) {
         setState(() {
-          activeTab = tabs.values[_bookmarksController.page.toInt()];
+          activeTab = ETabs.values[_bookmarksController.page.toInt()];
         });
       }
     });
@@ -245,14 +244,14 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                       middle: CupertinoSegmentedControl(
                         groupValue: activeTab,
                         onValueChanged: (value) {
-                          _bookmarksController.animateToPage(tabs.values.indexOf(value), duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+                          _bookmarksController.animateToPage(ETabs.values.indexOf(value), duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
                         },
                         children: {
-                          tabs.history: Padding(
+                          ETabs.history: Padding(
                             child: Text('Historie'),
                             padding: EdgeInsets.symmetric(horizontal: 16),
                           ),
-                          tabs.bookmarks: Padding(
+                          ETabs.bookmarks: Padding(
                             child: Text('Sledované'),
                             padding: EdgeInsets.symmetric(horizontal: 16),
                           ),
@@ -378,9 +377,9 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
   // Sometimes the activeTab var is changed after the listener where we call updateLatestView() finishes.
   // Therefore, the var activeTab needs to be handled as inverted.
   void updateLatestView({bool isInverted: false}) {
-    DefaultView latestView = activeTab == tabs.history ? DefaultView.history : DefaultView.bookmarks;
+    DefaultView latestView = activeTab == ETabs.history ? DefaultView.history : DefaultView.bookmarks;
     if (isInverted) {
-      latestView = activeTab == tabs.history ? DefaultView.bookmarks : DefaultView.history;
+      latestView = activeTab == ETabs.history ? DefaultView.bookmarks : DefaultView.history;
     }
 
     if (_filterUnread) {
