@@ -59,7 +59,7 @@ class NotificationService {
       }
       if (message['type'] == 'reply') {
         if (onNewPost is DiscussionCallback) {
-          onNewPost(discussionId: message['discussion_id'] ?? 0, postId: message['post_id']);
+          onNewPost(discussionId: int.parse(message['discussion_id'] ?? '0'), postId: int.parse(message['post_id'] ?? '0'));
           return;
         }
       }
