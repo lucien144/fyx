@@ -51,16 +51,15 @@ class NotificationService {
 
   void _handleNotifications(Map<String, dynamic> message) {
     try {
-      Map<String, dynamic> data = Map<String, dynamic>.from(message['aps']['alert']['data'] ?? '');
-      if (data['type'] == 'new_mail') {
+      if (message['type'] == 'new_mail') {
         if (onNewMail is Function) {
           onNewMail();
           return;
         }
       }
-      if (data['type'] == 'reply') {
+      if (message['type'] == 'reply') {
         if (onNewPost is DiscussionCallback) {
-          onNewPost(discussionId: data['discussion_id'] ?? 0, postId: data['post_id'] ?? 0);
+          onNewPost(discussionId: message['discussion_id'] ?? 0, postId: message['post_id']);
           return;
         }
       }
