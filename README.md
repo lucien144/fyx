@@ -2,6 +2,7 @@
 
 # Fyx
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/c5dd9261a8154bddb7f317f607307a1c)](https://app.codacy.com/gh/lucien144/fyx?utm_source=github.com&utm_medium=referral&utm_content=lucien144/fyx&utm_campaign=Badge_Grade_Settings)
 [![Build Status](https://travis-ci.com/lucien144/fyx.svg?branch=develop)](https://travis-ci.com/lucien144/fyx) [![Coverage Status](https://coveralls.io/repos/github/lucien144/fyx/badge.svg?branch=develop)](https://coveralls.io/github/lucien144/fyx?branch=develop)
 
 Fyx je neoficiální mobilní klient pro diskuzní server [Nyx.cz](https://nyx.cz) ve [Flutteru](https://flutter.dev/). V tuto chvíli je psaný a optimalizovaný pro iOS, ale v plánu je i Android verze.
