@@ -25,8 +25,7 @@ import 'package:fyx/theme/T.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry/sentry.dart';
-
-import 'controllers/NotificationsService.dar.dart';
+import 'controllers/NotificationsService.dart';
 
 enum Environment { dev, staging, production }
 
@@ -99,8 +98,18 @@ class FyxApp extends StatefulWidget {
       // TODO: Do not register if the token is already saved.
       onTokenRefresh: (fcmToken) => ApiController().refreshFcmToken(fcmToken),
     );
-    _notificationsService.onNewMail = () => FyxApp.navigatorKey.currentState.pushReplacementNamed('/home', arguments: HomePageArguments(HomePage.PAGE_MAIL));
-    _notificationsService.onNewPost = () => FyxApp.navigatorKey.currentState.pushReplacementNamed('/home', arguments: HomePageArguments(HomePage.PAGE_BOOKMARK));
+    _notificationsService.onNewMail = () =>
+        FyxApp.navigatorKey.currentState.pushReplacementNamed('/home',
+            arguments: HomePageArguments(HomePage.PAGE_MAIL));
+    _notificationsService.onNewPost = ({discussionId, postId}) {
+      if (discussionId > 0 && postId > 0) {
+        FyxApp.navigatorKey.currentState.pushNamed('/discussion', arguments: DiscussionPageArguments(discussionId, postId: postId));
+      } else if (discussionId > 0) {
+        FyxApp.navigatorKey.currentState.pushNamed('/discussion', arguments: DiscussionPageArguments(discussionId));
+      } else {
+        FyxApp.navigatorKey.currentState.pushReplacementNamed('/home', arguments: HomePageArguments(HomePage.PAGE_BOOKMARK));
+      }
+    };
     _notificationsService.onError = (error) {
       print(error);
       MainRepository().sentry.captureException(exception: error);

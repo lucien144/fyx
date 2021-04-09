@@ -5,12 +5,13 @@ import 'package:meta/meta.dart';
 
 typedef ErrorCallback = Function(dynamic error);
 typedef TokenCallback = Function(String token);
+typedef DiscussionCallback = Function({int discussionId, int postId});
 
 class NotificationService {
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   StreamSubscription<String> _tokenStream;
   Function onNewMail;
-  Function onNewPost;
+  DiscussionCallback onNewPost;
   ErrorCallback onError;
 
   TokenCallback _onToken;
@@ -20,9 +21,10 @@ class NotificationService {
       : this._onToken = onToken,
         this._onTokenRefresh = onTokenRefresh {
     _firebaseMessaging.configure(
-      onMessage: (Map<String, dynamic> message) async {
-        _handleNotifications(message);
-      },
+      // This is triggered when the app is in foreground (active)
+      // onMessage: (Map<String, dynamic> message) async {
+      //   _handleNotifications(message);
+      // },
       onLaunch: (Map<String, dynamic> message) async {
         _handleNotifications(message);
       },
@@ -49,16 +51,17 @@ class NotificationService {
 
   void _handleNotifications(Map<String, dynamic> message) {
     try {
-      String type = message['type'] ?? null;
-      if (type == 'new_mail') {
+      if (message['type'] == 'new_mail') {
         if (onNewMail is Function) {
           onNewMail();
           return;
         }
       }
-      if (onNewPost is Function) {
-        onNewPost();
-        return;
+      if (message['type'] == 'reply') {
+        if (onNewPost is DiscussionCallback) {
+          onNewPost(discussionId: int.parse(message['discussion_id'] ?? '0'), postId: int.parse(message['post_id'] ?? '0'));
+          return;
+        }
       }
     } catch (e) {
       if (onError is ErrorCallback) {

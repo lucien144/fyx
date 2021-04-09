@@ -4,13 +4,12 @@
    "google.c.sender.id": 9765431,
    "google.c.a.e": 1,
    "type": "reply",
+   "discussion_id": "25039",
+   "post_id": "52401104",
    "aps":{
        "alert": {
            "title": "Nová odpověď",
-           "subtitle": "Máte novou odpověď na příspěvek.",
            "body": "Máte novou odpověď na příspěvek.",
-       },
-      "badge":1,
-      "sound":"default"
+       }
    }
 }

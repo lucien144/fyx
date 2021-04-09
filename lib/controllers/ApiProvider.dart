@@ -8,7 +8,7 @@ class ApiProvider implements IApiProvider {
   final Dio dio = Dio();
 
   // ignore: non_constant_identifier_names
-  final URL = 'https://alpha.nyx.cz/api';
+  final URL = 'https://nyx.cz/api';
 
   Credentials _credentials;
 

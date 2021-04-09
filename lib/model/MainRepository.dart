@@ -1,4 +1,4 @@
-import 'package:fyx/controllers/NotificationsService.dar.dart';
+import 'package:fyx/controllers/NotificationsService.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/libs/DeviceInfo.dart';
 import 'package:fyx/model/Credentials.dart';

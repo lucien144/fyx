@@ -7,10 +7,7 @@
    "aps":{
        "alert": {
            "title": "Nová zpráva",
-           "subtitle": "Máte novou zprávu v poště.",
            "body": "Máte novou zprávu v poště.",
-       },
-      "badge":1,
-      "sound":"default"
+       }
    }
 }

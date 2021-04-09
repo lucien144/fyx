@@ -39,8 +39,8 @@ class _SettingsPageState extends State<SettingsPage> {
     CSWidgetStyle autocorrectStyle = const CSWidgetStyle(icon: const Icon(Icons.spellcheck, color: Colors.black54));
     CSWidgetStyle bugreportStyle = const CSWidgetStyle(icon: const Icon(Icons.bug_report, color: Colors.black54));
     CSWidgetStyle aboutStyle = const CSWidgetStyle(icon: const Icon(Icons.info, color: Colors.black54));
-    CSWidgetStyle patronsStyle = const CSWidgetStyle(icon: const Icon(Icons.stars, color: Colors.black54));
-    CSWidgetStyle termsStyle = const CSWidgetStyle(icon: const Icon(Icons.account_balance, color: Colors.black54));
+    CSWidgetStyle patronsStyle = const CSWidgetStyle(icon: const Icon(Icons.volunteer_activism, color: Colors.black54));
+    CSWidgetStyle termsStyle = const CSWidgetStyle(icon: const Icon(Icons.gavel, color: Colors.black54));
 
     var pkg = MainRepository().packageInfo;
     var version = '${pkg.version} (${pkg.buildNumber})';
@@ -125,12 +125,12 @@ class _SettingsPageState extends State<SettingsPage> {
             AnalyticsProvider().logEvent('resetBlockedContent');
           }),
           const CSHeader('Informace'),
-          // CSButton(
-          //   CSButtonType.DEFAULT,
-          //   L.BACKERS,
-          //   () => Navigator.of(context).pushNamed('/settings/info', arguments: InfoPageSettings(L.BACKERS, 'https://raw.githubusercontent.com/lucien144/fyx/develop/BACKERS.md')),
-          //   style: patronsStyle,
-          // ),
+          CSButton(
+            CSButtonType.DEFAULT,
+            L.BACKERS,
+            () => Navigator.of(context).pushNamed('/settings/info', arguments: InfoPageSettings(L.BACKERS, 'https://raw.githubusercontent.com/lucien144/fyx/develop/BACKERS.md')),
+            style: patronsStyle,
+          ),
           CSButton(CSButtonType.DEFAULT, L.ABOUT,
               () => Navigator.of(context).pushNamed('/settings/info', arguments: InfoPageSettings(L.ABOUT, 'https://raw.githubusercontent.com/lucien144/fyx/develop/ABOUT.md')),
               style: aboutStyle),
@@ -147,8 +147,7 @@ class _SettingsPageState extends State<SettingsPage> {
             CSButtonType.DEFAULT,
             L.TERMS,
             () {
-              // TODO: New API
-              T.openLink('https://www.nyx.cz/index.php?l=terms;lang=cs');
+              T.openLink('https://nyx.cz/terms');
               AnalyticsProvider().logEvent('openTerms');
             },
             style: termsStyle,
