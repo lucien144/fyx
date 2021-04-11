@@ -33,13 +33,7 @@ class ApiController {
   static ApiController _instance = ApiController._init();
   IApiProvider provider;
   bool isLoggingIn = false;
-  BuildContext _context;
-
-  set context(BuildContext value) {
-    if (_context == null) {
-      _context = value;
-    }
-  }
+  BuildContext buildContext;
 
   factory ApiController() {
     return _instance;
@@ -64,13 +58,13 @@ class ApiController {
     };
 
     provider.onContextData = (data) {
-      if (_context == null) {
+      if (buildContext == null) {
         return;
       }
 
       ResponseContext responseContext = ResponseContext.fromJson(data);
-      Provider.of<NotificationsModel>(_context, listen: false).setNewMails(responseContext.user.mailUnread);
-      Provider.of<NotificationsModel>(_context, listen: false).setNewNotices(responseContext.user.notificationsUnread);
+      Provider.of<NotificationsModel>(buildContext, listen: false).setNewMails(responseContext.user.mailUnread);
+      Provider.of<NotificationsModel>(buildContext, listen: false).setNewNotices(responseContext.user.notificationsUnread);
     };
   }
 

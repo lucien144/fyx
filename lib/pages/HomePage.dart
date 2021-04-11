@@ -170,6 +170,10 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   @override
   Widget build(BuildContext context) {
+    if (ApiController().buildContext == null) {
+      ApiController().buildContext = context;
+    }
+
     if (_pageIndex == null) {
       if (_arguments == null) {
         _arguments = ModalRoute.of(context).settings.arguments as HomePageArguments;
