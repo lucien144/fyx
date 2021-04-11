@@ -79,7 +79,7 @@ class _MailboxPageState extends State<MailboxPage> {
                 .map((_mail) => Mail.fromJson(_mail, isCompact: MainRepository().settings.useCompactMode))
                 .where((mail) => !MainRepository().settings.isMailBlocked(mail.id))
                 .where((mail) => !MainRepository().settings.isUserBlocked(mail.participant))
-                .map((mail) => MailListItem(mail))
+                .map((mail) => MailListItem(mail, onUpdate: this.refreshData,))
                 .toList();
             var id = Mail.fromJson(result.mails.last, isCompact: MainRepository().settings.useCompactMode).id;
             return DataProviderResult(mails, lastId: id);
@@ -93,6 +93,7 @@ class _MailboxPageState extends State<MailboxPage> {
             child: Icon(Icons.add),
             onPressed: () => Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
                 arguments: NewMessageSettings(
+                    onClose: this.refreshData,
                     hasInputField: true,
                     onSubmit: (String inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
                       var response = await ApiController().sendMail(inputField, message, attachments: attachments);

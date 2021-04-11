@@ -29,6 +29,7 @@ class PostAvatarActionSheet extends StatelessWidget {
                 arguments: NewMessageSettings(
                     hasInputField: true,
                     inputFieldPlaceholder: this.user,
+                    onClose: () => T.success('👍 Zpráva poslána.'),
                     onSubmit: (String inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
                       var response = await ApiController().sendMail(inputField, message, attachments: attachments);
                       return response.isOk;

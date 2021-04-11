@@ -37,7 +37,7 @@ class Mail {
 
   Content get content => _content;
 
-  MailDirection get direction => _direction ? MailDirection.from : MailDirection.from;
+  MailDirection get direction => _direction ? MailDirection.from : MailDirection.to;
 
   int get time => _time;
 
