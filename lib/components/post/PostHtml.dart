@@ -100,6 +100,10 @@ class PostHtml extends StatelessWidget {
           if (element.classes.contains('w-dyn')) {
             return Poll(element.outerHtml);
           }
+          // Spoiler
+          if (element.classes.contains('spoiler')) {
+            return Spoiler(element.text);
+          }
 
           return parsedChild;
         },
