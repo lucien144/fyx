@@ -116,14 +116,18 @@ class PostHtml extends StatelessWidget {
 
           return parsedChild;
         },
-        'code': (
+        'pre': (
           RenderContext renderContext,
           Widget parsedChild,
           Map<String, String> attributes,
           dom.Element element,
         ) {
-          final source = HtmlUnescape().convert(element.innerHtml);
-          return SyntaxHighlighter(source);
+          if (attributes["style"] == "background-color:#272822") {
+            final source = HtmlUnescape().convert(element.text);
+            return SyntaxHighlighter(source);
+          } else {
+            return parsedChild;
+          }
         }
       },
       onImageTap: (String src) {
