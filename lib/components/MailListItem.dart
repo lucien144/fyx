@@ -15,8 +15,9 @@ import 'package:fyx/theme/T.dart';
 class MailListItem extends StatefulWidget {
   final Mail mail;
   final bool isPreview;
+  final Function onUpdate;
 
-  const MailListItem(this.mail, {this.isPreview});
+  const MailListItem(this.mail, {this.isPreview, this.onUpdate});
 
   @override
   _MailListItemState createState() => _MailListItemState();
@@ -70,6 +71,7 @@ class _MailListItemState extends State<MailListItem> {
                           var response = await ApiController().sendMail(inputField, message, attachments: attachments);
                           return response.isOk;
                         },
+                        onClose: this.widget.onUpdate,
                         inputFieldPlaceholder: widget.mail.participant,
                         hasInputField: true,
                         replyWidget: MailListItem(
