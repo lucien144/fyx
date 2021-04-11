@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "759579571053",
+    "firebase_url": "https://fyxapp-6f21a.firebaseio.com",
+    "project_id": "fyxapp-6f21a",
+    "storage_bucket": "fyxapp-6f21a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:759579571053:android:4dcfc9bb9fcc436bcfa064",
+        "android_client_info": {
+          "package_name": "net.lucien144.fyx"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "759579571053-kdemllrl5us6m1hof31o5m410659dct3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBraxzIn5lb4ADG-4A4cdj2MjbN1p0lQoc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "759579571053-kdemllrl5us6m1hof31o5m410659dct3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "759579571053-kvh9iifb4318ilasge28dhpjti2hba2c.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "wtf.144.fyx",
+                "app_store_id": "1507921589"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
