@@ -7,7 +7,7 @@ Takže milí podporovatelé, díky! ❤️
 
 ### Měsíčně
 
-- ID **_LEPIK_** ($20)
+- ID **\_LEPIK_** ($20)
 - ID **CUCHULAIN** ($12)
 - ID **YMLADRIS** ($12)
 - ID **TOMAN** ($12)
