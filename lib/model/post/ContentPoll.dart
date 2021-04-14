@@ -1,6 +1,11 @@
+import 'package:fyx/model/enums/PostTypeEnum.dart';
+import 'package:fyx/model/post/Content.dart';
+import 'package:fyx/model/post/Image.dart';
+import 'package:fyx/model/post/Link.dart';
+import 'package:fyx/model/post/Video.dart';
 import 'package:fyx/model/post/poll/PollAnswer.dart';
 
-class PostContentPoll {
+class ContentPoll implements Content {
   String _question;
   String _instructions;
   bool _publicResults;
@@ -23,7 +28,7 @@ class PostContentPoll {
 
   List<PollAnswer> get answers => _answers;
 
-  PostContentPoll.fromJson(Map<String, dynamic> json) {
+  ContentPoll.fromJson(Map<String, dynamic> json) {
     _question = json['question'];
     _instructions = json['instructions'];
     _publicResults = json['public_results'];
@@ -37,4 +42,40 @@ class PostContentPoll {
       });
     }
   }
+
+  @override
+  PostTypeEnum get contentType => PostTypeEnum.poll;
+
+  @override
+  List get attachments => [];
+
+  @override
+  Map<String, dynamic> get attachmentsWithFeatured => {};
+
+  @override
+  // TODO: implement body
+  String get body => throw UnimplementedError();
+
+  @override
+  bool get consecutiveImages => false;
+
+  @override
+  List<Link> get emptyLinks => [];
+
+  @override
+  List<Image> get images => [];
+
+  @override
+  bool get isCompact => false;
+
+  @override
+  // TODO: implement rawBody
+  String get rawBody => throw UnimplementedError();
+
+  @override
+  // TODO: implement strippedContent
+  String get strippedContent => throw UnimplementedError();
+
+  @override
+  List<Video> get videos => [];
 }

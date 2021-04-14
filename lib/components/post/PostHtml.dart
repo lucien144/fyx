@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_html/html_parser.dart';
 import 'package:flutter_html/style.dart';
-import 'package:fyx/components/post/Poll.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/components/post/Spoiler.dart';
 import 'package:fyx/components/post/SyntaxHighlighter.dart';
@@ -96,10 +95,6 @@ class PostHtml extends StatelessWidget {
           Map<String, String> attributes,
           dom.Element element,
         ) {
-          // Polls
-          if (element.classes.contains('w-dyn')) {
-            return Poll(element.outerHtml);
-          }
           // Spoiler
           if (element.classes.contains('spoiler')) {
             return Spoiler(element.text);
