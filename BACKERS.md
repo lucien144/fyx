@@ -7,44 +7,71 @@ Takže milí podporovatelé, díky! ❤️
 
 ### Měsíčně
 
-- ID **\_LEPIK_** ($20)
-- ID **CUCHULAIN** ($12)
-- ID **YMLADRIS** ($12)
-- ID **TOMAN** ($12)
-- ID **CPT_PLESARD** ($7)
-- ID **ISCH** ($7)
-- ID **MRAKY** ($7)
-- ID **PISKVOR** ($7)
-- ID **WOJTISHEK** ($7)
-- ID **ADMIX** ($3)
-- ID **ARAON** ($3)
-- ID **BARTOLOMEJ** ($3)
-- ID **BEEBLEBROX** ($3)
-- ID **BINARY_PARANOIC** ($3)
-- ID **CROSS** ($3)
-- ID **DARKSWORD** ($3)
-- ID **DEEFHA** ($3)
-- ID **FRK_R23** ($3)
-- ID **GL_ST0RM** ($3)
-- ID **IF_** ($3)
-- ID **IXTREMIST** ($3)
-- ID **JCK** ($3)
-- ID **MADBANANA** ($3)
-- ID **MR_PREWEET** ($3)
-- ID **NAVARA** ($3)
-- ID **NOP** ($3)
-- ID **SITH** ($3)
-- ID **SOUNDHAZARD** ($3)
-- ID **SPAULDING** ($3)
-- ID **THESTOUPA** ($3)
-- ID **VIDA** ($3)
-- ID **XLACHTAN** ($3)
-
-## Jednorázově
-- ID **SKAFF** (~$4)
-- ID **ADITU** (~$3)
-- ID **DANYSEK** (~$3)
-- ID **LAUNCHER** (~$3)
+- ID **\_LEPIK_** 🦸‍♂️
+- ID **ADITU**
+- ID **ADMIX** ☕️
+- ID **ALEA** ☕️
+- ID **ARAON** ☕️
+- ID **B3DA**
+- ID **BARTOLOMEJ** ☕️
+- ID **BEEBLEBROX** ☕️
+- ID **BINARY_PARANOIC** ☕️
+- ID **BURKHAR** ☕️
+- ID **CERMINEK** ☕️
+- ID **CPT_PLESARD** 🍦
+- ID **CROSS** ☕️
+- ID **CUCHULAIN** 🍜
+- ID **DANYSEK** ☕️
+- ID **DARKSWORD** ☕️
+- ID **DEEFHA** ☕️
+- ID **DOMCIS**
+- ID **DUNICAN**
+- ID **EARL**
+- ID **FRK_R23** ☕️
+- ID **GL_ST0RM** ☕️
+- ID **GRAETAR** ☕️
+- ID **HELVETE** 🍭
+- ID **IF_** ☕️
+- ID **ISCH** 🍦
+- ID **IXTREMIST** ☕️
+- ID **JAYB**
+- ID **JCK** ☕️
+- ID **JDAG**
+- ID **KOMPAS** ☕️
+- ID **KONOPASLIK** 🦸‍♂️
+- ID **KRUPAN**
+- ID **LAUNCHER**
+- ID **MADBANANA** ☕️
+- ID **MERISCZ** 🍭
+- ID **MIKEKT**
+- ID **MOGUCAN**
+- ID **MOIRAIN**
+- ID **MR_PREWEET** ☕️
+- ID **MRAKY** 🍦
+- ID **NAVARA** ☕️
+- ID **NEVILL** ☕️
+- ID **NOP** ☕️
+- ID **NYX** 🍜
+- ID **PES** ☕️
+- ID **PISKVOR** 🍦
+- ID **PULKA** ☕️
+- ID **QWWERTY** ☕️
+- ID **RADICETA** ☕️
+- ID **SITH** ☕️
+- ID **SKAFF** ☕️
+- ID **SOUNDHAZARD** ☕️
+- ID **SOUNDHAZARD**
+- ID **SPAULDING** ☕️
+- ID **TAP**
+- ID **TBC**
+- ID **THESTOUPA** ☕️
+- ID **TOMAN** 🍜
+- ID **TOOMIX**
+- ID **VIDA** ☕️
+- ID **VIDA** 🍜
+- ID **WOJTISHEK** 🍦
+- ID **WOTAR** ☕️
+- ID **XLACHTAN** ☕️
 
 Dárci pod $1 jsou uvedeni na nástěnce klubu na Nyxu.
 
