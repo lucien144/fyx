@@ -10,8 +10,7 @@ import 'package:html_unescape/html_unescape.dart';
 
 import 'Content.dart';
 
-class ContentRegular implements Content {
-  final bool isCompact;
+class ContentRegular extends Content {
 
   String _body;
   String _rawBody;
@@ -25,7 +24,7 @@ class ContentRegular implements Content {
   List<Link> _emptyLinks = [];
   List<Video> _videos = [];
 
-  ContentRegular(this._body, { this.isCompact }) {
+  ContentRegular(this._body, { bool isCompact }) : super(PostTypeEnum.text, isCompact: isCompact) {
     _rawBody = _body;
     _rawBody = this._tagAllImageLinks(_rawBody); // This updates the raw body.
     _body = this._tagAllImageLinks(_body); // This updates the raw body.
@@ -38,25 +37,34 @@ class ContentRegular implements Content {
     this._cleanupBody();
   }
 
+  @override
   PostTypeEnum get contentType => PostTypeEnum.text;
 
   // HTML body stripped out of all HTML elements
   // Clean text content without single HTML element.
   // Used to check if there's ANY content at all.
+  @override
   String get strippedContent => Helpers.stripHtmlTags(_body);
 
+  @override
   String get body => _body;
 
+  @override
   String get rawBody => _rawBody;
 
+  @override
   List<Image> get images => _images;
 
+  @override
   bool get consecutiveImages => _consecutiveImages;
 
+  @override
   List<Link> get emptyLinks => _emptyLinks;
 
+  @override
   List<Video> get videos => _videos;
 
+  @override
   List<dynamic> get attachments {
     var list = [];
     list.addAll(_images);
@@ -64,6 +72,7 @@ class ContentRegular implements Content {
     return list;
   }
 
+  @override
   Map<String, dynamic> get attachmentsWithFeatured {
     var cloneImages = List.from(_images);
     var cloneVideos = List.from(_videos);

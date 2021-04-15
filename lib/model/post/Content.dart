@@ -6,31 +6,27 @@ import 'package:fyx/model/post/Video.dart';
 // TODO move post specific methods to PostContent
 abstract class Content {
   final bool isCompact;
+  PostTypeEnum _contentType;
 
-  String _body;
+  Content(this._contentType, { this.isCompact });
 
-  Content(this._body, { this.isCompact });
+  PostTypeEnum get contentType => _contentType;
 
-  PostTypeEnum get contentType;
+  String get strippedContent => "";
 
-  // HTML body stripped out of all HTML elements
-  // Clean text content without single HTML element.
-  // Used to check if there's ANY content at all.
-  String get strippedContent;
+  String get body => "";
 
-  String get body;
+  String get rawBody => "";
 
-  String get rawBody;
+  List<Image> get images => [];
 
-  List<Image> get images;
+  bool get consecutiveImages => false;
 
-  bool get consecutiveImages;
+  List<Link> get emptyLinks => [];
 
-  List<Link> get emptyLinks;
+  List<Video> get videos => [];
 
-  List<Video> get videos;
+  List<dynamic> get attachments => [];
 
-  List<dynamic> get attachments;
-
-  Map<String, dynamic> get attachmentsWithFeatured;
+  Map<String, dynamic> get attachmentsWithFeatured => {};
 }
