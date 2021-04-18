@@ -57,7 +57,6 @@ class _PollState extends State<Poll> {
     return widget.content.answers
         .map((answer) => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             RichText(
                 textAlign: TextAlign.left,
@@ -107,6 +106,7 @@ class _PollState extends State<Poll> {
               ])
           ),
           Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
            children: buildAnswers(context)
           )
         ]),
