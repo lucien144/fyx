@@ -50,9 +50,7 @@ class _PollState extends State<Poll> {
   }
 
   List<Widget> buildAnswers(BuildContext context) {
-    var estimatedVotes = widget.content.answers
-      .map((answer) => answer.result?.respondentsCount)
-      .reduce((a, b) => (a??=0) + (b??=0));
+    var totalRespondents = widget.content.pollComputedValues.totalRespondents;
 
     return widget.content.answers
         .map((answer) => Column(
@@ -67,16 +65,25 @@ class _PollState extends State<Poll> {
                 ),
                 ]),
             ),
-            FractionallySizedBox(
-
-                  widthFactor: answer.result == null ? 0 : (answer.result.respondentsCount/estimatedVotes).toDouble(), //TODO compare respondentCOunt with total number of respondents when added to API
-
-                  child: Container(
-                    color: answer.result == null ? null : answer.result.isMyVote ? T.COLOR_LIGHT : T.COLOR_PRIMARY,
-                    height: 10,
-                  )
-            )]
-
+            if (answer.result != null)
+              FractionallySizedBox(
+                widthFactor: (answer.result.respondentsCount/totalRespondents).toDouble() + 0.001,
+                child: Container(
+                  color: answer.result.isMyVote ? T.COLOR_LIGHT : T.COLOR_PRIMARY,
+                  height: 10,
+                )
+              ),
+            if (answer.result != null)
+              RichText(
+                textAlign: TextAlign.left,
+                text: TextSpan(children: [TextSpan(
+                    text: "${answer.result.respondentsCount} (${(answer.result.respondentsCount/totalRespondents*100).toStringAsFixed(1)}%)",
+                    style: DefaultTextStyle.of(context)
+                        .style
+                ),
+                ]),
+              )
+          ]
     ))
     .toList();
   }
@@ -87,7 +94,6 @@ class _PollState extends State<Poll> {
       alignment: Alignment.centerLeft,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
         children:[
           RichText(
                     text: TextSpan(children: [TextSpan(
@@ -100,6 +106,14 @@ class _PollState extends State<Poll> {
           RichText(
               text: TextSpan(children: [TextSpan(
                   text: widget.content.instructions,
+                  style: DefaultTextStyle.of(context)
+                      .style
+              ),
+              ])
+          ),
+          RichText(
+              text: TextSpan(children: [TextSpan(
+                  text: "${widget.content.pollComputedValues.totalVotes} hlasů od ${widget.content.pollComputedValues.totalRespondents} hlasujících",
                   style: DefaultTextStyle.of(context)
                       .style
               ),
