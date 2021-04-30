@@ -20,34 +20,6 @@ class _PollState extends State<Poll> {
   TapGestureRecognizer columnsRecognizer;
   TapGestureRecognizer rowsRecognizer;
 
-  @override
-  void initState() {
-    votesRecognizer = TapGestureRecognizer()
-      ..onTap = () {
-        setState(() {
-          _showRowStats = false;
-          _showColumnStats = false;
-        });
-      };
-
-    columnsRecognizer = TapGestureRecognizer()
-      ..onTap = () {
-        setState(() {
-          _showRowStats = false;
-          _showColumnStats = !_showColumnStats;
-        });
-      };
-
-    rowsRecognizer = TapGestureRecognizer()
-      ..onTap = () {
-        setState(() {
-          _showRowStats = !_showRowStats;
-          _showColumnStats = false;
-        });
-      };
-
-    super.initState();
-  }
 
   List<Widget> buildAnswers(BuildContext context) {
     var totalRespondents = widget.content.pollComputedValues.totalRespondents;
