@@ -8,8 +8,8 @@ class ContentPoll extends Content {
   String _instructions;
   bool _publicResults;
   int _allowedVotes;
-  String _allowAnswersUntil;
-  String _showAnswersAfter;
+  int _allowAnswersUntil;
+  int _showAnswersAfter;
   List<PollAnswer> _answers;
   PollComputedValues _pollComputedValues;
 
@@ -21,21 +21,29 @@ class ContentPoll extends Content {
 
   int get allowedVotes => _allowedVotes;
 
-  String get allowAnswersUntil => _allowAnswersUntil;
+  int get allowAnswersUntil => _allowAnswersUntil;
 
-  String get showAnswersAfter => _showAnswersAfter;
+  int get showAnswersAfter => _showAnswersAfter;
 
   List<PollAnswer> get answers => _answers;
 
   PollComputedValues get pollComputedValues => _pollComputedValues;
+
+  bool get canVote {
+    bool _canVote = pollComputedValues != null && !pollComputedValues.userDidVote;
+    if (allowAnswersUntil != null) {
+      _canVote = _canVote && allowAnswersUntil > DateTime.now().millisecondsSinceEpoch;
+    }
+    return _canVote;
+  }
 
   ContentPoll.fromJson(Map<String, dynamic> json) : super(PostTypeEnum.poll, isCompact: false) {
     _question = json['question'];
     _instructions = json['instructions'];
     _publicResults = json['public_results'];
     _allowedVotes = json['allowed_votes'];
-    _allowAnswersUntil = json['allow_answers_until'];
-    _showAnswersAfter = json['show_answers_after'];
+    _allowAnswersUntil = json['allow_answers_until'] != null ? DateTime.parse(json['allow_answers_until']).millisecondsSinceEpoch : null;
+    _showAnswersAfter = json['show_answers_after'] != null ? DateTime.parse(json['show_answers_after']).millisecondsSinceEpoch : null;
     if (json['answers'] != null) {
       _answers = new List<PollAnswer>();
       (json['answers'] as Map<String, dynamic>).forEach((String key, dynamic answer) {

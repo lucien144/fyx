@@ -31,10 +31,11 @@ class PostHtml extends StatelessWidget {
               ? content.body
               : content.rawBody,
       style: {
-        "html": Style.fromTextStyle(
+        'html': Style.fromTextStyle(
             CupertinoTheme.of(context).textTheme.textStyle),
-        ".image-link": Style(textDecoration: TextDecoration.none),
-        "span.r": Style(fontWeight: FontWeight.bold),
+        '.image-link': Style(textDecoration: TextDecoration.none),
+        'span.r': Style(fontWeight: FontWeight.bold),
+        'body': Style(margin: EdgeInsets.all(0))
       },
       customRender: {
         'img': (
@@ -121,7 +122,7 @@ class PostHtml extends StatelessWidget {
           Map<String, String> attributes,
           dom.Element element,
         ) {
-          if (attributes["style"] == "background-color:#272822") {
+          if (attributes['style'] == 'background-color:#272822') {
             final source = HtmlUnescape().convert(element.text);
             return SyntaxHighlighter(source);
           } else {
