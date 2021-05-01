@@ -10,6 +10,7 @@ import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/ResponseContext.dart';
+import 'package:fyx/model/post/ContentPoll.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/model/reponses/BookmarksAllResponse.dart';
 import 'package:fyx/model/reponses/BookmarksHistoryResponse.dart';
@@ -268,6 +269,13 @@ class ApiController {
   Future<WaitingFilesResponse> fetchMailWaitingFiles() async {
     Response response = await provider.fetchMailWaitingFiles();
     return WaitingFilesResponse.fromJson(response.data);
+  }
+
+  Future<ContentPoll> votePoll(discussionId, postId, votes) async {
+    Response response = await provider.votePoll(discussionId, postId, votes);
+    print(response.data);
+    Map<String, dynamic> json = response.data;
+    return ContentPoll.fromJson(json['content_raw']['data'], discussionId: json['discussion_id'], postId: json['post_id']);
   }
 
   throwAuthException(LoginResponse loginResponse, {String message: ''}) {

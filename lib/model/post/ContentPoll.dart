@@ -4,6 +4,9 @@ import 'package:fyx/model/post/poll/PollAnswer.dart';
 import 'package:fyx/model/post/poll/PollComputedValues.dart';
 
 class ContentPoll extends Content {
+  int postId;
+  int discussionId;
+
   String _question;
   String _instructions;
   bool _publicResults;
@@ -37,7 +40,7 @@ class ContentPoll extends Content {
     return _canVote;
   }
 
-  ContentPoll.fromJson(Map<String, dynamic> json) : super(PostTypeEnum.poll, isCompact: false) {
+  ContentPoll.fromJson(Map<String, dynamic> json, {this.postId, this.discussionId}) : super(PostTypeEnum.poll, isCompact: false) {
     _question = json['question'];
     _instructions = json['instructions'];
     _publicResults = json['public_results'];

@@ -34,7 +34,7 @@ class Post {
     if (json['content_raw'] != null) {
       switch (json['content_raw']['type']) {
         case 'poll':
-          this._content = ContentPoll.fromJson(json['content_raw']['data']);
+          this._content = ContentPoll.fromJson(json['content_raw']['data'], discussionId: json['discussion_id'], postId: json['id']);
           break;
       }
       //TODO handle other cases

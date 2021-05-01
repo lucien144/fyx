@@ -169,4 +169,8 @@ class ApiProvider implements IApiProvider {
     }
     return Future.wait(uploads);
   }
+
+  Future<Response> votePoll(int discussionId, int postId, List<int> votes) async {
+    return await dio.post('$URL/discussion/$discussionId/poll/$postId/vote/${votes.join(',')}');
+  }
 }
