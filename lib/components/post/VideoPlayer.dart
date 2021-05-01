@@ -2,7 +2,6 @@ import 'package:chewie/chewie.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:video_player/video_player.dart';
@@ -77,7 +76,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
   @override
   Widget build(BuildContext context) {
     if (widget.videoUrl?.isEmpty ?? true) {
-      return PlatformTheme.somethingsWrongButton(widget.element.outerHtml);
+      return T.somethingsWrongButton(widget.element.outerHtml);
     }
 
     return FutureBuilder(
@@ -91,7 +90,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
                   height: 8,
                 ),
                 GestureDetector(
-                  onTap: () => PlatformTheme.openLink(widget.videoUrl),
+                  onTap: () => T.openLink(widget.videoUrl),
                   child: RichText(
                     overflow: TextOverflow.ellipsis,
                     text: TextSpan(children: [
@@ -109,7 +108,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
               ],
             );
           } else if (snapshot.hasError) {
-            return PlatformTheme.somethingsWrongButton(widget.element.outerHtml);
+            return T.somethingsWrongButton(widget.element.outerHtml);
           }
           return Center(child: CupertinoActivityIndicator());
         });

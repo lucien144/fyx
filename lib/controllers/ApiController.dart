@@ -2,8 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fyx/PlatformApp.dart';
-import 'package:fyx/PlatformTheme.dart';
+import 'package:fyx/FyxApp.dart';
 import 'package:fyx/controllers/ApiProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/exceptions/AuthException.dart';
@@ -11,6 +10,7 @@ import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/ResponseContext.dart';
+import 'package:fyx/model/post/ContentPoll.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/model/reponses/BookmarksAllResponse.dart';
 import 'package:fyx/model/reponses/BookmarksHistoryResponse.dart';
@@ -24,6 +24,7 @@ import 'package:fyx/model/reponses/OkResponse.dart';
 import 'package:fyx/model/reponses/RatingResponse.dart';
 import 'package:fyx/model/reponses/WaitingFilesResponse.dart';
 import 'package:fyx/theme/L.dart';
+import 'package:fyx/theme/T.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -33,13 +34,7 @@ class ApiController {
   static ApiController _instance = ApiController._init();
   IApiProvider provider;
   bool isLoggingIn = false;
-  BuildContext _context;
-
-  set context(BuildContext value) {
-    if (_context == null) {
-      _context = value;
-    }
-  }
+  BuildContext buildContext;
 
   factory ApiController() {
     return _instance;
@@ -55,22 +50,22 @@ class ApiController {
       }
 
       this.logout(removeAuthrorization: false);
-      PlatformTheme.error(message == '' ? L.AUTH_ERROR : message);
-      PlatformApp.navigatorKey.currentState.pushNamed('/login');
+      T.error(message == '' ? L.AUTH_ERROR : message);
+      FyxApp.navigatorKey.currentState.pushNamed('/login');
     };
 
     provider.onError = (message) {
-      PlatformTheme.error(message);
+      T.error(message);
     };
 
     provider.onContextData = (data) {
-      if (_context == null) {
+      if (buildContext == null) {
         return;
       }
 
       ResponseContext responseContext = ResponseContext.fromJson(data);
-      Provider.of<NotificationsModel>(_context, listen: false).setNewMails(responseContext.user.mailUnread);
-      Provider.of<NotificationsModel>(_context, listen: false).setNewNotices(responseContext.user.notificationsUnread);
+      Provider.of<NotificationsModel>(buildContext, listen: false).setNewMails(responseContext.user.mailUnread);
+      Provider.of<NotificationsModel>(buildContext, listen: false).setNewNotices(responseContext.user.notificationsUnread);
     };
   }
 
@@ -274,6 +269,13 @@ class ApiController {
   Future<WaitingFilesResponse> fetchMailWaitingFiles() async {
     Response response = await provider.fetchMailWaitingFiles();
     return WaitingFilesResponse.fromJson(response.data);
+  }
+
+  Future<ContentPoll> votePoll(discussionId, postId, votes) async {
+    Response response = await provider.votePoll(discussionId, postId, votes);
+    print(response.data);
+    Map<String, dynamic> json = response.data;
+    return ContentPoll.fromJson(json['content_raw']['data'], discussionId: json['discussion_id'], postId: json['post_id']);
   }
 
   throwAuthException(LoginResponse loginResponse, {String message: ''}) {

@@ -2,7 +2,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/model/BookmarkedDiscussion.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 
@@ -26,7 +25,7 @@ class DiscussionListItem extends StatelessWidget {
                   )
                 : Container(
                     width: 24,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(4), color: discussion.replies > 0 ? Colors.red : PlatformTheme.of(context).primaryColor),
+                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(4), color: discussion.replies > 0 ? Colors.red : CupertinoTheme.of(context).primaryColor),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                       child: Center(

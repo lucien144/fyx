@@ -35,7 +35,7 @@ class ApiProvider implements IApiProvider {
       try {
         // TODO: Perhaps, solve Czech characters too...
         // TODO: Get rid of MainRepository()
-        var deviceName = MainRepository().deviceInfo.name.replaceAll(RegExp(r'[ʀ]', caseSensitive: false), 'r');
+        var deviceName = MainRepository().deviceInfo.localizedModel.replaceAll(RegExp(r'[ʀ]', caseSensitive: false), 'r');
         deviceName = deviceName.replaceAll(RegExp(r'[^\w _\-]', caseSensitive: false), '_');
         options.headers['user-agent'] =
             'Fyx | ${MainRepository().deviceInfo.systemName} | ${MainRepository().packageInfo.version} (${MainRepository().packageInfo.buildNumber}) | $deviceName';
@@ -168,5 +168,9 @@ class ApiProvider implements IApiProvider {
       uploads.add(dio.put('$URL/file/upload', data: fileData));
     }
     return Future.wait(uploads);
+  }
+
+  Future<Response> votePoll(int discussionId, int postId, List<int> votes) async {
+    return await dio.post('$URL/discussion/$discussionId/poll/$postId/vote/${votes.join(',')}');
   }
 }

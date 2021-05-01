@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_html/html_parser.dart';
 import 'package:flutter_html/style.dart';
-import 'package:fyx/PlatformTheme.dart';
-import 'package:fyx/components/post/Poll.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/components/post/Spoiler.dart';
 import 'package:fyx/components/post/SyntaxHighlighter.dart';
@@ -14,6 +12,7 @@ import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/Image.dart' as post;
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/theme/Helpers.dart';
+import 'package:fyx/theme/T.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html_unescape/html_unescape.dart';
 
@@ -32,11 +31,11 @@ class PostHtml extends StatelessWidget {
               ? content.body
               : content.rawBody,
       style: {
-        "html": Style.fromTextStyle(
-            PlatformTheme.of(context).textTheme.textStyle ??
-                PlatformTheme.of(context).textTheme.body1),
-        ".image-link": Style(textDecoration: TextDecoration.none),
-        "span.r": Style(fontWeight: FontWeight.bold),
+        'html': Style.fromTextStyle(
+            CupertinoTheme.of(context).textTheme.textStyle),
+        '.image-link': Style(textDecoration: TextDecoration.none),
+        'span.r': Style(fontWeight: FontWeight.bold),
+        'body': Style(margin: EdgeInsets.all(0))
       },
       customRender: {
         'img': (
@@ -89,7 +88,7 @@ class PostHtml extends StatelessWidget {
             return VideoPlayer(element);
           }
 
-          return PlatformTheme.somethingsWrongButton(content.rawBody);
+          return T.somethingsWrongButton(content.rawBody);
         },
         'div': (
           RenderContext renderContext,
@@ -97,9 +96,9 @@ class PostHtml extends StatelessWidget {
           Map<String, String> attributes,
           dom.Element element,
         ) {
-          // Polls
-          if (element.classes.contains('w-dyn')) {
-            return Poll(element.outerHtml);
+          // Spoiler
+          if (element.classes.contains('spoiler')) {
+            return Spoiler(element.text);
           }
 
           return parsedChild;
@@ -117,14 +116,18 @@ class PostHtml extends StatelessWidget {
 
           return parsedChild;
         },
-        'code': (
+        'pre': (
           RenderContext renderContext,
           Widget parsedChild,
           Map<String, String> attributes,
           dom.Element element,
         ) {
-          final source = HtmlUnescape().convert(element.innerHtml);
-          return SyntaxHighlighter(source);
+          if (attributes['style'] == 'background-color:#272822') {
+            final source = HtmlUnescape().convert(element.text);
+            return SyntaxHighlighter(source);
+          } else {
+            return parsedChild;
+          }
         }
       },
       onImageTap: (String src) {
@@ -168,7 +171,7 @@ class PostHtml extends StatelessWidget {
           link = 'https://www.nyx.cz$link';
         }
 
-        PlatformTheme.openLink(link);
+        T.openLink(link);
       },
     );
   }

@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/ContentBoxLayout.dart';
 import 'package:fyx/components/FeedbackIndicator.dart';
 import 'package:fyx/components/GestureFeedback.dart';
@@ -115,7 +114,7 @@ class _PostListItemState extends State<PostListItem> {
                     _isSaving = true;
                   });
                   ApiController().setPostReminder(_post.idKlub, _post.id, _post.hasReminder).catchError((error) {
-                    PlatformTheme.error(L.REMINDER_ERROR);
+                    T.error(L.REMINDER_ERROR);
                     setState(() => _post.hasReminder = !_post.hasReminder);
                   }).whenComplete(() => setState(() => _isSaving = false));
                   AnalyticsProvider().logEvent('reminder');

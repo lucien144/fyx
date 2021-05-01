@@ -5,8 +5,7 @@ import 'package:fyx/components/ContentBoxLayout.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
-import 'package:fyx/model/post/Content.dart';
-import 'package:fyx/model/reponses/DiscussionHomeResponse.dart';
+import 'package:fyx/model/post/ContentRegular.dart';
 import 'package:fyx/model/reponses/FeedNoticesResponse.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/theme/Helpers.dart';
@@ -70,7 +69,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
 
                 return ContentBoxLayout(
                   onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(item.idKlub, postId: item.idWu)),
-                  content: Content(item.content),
+                  content: ContentRegular(item.content),
                   isHighlighted: highlight,
                   topRightWidget: Text(
                     item.wuRating > 0 ? '+${item.wuRating}' : item.wuRating.toString(),

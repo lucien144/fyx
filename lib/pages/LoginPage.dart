@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Credentials.dart';
@@ -143,7 +142,7 @@ class _LoginPageState extends State<LoginPage> {
             Navigator.of(context).pushNamed('/token', arguments: new TutorialPageArguments(token: response.authCode, username: _loginController.text));
           }).catchError((error) {
             print(error);
-            PlatformTheme.error(error.toString());
+            T.error(error.toString());
           }).whenComplete(() => setState(() => _isRunning = false));
         },
         color: Colors.white,

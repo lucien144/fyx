@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fyx/components/post/Poll.dart';
 import 'package:fyx/components/post/PostFooterLink.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/components/post/PostHtml.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/enums/PostTypeEnum.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/theme/T.dart';
@@ -180,9 +182,19 @@ class ContentBoxLayout extends StatelessWidget {
                 return result;
               }
             }
-
-            return PostHtml(content);
+            return getWidgetByContentType(content);
           })()
-        : PostHtml(content);
+        : getWidgetByContentType(content);
+  }
+  Widget getWidgetByContentType(Content content) {
+    switch(this.content.contentType) {
+      case PostTypeEnum.poll:
+        return Poll(content);
+      case PostTypeEnum.text:
+        return PostHtml(content);
+      default:
+        return T.somethingsWrongButton(content.rawBody);
+
+    }
   }
 }

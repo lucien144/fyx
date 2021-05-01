@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
-import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
@@ -63,7 +62,7 @@ class _TutorialPageState extends State<TutorialPage> {
                             size: 16,
                           ), onTap: () {
                     var onError = (error) => setState(() {
-                          PlatformTheme.error('Přihlášení se nezdařilo. Chyba: $error');
+                          T.error('Přihlášení se nezdařilo. Chyba: $error');
                           _hasOpenedNyx = false;
                           _loggingIn = false;
                         });
@@ -82,7 +81,7 @@ class _TutorialPageState extends State<TutorialPage> {
                     ), onTap: () async {
                     setState(() => _hasOpenedNyx = true);
                     String url = 'https://www.nyx.cz/profile/${_arguments.username}/settings/authorizations';
-                    PlatformTheme.openLink(url);
+                    T.openLink(url);
                   }))
       ];
       _slider = CarouselSlider.builder(
