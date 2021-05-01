@@ -25,15 +25,17 @@ class DiscussionListItem extends StatelessWidget {
                   )
                 : Container(
                     width: 24,
+                    height: 24,
                     decoration: BoxDecoration(borderRadius: BorderRadius.circular(4), color: discussion.replies > 0 ? Colors.red : CupertinoTheme.of(context).primaryColor),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                       child: Center(
                         child: AutoSizeText(
-                          discussion.unread > 199 ? '∞' : discussion.unread.toString(), //discussion.unread.toString(),
+                          discussion.unread > 999 ? '∞' : discussion.unread.toString(), //discussion.unread.toString(),
+                          maxFontSize: 12,
                           maxLines: 1,
                           minFontSize: 1,
-                          style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                          style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
                         ),
                       ),
                     )),
