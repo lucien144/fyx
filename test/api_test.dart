@@ -163,6 +163,12 @@ class ApiMock implements IApiProvider {
     // TODO: implement uploadFile
     throw UnimplementedError();
   }
+
+  @override
+  Future<Response> votePoll(int discussionId, int postId, List<int> votes) {
+    // TODO: implement votePoll
+    throw UnimplementedError();
+  }
 }
 
 void main() {
