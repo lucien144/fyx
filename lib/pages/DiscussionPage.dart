@@ -16,8 +16,6 @@ import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import '../FyxApp.dart';
-
 class DiscussionPageArguments {
   final int discussionId;
   final int postId;
