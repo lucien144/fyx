@@ -29,7 +29,7 @@ class BookmarkedDiscussion {
 
   int get replies => _replies;
 
-  int get unread => _unread;
+  int get unread => _unread < 0 ? 0 : _unread;
 
   String get jmeno => _name;
 
