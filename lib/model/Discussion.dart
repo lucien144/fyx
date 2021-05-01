@@ -26,9 +26,12 @@ class Discussion {
     this._has_home = json['discussion']['has_home'];
     this._has_header = json['discussion']['has_header'];
     this._id_domain = json['domain_id'] ?? 0;
-    this._last_visit =
-        DateTime.parse(json['bookmark']['last_visited_at'] ?? '0')
-            .millisecondsSinceEpoch;
+
+    try {
+      this._last_visit = DateTime.parse(json['bookmark']['last_visited_at']).millisecondsSinceEpoch;
+    } catch (error) {
+      this._last_visit = 0;
+    }
   }
 
   String get jmeno => _name;

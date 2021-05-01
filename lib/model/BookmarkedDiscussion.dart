@@ -16,8 +16,11 @@ class BookmarkedDiscussion {
     this._images = json['new_images_count'] ?? 0; // Premium
     this._links = json['new_links_count'] ?? 0; // Premium
     this._name = json['full_name'] ?? (json['full_name'] ?? '');
-    this._last_visit =
-        DateTime.parse(json['last_visited_at'] ?? '0').millisecondsSinceEpoch;
+    try {
+      this._last_visit = DateTime.parse(json['last_visited_at']).millisecondsSinceEpoch;
+    } catch (error) {
+      this._last_visit = 0;
+    }
   }
 
   int get links => _links;
