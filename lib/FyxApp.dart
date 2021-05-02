@@ -77,10 +77,12 @@ class FyxApp extends StatefulWidget {
       }
     };
 
-    ErrorWidget.builder = (FlutterErrorDetails details) {
-      String stack = '${DateTime.now()}: ${details.exceptionAsString()}';
-      return T.somethingsWrongButton(stack);
-    };
+    if (FyxApp.isDev) {
+      ErrorWidget.builder = (FlutterErrorDetails details) {
+        String stack = '${DateTime.now()}: ${details.exceptionAsString()}';
+        return T.somethingsWrongButton(stack);
+      };
+    }
 
     SystemUiOverlayStyle(statusBarBrightness: Brightness.light);
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
