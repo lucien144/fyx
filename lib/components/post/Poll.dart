@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/components/post/PostHtml.dart';
 import 'package:fyx/controllers/ApiController.dart';
-import 'package:fyx/model/post/ContentPoll.dart';
-import 'package:fyx/model/post/ContentRegular.dart';
+import 'package:fyx/model/post/content/Poll.dart';
+import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/theme/T.dart';
 
 class Poll extends StatefulWidget {

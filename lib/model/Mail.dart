@@ -1,7 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 import 'package:fyx/model/Active.dart';
 import 'package:fyx/model/post/Content.dart';
-import 'package:fyx/model/post/ContentRegular.dart';
+import 'package:fyx/model/post/content/Regular.dart';
 
 enum MailDirection { from, to }
 enum MailStatus { read, unread, unknown }

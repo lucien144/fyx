@@ -10,7 +10,7 @@ import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/ResponseContext.dart';
-import 'package:fyx/model/post/ContentPoll.dart';
+import 'package:fyx/model/post/content/Poll.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/model/reponses/BookmarksAllResponse.dart';
 import 'package:fyx/model/reponses/BookmarksHistoryResponse.dart';

@@ -1,4 +1,5 @@
 import 'package:fyx/model/enums/PostTypeEnum.dart';
+import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/Image.dart';
 import 'package:fyx/model/post/Link.dart';
 import 'package:fyx/model/post/Video.dart';
@@ -7,8 +8,6 @@ import 'package:fyx/theme/T.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:html_unescape/html_unescape.dart';
-
-import 'Content.dart';
 
 class ContentRegular extends Content {
 

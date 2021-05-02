@@ -1,7 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 import 'package:fyx/model/post/Content.dart';
-import 'package:fyx/model/post/ContentPoll.dart';
-import 'package:fyx/model/post/ContentRegular.dart';
+import 'package:fyx/model/post/content/Poll.dart';
+import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/theme/Helpers.dart';
 
 class Post {
@@ -35,6 +35,9 @@ class Post {
       switch (json['content_raw']['type']) {
         case 'poll':
           this._content = ContentPoll.fromJson(json['content_raw']['data'], discussionId: json['discussion_id'], postId: json['id']);
+          break;
+        default:
+          this._content = ContentRegular('${json['content']}<br><br><small><em>Chyba: neošetřený druh příspěvku: "${json['content_raw']['type']}"</em></small>', isCompact: this.isCompact);
           break;
       }
       //TODO handle other cases
