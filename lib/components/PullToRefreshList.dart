@@ -17,8 +17,9 @@ class PullToRefreshList extends StatefulWidget {
   bool _disabled;
   bool _isInfinite;
   int _rebuild;
+  final Widget pinnedWidget;
 
-  PullToRefreshList({@required this.dataProvider, isInfinite = false, int rebuild = 0, this.sliverListBuilder, bool disabled = false})
+  PullToRefreshList({@required this.dataProvider, isInfinite = false, int rebuild = 0, this.sliverListBuilder, bool disabled = false, this.pinnedWidget})
       : _isInfinite = isInfinite,
         _rebuild = rebuild,
         _disabled = disabled,
@@ -115,10 +116,18 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
     return CupertinoScrollbar(
       child: Stack(
         children: [
-          CustomScrollView(
-            physics: Platform.isIOS ? const AlwaysScrollableScrollPhysics() : const RefreshScrollPhysics(),
-            slivers: _slivers,
-            controller: _controller,
+          Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              if (widget.pinnedWidget is Widget) widget.pinnedWidget,
+              Expanded(
+                child: CustomScrollView(
+                  physics: Platform.isIOS ? const AlwaysScrollableScrollPhysics() : const RefreshScrollPhysics(),
+                  slivers: _slivers,
+                  controller: _controller,
+                ),
+              ),
+            ],
           ),
           Visibility(
             visible: _isLoading && !_hasPulledDown, // Show only when not pulling down the list
