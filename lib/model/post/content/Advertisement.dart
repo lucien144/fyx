@@ -5,7 +5,7 @@ import 'package:fyx/model/post/Content.dart';
 import 'Regular.dart';
 
 class ContentAdvertisement extends Content {
-  ContentRegular _contentRegular;
+  ContentRegular contentRegular;
 
   int _discussion_id;
   String _full_name;
@@ -22,27 +22,33 @@ class ContentAdvertisement extends Content {
   List _parameters;
 
   ContentAdvertisement.fromJson(Map<String, dynamic> json, {bool isCompact}) : super(PostTypeEnum.advertisement, isCompact: isCompact) {
-    _contentRegular = ContentRegular(json['content']);
-
-    var rawJson = json['content_raw']['data'];
-    _discussion_id = rawJson['discussion_id'];
-    _full_name = rawJson['full_name'] ?? '';
-    _parent_categories = List.castFrom(rawJson['parent_categories']);
-    _photo_ids = List.castFrom(rawJson['photo_ids'] ?? []);
-    _ad_type = rawJson['ad_type'];
-    _price = rawJson['price'];
-    _location = rawJson['location'] ?? '';
-    _currency = rawJson['currency'] ?? '';
-    _state = rawJson['state'];
-    _summary = rawJson['summary'] ?? '';
-    _posts_count = rawJson['posts_count'];
-    _parameters = rawJson['parameters'];
+    _discussion_id = json['discussion_id'];
+    _full_name = json['full_name'] ?? '';
+    _parent_categories = List.castFrom(json['parent_categories'] ?? []);
+    _photo_ids = List.castFrom(json['photo_ids'] ?? []);
+    _ad_type = json['ad_type'];
+    _price = json['price'];
+    _location = json['location'] ?? '';
+    _currency = json['currency'] ?? '';
+    _state = json['state'];
+    _summary = json['summary'] ?? '';
+    _posts_count = json['posts_count'];
+    _parameters = List.castFrom(json['parameters'] ?? []);
 
     try {
-      _refreshed_at = DateTime.parse(rawJson['refreshed_at']).millisecondsSinceEpoch;
+      _refreshed_at = DateTime.parse(json['refreshed_at']).millisecondsSinceEpoch;
     } catch (error) {
       _refreshed_at = 0;
     }
+  }
+
+  ContentAdvertisement.fromDiscussionJson(Map<String, dynamic> json, {bool isCompact}):
+        this.fromJson(json, isCompact: isCompact);
+
+  factory ContentAdvertisement.fromPostJson(Map<String, dynamic> json, {bool isCompact}) {
+    var result = ContentAdvertisement.fromJson(json['content_raw']['data'], isCompact: isCompact);
+    result.contentRegular = ContentRegular(json['content']);
+    return result;
   }
 
   List get parameters => _parameters;
@@ -77,6 +83,4 @@ class ContentAdvertisement extends Content {
   String get fullName => _full_name;
 
   int get discussionId => _discussion_id;
-
-  ContentRegular get contentRegular => _contentRegular;
 }

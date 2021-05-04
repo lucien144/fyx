@@ -1,11 +1,15 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'package:fyx/model/enums/DiscussionTypeEnum.dart';
+import 'package:fyx/model/post/content/Advertisement.dart';
+
 class Discussion {
   int _id_klub;
 
   String _name;
   String _name_main;
   String _name_sub;
+  String _discussion_type;
   int _last_visit;
   bool _has_home;
   bool _has_header;
@@ -16,6 +20,8 @@ class Discussion {
   bool _canEdit = false;
   bool _canEditRights = false;
   bool _accessDenied = false;
+
+  ContentAdvertisement _advertisement;
 
   Discussion.fromJson(Map<String, dynamic> json) {
     if (json == null) {
@@ -33,7 +39,7 @@ class Discussion {
     this._has_home = json['discussion']['has_home'];
     this._has_header = json['discussion']['has_header'];
     this._id_domain = json['domain_id'] ?? 0;
-
+    this._discussion_type = json['discussion']['discussion_type'] ?? 'discussion';
     this._canWrite = json['discussion']['ar_write'] ?? true;
     this._canDelete = json['discussion']['ar_delete'] ?? false;
     this._canEdit = json['discussion']['ar_edit'] ?? false;
@@ -43,6 +49,11 @@ class Discussion {
       this._last_visit = DateTime.parse(json['bookmark']['last_visited_at']).millisecondsSinceEpoch;
     } catch (error) {
       this._last_visit = 0;
+    }
+
+    print(json['discussion_type']);
+    if (type == DiscussionTypeEnum.advertisement && json['advertisement_specific_data'] != null && json['advertisement_specific_data']['advertisement'] != null) {
+      _advertisement = ContentAdvertisement.fromDiscussionJson(json['advertisement_specific_data']['advertisement']);
     }
   }
 
@@ -73,4 +84,16 @@ class Discussion {
   bool get canWrite => _canWrite;
 
   bool get accessDenied => _accessDenied;
+
+  ContentAdvertisement get advertisement => _advertisement;
+
+  DiscussionTypeEnum get type {
+    switch (_discussion_type) {
+      case 'discussion': return DiscussionTypeEnum.discussion;
+      case 'advertisement': return DiscussionTypeEnum.advertisement;
+      case 'event': return DiscussionTypeEnum.event;
+      default:
+        throw Exception('Unknown discussion type: "$_discussion_type"');
+    }
+  }
 }

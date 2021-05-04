@@ -7,11 +7,14 @@ import 'package:fyx/theme/T.dart';
 
 class Advertisement extends StatelessWidget {
   final ContentAdvertisement content;
+  final String title; // Ad title can be overwritten. Helpful in discussion page where content.fullName is null.
 
-  const Advertisement(this.content);
+  const Advertisement(this.content, {this.title});
 
   @override
   Widget build(BuildContext context) {
+    String heading = this.title ?? (content.fullName ?? '');
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -20,7 +23,7 @@ class Advertisement extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.baseline,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Flexible(child: Text(content.fullName, style: DefaultTextStyle.of(context).style.copyWith(fontSize: 20, fontWeight: FontWeight.bold))),
+            if (heading.isNotEmpty) Flexible(child: Text(heading, style: DefaultTextStyle.of(context).style.copyWith(fontSize: 20, fontWeight: FontWeight.bold))),
             if (content.price > 0) Container(
               padding: const EdgeInsets.all(6),
                 child: Text('${content.price.toString()} ${content.currency}', style: DefaultTextStyle.of(context).style.copyWith(fontSize: 16, fontWeight: FontWeight.bold, color: T.COLOR_PRIMARY)),

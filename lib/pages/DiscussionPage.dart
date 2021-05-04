@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
+import 'package:fyx/components/post/Advertisement.dart';
 import 'package:fyx/components/post/PostListItem.dart';
 import 'package:fyx/components/post/SyntaxHighlighter.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
@@ -10,6 +11,7 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
+import 'package:fyx/model/post/content/Advertisement.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/L.dart';
@@ -98,6 +100,10 @@ class _DiscussionPageState extends State<DiscussionPage> {
           PullToRefreshList(
             rebuild: _refreshList,
             isInfinite: true,
+            pinnedWidget: (discussionResponse.discussion.advertisement is ContentAdvertisement) ? Padding(
+              padding: const EdgeInsets.all(16),
+              child: Advertisement(discussionResponse.discussion.advertisement, title: discussionResponse.discussion.name),
+            ) : null,
             sliverListBuilder: (List data) {
               return ValueListenableBuilder(
                 valueListenable: MainRepository().settings.box.listenable(keys: ['blockedPosts', 'blockedUsers']),
@@ -136,7 +142,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
                   result = response.posts;
                 }
               }
-              var data = (result as List)
+              List<Widget> data = (result as List)
                   .map((post) {
                     return Post.fromJson(post, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode);
                   })

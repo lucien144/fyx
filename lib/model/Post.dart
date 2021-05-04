@@ -41,7 +41,7 @@ class Post {
           break;
         case 'advertisement':
           this._canReply = false;
-          this._content = ContentAdvertisement.fromJson(json);
+          this._content = ContentAdvertisement.fromPostJson(json);
           break;
         default:
           this._content =
