@@ -152,20 +152,23 @@ class _DiscussionPageState extends State<DiscussionPage> {
               return DataProviderResult(data, lastId: id);
             },
           ),
-          Positioned(
-            right: 20,
-            bottom: 20,
-            child: SafeArea(
-              child: FloatingActionButton(
-                backgroundColor: T.COLOR_PRIMARY,
-                child: Icon(Icons.add),
-                onPressed: () => Navigator.of(context).pushNamed('/new-message',
-                    arguments: NewMessageSettings(
-                        onClose: this.refresh,
-                        onSubmit: (String inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
-                          var result = await ApiController().postDiscussionMessage(pageArguments.discussionId, message, attachments: attachments);
-                          return result.isOk;
-                        })),
+          Visibility(
+            visible: discussionResponse.discussion.canWrite,
+            child: Positioned(
+              right: 20,
+              bottom: 20,
+              child: SafeArea(
+                child: FloatingActionButton(
+                  backgroundColor: T.COLOR_PRIMARY,
+                  child: Icon(Icons.add),
+                  onPressed: () => Navigator.of(context).pushNamed('/new-message',
+                      arguments: NewMessageSettings(
+                          onClose: this.refresh,
+                          onSubmit: (String inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                            var result = await ApiController().postDiscussionMessage(pageArguments.discussionId, message, attachments: attachments);
+                            return result.isOk;
+                          })),
+                ),
               ),
             ),
           ),

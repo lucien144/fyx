@@ -11,12 +11,19 @@ class Discussion {
   bool _has_header;
   int _id_domain;
 
-  bool accessDenied = false;
+  bool _canWrite = true;
+  bool _canDelete = false;
+  bool _canEdit = false;
+  bool _canEditRights = false;
+  bool _accessDenied = false;
 
   Discussion.fromJson(Map<String, dynamic> json) {
     if (json == null) {
-      this.accessDenied = true;
+      this._accessDenied = true;
       return;
+    } else {
+      bool canRead = json['discussion']['ar_read'] ?? true;
+      this._accessDenied = !canRead;
     }
 
     this._id_klub = json['discussion']['id'];
@@ -26,6 +33,11 @@ class Discussion {
     this._has_home = json['discussion']['has_home'];
     this._has_header = json['discussion']['has_header'];
     this._id_domain = json['domain_id'] ?? 0;
+
+    this._canWrite = json['discussion']['ar_write'] ?? true;
+    this._canDelete = json['discussion']['ar_delete'] ?? false;
+    this._canEdit = json['discussion']['ar_edit'] ?? false;
+    this._canEditRights = json['discussion']['ar_rights'] ?? false;
 
     try {
       this._last_visit = DateTime.parse(json['bookmark']['last_visited_at']).millisecondsSinceEpoch;
@@ -51,4 +63,14 @@ class Discussion {
   bool get hasHeader => _has_header;
 
   int get domainId => _id_domain;
+
+  bool get canEditRights => _canEditRights;
+
+  bool get canEdit => _canEdit;
+
+  bool get canDelete => _canDelete;
+
+  bool get canWrite => _canWrite;
+
+  bool get accessDenied => _accessDenied;
 }
