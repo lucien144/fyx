@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
-import 'package:fyx/components/post/PostHeroAttachmentBox.dart';
 import 'package:fyx/model/enums/AdEnums.dart';
 import 'package:fyx/model/post/Image.dart' as i;
 import 'package:fyx/model/post/content/Advertisement.dart';
