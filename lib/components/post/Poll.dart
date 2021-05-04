@@ -64,7 +64,7 @@ class _PollState extends State<Poll> {
                           child: FractionallySizedBox(
                             widthFactor: totalRespondents > 0 ? (answer.result.respondentsCount / totalRespondents) + 0.005 : .005,
                             child: Container(
-                              color: answer.result.isMyVote ? Color(0xffB60F0F) : T.COLOR_PRIMARY,
+                              color: answer.result.isMyVote ? T.COLOR_ACCENT : T.COLOR_PRIMARY,
                               height: 10,
                             ),
                           ),

@@ -71,7 +71,7 @@ class _PostListItemState extends State<PostListItem> {
           Row(
             children: <Widget>[
               Visibility(
-                visible: widget._isPreview != true,
+                visible: widget._isPreview != true && _post.canReply,
                 child: GestureDetector(
                     onTap: () => Navigator.of(context).pushNamed('/new-message',
                         arguments: NewMessageSettings(

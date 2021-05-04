@@ -60,7 +60,7 @@ class PostHtml extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 16.0),
             child: PostHeroAttachment(
               img,
-              content,
+              images: content.images,
               openGallery: openGallery,
               onTap: () => openGallery ? _isImageTap = true : null,
               crop: false,

@@ -18,17 +18,18 @@ class GalleryArguments {
 
 class PostHeroAttachment extends StatelessWidget {
   final dynamic attachment;
-  final Content content;
+  final List<model.Image> _images;
   final double _size;
   final bool _crop;
   final Function _onTap;
   final bool _openGallery;
 
-  PostHeroAttachment(this.attachment, this.content, {crop = true, size = 100.0, onTap, openGallery = true})
+  PostHeroAttachment(this.attachment, {images = const <model.Image>[], crop = true, size = 100.0, onTap, openGallery = true})
       : this._crop = crop,
         this._size = size,
         this._onTap = onTap,
-        this._openGallery = openGallery;
+        this._openGallery = openGallery,
+        this._images = images;
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +40,7 @@ class PostHeroAttachment extends StatelessWidget {
             _onTap();
           }
           if (_openGallery) {
-            Navigator.of(context, rootNavigator: true).pushNamed('/gallery', arguments: GalleryArguments((attachment as model.Image).image, images: content.images));
+            Navigator.of(context, rootNavigator: true).pushNamed('/gallery', arguments: GalleryArguments((attachment as model.Image).image, images: _images));
           }
         },
         child: ClipRRect(
