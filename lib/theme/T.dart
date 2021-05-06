@@ -42,7 +42,6 @@ class T {
     color: Colors.black38,
   );
 
-
   // ************************
   // Theme mixins
   // ************************
@@ -139,14 +138,22 @@ class T {
           Visibility(
             visible: title.isNotEmpty,
             child: Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Text(title),
+              padding: const EdgeInsets.only(bottom: 8, left: 16, right: 16),
+              child: isWarning
+                  ? Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(color: T.COLOR_LIGHT, border: Border.all(width: 1, color: T.COLOR_PRIMARY), borderRadius: BorderRadius.circular(8)),
+                      child: Text(
+                        title,
+                        style: TextStyle(fontFamily: 'JetBrainsMono', fontSize: 14),
+                      ))
+                  : Text(title),
             ),
           ),
           Visibility(
             visible: !isLoading && onPress is Function,
             child: CupertinoButton(
-              color: Colors.black26,
+              color: T.COLOR_PRIMARY,
               child: Text(label),
               onPressed: onPress,
             ),

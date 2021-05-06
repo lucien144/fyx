@@ -9,6 +9,7 @@ import 'package:fyx/components/post/SyntaxHighlighter.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
+import 'package:fyx/model/DiscussionOwner.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/post/content/Advertisement.dart';
@@ -99,11 +100,8 @@ class _DiscussionPageState extends State<DiscussionPage> {
         children: [
           PullToRefreshList(
             rebuild: _refreshList,
-            isInfinite: true,
-            pinnedWidget: (discussionResponse.discussion.advertisement is ContentAdvertisement) ? Padding(
-              padding: const EdgeInsets.all(16),
-              child: Advertisement(discussionResponse.discussion.advertisement, title: discussionResponse.discussion.name),
-            ) : null,
+            isInfinite: (discussionResponse.discussion.advertisement is ContentAdvertisement) ? false : true,
+            pinnedWidget: getPinnedWidget(discussionResponse),
             sliverListBuilder: (List data) {
               return ValueListenableBuilder(
                 valueListenable: MainRepository().settings.box.listenable(keys: ['blockedPosts', 'blockedUsers']),
@@ -159,7 +157,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
             },
           ),
           Visibility(
-            visible: discussionResponse.discussion.canWrite,
+            visible: discussionResponse.discussion.accessRights?.canWrite != false && discussionResponse.discussion.rights?.canWrite != false,
             child: Positioned(
               right: 20,
               bottom: 20,
@@ -181,5 +179,21 @@ class _DiscussionPageState extends State<DiscussionPage> {
         ],
       ),
     );
+  }
+
+  Widget getPinnedWidget(DiscussionResponse discussionResponse) {
+    switch (discussionResponse.discussion.advertisement.runtimeType) {
+      case ContentAdvertisement:
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: Advertisement(
+            discussionResponse.discussion.advertisement,
+            title: discussionResponse.discussion.name,
+            username: discussionResponse.discussion.owner is DiscussionOwner ? discussionResponse.discussion.owner.username : '',
+          ),
+        );
+      default:
+        return null;
+    }
   }
 }

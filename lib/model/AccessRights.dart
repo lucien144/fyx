@@ -1,19 +1,23 @@
-class DiscussionRights {
+class AccessRights {
+  int _discussionId;
   bool _arRead;
   bool _arWrite;
   bool _arDelete;
   bool _arEdit;
   bool _arRights;
-  bool _public;
+  int _daysLeft;
 
-  DiscussionRights({bool arRead, bool arWrite, bool arDelete, bool arEdit, bool arRights, bool public}) {
+  AccessRights({int discussionId, bool arRead, bool arWrite, bool arDelete, bool arEdit, bool arRights, int daysLeft}) {
+    this._discussionId = discussionId;
     this._arRead = arRead;
     this._arWrite = arWrite;
     this._arDelete = arDelete;
     this._arEdit = arEdit;
     this._arRights = arRights;
-    this._public = public;
+    this._daysLeft = daysLeft;
   }
+
+  int get discussionId => _discussionId;
 
   bool get canRead => _arRead;
 
@@ -25,25 +29,27 @@ class DiscussionRights {
 
   bool get canRights => _arRights;
 
-  bool get ispublic => _public;
+  int get daysLeft => _daysLeft;
 
-  DiscussionRights.fromJson(Map<String, dynamic> json) {
+  AccessRights.fromJson(Map<String, dynamic> json) {
+    _discussionId = json['discussion_id'];
     _arRead = json['ar_read'] ?? false;
     _arWrite = json['ar_write'] ?? false;
     _arDelete = json['ar_delete'] ?? false;
     _arEdit = json['ar_edit'] ?? false;
     _arRights = json['ar_rights'] ?? false;
-    _public = json['public'] ?? false;
+    _daysLeft = json['days_left'] ?? -1;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['discussion_id'] = this._discussionId;
     data['ar_read'] = this._arRead;
     data['ar_write'] = this._arWrite;
     data['ar_delete'] = this._arDelete;
     data['ar_edit'] = this._arEdit;
     data['ar_rights'] = this._arRights;
-    data['public'] = this._public;
+    data['days_left'] = this._daysLeft;
     return data;
   }
 }

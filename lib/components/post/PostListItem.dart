@@ -51,7 +51,7 @@ class _PostListItemState extends State<PostListItem> {
         onTap: () => showCupertinoModalPopup(context: context, builder: (BuildContext context) => PostAvatarActionSheet(user: _post.nick, idKlub: _post.idKlub,)),
         child: PostAvatar(
           _post.nick,
-          description: Helpers.parseTime(_post.time),
+          description: Helpers.relativeTime(_post.time),
         ),
       ),
       topRightWidget: GestureDetector(

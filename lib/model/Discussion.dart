@@ -1,5 +1,8 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'package:fyx/model/AccessRights.dart';
+import 'package:fyx/model/DiscussionOwner.dart';
+import 'package:fyx/model/DiscussionRights.dart';
 import 'package:fyx/model/enums/DiscussionTypeEnum.dart';
 import 'package:fyx/model/post/content/Advertisement.dart';
 
@@ -15,21 +18,33 @@ class Discussion {
   bool _has_header;
   int _id_domain;
 
-  bool _canWrite = true;
-  bool _canDelete = false;
-  bool _canEdit = false;
-  bool _canEditRights = false;
   bool _accessDenied = false;
 
+  DiscussionRights _discussion_rights;
+  AccessRights _access_rights;
+  DiscussionOwner _owner;
   ContentAdvertisement _advertisement;
 
   Discussion.fromJson(Map<String, dynamic> json) {
     if (json == null) {
       this._accessDenied = true;
       return;
-    } else {
-      bool canRead = json['discussion']['ar_read'] ?? true;
-      this._accessDenied = !canRead;
+    }
+
+    // Personal rights
+    if (json['access_right'] is Map) {
+      this._access_rights = AccessRights.fromJson(json['access_right']);
+      if (!this._access_rights.canRead) {
+        this._accessDenied = true;
+        return;
+      }
+    }
+
+    // Global rights
+    this._discussion_rights = DiscussionRights.fromJson(json['discussion']);
+    if (this._access_rights?.canRead != true && !this._discussion_rights.canRead) {
+      this._accessDenied = true;
+      return;
     }
 
     this._id_klub = json['discussion']['id'];
@@ -40,19 +55,19 @@ class Discussion {
     this._has_header = json['discussion']['has_header'];
     this._id_domain = json['domain_id'] ?? 0;
     this._discussion_type = json['discussion']['discussion_type'] ?? 'discussion';
-    this._canWrite = json['discussion']['ar_write'] ?? true;
-    this._canDelete = json['discussion']['ar_delete'] ?? false;
-    this._canEdit = json['discussion']['ar_edit'] ?? false;
-    this._canEditRights = json['discussion']['ar_rights'] ?? false;
+
+    if (json['owner'] is Map) {
+      this._owner = DiscussionOwner.fromJson(json['owner']);
+    }
 
     try {
       this._last_visit = DateTime.parse(json['bookmark']['last_visited_at']).millisecondsSinceEpoch;
     } catch (error) {
       this._last_visit = 0;
     }
-    
+
     if (type == DiscussionTypeEnum.advertisement && json['advertisement_specific_data'] != null && json['advertisement_specific_data']['advertisement'] != null) {
-      _advertisement = ContentAdvertisement.fromDiscussionJson(json['advertisement_specific_data']['advertisement']);
+      _advertisement = ContentAdvertisement.fromDiscussionJson(json['advertisement_specific_data']);
     }
   }
 
@@ -74,17 +89,15 @@ class Discussion {
 
   int get domainId => _id_domain;
 
-  bool get canEditRights => _canEditRights;
-
-  bool get canEdit => _canEdit;
-
-  bool get canDelete => _canDelete;
-
-  bool get canWrite => _canWrite;
-
   bool get accessDenied => _accessDenied;
 
   ContentAdvertisement get advertisement => _advertisement;
+
+  DiscussionOwner get owner => _owner;
+
+  AccessRights get accessRights => _access_rights;
+
+  DiscussionRights get rights => _discussion_rights;
 
   DiscussionTypeEnum get type {
     switch (_discussion_type) {

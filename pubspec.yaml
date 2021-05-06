@@ -61,6 +61,7 @@ dependencies:
   # Dart-lang core plugins 👇
   http_parser: ^3.1.4
   mime: ^0.9.7
+  intl: ^0.16.0
 
   flutter:
     sdk: flutter

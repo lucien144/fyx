@@ -119,7 +119,6 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
           Column(
             mainAxisSize: MainAxisSize.max,
             children: [
-              if (widget.pinnedWidget is Widget) widget.pinnedWidget,
               Expanded(
                 child: CustomScrollView(
                   physics: Platform.isIOS ? const AlwaysScrollableScrollPhysics() : const RefreshScrollPhysics(),
@@ -150,9 +149,10 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
   }
 
   List<Widget> buildTheList(List _data) {
+    // If the list contains widgets
     if (_data.first is Widget) {
       if (widget.sliverListBuilder is Function) {
-        return [widget.sliverListBuilder(_data)];
+        return <Widget>[widget.sliverListBuilder(_data)];
       } else {
         return [
           SliverList(
@@ -165,6 +165,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
       }
     }
 
+    // If the list contains category headers
     if (_data.first is Map && (_data.first as Map).containsKey('header')) {
       List<Widget> _list = [];
 
@@ -200,6 +201,10 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
         _slivers.addAll(this.buildTheList(_result.data));
         setState(() => _hasError = false);
         setState(() => _lastId = _result.lastId);
+      }
+
+      if (widget.pinnedWidget is Widget) {
+        _slivers.insert(0, SliverToBoxAdapter(child: widget.pinnedWidget));
       }
     } catch (error) {
       setState(() => _hasError = true);
@@ -267,4 +272,3 @@ class DataProviderResult {
 }
 
 typedef Future<DataProviderResult> TDataProvider(int id);
-

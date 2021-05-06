@@ -10,6 +10,8 @@ abstract class Content {
 
   Content(this._contentType, { this.isCompact });
 
+  bool get isNotEmpty => body.isNotEmpty;
+
   PostTypeEnum get contentType => _contentType;
 
   String get strippedContent => "";
