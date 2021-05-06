@@ -276,7 +276,6 @@ class ApiController {
 
   Future<ContentPoll> votePoll(discussionId, postId, votes) async {
     Response response = await provider.votePoll(discussionId, postId, votes);
-    print(response.data);
     Map<String, dynamic> json = response.data;
     return ContentPoll.fromJson(json['content_raw']['data'], discussionId: json['discussion_id'], postId: json['post_id']);
   }

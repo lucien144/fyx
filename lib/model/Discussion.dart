@@ -50,8 +50,7 @@ class Discussion {
     } catch (error) {
       this._last_visit = 0;
     }
-
-    print(json['discussion_type']);
+    
     if (type == DiscussionTypeEnum.advertisement && json['advertisement_specific_data'] != null && json['advertisement_specific_data']['advertisement'] != null) {
       _advertisement = ContentAdvertisement.fromDiscussionJson(json['advertisement_specific_data']['advertisement']);
     }
