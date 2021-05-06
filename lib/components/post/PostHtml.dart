@@ -10,6 +10,7 @@ import 'package:fyx/components/post/VideoPlayer.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/Image.dart' as post;
+import 'package:fyx/model/post/Video.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/T.dart';
@@ -26,13 +27,9 @@ class PostHtml extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Html(
-      data:
-          MainRepository().settings.useCompactMode && content.consecutiveImages
-              ? content.body
-              : content.rawBody,
+      data: MainRepository().settings.useCompactMode && content.consecutiveImages ? content.body : content.rawBody,
       style: {
-        'html': Style.fromTextStyle(
-            CupertinoTheme.of(context).textTheme.textStyle),
+        'html': Style.fromTextStyle(CupertinoTheme.of(context).textTheme.textStyle),
         '.image-link': Style(textDecoration: TextDecoration.none),
         'span.r': Style(fontWeight: FontWeight.bold),
         'body': Style(margin: EdgeInsets.all(0))
@@ -74,10 +71,7 @@ class PostHtml extends StatelessWidget {
           dom.Element element,
         ) {
           var url = element.attributes['src'];
-          var urls = element
-              .querySelectorAll('source')
-              .map((element) => element.attributes['src'])
-              .toList();
+          var urls = element.querySelectorAll('source').map((element) => element.attributes['src']).toList();
           if ([null, ''].contains(url) && urls.length > 0) {
             url = urls.firstWhere((url) => url.endsWith('.mp4'));
             if (url.isEmpty) {
@@ -99,6 +93,27 @@ class PostHtml extends StatelessWidget {
           // Spoiler
           if (element.classes.contains('spoiler')) {
             return Spoiler(element.text);
+          }
+
+          // Youtube
+          if (element.attributes['data-embed-type'] == 'youtube') {
+            var img = element.querySelector('img');
+            if (img == null) {
+              return parsedChild;
+            }
+
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: PostHeroAttachment(
+                Video(
+                    id: element.attributes['data-embed-value'],
+                    type: Video.findVideoType(element.attributes['data-embed-type']),
+                    image: img.attributes['src'],
+                    thumb: img.attributes['src']),
+                size: Size(double.infinity, MediaQuery.of(context).size.width * (0.5)),
+                showStrip: false,
+              ),
+            );
           }
 
           return parsedChild;
@@ -132,8 +147,7 @@ class PostHtml extends StatelessWidget {
       },
       onImageTap: (String src) {
         _isImageTap = true;
-        Navigator.of(context).pushNamed('/gallery',
-            arguments: GalleryArguments(src, images: content.images));
+        Navigator.of(context).pushNamed('/gallery', arguments: GalleryArguments(src, images: content.images));
       },
       onLinkTap: (String link) async {
         // 👇 https://github.com/Sub6Resources/flutter_html/issues/121#issuecomment-581593467
@@ -146,8 +160,7 @@ class PostHtml extends StatelessWidget {
         var parserResult = Helpers.parseDiscussionUri(link);
         if (parserResult.isNotEmpty) {
           var arguments = DiscussionPageArguments(parserResult[INTERNAL_URI_PARSER.discussionId]);
-          Navigator.of(context, rootNavigator: true)
-              .pushNamed('/discussion', arguments: arguments);
+          Navigator.of(context, rootNavigator: true).pushNamed('/discussion', arguments: arguments);
           return;
         }
 
@@ -155,8 +168,7 @@ class PostHtml extends StatelessWidget {
         parserResult = Helpers.parseDiscussionPostUri(link);
         if (parserResult.isNotEmpty) {
           var arguments = DiscussionPageArguments(parserResult[INTERNAL_URI_PARSER.discussionId], postId: parserResult[INTERNAL_URI_PARSER.postId]);
-          Navigator.of(context, rootNavigator: true)
-              .pushNamed('/discussion', arguments: arguments);
+          Navigator.of(context, rootNavigator: true).pushNamed('/discussion', arguments: arguments);
           return;
         }
 
@@ -165,8 +177,7 @@ class PostHtml extends StatelessWidget {
         // TODO: New API
         // Other Nyx internal links that cannot be displayed within Fyx
         RegExp otherDeeplinkTest = new RegExp(r"^/(.*)");
-        Iterable<RegExpMatch> otherDeeplinkMatches =
-            otherDeeplinkTest.allMatches(link);
+        Iterable<RegExpMatch> otherDeeplinkMatches = otherDeeplinkTest.allMatches(link);
         if (otherDeeplinkMatches.length == 1) {
           link = 'https://www.nyx.cz$link';
         }

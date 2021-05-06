@@ -94,7 +94,7 @@ class ContentBoxLayout extends StatelessWidget {
                         child: PostHeroAttachment(
                           attachment,
                           images: content.images,
-                          size: 50.0,
+                          size: Size(50, 50),
                         ));
                   }).toList();
                   return Row(children: children, mainAxisAlignment: MainAxisAlignment.start);

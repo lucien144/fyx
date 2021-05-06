@@ -19,14 +19,14 @@ class GalleryArguments {
 class PostHeroAttachment extends StatelessWidget {
   final dynamic attachment;
   final List<model.Image> _images;
-  final double _size;
   final bool _crop;
   final Function _onTap;
   final bool _openGallery;
+  Size size;
+  bool showStrip;
 
-  PostHeroAttachment(this.attachment, {images = const <model.Image>[], crop = true, size = 100.0, onTap, openGallery = true})
+  PostHeroAttachment(this.attachment, {images = const <model.Image>[], crop = true, this.showStrip = true, this.size = const Size(100, 100), onTap, openGallery = true})
       : this._crop = crop,
-        this._size = size,
         this._onTap = onTap,
         this._openGallery = openGallery,
         this._images = images;
@@ -51,8 +51,8 @@ class PostHeroAttachment extends StatelessWidget {
             placeholder: (context, url) => CupertinoActivityIndicator(),
             errorWidget: (context, url, error) => Icon(Icons.error),
             fit: BoxFit.cover,
-            width: _crop ? _size : null,
-            height: _crop ? _size : null,
+            width: _crop ? size.width : null,
+            height: _crop ? size.height : null,
           ),
         ),
       );
@@ -60,8 +60,10 @@ class PostHeroAttachment extends StatelessWidget {
 
     if (attachment is Link) {
       return PostHeroAttachmentBox(
+        showStrip: this.showStrip,
         title: (attachment as Link).title,
         icon: Icons.link,
+        size: size,
         onTap: () => T.openLink((attachment as Link).url),
       );
     }
@@ -69,8 +71,10 @@ class PostHeroAttachment extends StatelessWidget {
     if (attachment is Video) {
       return PostHeroAttachmentBox(
         title: (attachment as Video).link.title,
+        showStrip: this.showStrip,
         icon: Icons.play_circle_filled,
         image: (attachment as Video).thumb,
+        size: size,
         onTap: () => T.openLink((attachment as Video).link.url),
       );
     }
