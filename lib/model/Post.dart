@@ -9,6 +9,7 @@ import 'package:fyx/theme/Helpers.dart';
 class Post {
   final bool isCompact;
   bool _canReply = true;
+  bool _isNew;
   int idKlub;
   int _id_wu;
   String _nick;
@@ -28,6 +29,7 @@ class Post {
     this._time = DateTime.parse(json['inserted_at'] ?? '0').millisecondsSinceEpoch;
     this._wu_rating = json['rating'] ?? 0;
     this._wu_type = json['type'];
+    this._isNew = json['new'] ?? false;
     this.myRating = json['my_rating'] ?? 'none'; // positive / negative / negative_visible / none TODO: enums
     this._reminder = json['reminder'] ?? false;
     this._canBeRated = json['can_be_rated'] ?? false;
@@ -72,6 +74,8 @@ class Post {
 
   // ignore: unnecessary_getters_setters
   bool get hasReminder => _reminder;
+
+  bool get isNew => _isNew;
 
   String get link => 'https://www.nyx.cz/discussion/${this.idKlub}/id/${this.id}';
 

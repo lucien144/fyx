@@ -146,7 +146,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
                   })
                   .where((post) => !MainRepository().settings.isPostBlocked(post.id))
                   .where((post) => !MainRepository().settings.isUserBlocked(post.nick))
-                  .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.time > discussionResponse.discussion.lastVisit))
+                  .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.isNew))
                   .toList();
 
               int id;
