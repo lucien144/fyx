@@ -168,7 +168,7 @@ class ApiController {
   }
 
   Future<DiscussionResponse> loadDiscussion(int id, {int lastId, String user}) async {
-    var response = await provider.fetchDiscussion(id, lastId: lastId == null ? null : lastId + 1, user: user);
+    var response = await provider.fetchDiscussion(id, lastId: lastId == null ? null : lastId, user: user);
     if (response.statusCode == 400) {
       return DiscussionResponse.accessDenied();
     }
