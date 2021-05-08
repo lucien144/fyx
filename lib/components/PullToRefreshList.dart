@@ -36,6 +36,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
   bool _hasError = false;
   DataProviderResult _result;
   int _lastId;
+  int _prevLastId; // ID of last item loaded previously.
   var _slivers = <Widget>[];
   int _lastRebuild = 0;
 
@@ -190,9 +191,35 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
   loadData({bool append = false}) async {
     setState(() => _isLoading = true);
 
+    // If we try to append the data but the last ID
+    // from where we try to load the posts is same as the ID of
+    // last item ID loaded previously.
+    // Hide the loading indicator and stop.
+    if (append && _prevLastId == _lastId) {
+      _slivers.removeLast(); // Remove the loading indicator
+      setState(() => _isLoading = false);
+      return;
+    } else {
+      // Otherwise save the current last ID for the next loadData() to check
+      _prevLastId = _lastId;
+    }
+
     try {
       _result = await widget.dataProvider(append ? _lastId : null);
-      if (_result.data.length > 0) {
+      bool makeInactive = false;
+
+      // If the ID of the last ID is same as the ID of currently loaded last ID
+      // Make the list inactive (makeInactive = true)
+      if (_lastId != null && _result.lastId == _lastId) {
+        makeInactive = true;
+        if (append) {
+          // ... and if also appending, remove the loading indicator
+          _slivers.removeLast(); // Remove the loading indicator
+        }
+      }
+
+      // Load the data only if there are any data AND should not be inactive.
+      if (_result.data.length > 0 && !makeInactive) {
         if (append) {
           _slivers.removeLast(); // Remove the loading indicator
         } else {
@@ -203,7 +230,8 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
         setState(() => _lastId = _result.lastId);
       }
 
-      if (widget.pinnedWidget is Widget) {
+      // Add the pinned widget only if the list is active
+      if (widget.pinnedWidget is Widget && !makeInactive) {
         _slivers.insert(0, SliverToBoxAdapter(child: widget.pinnedWidget));
       }
     } catch (error) {

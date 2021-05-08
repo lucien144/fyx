@@ -100,7 +100,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
         children: [
           PullToRefreshList(
             rebuild: _refreshList,
-            isInfinite: (discussionResponse.discussion.advertisement is ContentAdvertisement) ? false : true,
+            isInfinite: true,
             pinnedWidget: getPinnedWidget(discussionResponse),
             sliverListBuilder: (List data) {
               return ValueListenableBuilder(
