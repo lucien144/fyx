@@ -34,10 +34,13 @@ class Discussion {
     // Personal rights
     if (json['access_right'] is Map) {
       this._access_rights = AccessRights.fromJson(json['access_right']);
-      if (!this._access_rights.canRead) {
-        this._accessDenied = true;
-        return;
-      }
+    } else {
+      // If no access rights returned, we expect full access.
+      this._access_rights = AccessRights.fullAccess();
+    }
+    if (!this._access_rights.canRead) {
+      this._accessDenied = true;
+      return;
     }
 
     // Global rights
@@ -101,9 +104,12 @@ class Discussion {
 
   DiscussionTypeEnum get type {
     switch (_discussion_type) {
-      case 'discussion': return DiscussionTypeEnum.discussion;
-      case 'advertisement': return DiscussionTypeEnum.advertisement;
-      case 'event': return DiscussionTypeEnum.event;
+      case 'discussion':
+        return DiscussionTypeEnum.discussion;
+      case 'advertisement':
+        return DiscussionTypeEnum.advertisement;
+      case 'event':
+        return DiscussionTypeEnum.event;
       default:
         throw Exception('Unknown discussion type: "$_discussion_type"');
     }

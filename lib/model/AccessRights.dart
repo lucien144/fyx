@@ -33,12 +33,21 @@ class AccessRights {
 
   AccessRights.fromJson(Map<String, dynamic> json) {
     _discussionId = json['discussion_id'];
-    _arRead = json['ar_read'] ?? false;
-    _arWrite = json['ar_write'] ?? false;
-    _arDelete = json['ar_delete'] ?? false;
-    _arEdit = json['ar_edit'] ?? false;
-    _arRights = json['ar_rights'] ?? false;
+    _arRead = json['ar_read'] ?? true;
+    _arWrite = json['ar_write'] ?? true;
+    _arDelete = json['ar_delete'] ?? true;
+    _arEdit = json['ar_edit'] ?? true;
+    _arRights = json['ar_rights'] ?? true;
     _daysLeft = json['days_left'] ?? -1;
+  }
+
+  AccessRights.fullAccess() {
+    _arRead = true;
+    _arWrite = true;
+    _arDelete = true;
+    _arEdit = true;
+    _arRights = true;
+    _daysLeft = -1;
   }
 
   Map<String, dynamic> toJson() {
