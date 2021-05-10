@@ -167,7 +167,7 @@ class PostHtml extends StatelessWidget {
         // Click through to another discussion with message deeplink
         parserResult = Helpers.parseDiscussionPostUri(link);
         if (parserResult.isNotEmpty) {
-          var arguments = DiscussionPageArguments(parserResult[INTERNAL_URI_PARSER.discussionId], postId: parserResult[INTERNAL_URI_PARSER.postId]);
+          var arguments = DiscussionPageArguments(parserResult[INTERNAL_URI_PARSER.discussionId], postId: parserResult[INTERNAL_URI_PARSER.postId] + 1);
           Navigator.of(context, rootNavigator: true).pushNamed('/discussion', arguments: arguments);
           return;
         }
