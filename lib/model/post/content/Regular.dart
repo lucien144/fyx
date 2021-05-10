@@ -1,3 +1,4 @@
+import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/PostTypeEnum.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/Image.dart';
@@ -10,7 +11,6 @@ import 'package:html/parser.dart';
 import 'package:html_unescape/html_unescape.dart';
 
 class ContentRegular extends Content {
-
   String _body;
   String _rawBody;
 
@@ -23,7 +23,7 @@ class ContentRegular extends Content {
   List<Link> _emptyLinks = [];
   List<Video> _videos = [];
 
-  ContentRegular(this._body, { bool isCompact }) : super(PostTypeEnum.text, isCompact: isCompact) {
+  ContentRegular(this._body, {bool isCompact}) : super(PostTypeEnum.text, isCompact: isCompact) {
     _rawBody = _body;
     _rawBody = this._tagAllImageLinks(_rawBody); // This updates the raw body.
     _body = this._tagAllImageLinks(_body); // This updates the raw body.
@@ -99,15 +99,19 @@ class ContentRegular extends Content {
   }
 
   void _cleanupBody() {
-    // Remove all HTML comments
-    _body = _body.replaceAll(RegExp(r'<!--(.*?)-->'), '');
+    try {
+      // Remove all HTML comments
+      _body = _body.replaceAll(RegExp(r'<!--(.*?)-->'), '');
 
-    // Remove trailing <br>
-    var startBr = RegExp(r'^(((\s*)<\s*br\s*\/?\s*>(\s*))*)', caseSensitive: false);
-    _body = _body.replaceAll(startBr, '');
+      // Remove trailing <br>
+      var startBr = RegExp(r'^(((\s*)<\s*br\s*\/?\s*>(\s*))*)', caseSensitive: false);
+      _body = _body.replaceAll(startBr, '');
 
-    var trailingBr = RegExp(r'(((\s*)<\s*br\s*\/?\s*>(\s*))*)$', caseSensitive: false);
-    _body = _body.replaceAll(trailingBr, '');
+      var trailingBr = RegExp(r'(((\s*)<\s*br\s*\/?\s*>(\s*))*)$', caseSensitive: false);
+      _body = _body.replaceAll(trailingBr, '');
+    } catch (error) {
+      MainRepository().sentry.captureException(exception: error, stackTrace: StackTrace.current);
+    }
   }
 
   /// Parse emebeded videos.
@@ -124,10 +128,7 @@ class ContentRegular extends Content {
         }
 
         var video = Video(
-            id: el.attributes['data-embed-value'],
-            type: Video.findVideoType(el.attributes['data-embed-type']),
-            image: img.attributes['src'],
-            thumb: img.attributes['data-thumb']);
+            id: el.attributes['data-embed-value'], type: Video.findVideoType(el.attributes['data-embed-type']), image: img.attributes['src'], thumb: img.attributes['data-thumb']);
 
         // Remove the video element from the content.
         this._videos.add(video);
@@ -147,21 +148,25 @@ class ContentRegular extends Content {
   /// For some reason the a>img[src] selector also selects standalone <img/> files
   /// -> Solved. It's the Nyx API. It wraps all images into the <a> tag with full image and replaces the img with thumbnail.
   void _parseAttachedImages() {
-    Document document = parse(_body);
+    try {
+      Document document = parse(_body);
 
-    RegExp reg = RegExp(r'^((?!<img).)*(((<a([^>]*?)>)?(\s*)<img([^>]*?)>(\s*)(<\/\s*a\s*>)?(\s*(\s*<\s*br\s*\/?\s*>\s*)*\s*))*)$', caseSensitive: false, dotAll: true);
-    _consecutiveImages = reg.hasMatch(_body);
+      RegExp reg = RegExp(r'^((?!<img).)*(((<a([^>]*?)>)?(\s*)<img([^>]*?)>(\s*)(<\/\s*a\s*>)?(\s*(\s*<\s*br\s*\/?\s*>\s*)*\s*))*)$', caseSensitive: false, dotAll: true);
+      _consecutiveImages = reg.hasMatch(_body);
 
-    document.querySelectorAll('img[src]').forEach((Element el) {
-      var image = el.attributes['src'];
-      var thumb = el.attributes['data-thumb'];
-      _images.add(Image(image, thumb));
+      document.querySelectorAll('img[src]').forEach((Element el) {
+        var image = el.attributes['src'];
+        var thumb = el.attributes['data-thumb'];
+        _images.add(Image(image, thumb));
 
-      if (_consecutiveImages) {
-        el.remove();
-      }
-    });
-    _body = document.body.innerHtml;
+        if (_consecutiveImages) {
+          el.remove();
+        }
+      });
+      _body = document.body.innerHtml;
+    } catch (error) {
+      MainRepository().sentry.captureException(exception: error, stackTrace: StackTrace.current);
+    }
   }
 
   String _tagAllImageLinks(String source) {
@@ -180,15 +185,19 @@ class ContentRegular extends Content {
   /// Nyx API returns: <a href="google.com"><a href="img.png"><img src="i.nyx.cz/thumb.jpg"></a></a>
   ///
   void _parseEmptyLinks() {
-    RegExp r = RegExp(r'<a[^>]*?>\s*<\/a>', caseSensitive: false, multiLine: true);
-    r.allMatches(_body).forEach((match) {
-      String element = match.group(0);
-      Document html = parse(element);
-      String url = html.querySelector('a').attributes['href'];
-      if (url != null) {
-        _emptyLinks.add(Link(url));
-        _body = _body.replaceFirst(element, '');
-      }
-    });
+    try {
+      RegExp r = RegExp(r'<a[^>]*?>\s*<\/a>', caseSensitive: false, multiLine: true);
+      r.allMatches(_body).forEach((match) {
+        String element = match.group(0);
+        Document html = parse(element);
+        String url = html.querySelector('a').attributes['href'];
+        if (url != null) {
+          _emptyLinks.add(Link(url));
+          _body = _body.replaceFirst(element, '');
+        }
+      });
+    } catch (error) {
+      MainRepository().sentry.captureException(exception: error, stackTrace: StackTrace.current);
+    }
   }
 }
