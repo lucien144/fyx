@@ -179,7 +179,7 @@ class PostHtml extends StatelessWidget {
         RegExp otherDeeplinkTest = new RegExp(r"^/(.*)");
         Iterable<RegExpMatch> otherDeeplinkMatches = otherDeeplinkTest.allMatches(link);
         if (otherDeeplinkMatches.length == 1) {
-          link = 'https://www.nyx.cz$link';
+          link = 'https://nyx.cz$link';
         }
 
         T.openLink(link);
