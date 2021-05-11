@@ -170,7 +170,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   @override
   Widget build(BuildContext context) {
-    if (ApiController().buildContext == null) {
+    if (ApiController().buildContext == null || ApiController().buildContext.hashCode != context.hashCode) {
       ApiController().buildContext = context;
     }
 
