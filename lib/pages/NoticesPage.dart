@@ -68,7 +68,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
                 item.thumbsUp.forEach((NoticeThumbsUp thumbUp) => highlight = thumbUp.time > result.lastVisit ? true : highlight);
 
                 return ContentBoxLayout(
-                  onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(item.idKlub, postId: item.idWu)),
+                  onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(item.idKlub, postId: item.idWu + 1)),
                   content: ContentRegular(item.content),
                   isHighlighted: highlight,
                   topRightWidget: Text(
@@ -136,7 +136,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
   Widget buildReplies(BuildContext context, List<NoticeReplies> replies, int lastVisit) {
     List<Widget> replyRows = replies.map((reply) {
       return GestureDetector(
-        onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(reply.idKlub, postId: reply.idWu)),
+        onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(reply.idKlub, postId: reply.idWu + 1)),
         child: Padding(
           padding: const EdgeInsets.only(bottom: 5),
           child: Row(

@@ -77,7 +77,7 @@ class Post {
 
   bool get isNew => _isNew;
 
-  String get link => 'https://www.nyx.cz/discussion/${this.idKlub}/id/${this.id}';
+  String get link => 'https://nyx.cz/discussion/${this.idKlub}/id/${this.id}';
 
   // ignore: unnecessary_getters_setters
   set hasReminder(bool value) => _reminder = value;

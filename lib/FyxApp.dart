@@ -105,7 +105,7 @@ class FyxApp extends StatefulWidget {
             arguments: HomePageArguments(HomePage.PAGE_MAIL));
     _notificationsService.onNewPost = ({discussionId, postId}) {
       if (discussionId > 0 && postId > 0) {
-        FyxApp.navigatorKey.currentState.pushNamed('/discussion', arguments: DiscussionPageArguments(discussionId, postId: postId));
+        FyxApp.navigatorKey.currentState.pushNamed('/discussion', arguments: DiscussionPageArguments(discussionId, postId: postId + 1));
       } else if (discussionId > 0) {
         FyxApp.navigatorKey.currentState.pushNamed('/discussion', arguments: DiscussionPageArguments(discussionId));
       } else {
