@@ -157,7 +157,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
             },
           ),
           Visibility(
-            visible: discussionResponse.discussion.accessRights?.canWrite != false && discussionResponse.discussion.rights?.canWrite != false,
+            visible: discussionResponse.discussion.accessRights?.canWrite != false || discussionResponse.discussion.rights?.canWrite != false,
             child: Positioned(
               right: 20,
               bottom: 20,
