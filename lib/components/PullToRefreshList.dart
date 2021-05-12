@@ -191,6 +191,12 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
   loadData({bool append = false}) async {
     setState(() => _isLoading = true);
 
+    if (!append) {
+      // Not using setState on purpose -> we don't want to rebuild the widget tree, it's not needed.
+      // TODO: See if this affects performance and if we can do it on other places too.
+      _lastId = null;
+    }
+
     // If we try to append the data but the last ID
     // from where we try to load the posts is same as the ID of
     // last item ID loaded previously.
