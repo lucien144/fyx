@@ -118,7 +118,7 @@ class ApiProvider implements IApiProvider {
   }
 
   Future<Response> postDiscussionMessage(int postId, String message) async {
-    return await dio.post('$URL/discussion/$postId/send/text', data: {'content': message, 'format': 'text'}, options: Options(contentType: Headers.formUrlEncodedContentType));
+    return await dio.post('$URL/discussion/$postId/send/text', data: {'content': message, 'format': 'html'}, options: Options(contentType: Headers.formUrlEncodedContentType));
   }
 
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder) async {
@@ -142,7 +142,7 @@ class ApiProvider implements IApiProvider {
   }
 
   Future<Response> sendMail(String recipient, String message) async {
-    return await dio.post('$URL/mail/send', data: {'recipient': recipient, 'message': message, 'format': 'text'}, options: Options(contentType: Headers.formUrlEncodedContentType));
+    return await dio.post('$URL/mail/send', data: {'recipient': recipient, 'message': message, 'format': 'html'}, options: Options(contentType: Headers.formUrlEncodedContentType));
   }
 
   Future<Response> deleteFile(int id) async {
