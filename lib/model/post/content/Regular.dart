@@ -27,8 +27,7 @@ class ContentRegular extends Content {
     _rawBody = _body;
     _rawBody = this._tagAllImageLinks(_rawBody); // This updates the raw body.
     _body = this._tagAllImageLinks(_body); // This updates the raw body.
-
-    _body = HtmlUnescape().convert(_body);
+    
     this._cleanupBody();
     this._parseEmbeds();
     this._parseAttachedImages();
@@ -156,7 +155,7 @@ class ContentRegular extends Content {
 
       document.querySelectorAll('img[src]').forEach((Element el) {
         var image = el.attributes['src'];
-        var thumb = el.attributes['data-thumb'];
+        var thumb = el.attributes['data-thumb'] ?? '';
         _images.add(Image(image, thumb));
 
         if (_consecutiveImages) {
