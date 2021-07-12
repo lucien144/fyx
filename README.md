@@ -5,9 +5,10 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/c5dd9261a8154bddb7f317f607307a1c)](https://app.codacy.com/gh/lucien144/fyx?utm_source=github.com&utm_medium=referral&utm_content=lucien144/fyx&utm_campaign=Badge_Grade_Settings)
 [![Build Status](https://travis-ci.com/lucien144/fyx.svg?branch=develop)](https://travis-ci.com/lucien144/fyx) [![Coverage Status](https://coveralls.io/repos/github/lucien144/fyx/badge.svg?branch=develop)](https://coveralls.io/github/lucien144/fyx?branch=develop)
 
-Fyx je neoficiální mobilní klient pro diskuzní server [Nyx.cz](https://nyx.cz) ve [Flutteru](https://flutter.dev/). V tuto chvíli je psaný a optimalizovaný pro iOS, ale v plánu je i Android verze.
+Fyx je neoficiální mobilní klient (Android a iOS) pro diskuzní server [Nyx.cz](https://nyx.cz) ve [Flutteru](https://flutter.dev/).
 
 <p align="center">
+<a href="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" target="_blank"><img src="https://imgur.com/yQvstXc.png" height="60"/></a>
 <a href="https://144.wtf/AmcGAl" target="_blank"><img src="https://144.wtf/9VRKzD+" height="60"/></a>
 </p>
 
@@ -26,7 +27,7 @@ Zde je přehled funkcí pro lepší představu.
 | Funkce | Fyx | Nyx |
 |-|:-:|:-:|
 | iOS | ✅ | ✅ |
-| Android | 🛠 | ❌ |
+| Android | ✅ | ❌ |
 | Notifikace | ✅ | ✅ |
 | Výpis klubů | ✅ | ✅ |
 | Historie | ✅ | ✅ |
@@ -79,10 +80,6 @@ Tento repozitář používá [Gitflow](https://www.atlassian.com/git/tutorials/c
 Pokud jste našli chybu, pak ji nahlaste ideálně přes aplikaci. Pokud to nejde, pak přes [Issues](https://github.com/lucien144/fyx/issues) - nezapomeňte uvést verzi aplikace a popsat chybu.
 
 ## FAQ
-
-- **Proč není podporovaný i Android?**
-
-  Na Androidu se pracuje. Předpoklad je přelom Q2 a Q3 2021.
 
 - **Proč nelze k příspěvku nahrát víc obrázků najednou?**
 
