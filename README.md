@@ -8,7 +8,7 @@
 Fyx je neoficiální mobilní klient (Android a iOS) pro diskuzní server [Nyx.cz](https://nyx.cz) ve [Flutteru](https://flutter.dev/).
 
 <p align="center">
-<a href="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" target="_blank"><img src="https://imgur.com/yQvstXc.png" height="60"/></a>
+<a href="https://play.google.com/store/apps/details?id=net.lucien144.fyx" target="_blank"><img src="https://imgur.com/yQvstXc.png" height="60"/></a>
 <a href="https://144.wtf/AmcGAl" target="_blank"><img src="https://144.wtf/9VRKzD+" height="60"/></a>
 </p>
 
