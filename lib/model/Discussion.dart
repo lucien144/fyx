@@ -1,21 +1,52 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'package:fyx/model/AccessRights.dart';
+import 'package:fyx/model/DiscussionOwner.dart';
+import 'package:fyx/model/DiscussionRights.dart';
+import 'package:fyx/model/enums/DiscussionTypeEnum.dart';
+import 'package:fyx/model/post/content/Advertisement.dart';
+
 class Discussion {
   int _id_klub;
 
   String _name;
   String _name_main;
   String _name_sub;
+  String _discussion_type;
   int _last_visit;
   bool _has_home;
   bool _has_header;
   int _id_domain;
 
-  bool accessDenied = false;
+  bool _accessDenied = false;
+
+  DiscussionRights _discussion_rights;
+  AccessRights _access_rights;
+  DiscussionOwner _owner;
+  ContentAdvertisement _advertisement;
 
   Discussion.fromJson(Map<String, dynamic> json) {
     if (json == null) {
-      this.accessDenied = true;
+      this._accessDenied = true;
+      return;
+    }
+
+    // Personal rights
+    if (json['access_right'] is Map) {
+      this._access_rights = AccessRights.fromJson(json['access_right']);
+    } else {
+      // If no access rights returned, we expect full access.
+      this._access_rights = AccessRights.fullAccess();
+    }
+    if (!this._access_rights.canRead) {
+      this._accessDenied = true;
+      return;
+    }
+
+    // Global rights
+    this._discussion_rights = DiscussionRights.fromJson(json['discussion']);
+    if (this._access_rights?.canRead != true && !this._discussion_rights.canRead) {
+      this._accessDenied = true;
       return;
     }
 
@@ -26,9 +57,21 @@ class Discussion {
     this._has_home = json['discussion']['has_home'];
     this._has_header = json['discussion']['has_header'];
     this._id_domain = json['domain_id'] ?? 0;
-    this._last_visit =
-        DateTime.parse(json['bookmark']['last_visited_at'] ?? '0')
-            .millisecondsSinceEpoch;
+    this._discussion_type = json['discussion']['discussion_type'] ?? 'discussion';
+
+    if (json['owner'] is Map) {
+      this._owner = DiscussionOwner.fromJson(json['owner']);
+    }
+
+    try {
+      this._last_visit = DateTime.parse(json['bookmark']['last_visited_at']).millisecondsSinceEpoch;
+    } catch (error) {
+      this._last_visit = 0;
+    }
+
+    if (type == DiscussionTypeEnum.advertisement && json['advertisement_specific_data'] != null && json['advertisement_specific_data']['advertisement'] != null) {
+      _advertisement = ContentAdvertisement.fromDiscussionJson(json['advertisement_specific_data']);
+    }
   }
 
   String get jmeno => _name;
@@ -48,4 +91,27 @@ class Discussion {
   bool get hasHeader => _has_header;
 
   int get domainId => _id_domain;
+
+  bool get accessDenied => _accessDenied;
+
+  ContentAdvertisement get advertisement => _advertisement;
+
+  DiscussionOwner get owner => _owner;
+
+  AccessRights get accessRights => _access_rights;
+
+  DiscussionRights get rights => _discussion_rights;
+
+  DiscussionTypeEnum get type {
+    switch (_discussion_type) {
+      case 'discussion':
+        return DiscussionTypeEnum.discussion;
+      case 'advertisement':
+        return DiscussionTypeEnum.advertisement;
+      case 'event':
+        return DiscussionTypeEnum.event;
+      default:
+        throw Exception('Unknown discussion type: "$_discussion_type"');
+    }
+  }
 }

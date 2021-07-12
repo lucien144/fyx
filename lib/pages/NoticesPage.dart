@@ -5,8 +5,7 @@ import 'package:fyx/components/ContentBoxLayout.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
-import 'package:fyx/model/post/Content.dart';
-import 'package:fyx/model/reponses/DiscussionHomeResponse.dart';
+import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/model/reponses/FeedNoticesResponse.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/theme/Helpers.dart';
@@ -69,8 +68,8 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
                 item.thumbsUp.forEach((NoticeThumbsUp thumbUp) => highlight = thumbUp.time > result.lastVisit ? true : highlight);
 
                 return ContentBoxLayout(
-                  onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(item.idKlub, postId: item.idWu)),
-                  content: Content(item.content),
+                  onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(item.idKlub, postId: item.idWu + 1)),
+                  content: ContentRegular(item.content),
                   isHighlighted: highlight,
                   topRightWidget: Text(
                     item.wuRating > 0 ? '+${item.wuRating}' : item.wuRating.toString(),
@@ -137,7 +136,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
   Widget buildReplies(BuildContext context, List<NoticeReplies> replies, int lastVisit) {
     List<Widget> replyRows = replies.map((reply) {
       return GestureDetector(
-        onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(reply.idKlub, postId: reply.idWu)),
+        onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(reply.idKlub, postId: reply.idWu + 1)),
         child: Padding(
           padding: const EdgeInsets.only(bottom: 5),
           child: Row(

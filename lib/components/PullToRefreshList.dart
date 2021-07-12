@@ -1,21 +1,14 @@
+import 'dart:io';
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
-import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
-
-class DataProviderResult {
-  final List data;
-  final dynamic lastId;
-
-  DataProviderResult(this.data, {this.lastId});
-}
-
-typedef Future<DataProviderResult> TDataProvider(int id);
 
 // ignore: must_be_immutable
 class PullToRefreshList extends StatefulWidget {
@@ -24,8 +17,9 @@ class PullToRefreshList extends StatefulWidget {
   bool _disabled;
   bool _isInfinite;
   int _rebuild;
+  final Widget pinnedWidget;
 
-  PullToRefreshList({@required this.dataProvider, isInfinite = false, int rebuild = 0, this.sliverListBuilder, bool disabled = false})
+  PullToRefreshList({@required this.dataProvider, isInfinite = false, int rebuild = 0, this.sliverListBuilder, bool disabled = false, this.pinnedWidget})
       : _isInfinite = isInfinite,
         _rebuild = rebuild,
         _disabled = disabled,
@@ -42,6 +36,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
   bool _hasError = false;
   DataProviderResult _result;
   int _lastId;
+  int _prevLastId; // ID of last item loaded previously.
   var _slivers = <Widget>[];
   int _lastRebuild = 0;
 
@@ -71,6 +66,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
 
     // Add the refresh control on first position
     _slivers.add(CupertinoSliverRefreshControl(
+      builder: Platform.isIOS ? CupertinoSliverRefreshControl.buildRefreshIndicator : buildAndroidRefreshIndicator,
       onRefresh: () {
         setState(() => _hasPulledDown = true);
         if (!widget._disabled) {
@@ -97,7 +93,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
     }
 
     if (_hasError) {
-      return PlatformTheme.feedbackScreen(isLoading: _isLoading, onPress: loadData, label: L.GENERAL_REFRESH);
+      return T.feedbackScreen(isLoading: _isLoading, onPress: loadData, label: L.GENERAL_REFRESH);
     }
 
     if (_slivers.length == 1 && !_isLoading) {
@@ -121,10 +117,17 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
     return CupertinoScrollbar(
       child: Stack(
         children: [
-          CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            slivers: _slivers,
-            controller: _controller,
+          Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Expanded(
+                child: CustomScrollView(
+                  physics: Platform.isIOS ? const AlwaysScrollableScrollPhysics() : const RefreshScrollPhysics(),
+                  slivers: _slivers,
+                  controller: _controller,
+                ),
+              ),
+            ],
           ),
           Visibility(
             visible: _isLoading && !_hasPulledDown, // Show only when not pulling down the list
@@ -147,9 +150,10 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
   }
 
   List<Widget> buildTheList(List _data) {
+    // If the list contains widgets
     if (_data.first is Widget) {
       if (widget.sliverListBuilder is Function) {
-        return [widget.sliverListBuilder(_data)];
+        return <Widget>[widget.sliverListBuilder(_data)];
       } else {
         return [
           SliverList(
@@ -162,6 +166,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
       }
     }
 
+    // If the list contains category headers
     if (_data.first is Map && (_data.first as Map).containsKey('header')) {
       List<Widget> _list = [];
 
@@ -186,9 +191,41 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
   loadData({bool append = false}) async {
     setState(() => _isLoading = true);
 
+    if (!append) {
+      // Not using setState on purpose -> we don't want to rebuild the widget tree, it's not needed.
+      // TODO: See if this affects performance and if we can do it on other places too.
+      _lastId = null;
+    }
+
+    // If we try to append the data but the last ID
+    // from where we try to load the posts is same as the ID of
+    // last item ID loaded previously.
+    // Hide the loading indicator and stop.
+    if (append && _prevLastId == _lastId) {
+      _slivers.removeLast(); // Remove the loading indicator
+      setState(() => _isLoading = false);
+      return;
+    } else {
+      // Otherwise save the current last ID for the next loadData() to check
+      _prevLastId = _lastId;
+    }
+
     try {
       _result = await widget.dataProvider(append ? _lastId : null);
-      if (_result.data.length > 0) {
+      bool makeInactive = false;
+
+      // If the ID of the last ID is same as the ID of currently loaded last ID
+      // Make the list inactive (makeInactive = true)
+      if (_lastId != null && _result.lastId == _lastId) {
+        makeInactive = true;
+        if (append) {
+          // ... and if also appending, remove the loading indicator
+          _slivers.removeLast(); // Remove the loading indicator
+        }
+      }
+
+      // Load the data only if there are any data AND should not be inactive.
+      if (_result.data.length > 0 && !makeInactive) {
         if (append) {
           _slivers.removeLast(); // Remove the loading indicator
         } else {
@@ -197,6 +234,11 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
         _slivers.addAll(this.buildTheList(_result.data));
         setState(() => _hasError = false);
         setState(() => _lastId = _result.lastId);
+      }
+
+      // Add the pinned widget only if the list is active
+      if (widget.pinnedWidget is Widget && !makeInactive) {
+        _slivers.insert(0, SliverToBoxAdapter(child: widget.pinnedWidget));
       }
     } catch (error) {
       setState(() => _hasError = true);
@@ -211,4 +253,56 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
       });
     }
   }
+
+  Widget buildAndroidRefreshIndicator(
+    BuildContext context,
+    RefreshIndicatorMode refreshState,
+    double pulledExtent,
+    double refreshTriggerPullDistance,
+    double refreshIndicatorExtent,
+  ) {
+    const Curve opacityCurve = const Interval(0.4, 0.8, curve: Curves.easeInOut);
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 16.0),
+        child: refreshState == RefreshIndicatorMode.drag
+            ? Opacity(
+                opacity: opacityCurve.transform(min(pulledExtent / refreshTriggerPullDistance, 1.0)),
+                child: const Icon(
+                  Icons.arrow_downward,
+                  color: CupertinoColors.inactiveGray,
+                  size: 24.0,
+                ),
+              )
+            : Opacity(
+                opacity: opacityCurve.transform(min(pulledExtent / refreshIndicatorExtent, 1.0)),
+                child: CircularProgressIndicator(strokeWidth: 2.0, valueColor: AlwaysStoppedAnimation<Color>(T.COLOR_PRIMARY)),
+              ),
+      ),
+    );
+  }
 }
+
+class RefreshScrollPhysics extends BouncingScrollPhysics {
+  const RefreshScrollPhysics({ScrollPhysics parent}) : super(parent: parent);
+
+  @override
+  RefreshScrollPhysics applyTo(ScrollPhysics ancestor) {
+    return RefreshScrollPhysics(parent: buildParent(ancestor));
+  }
+
+  @override
+  bool shouldAcceptUserOffset(ScrollMetrics position) {
+    return true;
+  }
+}
+
+class DataProviderResult {
+  final List data;
+  final dynamic lastId;
+
+  DataProviderResult(this.data, {this.lastId});
+}
+
+typedef Future<DataProviderResult> TDataProvider(int id);

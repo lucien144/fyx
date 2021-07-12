@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/FeedbackIndicator.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/theme/L.dart';
+import 'package:fyx/theme/T.dart';
 
 class PostRating extends StatefulWidget {
   final Post post;
@@ -58,7 +58,7 @@ class _PostRatingState extends State<PostRating> {
                         });
                       }).catchError((error) {
                         print(error);
-                        PlatformTheme.error(L.RATING_ERROR);
+                        T.error(L.RATING_ERROR);
                       }).whenComplete(() => setState(() => _givingRating = false));
                     },
             ),
@@ -117,7 +117,7 @@ class _PostRatingState extends State<PostRating> {
                                         });
                                       }).catchError((error) {
                                         print(error);
-                                        PlatformTheme.error(L.RATING_ERROR);
+                                        T.error(L.RATING_ERROR);
                                       }).whenComplete(() {
                                         setState(() => _givingRating = false);
                                         Navigator.of(context, rootNavigator: true).pop();
@@ -135,7 +135,7 @@ class _PostRatingState extends State<PostRating> {
                         }
                       }).catchError((error) {
                         setState(() => _givingRating = false);
-                        PlatformTheme.error(L.RATING_ERROR);
+                        T.error(L.RATING_ERROR);
                       });
                     },
             ),

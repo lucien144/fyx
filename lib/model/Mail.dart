@@ -1,6 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 import 'package:fyx/model/Active.dart';
 import 'package:fyx/model/post/Content.dart';
+import 'package:fyx/model/post/content/Regular.dart';
 
 enum MailDirection { from, to }
 enum MailStatus { read, unread, unknown }
@@ -21,7 +22,7 @@ class Mail {
     _other_nick = json['username'];
     _time = DateTime.parse(json['inserted_at'] ?? '0').millisecondsSinceEpoch;
     _direction = json['incoming'] ?? false;
-    _content = Content(json['content'], isCompact: this.isCompact);
+    _content = ContentRegular(json['content'], isCompact: this.isCompact);
     _message_status = (json['unread'] ?? false) ? MailStatus.unread : MailStatus.read;
     _new = json['new'] ?? false;
     _active = json['activity'];

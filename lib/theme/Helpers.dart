@@ -1,5 +1,6 @@
 import 'package:fyx/theme/L.dart';
 import 'package:html/parser.dart';
+import 'package:intl/intl.dart';
 
 enum INTERNAL_URI_PARSER { discussionId, postId }
 
@@ -9,7 +10,13 @@ class Helpers {
     return parse(document.body.text).documentElement.text.trim();
   }
 
-  static String parseTime(int time) {
+  static String absoluteTime(int time) {
+    final DateTime now = DateTime.fromMillisecondsSinceEpoch(time);
+    final DateFormat formatter = DateFormat('d. M. y H:m');
+    return formatter.format(now);
+  }
+
+  static String relativeTime(int time) {
     var duration = Duration(milliseconds: ((DateTime.now().millisecondsSinceEpoch).floor() - time));
     if (duration.inSeconds <= 0) {
       return L.GENERAL_NOW;

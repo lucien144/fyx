@@ -1,28 +1,30 @@
 import 'dart:async';
 
-import 'package:device_info/device_info.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fyx/PlatformApp.dart';
-import 'package:fyx/PlatformThemeData.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
+import 'package:fyx/libs/DeviceInfo.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
+import 'package:fyx/pages/GalleryPage.dart';
 import 'package:fyx/pages/HomePage.dart';
+import 'package:fyx/pages/InfoPage.dart';
 import 'package:fyx/pages/LoginPage.dart';
+import 'package:fyx/pages/NewMessagePage.dart';
+import 'package:fyx/pages/NoticesPage.dart';
+import 'package:fyx/pages/SettingsPage.dart';
+import 'package:fyx/pages/TutorialPage.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry/sentry.dart';
-
-import 'PlatformTheme.dart';
 import 'controllers/NotificationsService.dart';
 
 enum Environment { dev, staging, production }
@@ -45,6 +47,8 @@ class FyxApp extends StatefulWidget {
   static RouteObserver<PageRoute> _routeObserver;
 
   static NotificationService _notificationsService;
+
+  static GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
 
   setEnv(env) {
     FyxApp.env = env;
@@ -73,21 +77,18 @@ class FyxApp extends StatefulWidget {
       }
     };
 
-    ErrorWidget.builder = (FlutterErrorDetails details) {
-      String stack = '${DateTime.now()}: ${details.exceptionAsString()}';
-      return PlatformTheme.somethingsWrongButton(stack);
-    };
+    if (FyxApp.isDev) {
+      ErrorWidget.builder = (FlutterErrorDetails details) {
+        String stack = '${DateTime.now()}: ${details.exceptionAsString()}';
+        return T.somethingsWrongButton(stack);
+      };
+    }
 
-    SystemChrome.setPreferredOrientations(
-        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+    SystemUiOverlayStyle(statusBarBrightness: Brightness.light);
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
     // TODO: Move to build using FutureBuilder.
-    var results = await Future.wait([
-      ApiController().getCredentials(),
-      PackageInfo.fromPlatform(),
-      DeviceInfoPlugin().iosInfo,
-      SettingsProvider().init()
-    ]);
+    var results = await Future.wait([ApiController().getCredentials(), PackageInfo.fromPlatform(), DeviceInfo.init(), SettingsProvider().init()]);
     MainRepository().credentials = results[0];
     MainRepository().packageInfo = results[1];
     MainRepository().deviceInfo = results[2];
@@ -100,15 +101,15 @@ class FyxApp extends StatefulWidget {
       onTokenRefresh: (fcmToken) => ApiController().refreshFcmToken(fcmToken),
     );
     _notificationsService.onNewMail = () =>
-        PlatformApp.navigatorKey.currentState.pushReplacementNamed('/home',
+        FyxApp.navigatorKey.currentState.pushReplacementNamed('/home',
             arguments: HomePageArguments(HomePage.PAGE_MAIL));
     _notificationsService.onNewPost = ({discussionId, postId}) {
       if (discussionId > 0 && postId > 0) {
-        PlatformApp.navigatorKey.currentState.pushNamed('/discussion', arguments: DiscussionPageArguments(discussionId, postId: postId));
+        FyxApp.navigatorKey.currentState.pushNamed('/discussion', arguments: DiscussionPageArguments(discussionId, postId: postId + 1));
       } else if (discussionId > 0) {
-        PlatformApp.navigatorKey.currentState.pushNamed('/discussion', arguments: DiscussionPageArguments(discussionId));
+        FyxApp.navigatorKey.currentState.pushNamed('/discussion', arguments: DiscussionPageArguments(discussionId));
       } else {
-        PlatformApp.navigatorKey.currentState.pushReplacementNamed('/home', arguments: HomePageArguments(HomePage.PAGE_BOOKMARK));
+        FyxApp.navigatorKey.currentState.pushReplacementNamed('/home', arguments: HomePageArguments(HomePage.PAGE_BOOKMARK));
       }
     };
     _notificationsService.onError = (error) {
@@ -125,6 +126,42 @@ class FyxApp extends StatefulWidget {
 }
 
 class _FyxAppState extends State<FyxApp> {
+  Route routes(RouteSettings settings) {
+    switch (settings.name) {
+      case '/token':
+        print('[Router] Token');
+        return CupertinoPageRoute(builder: (_) => TutorialPage(), settings: settings);
+      case '/home':
+        print('[Router] Homepage');
+        return CupertinoPageRoute(builder: (_) => HomePage(), settings: settings);
+      case '/login':
+        print('[Router] Login');
+        return CupertinoPageRoute(builder: (_) => LoginPage(), settings: settings);
+      case '/discussion':
+        print('[Router] Discussion');
+        return CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings);
+      case '/new-message':
+        print('[Router] New Message');
+        return CupertinoPageRoute(builder: (_) => NewMessagePage(), settings: settings, fullscreenDialog: true);
+      case '/gallery':
+        print('[Router] Gallery');
+        return PageRouteBuilder(
+            transitionDuration: const Duration(milliseconds: 0), opaque: false, pageBuilder: (_, __, ___) => GalleryPage(), settings: settings, fullscreenDialog: true);
+      case '/settings':
+        print('[Router] Settings');
+        return CupertinoPageRoute(builder: (_) => SettingsPage(), settings: settings);
+      case '/settings/info':
+        print('[Router] Settings / info');
+        return CupertinoPageRoute(builder: (_) => InfoPage(), settings: settings);
+      case '/notices':
+        print('[Router] Notices');
+        return CupertinoPageRoute(builder: (_) => NoticesPage(), settings: settings);
+      default:
+        print('[Router] Discussion');
+        return CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -137,25 +174,26 @@ class _FyxAppState extends State<FyxApp> {
       },
       child: MultiProvider(
         providers: [
-          ChangeNotifierProvider<NotificationsModel>(
-              create: (context) => NotificationsModel()),
+          ChangeNotifierProvider<NotificationsModel>(create: (context) => NotificationsModel()),
         ],
-        child: PlatformApp(
+        child: CupertinoApp(
           title: 'Fyx',
-          theme: PlatformThemeData(primaryColor: T.COLOR_PRIMARY),
-          home: MainRepository().credentials is Credentials &&
-                  MainRepository().credentials.isValid
-              ? HomePage()
-              : LoginPage(),
+          theme: CupertinoThemeData(
+              primaryColor: T.COLOR_PRIMARY,
+              brightness: Brightness.light,
+              textTheme: CupertinoTextThemeData(primaryColor: Colors.white, textStyle: TextStyle(color: T.COLOR_BLACK, fontSize: 16))),
+          home: MainRepository().credentials is Credentials && MainRepository().credentials.isValid ? HomePage() : LoginPage(),
           debugShowCheckedModeBanner: FyxApp.isDev,
-          listNavigatorObservers: [
+          onUnknownRoute: (RouteSettings settings) => CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings),
+          onGenerateRoute: routes,
+          navigatorKey: FyxApp.navigatorKey,
+          navigatorObservers: [
             FyxApp.routeObserver,
             FirebaseAnalyticsObserver(
                 analytics: FyxApp.analytics,
-                onError: (error) async =>
-                    await MainRepository().sentry.captureException(
-                          exception: error,
-                        ))
+                onError: (error) async => await MainRepository().sentry.captureException(
+                      exception: error,
+                    ))
           ],
         ),
       ),

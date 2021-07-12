@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/FyxApp.dart';
-import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/CircleAvatar.dart' as ca;
 import 'package:fyx/components/DiscussionListItem.dart';
 import 'package:fyx/components/ListHeader.dart';
@@ -16,6 +15,7 @@ import 'package:fyx/model/enums/DefaultView.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/pages/MailboxPage.dart';
 import 'package:fyx/theme/L.dart';
+import 'package:fyx/theme/T.dart';
 import 'package:provider/provider.dart';
 
 enum ETabs { history, bookmarks }
@@ -155,7 +155,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
           CupertinoActionSheetAction(
               child: Text('⚠️ ${L.SETTINGS_BUGREPORT}'),
               onPressed: () {
-                PlatformTheme.prefillGithubIssue(appContext: MainRepository(), user: MainRepository().credentials.nickname);
+                T.prefillGithubIssue(appContext: MainRepository(), user: MainRepository().credentials.nickname);
                 AnalyticsProvider().logEvent('reportBug');
               }),
         ],
@@ -170,6 +170,10 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   @override
   Widget build(BuildContext context) {
+    if (ApiController().buildContext == null || ApiController().buildContext.hashCode != context.hashCode) {
+      ApiController().buildContext = context;
+    }
+
     if (_pageIndex == null) {
       if (_arguments == null) {
         _arguments = ModalRoute.of(context).settings.arguments as HomePageArguments;

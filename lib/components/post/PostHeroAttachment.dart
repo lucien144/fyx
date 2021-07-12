@@ -2,13 +2,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/post/PostHeroAttachmentBox.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/model/post/Link.dart';
 import 'package:fyx/model/post/Video.dart';
-import 'package:fyx/pages/GalleryPage.dart';
+import 'package:fyx/theme/T.dart';
 
 class GalleryArguments {
   final String imageUrl;
@@ -19,17 +18,18 @@ class GalleryArguments {
 
 class PostHeroAttachment extends StatelessWidget {
   final dynamic attachment;
-  final Content content;
-  final double _size;
+  final List<model.Image> _images;
   final bool _crop;
   final Function _onTap;
   final bool _openGallery;
+  Size size;
+  bool showStrip;
 
-  PostHeroAttachment(this.attachment, this.content, {crop = true, size = 100.0, onTap, openGallery = true})
+  PostHeroAttachment(this.attachment, {images = const <model.Image>[], crop = true, this.showStrip = true, this.size = const Size(100, 100), onTap, openGallery = true})
       : this._crop = crop,
-        this._size = size,
         this._onTap = onTap,
-        this._openGallery = openGallery;
+        this._openGallery = openGallery,
+        this._images = images;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +40,7 @@ class PostHeroAttachment extends StatelessWidget {
             _onTap();
           }
           if (_openGallery) {
-            Navigator.of(context, rootNavigator: true).pushNamed('/gallery', arguments: GalleryArguments((attachment as model.Image).image, images: content.images));
+            Navigator.of(context, rootNavigator: true).pushNamed('/gallery', arguments: GalleryArguments((attachment as model.Image).image, images: _images));
           }
         },
         child: ClipRRect(
@@ -51,8 +51,8 @@ class PostHeroAttachment extends StatelessWidget {
             placeholder: (context, url) => CupertinoActivityIndicator(),
             errorWidget: (context, url, error) => Icon(Icons.error),
             fit: BoxFit.cover,
-            width: _crop ? _size : null,
-            height: _crop ? _size : null,
+            width: _crop ? size.width : null,
+            height: _crop ? size.height : null,
           ),
         ),
       );
@@ -60,18 +60,22 @@ class PostHeroAttachment extends StatelessWidget {
 
     if (attachment is Link) {
       return PostHeroAttachmentBox(
+        showStrip: this.showStrip,
         title: (attachment as Link).title,
         icon: Icons.link,
-        onTap: () => PlatformTheme.openLink((attachment as Link).url),
+        size: size,
+        onTap: () => T.openLink((attachment as Link).url),
       );
     }
 
     if (attachment is Video) {
       return PostHeroAttachmentBox(
         title: (attachment as Video).link.title,
+        showStrip: this.showStrip,
         icon: Icons.play_circle_filled,
         image: (attachment as Video).thumb,
-        onTap: () => PlatformTheme.openLink((attachment as Video).link.url),
+        size: size,
+        onTap: () => T.openLink((attachment as Video).link.url),
       );
     }
 

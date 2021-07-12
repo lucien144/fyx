@@ -11,7 +11,7 @@ description: A new Flutter project.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 0.6.1+7
+version: 0.7.0+1
 
 environment:
   sdk: ">=2.2.2 <3.0.0"
@@ -22,7 +22,7 @@ dependencies:
   dio: ^3.0.9
   flutter_sticky_header: ^0.4.5
   html: ^0.14.0+3
-  flutter_html: 1.0.2
+  flutter_html: 1.3.0
   shared_preferences: ^0.5.8
   fluttertoast: ^7.1.1
   html_unescape: ^1.0.2
@@ -43,9 +43,9 @@ dependencies:
   path: ^1.6.4
   image: ^2.1.14
   async: ^2.4.1
-  chewie: ^0.9.10
-  video_player: ^0.10.11+2
-  flutter_cupertino_settings: ^0.3.1
+  chewie: ^0.12.2
+  video_player: ^1.0.1
+  flutter_cupertino_settings: ^0.4.0
   flutter_markdown: ^0.4.2
   http: ^0.12.2
   share: ^0.6.5
@@ -61,6 +61,7 @@ dependencies:
   # Dart-lang core plugins 👇
   http_parser: ^3.1.4
   mime: ^0.9.7
+  intl: ^0.16.0
 
   flutter:
     sdk: flutter
@@ -68,7 +69,7 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^0.1.3
+  cupertino_icons: ^1.0.0
 
 dependency_overrides:
   # https://github.com/dnfield/flutter_svg/issues/368#issuecomment-650297001
@@ -78,13 +79,15 @@ dependency_overrides:
 dev_dependencies:
   hive_generator: ^0.7.1
   build_runner: ^1.10.0
+  flutter_launcher_icons: "^0.8.0"
   flutter_test:
     sdk: flutter
 
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/app_icon.png"
 
-# The following section is specific to Flutter.
 flutter:
 
   # The following line ensures that the Material Icons font is

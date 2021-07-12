@@ -2,22 +2,22 @@ import 'package:async/async.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
+import 'package:fyx/components/post/Advertisement.dart';
 import 'package:fyx/components/post/PostListItem.dart';
 import 'package:fyx/components/post/SyntaxHighlighter.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
+import 'package:fyx/model/DiscussionOwner.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
+import 'package:fyx/model/post/content/Advertisement.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-
-import '../FyxApp.dart';
 
 class DiscussionPageArguments {
   final int discussionId;
@@ -67,13 +67,13 @@ class _DiscussionPageState extends State<DiscussionPage> {
         builder: (BuildContext context, AsyncSnapshot<DiscussionResponse> snapshot) {
           if (snapshot.hasData) {
             if (snapshot.data.discussion.accessDenied) {
-              return PlatformTheme.feedbackScreen(title: L.ACCESS_DENIED_ERROR, icon: Icons.do_not_disturb_alt, label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
+              return T.feedbackScreen(title: L.ACCESS_DENIED_ERROR, icon: Icons.do_not_disturb_alt, label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
             }
             return this._createDiscussionPage(snapshot.data, pageArguments);
           } else if (snapshot.hasError) {
-            return PlatformTheme.feedbackScreen(isWarning: true, title: snapshot.error.toString(), label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
+            return T.feedbackScreen(isWarning: true, title: snapshot.error.toString(), label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
           } else {
-            return PlatformTheme.feedbackScreen(isLoading: true);
+            return T.feedbackScreen(isLoading: true);
           }
         });
   }
@@ -101,6 +101,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
           PullToRefreshList(
             rebuild: _refreshList,
             isInfinite: true,
+            pinnedWidget: getPinnedWidget(discussionResponse),
             sliverListBuilder: (List data) {
               return ValueListenableBuilder(
                 valueListenable: MainRepository().settings.box.listenable(keys: ['blockedPosts', 'blockedUsers']),
@@ -139,13 +140,13 @@ class _DiscussionPageState extends State<DiscussionPage> {
                   result = response.posts;
                 }
               }
-              var data = (result as List)
+              List<Widget> data = (result as List)
                   .map((post) {
                     return Post.fromJson(post, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode);
                   })
                   .where((post) => !MainRepository().settings.isPostBlocked(post.id))
                   .where((post) => !MainRepository().settings.isUserBlocked(post.nick))
-                  .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.time > discussionResponse.discussion.lastVisit))
+                  .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.isNew))
                   .toList();
 
               int id;
@@ -155,25 +156,44 @@ class _DiscussionPageState extends State<DiscussionPage> {
               return DataProviderResult(data, lastId: id);
             },
           ),
-          Positioned(
-            right: 20,
-            bottom: 20,
-            child: SafeArea(
-              child: FloatingActionButton(
-                backgroundColor: T.COLOR_PRIMARY,
-                child: Icon(Icons.add),
-                onPressed: () => Navigator.of(context).pushNamed('/new-message',
-                    arguments: NewMessageSettings(
-                        onClose: this.refresh,
-                        onSubmit: (String inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
-                          var result = await ApiController().postDiscussionMessage(pageArguments.discussionId, message, attachments: attachments);
-                          return result.isOk;
-                        })),
+          Visibility(
+            visible: discussionResponse.discussion.accessRights?.canWrite != false || discussionResponse.discussion.rights?.canWrite != false,
+            child: Positioned(
+              right: 20,
+              bottom: 20,
+              child: SafeArea(
+                child: FloatingActionButton(
+                  backgroundColor: T.COLOR_PRIMARY,
+                  child: Icon(Icons.add),
+                  onPressed: () => Navigator.of(context).pushNamed('/new-message',
+                      arguments: NewMessageSettings(
+                          onClose: this.refresh,
+                          onSubmit: (String inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                            var result = await ApiController().postDiscussionMessage(pageArguments.discussionId, message, attachments: attachments);
+                            return result.isOk;
+                          })),
+                ),
               ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  Widget getPinnedWidget(DiscussionResponse discussionResponse) {
+    switch (discussionResponse.discussion.advertisement.runtimeType) {
+      case ContentAdvertisement:
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: Advertisement(
+            discussionResponse.discussion.advertisement,
+            title: discussionResponse.discussion.name,
+            username: discussionResponse.discussion.owner is DiscussionOwner ? discussionResponse.discussion.owner.username : '',
+          ),
+        );
+      default:
+        return null;
+    }
   }
 }

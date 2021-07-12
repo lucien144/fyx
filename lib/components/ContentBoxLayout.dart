@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fyx/components/post/Advertisement.dart';
+import 'package:fyx/components/post/Poll.dart';
 import 'package:fyx/components/post/PostFooterLink.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/components/post/PostHtml.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/enums/PostTypeEnum.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/theme/T.dart';
@@ -45,7 +48,7 @@ class ContentBoxLayout extends StatelessWidget {
 
               return PostHeroAttachment(
                 content.images[0],
-                content,
+                images: content.images,
                 crop: false,
               );
             });
@@ -59,7 +62,7 @@ class ContentBoxLayout extends StatelessWidget {
 
               var children = <Widget>[];
               content.attachments.forEach((attachment) {
-                children.add(PostHeroAttachment(attachment, content));
+                children.add(PostHeroAttachment(attachment, images: content.images));
               });
 
               return Wrap(children: children, spacing: 8, alignment: WrapAlignment.start);
@@ -80,7 +83,7 @@ class ContentBoxLayout extends StatelessWidget {
               var children = <Widget>[];
               children.add(Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[Expanded(child: PostHtml(content)), PostHeroAttachment(content.attachmentsWithFeatured['featured'], content)],
+                children: <Widget>[Expanded(child: PostHtml(content)), PostHeroAttachment(content.attachmentsWithFeatured['featured'], images: content.images,)],
               ));
 
               if ((content.attachmentsWithFeatured['attachments'] as List).whereType<model.Image>().length > 0) {
@@ -90,8 +93,8 @@ class ContentBoxLayout extends StatelessWidget {
                         padding: const EdgeInsets.only(right: 8),
                         child: PostHeroAttachment(
                           attachment,
-                          content,
-                          size: 50.0,
+                          images: content.images,
+                          size: Size(50, 50),
                         ));
                   }).toList();
                   return Row(children: children, mainAxisAlignment: MainAxisAlignment.start);
@@ -180,9 +183,21 @@ class ContentBoxLayout extends StatelessWidget {
                 return result;
               }
             }
-
-            return PostHtml(content);
+            return getWidgetByContentType(content);
           })()
-        : PostHtml(content);
+        : getWidgetByContentType(content);
+  }
+
+  Widget getWidgetByContentType(Content content) {
+    switch (this.content.contentType) {
+      case PostTypeEnum.poll:
+        return Poll(content);
+      case PostTypeEnum.text:
+        return PostHtml(content);
+      case PostTypeEnum.advertisement:
+        return Advertisement(content);
+      default:
+        return T.somethingsWrongButton(content.rawBody);
+    }
   }
 }

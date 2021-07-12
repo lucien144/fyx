@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/ContentBoxLayout.dart';
 import 'package:fyx/components/FeedbackIndicator.dart';
 import 'package:fyx/components/GestureFeedback.dart';
@@ -52,7 +51,7 @@ class _PostListItemState extends State<PostListItem> {
         onTap: () => showCupertinoModalPopup(context: context, builder: (BuildContext context) => PostAvatarActionSheet(user: _post.nick, idKlub: _post.idKlub,)),
         child: PostAvatar(
           _post.nick,
-          description: Helpers.parseTime(_post.time),
+          description: Helpers.relativeTime(_post.time),
         ),
       ),
       topRightWidget: GestureDetector(
@@ -72,7 +71,7 @@ class _PostListItemState extends State<PostListItem> {
           Row(
             children: <Widget>[
               Visibility(
-                visible: widget._isPreview != true,
+                visible: widget._isPreview != true && _post.canReply,
                 child: GestureDetector(
                     onTap: () => Navigator.of(context).pushNamed('/new-message',
                         arguments: NewMessageSettings(
@@ -115,7 +114,7 @@ class _PostListItemState extends State<PostListItem> {
                     _isSaving = true;
                   });
                   ApiController().setPostReminder(_post.idKlub, _post.id, _post.hasReminder).catchError((error) {
-                    PlatformTheme.error(L.REMINDER_ERROR);
+                    T.error(L.REMINDER_ERROR);
                     setState(() => _post.hasReminder = !_post.hasReminder);
                   }).whenComplete(() => setState(() => _isSaving = false));
                   AnalyticsProvider().logEvent('reminder');

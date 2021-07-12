@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cupertino_settings/flutter_cupertino_settings.dart';
 import 'package:fyx/FyxApp.dart';
-import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
@@ -122,7 +121,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           CSButton(CSButtonType.DESTRUCTIVE, 'Reset', () {
             MainRepository().settings.resetBlockedContent();
-            PlatformTheme.success(L.SETTINGS_CACHE_RESET);
+            T.success(L.SETTINGS_CACHE_RESET);
             AnalyticsProvider().logEvent('resetBlockedContent');
           }),
           const CSHeader('Informace'),
@@ -139,7 +138,7 @@ class _SettingsPageState extends State<SettingsPage> {
             CSButtonType.DEFAULT,
             L.SETTINGS_BUGREPORT,
             () {
-              PlatformTheme.prefillGithubIssue(appContext: MainRepository(), user: MainRepository().credentials.nickname);
+              T.prefillGithubIssue(appContext: MainRepository(), user: MainRepository().credentials.nickname);
               AnalyticsProvider().logEvent('reportBug');
             },
             style: bugreportStyle,
@@ -148,7 +147,7 @@ class _SettingsPageState extends State<SettingsPage> {
             CSButtonType.DEFAULT,
             L.TERMS,
             () {
-              PlatformTheme.openLink('https://nyx.cz/terms');
+              T.openLink('https://nyx.cz/terms');
               AnalyticsProvider().logEvent('openTerms');
             },
             style: termsStyle,

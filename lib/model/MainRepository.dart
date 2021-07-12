@@ -1,6 +1,6 @@
-import 'package:device_info/device_info.dart';
 import 'package:fyx/controllers/NotificationsService.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
+import 'package:fyx/libs/DeviceInfo.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:package_info/package_info.dart';
 import 'package:sentry/sentry.dart';
@@ -10,7 +10,7 @@ class MainRepository {
   static final MainRepository _singleton = MainRepository._internal();
   Credentials credentials;
   PackageInfo packageInfo;
-  IosDeviceInfo deviceInfo;
+  DeviceInfo deviceInfo;
   SettingsProvider settings;
   SentryClient sentry;
   NotificationService notifications;

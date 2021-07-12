@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/TextIcon.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/theme/L.dart';
+import 'package:fyx/theme/T.dart';
 import 'package:share/share.dart';
 
 class ShareData {
@@ -44,7 +44,7 @@ class _PostActionSheetState extends State<PostActionSheet> {
                 onPressed: () {
                   var data = ClipboardData(text: widget.shareData.link);
                   Clipboard.setData(data).then((_) {
-                    PlatformTheme.success(L.TOAST_COPIED);
+                    T.success(L.TOAST_COPIED);
                     Navigator.pop(context);
                   });
                   AnalyticsProvider().logEvent('copyLink');
@@ -81,7 +81,7 @@ class _PostActionSheetState extends State<PostActionSheet> {
               isDestructiveAction: true,
               onPressed: () {
                 widget.flagPostCallback(widget.postId);
-                PlatformTheme.success(L.TOAST_POST_HIDDEN);
+                T.success(L.TOAST_POST_HIDDEN);
                 Navigator.pop(context);
                 AnalyticsProvider().logEvent('hidePost');
               }),
@@ -96,9 +96,9 @@ class _PostActionSheetState extends State<PostActionSheet> {
                 try {
                   setState(() => _reportIndicator = true);
                   await ApiController().sendMail('FYXBOT', 'Inappropriate post/mail report: ID $widget.postId by user @$widget.user.');
-                  PlatformTheme.success(L.TOAST_POST_FLAGGED);
+                  T.success(L.TOAST_POST_FLAGGED);
                 } catch (error) {
-                  PlatformTheme.error(L.TOAST_POST_FLAG_ERROR);
+                  T.error(L.TOAST_POST_FLAG_ERROR);
                 } finally {
                   setState(() => _reportIndicator = false);
                   Navigator.pop(context);

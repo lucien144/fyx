@@ -5,7 +5,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
@@ -139,9 +138,9 @@ class _GalleryPageState extends State<GalleryPage> {
                     throw Exception(resultMap['errorMessage']);
                   }
 
-                  PlatformTheme.success(L.TOAST_IMAGE_SAVE_OK);
+                  T.success(L.TOAST_IMAGE_SAVE_OK);
                 } catch (error) {
-                  PlatformTheme.error(L.TOAST_IMAGE_SAVE_ERROR);
+                  T.error(L.TOAST_IMAGE_SAVE_ERROR);
                   MainRepository().sentry.captureException(exception: error);
                 } finally {
                   setState(() => _saving = false);

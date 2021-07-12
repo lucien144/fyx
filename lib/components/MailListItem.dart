@@ -32,7 +32,7 @@ class _MailListItemState extends State<MailListItem> {
       content: widget.mail.content,
       topLeftWidget: PostAvatar(
         widget.mail.direction == MailDirection.from ? widget.mail.participant : MainRepository().credentials.nickname,
-        description: '→ ${widget.mail.direction == MailDirection.to ? widget.mail.participant : MainRepository().credentials.nickname}, ~${Helpers.parseTime(widget.mail.time)}'
+        description: '→ ${widget.mail.direction == MailDirection.to ? widget.mail.participant : MainRepository().credentials.nickname}, ~${Helpers.relativeTime(widget.mail.time)}'
       ),
       topRightWidget: Row(
         children: <Widget>[

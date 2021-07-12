@@ -2,7 +2,6 @@ import 'package:chewie/chewie.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fyx/PlatformTheme.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:video_player/video_player.dart';
@@ -77,41 +76,44 @@ class _VideoPlayerState extends State<VideoPlayer> {
   @override
   Widget build(BuildContext context) {
     if (widget.videoUrl?.isEmpty ?? true) {
-      return PlatformTheme.somethingsWrongButton(widget.element.outerHtml);
+      return T.somethingsWrongButton(widget.element.outerHtml);
     }
 
-    return FutureBuilder(
-        future: initVideo(context),
-        builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-          if (snapshot.hasData && snapshot.data == true) {
-            return Column(
-              children: <Widget>[
-                AspectRatio(aspectRatio: videoPlayerController.value.aspectRatio, child: Chewie(controller: chewieController)),
-                SizedBox(
-                  height: 8,
-                ),
-                GestureDetector(
-                  onTap: () => PlatformTheme.openLink(widget.videoUrl),
-                  child: RichText(
-                    overflow: TextOverflow.ellipsis,
-                    text: TextSpan(children: [
-                      TextSpan(text: 'Zdroj: ', style: DefaultTextStyle.of(context).style.merge(TextStyle(fontSize: 12))),
-                      TextSpan(
-                        text: widget.videoUrl.replaceAll('', '\u{200B}'),
-                        style: TextStyle(fontSize: 12, color: T.COLOR_PRIMARY, decoration: TextDecoration.underline),
-                      )
-                    ]),
+    return Card(
+      elevation: 0,
+      child: FutureBuilder(
+          future: initVideo(context),
+          builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+            if (snapshot.hasData && snapshot.data == true) {
+              return Column(
+                children: <Widget>[
+                  AspectRatio(aspectRatio: videoPlayerController.value.aspectRatio, child: Chewie(controller: chewieController)),
+                  SizedBox(
+                    height: 8,
                   ),
-                ),
-                SizedBox(
-                  height: 8,
-                )
-              ],
-            );
-          } else if (snapshot.hasError) {
-            return PlatformTheme.somethingsWrongButton(widget.element.outerHtml);
-          }
-          return Center(child: CupertinoActivityIndicator());
-        });
+                  GestureDetector(
+                    onTap: () => T.openLink(widget.videoUrl),
+                    child: RichText(
+                      overflow: TextOverflow.ellipsis,
+                      text: TextSpan(children: [
+                        TextSpan(text: 'Zdroj: ', style: DefaultTextStyle.of(context).style.merge(TextStyle(fontSize: 12))),
+                        TextSpan(
+                          text: widget.videoUrl.replaceAll('', '\u{200B}'),
+                          style: TextStyle(fontSize: 12, color: T.COLOR_PRIMARY, decoration: TextDecoration.underline),
+                        )
+                      ]),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 8,
+                  )
+                ],
+              );
+            } else if (snapshot.hasError) {
+              return T.somethingsWrongButton(widget.element.outerHtml);
+            }
+            return Center(child: CupertinoActivityIndicator());
+          }),
+    );
   }
 }

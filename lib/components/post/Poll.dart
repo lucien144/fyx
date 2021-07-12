@@ -1,225 +1,127 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_html/html_parser.dart';
-import 'package:flutter_html/style.dart';
-import 'package:fyx/PlatformTheme.dart';
+import 'package:flutter/widgets.dart';
+import 'package:fyx/components/post/PostHtml.dart';
+import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/model/post/content/Poll.dart';
+import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/theme/T.dart';
-import 'package:html/dom.dart' as dom;
 
 class Poll extends StatefulWidget {
-  String html;
+  final ContentPoll content;
 
-  Poll(this.html);
+  Poll(this.content);
 
   @override
   _PollState createState() => _PollState();
 }
 
 class _PollState extends State<Poll> {
-  bool _showColumnStats = false;
-  bool _showRowStats = false;
-  TapGestureRecognizer votesRecognizer;
-  TapGestureRecognizer columnsRecognizer;
-  TapGestureRecognizer rowsRecognizer;
+  List<int> _votes = [];
+  bool _loading = false;
+  ContentPoll _poll;
+
 
   @override
   void initState() {
-    votesRecognizer = TapGestureRecognizer()
-      ..onTap = () {
-        setState(() {
-          _showRowStats = false;
-          _showColumnStats = false;
-        });
-      };
-
-    columnsRecognizer = TapGestureRecognizer()
-      ..onTap = () {
-        setState(() {
-          _showRowStats = false;
-          _showColumnStats = !_showColumnStats;
-        });
-      };
-
-    rowsRecognizer = TapGestureRecognizer()
-      ..onTap = () {
-        setState(() {
-          _showRowStats = !_showRowStats;
-          _showColumnStats = false;
-        });
-      };
-
+    _poll = widget.content;
     super.initState();
+  }
+
+  Widget buildAnswers(BuildContext context) {
+    var totalRespondents = _poll.pollComputedValues.totalRespondents;
+
+    return ListView.builder(
+      physics: NeverScrollableScrollPhysics(),
+        itemBuilder: (context, index) {
+          final answer = _poll.answers[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
+            child: GestureDetector(
+              onTap: !_poll.canVote ? null : () => setState(() {
+                if (_votes.contains(index)) {
+                  _votes.remove(index);
+                } else {
+                  if (_votes.length >= _poll.allowedVotes) {
+                    _votes.removeLast();
+                    _votes.add(index);
+                  } else {
+                    _votes.add(index);
+                  }
+                }
+              }),
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                    color: _votes.contains(index) ? Color(0xff76b9b9) : Color(0xffa9ccd3), border: _poll.canVote ? Border.all(color: T.COLOR_PRIMARY) : null),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  PostHtml(ContentRegular(answer.answer)),
+                  if (answer.result != null)
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Flexible(
+                          child: FractionallySizedBox(
+                            widthFactor: totalRespondents > 0 ? (answer.result.respondentsCount / totalRespondents) + 0.005 : .005,
+                            child: Container(
+                              color: answer.result.isMyVote ? T.COLOR_ACCENT : T.COLOR_PRIMARY,
+                              height: 10,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Text('${totalRespondents == 0 ? 0 : (answer.result.respondentsCount / totalRespondents * 100).toStringAsFixed(1)}% / ${answer.result.respondentsCount}',
+                            style: DefaultTextStyle.of(context).style.copyWith(fontSize: 13)),
+                      ],
+                    )
+                ]),
+              ),
+            ),
+          );
+        },
+        itemCount: _poll.answers.length,
+        shrinkWrap: true,
+        padding: const EdgeInsets.all(0));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Html(
-        data: widget.html,
-        style: {
-          'tbody tr': Style(
-              backgroundColor: Color(0xffa9ccd3),
-              border: Border(
-                  bottom: BorderSide(width: 5, color: Color(0xffcde5e9)))),
-          'th': Style(
-              padding: EdgeInsets.only(bottom: 5),
-              fontWeight: FontWeight.bold,
-              fontSize: FontSize.percent(90),
-              color: _showColumnStats ? T.COLOR_ACCENT : null),
-          'tr > td': Style(
-              fontWeight: FontWeight.bold,
-              fontSize: FontSize.percent(90),
-              color: _showRowStats ? T.COLOR_ACCENT : null),
-          'tbody td': Style(padding: EdgeInsets.fromLTRB(5, 5, 5, 10))
-        },
-        customRender: {
-          'div': (
-            RenderContext renderContext,
-            Widget parsedChild,
-            Map<String, String> attributes,
-            dom.Element element,
-          ) {
-            // Main box element styling
-            if (element.classes.contains('w-dyn')) {
-              return Container(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    parsedChild,
-                    if (element.classes.contains('w2'))
-                      RichText(
-                          text: TextSpan(
-                              text: 'Zobrazit %: ',
-                              style: DefaultTextStyle.of(context)
-                                  .style
-                                  .apply(fontSizeFactor: 0.9),
-                              children: [
-                            TextSpan(
-                                text: 'hlasy',
-                                recognizer: votesRecognizer,
-                                style: TextStyle(
-                                    decoration: TextDecoration.underline,
-                                    fontWeight:
-                                        !_showColumnStats && !_showRowStats
-                                            ? FontWeight.bold
-                                            : null)),
-                            TextSpan(text: ', '),
-                            TextSpan(
-                                text: 'sloupce',
-                                recognizer: columnsRecognizer,
-                                style: TextStyle(
-                                    decoration: TextDecoration.underline,
-                                    fontWeight:
-                                        _showColumnStats && !_showRowStats
-                                            ? FontWeight.bold
-                                            : null)),
-                            TextSpan(text: ', '),
-                            TextSpan(
-                                text: 'řádky',
-                                recognizer: rowsRecognizer,
-                                style: TextStyle(
-                                    decoration: TextDecoration.underline,
-                                    fontWeight:
-                                        !_showColumnStats && _showRowStats
-                                            ? FontWeight.bold
-                                            : null))
-                          ]))
-                  ],
-                ),
-                color: Color(0xffcde5e9),
-                padding: EdgeInsets.all(15),
-              );
-            }
-
-            // Poll bars
-            if (element.classes.contains('pgbar') &&
-                element.attributes.containsKey('style')) {
-              RegExp regExp = new RegExp(
-                r"width: ([0-9.]*)%",
-                caseSensitive: false,
-                multiLine: false,
-              );
-              String percentage =
-                  regExp.firstMatch(element.attributes['style']).group(1);
-              return Container(
-                  width: double.parse(percentage) + 1,
-                  // +1 is here to show something if votes = 0
-                  height: 10,
-                  color: T.COLOR_PRIMARY);
-            }
-            return parsedChild;
-          },
-          'span': (
-            RenderContext renderContext,
-            Widget parsedChild,
-            Map<String, String> attributes,
-            dom.Element element,
-          ) {
-            if (element.classes.contains('votes')) {
-              return RichText(
-                  text: TextSpan(children: [
-                TextSpan(
-                    text: element.innerHtml,
-                    style: DefaultTextStyle.of(context)
-                        .style
-                        .apply(fontSizeFactor: .8))
-              ]));
-            }
-
-            if (element.classes.contains('opt-percent')) {
-              if (_showColumnStats || _showRowStats) {
-                return null;
-              }
-
-              return RichText(
-                  text: TextSpan(
-                      children: [
-                    TextSpan(text: ' / '),
-                    TextSpan(text: element.innerHtml)
-                  ],
-                      style: DefaultTextStyle.of(context)
-                          .style
-                          .apply(fontSizeFactor: .8)));
-            }
-
-            if (element.classes.contains('row-percent')) {
-              if (!_showRowStats) {
-                return null;
-              }
-
-              return RichText(
-                  text: TextSpan(
-                      children: [
-                    TextSpan(text: ' / '),
-                    TextSpan(text: element.innerHtml)
-                  ],
-                      style: DefaultTextStyle.of(context)
-                          .style
-                          .apply(fontSizeFactor: .8, color: T.COLOR_ACCENT)));
-            }
-
-            if (element.classes.contains('col-percent')) {
-              if (!_showColumnStats) {
-                return null;
-              }
-
-              return RichText(
-                  text: TextSpan(
-                      children: [
-                    TextSpan(text: ' / '),
-                    TextSpan(text: element.innerHtml)
-                  ],
-                      style: DefaultTextStyle.of(context)
-                          .style
-                          .apply(fontSizeFactor: .8, color: T.COLOR_ACCENT)));
-            }
-
-            return parsedChild;
-          }
-        },
-        onLinkTap: (String link) {
-          PlatformTheme.openLink(link);
-        });
+    return Container(
+        alignment: Alignment.centerLeft,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Text(_poll.question, style: DefaultTextStyle.of(context).style.copyWith(fontSize: 20, fontWeight: FontWeight.bold)),
+          if (_poll.instructions != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: PostHtml(ContentRegular(_poll.instructions)),
+            ),
+          Text('Hlasů: ${_poll.pollComputedValues.totalVotes}\nHlasujících: ${_poll.pollComputedValues.totalRespondents}'),
+          SizedBox(height: 8,),
+          buildAnswers(context),
+          if (_poll.canVote)
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: CupertinoButton(
+                onPressed: _votes.length == 0 || _loading ? null : () async {
+                  setState(() => _loading = true);
+                  try {
+                    var votes = _votes.map((index) => index + 1).toList(); // Votes starting from 1 and not from 0.
+                    var poll = await ApiController().votePoll(_poll.discussionId, _poll.postId, votes);
+                    setState(() => _poll = poll);
+                  } catch (error) {
+                    T.error(error.toString());
+                  } finally {
+                    setState(() => _loading = false);
+                  }
+                },
+                child: _loading ? CupertinoActivityIndicator() : Text('Hlasovat ${_votes.length}/${_poll.allowedVotes}'),
+                color: T.COLOR_PRIMARY,
+                padding: EdgeInsets.all(0),
+                disabledColor: Colors.black26,
+              ),
+            )
+        ]),
+        color: Color(0xffcde5e9),
+        padding: EdgeInsets.all(15));
   }
 }

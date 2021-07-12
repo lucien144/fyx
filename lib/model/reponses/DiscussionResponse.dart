@@ -6,6 +6,11 @@ class DiscussionResponse {
   List _posts;
   ResponseContext _context;
 
+  DiscussionResponse.accessDenied() {
+    this._discussion = Discussion.fromJson(null);
+    this._posts = [];
+  }
+
   DiscussionResponse.fromJson(Map<String, dynamic> json) {
     this._discussion = Discussion.fromJson(json['discussion_common']);
     this._posts = json['posts'];

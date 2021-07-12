@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_html/html_parser.dart';
 import 'package:flutter_html/style.dart';
-import 'package:fyx/PlatformTheme.dart';
-import 'package:fyx/components/post/Poll.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/components/post/Spoiler.dart';
 import 'package:fyx/components/post/SyntaxHighlighter.dart';
@@ -12,8 +10,10 @@ import 'package:fyx/components/post/VideoPlayer.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/Image.dart' as post;
+import 'package:fyx/model/post/Video.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/theme/Helpers.dart';
+import 'package:fyx/theme/T.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html_unescape/html_unescape.dart';
 
@@ -27,16 +27,12 @@ class PostHtml extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Html(
-      data:
-          MainRepository().settings.useCompactMode && content.consecutiveImages
-              ? content.body
-              : content.rawBody,
+      data: MainRepository().settings.useCompactMode && content.consecutiveImages ? content.body : content.rawBody,
       style: {
-        "html": Style.fromTextStyle(
-            PlatformTheme.of(context).textTheme.textStyle ??
-                PlatformTheme.of(context).textTheme.body1),
-        ".image-link": Style(textDecoration: TextDecoration.none),
-        "span.r": Style(fontWeight: FontWeight.bold),
+        'html': Style.fromTextStyle(CupertinoTheme.of(context).textTheme.textStyle),
+        '.image-link': Style(textDecoration: TextDecoration.none),
+        'span.r': Style(fontWeight: FontWeight.bold),
+        'body': Style(margin: EdgeInsets.all(0))
       },
       customRender: {
         'img': (
@@ -61,7 +57,7 @@ class PostHtml extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 16.0),
             child: PostHeroAttachment(
               img,
-              content,
+              images: content.images,
               openGallery: openGallery,
               onTap: () => openGallery ? _isImageTap = true : null,
               crop: false,
@@ -75,10 +71,7 @@ class PostHtml extends StatelessWidget {
           dom.Element element,
         ) {
           var url = element.attributes['src'];
-          var urls = element
-              .querySelectorAll('source')
-              .map((element) => element.attributes['src'])
-              .toList();
+          var urls = element.querySelectorAll('source').map((element) => element.attributes['src']).toList();
           if ([null, ''].contains(url) && urls.length > 0) {
             url = urls.firstWhere((url) => url.endsWith('.mp4'));
             if (url.isEmpty) {
@@ -89,7 +82,7 @@ class PostHtml extends StatelessWidget {
             return VideoPlayer(element);
           }
 
-          return PlatformTheme.somethingsWrongButton(content.rawBody);
+          return T.somethingsWrongButton(content.rawBody);
         },
         'div': (
           RenderContext renderContext,
@@ -97,9 +90,30 @@ class PostHtml extends StatelessWidget {
           Map<String, String> attributes,
           dom.Element element,
         ) {
-          // Polls
-          if (element.classes.contains('w-dyn')) {
-            return Poll(element.outerHtml);
+          // Spoiler
+          if (element.classes.contains('spoiler')) {
+            return Spoiler(element.text);
+          }
+
+          // Youtube
+          if (element.attributes['data-embed-type'] == 'youtube') {
+            var img = element.querySelector('img');
+            if (img == null) {
+              return parsedChild;
+            }
+
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: PostHeroAttachment(
+                Video(
+                    id: element.attributes['data-embed-value'],
+                    type: Video.findVideoType(element.attributes['data-embed-type']),
+                    image: img.attributes['src'],
+                    thumb: img.attributes['src']),
+                size: Size(double.infinity, MediaQuery.of(context).size.width * (0.5)),
+                showStrip: false,
+              ),
+            );
           }
 
           return parsedChild;
@@ -117,20 +131,23 @@ class PostHtml extends StatelessWidget {
 
           return parsedChild;
         },
-        'code': (
+        'pre': (
           RenderContext renderContext,
           Widget parsedChild,
           Map<String, String> attributes,
           dom.Element element,
         ) {
-          final source = HtmlUnescape().convert(element.innerHtml);
-          return SyntaxHighlighter(source);
+          if (attributes['style'] == 'background-color:#272822') {
+            final source = HtmlUnescape().convert(element.text);
+            return SyntaxHighlighter(source);
+          } else {
+            return parsedChild;
+          }
         }
       },
       onImageTap: (String src) {
         _isImageTap = true;
-        Navigator.of(context).pushNamed('/gallery',
-            arguments: GalleryArguments(src, images: content.images));
+        Navigator.of(context).pushNamed('/gallery', arguments: GalleryArguments(src, images: content.images));
       },
       onLinkTap: (String link) async {
         // 👇 https://github.com/Sub6Resources/flutter_html/issues/121#issuecomment-581593467
@@ -143,17 +160,15 @@ class PostHtml extends StatelessWidget {
         var parserResult = Helpers.parseDiscussionUri(link);
         if (parserResult.isNotEmpty) {
           var arguments = DiscussionPageArguments(parserResult[INTERNAL_URI_PARSER.discussionId]);
-          Navigator.of(context, rootNavigator: true)
-              .pushNamed('/discussion', arguments: arguments);
+          Navigator.of(context, rootNavigator: true).pushNamed('/discussion', arguments: arguments);
           return;
         }
 
         // Click through to another discussion with message deeplink
         parserResult = Helpers.parseDiscussionPostUri(link);
         if (parserResult.isNotEmpty) {
-          var arguments = DiscussionPageArguments(parserResult[INTERNAL_URI_PARSER.discussionId], postId: parserResult[INTERNAL_URI_PARSER.postId]);
-          Navigator.of(context, rootNavigator: true)
-              .pushNamed('/discussion', arguments: arguments);
+          var arguments = DiscussionPageArguments(parserResult[INTERNAL_URI_PARSER.discussionId], postId: parserResult[INTERNAL_URI_PARSER.postId] + 1);
+          Navigator.of(context, rootNavigator: true).pushNamed('/discussion', arguments: arguments);
           return;
         }
 
@@ -162,13 +177,12 @@ class PostHtml extends StatelessWidget {
         // TODO: New API
         // Other Nyx internal links that cannot be displayed within Fyx
         RegExp otherDeeplinkTest = new RegExp(r"^/(.*)");
-        Iterable<RegExpMatch> otherDeeplinkMatches =
-            otherDeeplinkTest.allMatches(link);
+        Iterable<RegExpMatch> otherDeeplinkMatches = otherDeeplinkTest.allMatches(link);
         if (otherDeeplinkMatches.length == 1) {
-          link = 'https://www.nyx.cz$link';
+          link = 'https://nyx.cz$link';
         }
 
-        PlatformTheme.openLink(link);
+        T.openLink(link);
       },
     );
   }

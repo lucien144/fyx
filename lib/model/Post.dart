@@ -1,9 +1,15 @@
 // ignore_for_file: non_constant_identifier_names
+import 'package:fyx/model/enums/PostTypeEnum.dart';
 import 'package:fyx/model/post/Content.dart';
+import 'package:fyx/model/post/content/Advertisement.dart';
+import 'package:fyx/model/post/content/Poll.dart';
+import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/theme/Helpers.dart';
 
 class Post {
   final bool isCompact;
+  bool _canReply = true;
+  bool _isNew;
   int idKlub;
   int _id_wu;
   String _nick;
@@ -15,21 +21,39 @@ class Post {
   bool _canBeRated;
   bool _canBeDeleted;
   bool _canBeReminded;
-
   Content _content;
 
-  Post.fromJson(Map<String, dynamic> json, this.idKlub, { this.isCompact }) {
+  Post.fromJson(Map<String, dynamic> json, this.idKlub, {this.isCompact}) {
     this._id_wu = json['id'];
-    this._content = Content(json['content'], isCompact: this.isCompact);
     this._nick = json['username'];
     this._time = DateTime.parse(json['inserted_at'] ?? '0').millisecondsSinceEpoch;
     this._wu_rating = json['rating'] ?? 0;
     this._wu_type = json['type'];
+    this._isNew = json['new'] ?? false;
     this.myRating = json['my_rating'] ?? 'none'; // positive / negative / negative_visible / none TODO: enums
     this._reminder = json['reminder'] ?? false;
     this._canBeRated = json['can_be_rated'] ?? false;
     this._canBeDeleted = json['can_be_deleted'] ?? false;
     this._canBeReminded = json['can_be_reminded'] ?? false;
+
+    if (json['content_raw'] != null) {
+      switch (json['content_raw']['type']) {
+        case 'poll':
+          this._content = ContentPoll.fromJson(json['content_raw']['data'], discussionId: json['discussion_id'], postId: json['id']);
+          break;
+        case 'advertisement':
+          this._canReply = false;
+          this._content = ContentAdvertisement.fromPostJson(json);
+          break;
+        default:
+          this._content =
+              ContentRegular('${json['content']}<br><br><small><em>Chyba: neošetřený druh příspěvku: "${json['content_raw']['type']}"</em></small>', isCompact: this.isCompact);
+          break;
+      }
+      //TODO handle other cases
+    } else {
+      this._content = ContentRegular(json['content'], isCompact: this.isCompact);
+    }
   }
 
   Content get content => _content;
@@ -51,7 +75,9 @@ class Post {
   // ignore: unnecessary_getters_setters
   bool get hasReminder => _reminder;
 
-  String get link => 'https://www.nyx.cz/discussion/${this.idKlub}/id/${this.id}';
+  bool get isNew => _isNew;
+
+  String get link => 'https://nyx.cz/discussion/${this.idKlub}/id/${this.id}';
 
   // ignore: unnecessary_getters_setters
   set hasReminder(bool value) => _reminder = value;
@@ -61,4 +87,6 @@ class Post {
   bool get canBeDeleted => _canBeDeleted;
 
   bool get canBeRated => _canBeRated;
+
+  bool get canReply => _canReply;
 }

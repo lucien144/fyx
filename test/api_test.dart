@@ -13,11 +13,10 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/exceptions/AuthException.dart';
 import 'package:fyx/model/Credentials.dart';
-import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiMock implements IApiProvider {
-  final String loginJsonResponse;
+  final Map<String, dynamic> loginJsonResponse;
   TOnError onError;
   TOnAuthError onAuthError;
   Credentials _credentials;
@@ -27,6 +26,7 @@ class ApiMock implements IApiProvider {
 
   @override
   Future<Response> login(String username) {
+    // TODO update examples
     // Invalid call (GET)
     // {"result":"error","code":"401","error":"Not Authorized"}
 
@@ -39,7 +39,7 @@ class ApiMock implements IApiProvider {
     // Wrong token
     // {"result":"error","code":"401","error":"Not Authorized","auth_state":"AUTH_EXISTING","auth_dev_comment":"There is already confirmed authorization for this App name, but you haven't provided correct token. If you you've lost your auth token, tell user to cancel existing authorization. It might be also caused by using the same App name by the same app on different devices or different apps."}
 
-    return Future(() => Response<String>(data: this.loginJsonResponse));
+    return Future(() => Response<Map<String, dynamic>>(data: this.loginJsonResponse));
   }
 
   @override
@@ -87,7 +87,7 @@ class ApiMock implements IApiProvider {
 
 
   @override
-  Future<Response> giveRating(int discussionId, int postId, bool add, bool confirm) {
+  Future<Response> giveRating(int discussionId, int postId, bool add, bool confirm, bool remove) {
     // TODO: implement giveRating
     return null;
   }
@@ -139,6 +139,36 @@ class ApiMock implements IApiProvider {
     // TODO: implement fetchNotices
     throw UnimplementedError();
   }
+
+  @override
+  Future<Response> deleteFile(int id) {
+    // TODO: implement deleteFile
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> fetchDiscussionWaitingFiles(int id) {
+    // TODO: implement fetchDiscussionWaitingFiles
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> fetchMailWaitingFiles() {
+    // TODO: implement fetchMailWaitingFiles
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List> uploadFile(List<Map<ATTACHMENT, dynamic>> attachments, {int id}) {
+    // TODO: implement uploadFile
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> votePoll(int discussionId, int postId, List<int> votes) {
+    // TODO: implement votePoll
+    throw UnimplementedError();
+  }
 }
 
 void main() {
@@ -151,7 +181,7 @@ void main() {
     var loginName = 'TOMMYSHELBY';
 
     var api = ApiController();
-    api.provider = ApiMock('{"result": "error", "code": "401", "error": "Not Authorized"}');
+    api.provider = ApiMock({"message": "Not Authorized", "code": "401", "error": true});
     expect(() async => await api.login(loginName), throwsA(predicate((e) => (e is AuthException && e.toString() == 'Not Authorized'))));
   });
 
@@ -159,15 +189,12 @@ void main() {
     var loginName = 'TOMMYSHELBY';
 
     var api = ApiController();
-    api.provider = ApiMock(
-        '{"result": "error", "code": "401", "error": "Not Authorized", "auth_state": "AUTH_NEW", "auth_token": "44a3d1241830ca61a592e28df783007d", "auth_code": "6f9a10647d", "auth_dev_comment": "Direct user to PERSONAL \/ SETTINGS \/ AUTHORIZATIONS and tell him to accept request from this app. He will have to confirm it by transcribing passcode from [auth_code]. After confirming it, access using [token] should be working."}');
+    api.provider = ApiMock({"id": 1212, "token": "44a3d1241830ca61a592e28df783007d", "confirmation_code": "6f9a10647d"});
     var loginResponse = await api.login(loginName);
-    expect(loginResponse.result, 'error');
-    expect(loginResponse.code, 401);
-    expect(loginResponse.error, 'Not Authorized');
+    expect(loginResponse.code, 0);
+    expect(loginResponse.error, false);
     expect(loginResponse.authCode, '6f9a10647d');
     expect(loginResponse.authToken, '44a3d1241830ca61a592e28df783007d');
-    expect(loginResponse.authState, 'AUTH_NEW');
     expect(loginResponse.isAuthorized, true);
 
     var creds = await api.getCredentials();
@@ -181,7 +208,7 @@ void main() {
 
     var api = ApiController();
     api.provider = ApiMock(
-        '{"result": "error", "code": "401", "error": "Not Authorized", "auth_state": "AUTH_NEW", "auth_token": "44a3d1241830ca61a592e28df783007d", "auth_code": "6f9a10647d", "auth_dev_comment": "Direct user to PERSONAL \/ SETTINGS \/ AUTHORIZATIONS and tell him to accept request from this app. He will have to confirm it by transcribing passcode from [auth_code]. After confirming it, access using [token] should be working."}',
+        {"result": "error", "code": "401", "error": true, "auth_state": "AUTH_NEW", "auth_token": "44a3d1241830ca61a592e28df783007d", "auth_code": "6f9a10647d", "auth_dev_comment": "Direct user to PERSONAL \/ SETTINGS \/ AUTHORIZATIONS and tell him to accept request from this app. He will have to confirm it by transcribing passcode from [auth_code]. After confirming it, access using [token] should be working."},
       emptyCredentials: true // 👀 👈
     );
 
@@ -211,17 +238,18 @@ void main() {
     var loginName = 'TOMMYSHELBY';
 
     var api = ApiController();
-    api.provider = ApiMock('{"result": "error", "code": "401", "error": "Not Authorized", "auth_state": "AUTH_INVALID_USERNAME", "auth_dev_comment": "Invalid username!"}');
-    expect(() async => await api.login(loginName), throwsA(predicate((e) => (e is AuthException && e.toString() == 'Špatné uživatelské jméno nebo heslo.'))));
+    api.provider = ApiMock({"error": true, "message": "Nepodařilo se načíst uživatele."});
+    expect(() async => await api.login(loginName), throwsA(predicate((e) => (e is AuthException && e.toString() == 'Nepodařilo se načíst uživatele.'))));
   });
 
-  test('User uses wrong token.', () async {
-    var loginName = 'TOMMYSHELBY';
-
-    var api = ApiController();
-    api.provider = ApiMock(
-        '{"result": "error", "code": "401", "error": "Not Authorized", "auth_state": "AUTH_EXISTING", "auth_dev_comment": "There is already confirmed authorization for this App name, but you haven\'t provided correct token. If you you\'ve lost your auth token, tell user to cancel existing authorization. It might be also caused by using the same App name by the same app on different devices or different apps."}');
-    expect(() async => await api.login(loginName),
-        throwsA(predicate((e) => (e is AuthException && e.toString() == 'Je mi líto, ale autorizace se nezdařila. Zkuste si vyresetovat autorizaci v nastavení nyxu.'))));
-  });
+  // TODO is this still possible response? Can't reproduce it
+  // test('User uses wrong token.', () async {
+  //   var loginName = 'TOMMYSHELBY';
+  //
+  //   var api = ApiController();
+  //   api.provider = ApiMock(
+  //       '{"result": "error", "code": "401", "error": "Not Authorized", "auth_state": "AUTH_EXISTING", "auth_dev_comment": "There is already confirmed authorization for this App name, but you haven\'t provided correct token. If you you\'ve lost your auth token, tell user to cancel existing authorization. It might be also caused by using the same App name by the same app on different devices or different apps."}');
+  //   expect(() async => await api.login(loginName),
+  //       throwsA(predicate((e) => (e is AuthException && e.toString() == 'Je mi líto, ale autorizace se nezdařila. Zkuste si vyresetovat autorizaci v nastavení nyxu.'))));
+  // });
 }
