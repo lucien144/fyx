@@ -5,7 +5,7 @@ class NotificationBadge extends StatelessWidget {
   final bool isVisible;
   final int counter;
 
-  const NotificationBadge({Key key, @required this.widget, this.counter = 0, this.isVisible = false}) : super(key: key);
+  const NotificationBadge({Key? key, required this.widget, this.counter = 0, this.isVisible = false}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

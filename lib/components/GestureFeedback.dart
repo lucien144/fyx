@@ -4,7 +4,7 @@ class GestureFeedback extends StatefulWidget {
   final Widget child;
   final GestureTapCallback onTap;
 
-  GestureFeedback({Key key, @required this.child, this.onTap}) : super(key: key);
+  GestureFeedback({Key? key, required this.child, required this.onTap}) : super(key: key);
 
   @override
   _GestureFeedbackState createState() => _GestureFeedbackState();

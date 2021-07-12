@@ -30,7 +30,7 @@ import 'controllers/NotificationsService.dart';
 enum Environment { dev, staging, production }
 
 class FyxApp extends StatefulWidget {
-  static Environment _env;
+  static late Environment _env;
 
   static set env(val) => FyxApp._env = val;
 
@@ -44,9 +44,9 @@ class FyxApp extends StatefulWidget {
 
   static FirebaseAnalytics analytics = FirebaseAnalytics();
 
-  static RouteObserver<PageRoute> _routeObserver;
+  static late RouteObserver<PageRoute> _routeObserver;
 
-  static NotificationService _notificationsService;
+  static late NotificationService _notificationsService;
 
   static GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
 
@@ -66,7 +66,7 @@ class FyxApp extends StatefulWidget {
     FlutterError.onError = (details, {bool forceReport = false}) {
       try {
         sentry.captureException(
-          exception: details.exception,
+          details.exception,
           stackTrace: details.stack,
         );
       } catch (e) {
@@ -89,10 +89,10 @@ class FyxApp extends StatefulWidget {
 
     // TODO: Move to build using FutureBuilder.
     var results = await Future.wait([ApiController().getCredentials(), PackageInfo.fromPlatform(), DeviceInfo.init(), SettingsProvider().init()]);
-    MainRepository().credentials = results[0];
-    MainRepository().packageInfo = results[1];
-    MainRepository().deviceInfo = results[2];
-    MainRepository().settings = results[3];
+    MainRepository().credentials = results[0] as Credentials;
+    MainRepository().packageInfo = results[1] as PackageInfo;
+    MainRepository().deviceInfo = results[2] as DeviceInfo;
+    MainRepository().settings = results[3] as SettingsProvider;
     MainRepository().sentry = sentry;
 
     _notificationsService = NotificationService(
@@ -101,20 +101,20 @@ class FyxApp extends StatefulWidget {
       onTokenRefresh: (fcmToken) => ApiController().refreshFcmToken(fcmToken),
     );
     _notificationsService.onNewMail = () =>
-        FyxApp.navigatorKey.currentState.pushReplacementNamed('/home',
+        FyxApp.navigatorKey.currentState!.pushReplacementNamed('/home',
             arguments: HomePageArguments(HomePage.PAGE_MAIL));
     _notificationsService.onNewPost = ({discussionId, postId}) {
-      if (discussionId > 0 && postId > 0) {
-        FyxApp.navigatorKey.currentState.pushNamed('/discussion', arguments: DiscussionPageArguments(discussionId, postId: postId + 1));
+      if (discussionId! > 0 && postId! > 0) {
+        FyxApp.navigatorKey.currentState!.pushNamed('/discussion', arguments: DiscussionPageArguments(discussionId, postId: postId + 1));
       } else if (discussionId > 0) {
-        FyxApp.navigatorKey.currentState.pushNamed('/discussion', arguments: DiscussionPageArguments(discussionId));
+        FyxApp.navigatorKey.currentState!.pushNamed('/discussion', arguments: DiscussionPageArguments(discussionId));
       } else {
-        FyxApp.navigatorKey.currentState.pushReplacementNamed('/home', arguments: HomePageArguments(HomePage.PAGE_BOOKMARK));
+        FyxApp.navigatorKey.currentState!.pushReplacementNamed('/home', arguments: HomePageArguments(HomePage.PAGE_BOOKMARK));
       }
     };
     _notificationsService.onError = (error) {
       print(error);
-      MainRepository().sentry.captureException(exception: error);
+      MainRepository().sentry.captureException(error);
     };
     MainRepository().notifications = _notificationsService;
 
@@ -192,7 +192,7 @@ class _FyxAppState extends State<FyxApp> {
             FirebaseAnalyticsObserver(
                 analytics: FyxApp.analytics,
                 onError: (error) async => await MainRepository().sentry.captureException(
-                      exception: error,
+                      error,
                     ))
           ],
         ),

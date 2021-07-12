@@ -18,7 +18,7 @@ import 'package:html/dom.dart' as dom;
 import 'package:html_unescape/html_unescape.dart';
 
 class PostHtml extends StatelessWidget {
-  final Content content;
+  final Content? content;
   bool _isImageTap = false;
 
   /// overloadRaw - if true, the content.rawBody is used to parse no matter what settings is on.

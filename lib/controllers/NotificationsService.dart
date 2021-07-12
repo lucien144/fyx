@@ -5,7 +5,7 @@ import 'package:meta/meta.dart';
 
 typedef ErrorCallback = Function(dynamic error);
 typedef TokenCallback = Function(String token);
-typedef DiscussionCallback = Function({int discussionId, int postId});
+typedef DiscussionCallback = Function({int? discussionId, int? postId});
 
 class NotificationService {
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();

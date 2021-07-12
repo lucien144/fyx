@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/shims/dart_ui.dart';
 import 'package:fyx/components/post/Advertisement.dart';
 import 'package:fyx/components/post/Poll.dart';
 import 'package:fyx/components/post/PostFooterLink.dart';
@@ -9,24 +10,26 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/PostTypeEnum.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/Image.dart' as model;
+import 'package:fyx/model/post/content/Advertisement.dart';
+import 'package:fyx/model/post/content/Poll.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/UnreadBadgeDecoration.dart';
 
 enum LAYOUT_TYPES { textOnly, oneImageOnly, attachmentsOnly, attachmentsAndText }
 
-typedef Widget TLayout();
+typedef Widget? TLayout();
 
 class ContentBoxLayout extends StatelessWidget {
   final Widget topLeftWidget;
   final Widget topRightWidget;
-  final Widget bottomWidget;
+  final Widget? bottomWidget;
   final Content content;
   final bool _isPreview;
   final bool _isHighlighted;
   final Map<LAYOUT_TYPES, TLayout> _layoutMap = {};
-  final Function onTap;
+  final VoidCallback? onTap;
 
-  ContentBoxLayout({this.topLeftWidget, this.topRightWidget, this.bottomWidget, this.content, isPreview = false, isHighlighted = false, this.onTap})
+  ContentBoxLayout({required this.topLeftWidget, required this.topRightWidget, this.bottomWidget, required this.content, isPreview = false, isHighlighted = false, this.onTap})
       : _isPreview = isPreview,
         _isHighlighted = isHighlighted {
     // The order here is important!
@@ -178,7 +181,7 @@ class ContentBoxLayout extends StatelessWidget {
     return MainRepository().settings.useCompactMode
         ? (() {
             for (final layout in LAYOUT_TYPES.values) {
-              var result = _layoutMap[layout]();
+              var result = _layoutMap[layout]!();
               if (result != null) {
                 return result;
               }
@@ -191,11 +194,11 @@ class ContentBoxLayout extends StatelessWidget {
   Widget getWidgetByContentType(Content content) {
     switch (this.content.contentType) {
       case PostTypeEnum.poll:
-        return Poll(content);
+        return Poll(content as ContentPoll);
       case PostTypeEnum.text:
         return PostHtml(content);
       case PostTypeEnum.advertisement:
-        return Advertisement(content);
+        return Advertisement(content as ContentAdvertisement);
       default:
         return T.somethingsWrongButton(content.rawBody);
     }
