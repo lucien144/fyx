@@ -10,14 +10,14 @@ import 'package:fyx/theme/T.dart';
 class PostRating extends StatefulWidget {
   final Post post;
 
-  PostRating(this.post, {Key key}) : super(key: key);
+  PostRating(this.post, {Key? key}) : super(key: key);
 
   @override
   _PostRatingState createState() => _PostRatingState();
 }
 
 class _PostRatingState extends State<PostRating> {
-  Post _post;
+  late final Post _post;
   bool _givingRating = false;
 
   @override

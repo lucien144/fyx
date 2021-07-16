@@ -1,9 +1,9 @@
 import 'package:fyx/theme/Helpers.dart';
 
 class Credentials {
-  String _nickname;
-  String _token = '';
-  String _fcmToken;
+  late String _nickname;
+  late String _token;
+  String? _fcmToken;
 
   Credentials(this._nickname, this._token, {fcmToken}) : this._fcmToken = fcmToken;
 
@@ -23,11 +23,11 @@ class Credentials {
 
   String get token => _token;
 
-  String get fcmToken => _fcmToken;
+  String? get fcmToken => _fcmToken;
 
   String get nickname => _nickname.toUpperCase();
 
   String get avatar => Helpers.avatarUrl(nickname);
 
-  bool get isValid => _token != null && _nickname != null;
+  bool get isValid => _token.isNotEmpty && _nickname.length >= 3;
 }

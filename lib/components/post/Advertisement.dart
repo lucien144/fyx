@@ -11,7 +11,7 @@ import 'package:fyx/theme/T.dart';
 
 class Advertisement extends StatelessWidget {
   final ContentAdvertisement content;
-  final String title; // Ad title can be overwritten. Helpful in discussion page where content.fullName is null.
+  final String? title; // Ad title can be overwritten. Helpful in discussion page where content.fullName is null.
   final String username;
 
   // If this widget needs to be displayed within PostListItem (in discussion) or as a standalone widget (pinned to pull-to-refresh)
@@ -19,7 +19,7 @@ class Advertisement extends StatelessWidget {
 
   String get heading => this.title ?? (content.fullName ?? '');
 
-  const Advertisement(this.content, {this.title, this.username});
+  const Advertisement(this.content, {this.title, this.username = ''});
 
   Widget buildPriceWidget(BuildContext context) {
     return Container(
@@ -158,7 +158,7 @@ class Advertisement extends StatelessWidget {
       String small = 'https://nyx.cz/$thumb';
       String large = small.replaceAllMapped(RegExp(r'(square)(\.[a-z]{3,4})$'), (match) => 'original${match[2]}');
 
-      return i.Image(large, small);
+      return i.Image(large, thumb: small);
     }).toList();
     return Wrap(
       children: images.map((image) => PostHeroAttachment(image, images: images)).toList(),

@@ -25,7 +25,7 @@ class NewMessageSettings {
   String inputFieldPlaceholder;
   bool hasInputField;
   Widget replyWidget;
-  Function onClose;
+  Function? onClose;
   F onSubmit;
 
   NewMessageSettings(

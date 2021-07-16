@@ -13,7 +13,7 @@ class GalleryArguments {
   final String imageUrl;
   final List<model.Image> images;
 
-  GalleryArguments(this.imageUrl, {this.images});
+  GalleryArguments(this.imageUrl, {this.images = const []});
 }
 
 class PostHeroAttachment extends StatelessWidget {

@@ -13,13 +13,13 @@ import 'package:fyx/theme/T.dart';
 // ignore: must_be_immutable
 class PullToRefreshList extends StatefulWidget {
   final TDataProvider dataProvider;
-  Function sliverListBuilder;
+  final Function? sliverListBuilder;
   bool _disabled;
   bool _isInfinite;
   int _rebuild;
-  final Widget pinnedWidget;
+  final Widget? pinnedWidget;
 
-  PullToRefreshList({@required this.dataProvider, isInfinite = false, int rebuild = 0, this.sliverListBuilder, bool disabled = false, this.pinnedWidget})
+  PullToRefreshList({required this.dataProvider, isInfinite = false, int rebuild = 0, this.sliverListBuilder, bool disabled = false, this.pinnedWidget})
       : _isInfinite = isInfinite,
         _rebuild = rebuild,
         _disabled = disabled,
@@ -34,9 +34,9 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
   bool _isLoading = true;
   bool _hasPulledDown = false;
   bool _hasError = false;
-  DataProviderResult _result;
-  int _lastId;
-  int _prevLastId; // ID of last item loaded previously.
+  DataProviderResult? _result;
+  int? _lastId;
+  int? _prevLastId; // ID of last item loaded previously.
   var _slivers = <Widget>[];
   int _lastRebuild = 0;
 
@@ -153,7 +153,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
     // If the list contains widgets
     if (_data.first is Widget) {
       if (widget.sliverListBuilder is Function) {
-        return <Widget>[widget.sliverListBuilder(_data)];
+        return <Widget>[widget.sliverListBuilder!(_data)];
       } else {
         return [
           SliverList(
@@ -216,7 +216,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
 
       // If the ID of the last ID is same as the ID of currently loaded last ID
       // Make the list inactive (makeInactive = true)
-      if (_lastId != null && _result.lastId == _lastId) {
+      if (_lastId != null && _result!.lastId == _lastId) {
         makeInactive = true;
         if (append) {
           // ... and if also appending, remove the loading indicator
@@ -225,15 +225,15 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
       }
 
       // Load the data only if there are any data AND should not be inactive.
-      if (_result.data.length > 0 && !makeInactive) {
+      if (_result!.data.length > 0 && !makeInactive) {
         if (append) {
           _slivers.removeLast(); // Remove the loading indicator
         } else {
           _slivers.removeRange(1, _slivers.length);
         }
-        _slivers.addAll(this.buildTheList(_result.data));
+        _slivers.addAll(this.buildTheList(_result!.data));
         setState(() => _hasError = false);
-        setState(() => _lastId = _result.lastId);
+        setState(() => _lastId = _result!.lastId);
       }
 
       // Add the pinned widget only if the list is active
@@ -245,7 +245,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
 
       print('[PullToRefresh error]: $error');
       print(StackTrace.current);
-      MainRepository().sentry.captureException(exception: error);
+      MainRepository().sentry.captureException(error);
     } finally {
       setState(() {
         _hasPulledDown = false;
@@ -285,10 +285,10 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
 }
 
 class RefreshScrollPhysics extends BouncingScrollPhysics {
-  const RefreshScrollPhysics({ScrollPhysics parent}) : super(parent: parent);
+  const RefreshScrollPhysics({ScrollPhysics? parent}) : super(parent: parent);
 
   @override
-  RefreshScrollPhysics applyTo(ScrollPhysics ancestor) {
+  RefreshScrollPhysics applyTo(ScrollPhysics? ancestor) {
     return RefreshScrollPhysics(parent: buildParent(ancestor));
   }
 
@@ -305,4 +305,4 @@ class DataProviderResult {
   DataProviderResult(this.data, {this.lastId});
 }
 
-typedef Future<DataProviderResult> TDataProvider(int id);
+typedef Future<DataProviderResult> TDataProvider(int? id);

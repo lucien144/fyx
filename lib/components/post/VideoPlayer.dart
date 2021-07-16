@@ -8,14 +8,14 @@ import 'package:video_player/video_player.dart';
 
 class VideoPlayer extends StatefulWidget {
   final dom.Element element;
-  String videoUrl;
+  late final String? videoUrl;
 
   VideoPlayer(this.element) {
     videoUrl = element.attributes['src'];
     var urls = element.querySelectorAll('source').map((element) => element.attributes['src']).toList();
     if ([null, ''].contains(videoUrl) && urls.length > 0) {
-      videoUrl = urls.firstWhere((url) => url.endsWith('.mp4'));
-      if (videoUrl.isEmpty) {
+      videoUrl = urls.firstWhere((url) => url is String && url.endsWith('.mp4'));
+      if ((videoUrl as String).isEmpty) {
         videoUrl = urls.first;
       }
     }
@@ -26,29 +26,31 @@ class VideoPlayer extends StatefulWidget {
 }
 
 class _VideoPlayerState extends State<VideoPlayer> {
-  VideoPlayerController videoPlayerController;
-  ChewieController chewieController;
+  VideoPlayerController? videoPlayerController;
+  ChewieController? chewieController;
 
   @override
   void initState() {
     super.initState();
-    if (widget.videoUrl?.isEmpty ?? true) {
-      return;
+    if (widget.videoUrl != null && widget.videoUrl!.isNotEmpty) {
+      videoPlayerController = VideoPlayerController.network(widget.videoUrl!);
     }
-
-    videoPlayerController = VideoPlayerController.network(widget.videoUrl);
   }
 
   Future<bool> initVideo(BuildContext context) async {
-    await videoPlayerController.initialize();
+    if (videoPlayerController == null) {
+      return false;
+    }
+
+    await videoPlayerController!.initialize();
 
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final height = size.height;
-    final aspectRatio = videoPlayerController.value.initialized ? videoPlayerController.value.aspectRatio : (width > height ? width / height : height / width);
+    final aspectRatio = videoPlayerController!.value.isInitialized ? videoPlayerController!.value.aspectRatio : (width > height ? width / height : height / width);
 
     chewieController = ChewieController(
-        videoPlayerController: videoPlayerController,
+        videoPlayerController: videoPlayerController!,
         aspectRatio: aspectRatio,
         placeholder: Container(
           color: T.COLOR_PRIMARY,
@@ -65,10 +67,10 @@ class _VideoPlayerState extends State<VideoPlayer> {
   @override
   void dispose() {
     if (chewieController != null) {
-      chewieController.dispose();
+      chewieController!.dispose();
     }
     if (videoPlayerController != null) {
-      videoPlayerController.dispose();
+      videoPlayerController!.dispose();
     }
     super.dispose();
   }
@@ -87,18 +89,18 @@ class _VideoPlayerState extends State<VideoPlayer> {
             if (snapshot.hasData && snapshot.data == true) {
               return Column(
                 children: <Widget>[
-                  AspectRatio(aspectRatio: videoPlayerController.value.aspectRatio, child: Chewie(controller: chewieController)),
+                  AspectRatio(aspectRatio: videoPlayerController!.value.aspectRatio, child: Chewie(controller: chewieController!)),
                   SizedBox(
                     height: 8,
                   ),
                   GestureDetector(
-                    onTap: () => T.openLink(widget.videoUrl),
+                    onTap: () => T.openLink(widget.videoUrl!),
                     child: RichText(
                       overflow: TextOverflow.ellipsis,
                       text: TextSpan(children: [
                         TextSpan(text: 'Zdroj: ', style: DefaultTextStyle.of(context).style.merge(TextStyle(fontSize: 12))),
                         TextSpan(
-                          text: widget.videoUrl.replaceAll('', '\u{200B}'),
+                          text: widget.videoUrl!.replaceAll('', '\u{200B}'),
                           style: TextStyle(fontSize: 12, color: T.COLOR_PRIMARY, decoration: TextDecoration.underline),
                         )
                       ]),

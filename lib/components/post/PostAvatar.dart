@@ -8,11 +8,11 @@ class PostAvatar extends StatelessWidget {
   final String nick;
   final bool isHighlighted;
   String description;
-  Widget descriptionWidget;
+  Widget? descriptionWidget;
 
   String get image => Helpers.avatarUrl(nick);
 
-  PostAvatar(this.nick, {this.isHighlighted = false, this.description, this.descriptionWidget});
+  PostAvatar(this.nick, {this.isHighlighted = false, this.description = '', this.descriptionWidget});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +43,7 @@ class PostAvatar extends StatelessWidget {
               description,
               style: TextStyle(color: material.Colors.black38, fontSize: 10),
             )
-          else if (this.descriptionWidget is Widget) this.descriptionWidget
+          else if (this.descriptionWidget is Widget) this.descriptionWidget!
         ],
       )
     ]);

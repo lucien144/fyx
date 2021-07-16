@@ -22,7 +22,7 @@ class PostListItem extends StatefulWidget {
   final Post post;
   final bool _isPreview;
   final bool _isHighlighted;
-  final Function onUpdate;
+  final Function? onUpdate;
 
   PostListItem(this.post, {this.onUpdate, isPreview = false, isHighlighted = false})
       : _isPreview = isPreview,
@@ -33,7 +33,7 @@ class PostListItem extends StatefulWidget {
 }
 
 class _PostListItemState extends State<PostListItem> {
-  Post _post;
+  late final Post _post;
   bool _isSaving = false;
 
   @override

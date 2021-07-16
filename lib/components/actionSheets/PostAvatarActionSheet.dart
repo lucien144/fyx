@@ -14,7 +14,7 @@ class PostAvatarActionSheet extends StatelessWidget {
   final String user;
   final int idKlub;
 
-  const PostAvatarActionSheet({Key key, @required this.user, this.idKlub}) : super(key: key);
+  const PostAvatarActionSheet({Key? key, required this.user, required this.idKlub}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

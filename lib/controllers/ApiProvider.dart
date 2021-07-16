@@ -10,20 +10,20 @@ class ApiProvider implements IApiProvider {
   // ignore: non_constant_identifier_names
   final URL = 'https://nyx.cz/api';
 
-  Credentials _credentials;
+  Credentials? _credentials;
 
-  TOnError onError;
-  TOnAuthError onAuthError;
-  TOnContextData onContextData;
+  TOnError? onError;
+  TOnAuthError? onAuthError;
+  TOnContextData? onContextData;
 
-  Credentials getCredentials() {
-    if (_credentials != null && _credentials.isValid) {
+  getCredentials() {
+    if (_credentials != null && _credentials!.isValid) {
       return _credentials;
     }
     return null;
   }
 
-  Credentials setCredentials(Credentials creds) {
+  setCredentials(Credentials? creds) {
     if (creds != null && creds.isValid) {
       _credentials = creds;
     }
@@ -31,7 +31,7 @@ class ApiProvider implements IApiProvider {
   }
 
   ApiProvider() {
-    dio.interceptors.add(InterceptorsWrapper(onRequest: (RequestOptions options) async {
+    dio.interceptors.add(InterceptorsWrapper(onRequest: (RequestOptions options, RequestInterceptorHandler handler) async {
       try {
         // TODO: Perhaps, solve Czech characters too...
         // TODO: Get rid of MainRepository()
@@ -46,43 +46,53 @@ class ApiProvider implements IApiProvider {
       print('[API] UA: ${options.headers['user-agent']}');
       print('[API] ${options.method.toUpperCase()}: ${options.uri}');
 
-      if (_credentials != null && _credentials.isValid) {
-        print('[API] -> Bearer: ${_credentials.token}');
-        options.headers['Authorization'] = 'Bearer ${_credentials.token}';
+      if (_credentials != null && _credentials!.isValid) {
+        print('[API] -> Bearer: ${_credentials!.token}');
+        options.headers['Authorization'] = 'Bearer ${_credentials!.token}';
       }
-      return options;
-    }, onResponse: (Response response) async {
+
+    }, onResponse: (Response response, ResponseInterceptorHandler handler) async {
       if (response.data.containsKey('context')) {
-        onContextData(response.data['context']);
+        if (onContextData != null) {
+          onContextData!(response.data['context']);
+        }
       }
 
       // All seems ok.
       if (response.statusCode == 200) {
-        return response;
+        return;
       }
 
       // Malformed response
-      onError(L.API_ERROR);
-      return response;
-    }, onError: (DioError e) async {
+      if (onError != null) {
+        onError!(L.API_ERROR);
+      }
+      return;
+    }, onError: (DioError e, ErrorInterceptorHandler handler) async {
       // Not Authorized
       if (e.response?.statusCode == 401) {
-        onAuthError(e.response.data['message']);
-        return e.response;
+        if (onAuthError != null) {
+          onAuthError!(e.response!.data['message']);
+        }
+        return;
       }
 
       // Other problem
       if (e.response?.statusCode == 400) {
-        onError(e.response.data['message']);
-        return e.response;
+        if (onError != null) {
+          onError!(e.response!.data['message']);
+        }
+        return;
       }
 
       // Negative rating confirmation
       if (e.response?.statusCode == 403) {
-        return e.response;
+        return;
       }
 
-      onError(e.message);
+      if (onError != null) {
+        onError!(e.message);
+      }
     }));
   }
 
@@ -92,7 +102,7 @@ class ApiProvider implements IApiProvider {
 
   Future<Response> registerFcmToken(String token) async {
     String client = 'fyx';
-    return await dio.post('$URL/register_for_notifications/${_credentials.token}/$client/$token');
+    return await dio.post('$URL/register_for_notifications/${_credentials?.token}/$client/$token');
   }
 
   Future<Response> fetchBookmarks() async {
@@ -103,13 +113,13 @@ class ApiProvider implements IApiProvider {
     return await dio.get('$URL/bookmarks/history/more');
   }
 
-  Future<Response> fetchDiscussion(int discussionId, {int lastId, String user}) async {
+  Future<Response> fetchDiscussion(int discussionId, {int? lastId, String? user}) async {
     Map<String, dynamic> params = {'order': lastId == null ? 'newest' : 'older_than', 'from_id': lastId, 'user': user};
     return await dio.get('$URL/discussion/$discussionId', queryParameters: params);
   }
 
   Future<Response> fetchDiscussionHome(int id) async {
-    FormData formData = new FormData.fromMap({'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'discussion', 'l2': 'home', 'id_klub': id});
+    FormData formData = new FormData.fromMap({'auth_nick': _credentials?.nickname, 'auth_token': _credentials?.token, 'l': 'discussion', 'l2': 'home', 'id_klub': id});
     return await dio.post(URL, data: formData);
   }
 
@@ -133,10 +143,10 @@ class ApiProvider implements IApiProvider {
   }
 
   Future<Response> logout() async {
-    return await dio.delete('$URL/profile/delete_token/${_credentials.token}');
+    return await dio.delete('$URL/profile/delete_token/${_credentials?.token}');
   }
 
-  Future<Response> fetchMail({int lastId, String username}) async {
+  Future<Response> fetchMail({int? lastId, String? username}) async {
     Map<String, dynamic> params = {'order': lastId == null ? 'newest' : 'older_than', 'from_id': lastId, 'user': username};
     return await dio.get('$URL/mail', queryParameters: params);
   }

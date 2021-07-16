@@ -19,7 +19,7 @@ class Poll extends StatefulWidget {
 class _PollState extends State<Poll> {
   List<int> _votes = [];
   bool _loading = false;
-  ContentPoll _poll;
+  late final ContentPoll _poll;
 
 
   @override

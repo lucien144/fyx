@@ -9,7 +9,7 @@ class SyntaxHighlighter extends StatelessWidget {
   // TODO: Get rid of static.
   static String languageContext = '';
 
-  const SyntaxHighlighter(this.source, {Key key}) : super(key: key);
+  const SyntaxHighlighter(this.source, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +72,7 @@ class SyntaxHighlighter extends StatelessWidget {
 
     String foundLang = 'plaintext';
     for (String key in langs.keys) {
-      final RegExp regexp = new RegExp(langs[key], caseSensitive: false);
+      final RegExp regexp = new RegExp(langs[key]!, caseSensitive: false);
       if (regexp.hasMatch(SyntaxHighlighter.languageContext)) {
         foundLang = key;
         break;
