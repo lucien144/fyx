@@ -12,7 +12,7 @@ import 'package:html_unescape/html_unescape.dart';
 
 class ContentRegular extends Content {
   String _body;
-  String _rawBody;
+  late String _rawBody;
 
   /// If the post have consecutive images = ON
   /// Consecutive images means there are now characters other than
@@ -23,7 +23,7 @@ class ContentRegular extends Content {
   List<Link> _emptyLinks = [];
   List<Video> _videos = [];
 
-  ContentRegular(this._body, {bool isCompact}) : super(PostTypeEnum.text, isCompact: isCompact) {
+  ContentRegular(this._body, {bool isCompact = false}) : super(PostTypeEnum.text, isCompact: isCompact) {
     _rawBody = _body;
     _rawBody = this._tagAllImageLinks(_rawBody); // This updates the raw body.
     _body = this._tagAllImageLinks(_body); // This updates the raw body.

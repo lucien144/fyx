@@ -1,13 +1,13 @@
 // ignore_for_file: non_constant_identifier_names
 
 class BookmarkedDiscussion {
-  int _id_klub;
-  int _unread;
-  int _replies;
-  int _images;
-  int _links;
-  String _name;
-  int _last_visit;
+  late int _id_klub;
+  late int _unread;
+  late int _replies;
+  late int _images;
+  late int _links;
+  late String _name;
+  late int _last_visit;
 
   BookmarkedDiscussion.fromJson(Map<String, dynamic> json) {
     this._id_klub = json['discussion_id'];
