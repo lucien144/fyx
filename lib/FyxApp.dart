@@ -61,11 +61,11 @@ class FyxApp extends StatefulWidget {
     return _routeObserver;
   }
 
-  static init(SentryClient sentry) async {
+  static init() async {
     // This must be initialized after WidgetsFlutterBinding.ensureInitialized
     FlutterError.onError = (details, {bool forceReport = false}) {
       try {
-        sentry.captureException(
+        Sentry.captureException(
           details.exception,
           stackTrace: details.stack,
         );
@@ -93,7 +93,6 @@ class FyxApp extends StatefulWidget {
     MainRepository().packageInfo = results[1] as PackageInfo;
     MainRepository().deviceInfo = results[2] as DeviceInfo;
     MainRepository().settings = results[3] as SettingsProvider;
-    MainRepository().sentry = sentry;
 
     _notificationsService = NotificationService(
       onToken: (fcmToken) => ApiController().registerFcmToken(fcmToken),
@@ -114,7 +113,7 @@ class FyxApp extends StatefulWidget {
     };
     _notificationsService.onError = (error) {
       print(error);
-      MainRepository().sentry.captureException(error);
+      Sentry.captureException(error);
     };
     MainRepository().notifications = _notificationsService;
 
@@ -191,7 +190,7 @@ class _FyxAppState extends State<FyxApp> {
             FyxApp.routeObserver,
             FirebaseAnalyticsObserver(
                 analytics: FyxApp.analytics,
-                onError: (error) async => await MainRepository().sentry.captureException(
+                onError: (error) async => await Sentry.captureException(
                       error,
                     ))
           ],

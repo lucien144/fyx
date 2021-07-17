@@ -141,7 +141,7 @@ class _GalleryPageState extends State<GalleryPage> {
                   T.success(L.TOAST_IMAGE_SAVE_OK);
                 } catch (error) {
                   T.error(L.TOAST_IMAGE_SAVE_ERROR);
-                  MainRepository().sentry.captureException(exception: error);
+                  Sentry.captureException(exception: error);
                 } finally {
                   setState(() => _saving = false);
                 }

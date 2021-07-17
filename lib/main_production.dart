@@ -3,22 +3,25 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fyx/FyxApp.dart';
-import 'package:sentry/sentry.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await DotEnv().load('.env');
-  final sentry = SentryClient(dsn: DotEnv().env['SENTRY_KEY'], environmentAttributes: const Event(environment: 'production'));
+  await DotEnv().load();
 
   runZonedGuarded(
-    () async {
-      await FyxApp.init(sentry);
-      return runApp(FyxApp()..setEnv(Environment.production));
+        () async {
+      await FyxApp.init();
+      SentryFlutter.init((options)
+      {
+        options.dsn = DotEnv().env['SENTRY_KEY'];
+        options.environment = 'production';
+      }, appRunner: () => runApp(FyxApp()..setEnv(Environment.production)));
     },
-    (error, stackTrace) async {
+        (error, stackTrace) async {
       try {
-        await sentry.captureException(
-          exception: error,
+        await Sentry.captureException(
+          error,
           stackTrace: stackTrace,
         );
         print('Error sent to sentry.io: $error');

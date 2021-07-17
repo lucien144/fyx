@@ -76,7 +76,7 @@ class T {
       return true;
     } catch (e) {
       T.error(L.INAPPBROWSER_ERROR);
-      MainRepository().sentry.captureException(exception: e);
+      Sentry.captureException(exception: e);
       return false;
     }
   }

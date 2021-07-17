@@ -7,7 +7,7 @@ import 'package:fyx/controllers/ApiProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/exceptions/AuthException.dart';
 import 'package:fyx/model/Credentials.dart';
-import 'package:fyx/model/MainRepository.dart';
+import 'package:sentry/sentry.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/ResponseContext.dart';
 import 'package:fyx/model/post/content/Poll.dart';
@@ -134,7 +134,7 @@ class ApiController {
           this.setCredentials(creds.copyWith(fcmToken: token));
         } catch (error) {
           debugPrint(error.toString());
-          MainRepository().sentry.captureException(error);
+          Sentry.captureException(error);
         }
       }
     });
@@ -152,7 +152,7 @@ class ApiController {
         this.setCredentials(creds.copyWith(fcmToken: token));
       } catch (error) {
         debugPrint(error.toString());
-        MainRepository().sentry.captureException(error);
+        Sentry.captureException(error);
       }
     });
   }
@@ -192,7 +192,7 @@ class ApiController {
         await this.deleteAllWaitingFiles(waitingFilesResponse.files);
       } catch (error) {
         debugPrint(error.toString());
-        MainRepository().sentry.captureException(error);
+        Sentry.captureException(error);
         // TODO: Notify user?
       }
 
@@ -252,7 +252,7 @@ class ApiController {
         await this.deleteAllWaitingFiles(waitingFilesResponse.files);
       } catch (error) {
         debugPrint(error.toString());
-        MainRepository().sentry.captureException(error);
+        Sentry.captureException(error);
         // TODO: Notify user?
       }
       try {

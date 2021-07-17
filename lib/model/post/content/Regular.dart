@@ -109,7 +109,7 @@ class ContentRegular extends Content {
       var trailingBr = RegExp(r'(((\s*)<\s*br\s*\/?\s*>(\s*))*)$', caseSensitive: false);
       _body = _body.replaceAll(trailingBr, '');
     } catch (error) {
-      MainRepository().sentry.captureException(exception: error, stackTrace: StackTrace.current);
+      Sentry.captureException(error, stackTrace: StackTrace.current);
     }
   }
 
@@ -164,7 +164,7 @@ class ContentRegular extends Content {
       });
       _body = document.body.innerHtml;
     } catch (error) {
-      MainRepository().sentry.captureException(exception: error, stackTrace: StackTrace.current);
+      Sentry.captureException(error, stackTrace: StackTrace.current);
     }
   }
 
@@ -196,7 +196,7 @@ class ContentRegular extends Content {
         }
       });
     } catch (error) {
-      MainRepository().sentry.captureException(exception: error, stackTrace: StackTrace.current);
+      Sentry.captureException(error, stackTrace: StackTrace.current);
     }
   }
 }

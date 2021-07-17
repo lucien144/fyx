@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
-import 'package:fyx/model/MainRepository.dart';
+import 'package:sentry/sentry.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 
@@ -245,7 +245,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
 
       print('[PullToRefresh error]: $error');
       print(StackTrace.current);
-      MainRepository().sentry.captureException(error);
+      Sentry.captureException(error);
     } finally {
       setState(() {
         _hasPulledDown = false;

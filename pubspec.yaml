@@ -46,7 +46,7 @@ dependencies:
   hive: ^2.0.4
   hive_flutter: ^1.1.0
   firebase_analytics: ^8.1.2
-  sentry: ^5.1.0
+  sentry_flutter: ^5.1.0
   flutter_dotenv: ^5.0.0
   firebase_messaging: ^10.0.3
   flutter_highlight: ^0.7.0
