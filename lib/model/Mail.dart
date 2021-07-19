@@ -8,16 +8,16 @@ enum MailStatus { read, unread, unknown }
 
 class Mail {
   final bool isCompact;
-  int _id_mail;
-  String _other_nick;
-  int _time;
-  bool _direction;
-  Content _content;
-  MailStatus _message_status;
-  bool _new;
-  Map<String, dynamic> _active;
+  int _id_mail = 0;
+  String _other_nick = '';
+  int _time = 0;
+  bool _direction = false;
+  late Content _content;
+  late MailStatus _message_status;
+  bool _new = false;
+  Map<String, dynamic>? _active;
 
-  Mail.fromJson(Map<String, dynamic> json, {this.isCompact}) {
+  Mail.fromJson(Map<String, dynamic> json, {this.isCompact = false}) {
     _id_mail = json['id'];
     _other_nick = json['username'];
     _time = DateTime.parse(json['inserted_at'] ?? '0').millisecondsSinceEpoch;
@@ -32,7 +32,7 @@ class Mail {
 
   bool get isNew => _new;
 
-  Active get active => _active == null ? null : Active.fromJson(_active);
+  Active? get active => _active == null ? null : Active.fromJson(_active!);
 
   MailStatus get status => _message_status;
 

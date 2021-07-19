@@ -7,25 +7,25 @@ import 'package:fyx/model/enums/DiscussionTypeEnum.dart';
 import 'package:fyx/model/post/content/Advertisement.dart';
 
 class Discussion {
-  int _id_klub;
+  late int _id_klub;
 
-  String _name;
-  String _name_main;
-  String _name_sub;
-  String _discussion_type;
-  int _last_visit;
-  bool _has_home;
-  bool _has_header;
-  int _id_domain;
+  String _name = '';
+  String _name_main = '';
+  String _name_sub = '';
+  String _discussion_type = '';
+  int _last_visit = 0;
+  bool _has_home = false;
+  bool _has_header = false;
+  int _id_domain = 0;
 
   bool _accessDenied = false;
 
-  DiscussionRights _discussion_rights;
-  AccessRights _access_rights;
-  DiscussionOwner _owner;
-  ContentAdvertisement _advertisement;
+  late DiscussionRights _discussion_rights;
+  late AccessRights _access_rights;
+  DiscussionOwner? _owner;
+  ContentAdvertisement? _advertisement;
 
-  Discussion.fromJson(Map<String, dynamic> json) {
+  Discussion.fromJson(Map<String, dynamic>? json) {
     if (json == null) {
       this._accessDenied = true;
       return;
@@ -45,7 +45,7 @@ class Discussion {
 
     // Global rights
     this._discussion_rights = DiscussionRights.fromJson(json['discussion']);
-    if (this._access_rights?.canRead != true && !this._discussion_rights.canRead) {
+    if (this._access_rights.canRead != true && !this._discussion_rights.canRead) {
       this._accessDenied = true;
       return;
     }
@@ -94,9 +94,9 @@ class Discussion {
 
   bool get accessDenied => _accessDenied;
 
-  ContentAdvertisement get advertisement => _advertisement;
+  ContentAdvertisement? get advertisement => _advertisement;
 
-  DiscussionOwner get owner => _owner;
+  DiscussionOwner? get owner => _owner;
 
   AccessRights get accessRights => _access_rights;
 

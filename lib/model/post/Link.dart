@@ -2,9 +2,9 @@ class Link {
   final String url;
   final String _title;
 
-  Link(this.url, {String title}) : _title = title;
+  Link(this.url, {String title = ''}) : _title = title;
 
-  String get title => _title == null || _title == '' ? fancyUrl : _trimUrl(_title);
+  String get title => _title.isEmpty ? fancyUrl : _trimUrl(_title);
 
   String get fancyUrl => _trimUrl(url);
 

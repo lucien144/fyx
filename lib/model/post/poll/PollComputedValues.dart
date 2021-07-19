@@ -1,18 +1,18 @@
 
 class PollComputedValues {
 
-  bool _canModify;
-  bool _userDidVote;
-  int _totalVotes;
-  int _totalRespondents;
-  int _maximumAnswerVotes;
+  bool _canModify = false;
+  bool _userDidVote = false;
+  int _totalVotes = 0;
+  int _totalRespondents = 0;
+  int _maximumAnswerVotes = 0;
 
   PollComputedValues.fromJson(Map<String, dynamic> json) {
-    _canModify = json['can_modify'];
-    _userDidVote = json['user_did_vote'];
-    _totalVotes = json['total_votes'];
-    _totalRespondents = json['total_respondents'];
-    _maximumAnswerVotes = json['maximum_answer_votes'];
+    _canModify = json['can_modify'] ?? false;
+    _userDidVote = json['user_did_vote'] ?? false;
+    _totalVotes = json['total_votes'] ?? 0;
+    _totalRespondents = json['total_respondents'] ?? 0;
+    _maximumAnswerVotes = json['maximum_answer_votes'] ?? 0;
   }
 
   bool get canModify => _canModify;

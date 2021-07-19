@@ -9,6 +9,7 @@ import 'package:fyx/theme/T.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:html_unescape/html_unescape.dart';
+import 'package:sentry/sentry.dart';
 
 class ContentRegular extends Content {
   String _body;
@@ -121,13 +122,13 @@ class ContentRegular extends Content {
       var youtubes = document.querySelectorAll('div[data-embed-type="youtube"]');
       youtubes.forEach((el) {
         // If the video does not have preview, it's invalid Nyx attachment, therefore we skip it and handle it as a normal post.
-        Element img = el.querySelector('img');
+        Element? img = el.querySelector('img');
         if (img == null) {
           return;
         }
 
         var video = Video(
-            id: el.attributes['data-embed-value'], type: Video.findVideoType(el.attributes['data-embed-type']), image: img.attributes['src'], thumb: img.attributes['data-thumb']);
+            id: el.attributes['data-embed-value'] ?? '', type: Video.findVideoType(el.attributes['data-embed-type'] ?? ''), image: img.attributes['src'] ?? '', thumb: img.attributes['data-thumb']);
 
         // Remove the video element from the content.
         this._videos.add(video);
@@ -137,7 +138,7 @@ class ContentRegular extends Content {
           el.remove();
         }
       });
-      _body = document.body.innerHtml;
+      _body = document.body!.innerHtml;
     } catch (error) {
       T.error(error.toString());
     }
@@ -154,15 +155,15 @@ class ContentRegular extends Content {
       _consecutiveImages = reg.hasMatch(_body);
 
       document.querySelectorAll('img[src]').forEach((Element el) {
-        var image = el.attributes['src'];
+        var image = el.attributes['src'] ?? '';
         var thumb = el.attributes['data-thumb'] ?? '';
-        _images.add(Image(image, thumb));
+        _images.add(Image(image, thumb: thumb));
 
         if (_consecutiveImages) {
           el.remove();
         }
       });
-      _body = document.body.innerHtml;
+      _body = document.body!.innerHtml;
     } catch (error) {
       Sentry.captureException(error, stackTrace: StackTrace.current);
     }
@@ -171,9 +172,9 @@ class ContentRegular extends Content {
   String _tagAllImageLinks(String source) {
     Document document = parse(source);
     document.querySelectorAll('img').forEach((Element el) {
-      el.parent.classes.add('image-link');
+      el.parent?.classes.add('image-link');
     });
-    return document.body.innerHtml;
+    return document.body!.innerHtml;
   }
 
   ///
@@ -187,10 +188,10 @@ class ContentRegular extends Content {
     try {
       RegExp r = RegExp(r'<a[^>]*?>\s*<\/a>', caseSensitive: false, multiLine: true);
       r.allMatches(_body).forEach((match) {
-        String element = match.group(0);
+        String? element = match.group(0);
         Document html = parse(element);
-        String url = html.querySelector('a').attributes['href'];
-        if (url != null) {
+        String? url = html.querySelector('a')?.attributes['href'];
+        if (url != null && element != null) {
           _emptyLinks.add(Link(url));
           _body = _body.replaceFirst(element, '');
         }

@@ -9,21 +9,21 @@ import 'package:fyx/theme/Helpers.dart';
 class Post {
   final bool isCompact;
   bool _canReply = true;
-  bool _isNew;
-  int idKlub;
-  int _id_wu;
-  String _nick;
-  int _time;
-  int _wu_rating;
-  String _wu_type;
-  String myRating;
-  bool _reminder;
-  bool _canBeRated;
-  bool _canBeDeleted;
-  bool _canBeReminded;
-  Content _content;
+  bool _isNew = false;
+  int idKlub = 0;
+  int _id_wu = 0;
+  String _nick = '';
+  int _time = 0;
+  int _wu_rating = 0;
+  String _wu_type = '';
+  String myRating = '';
+  bool _reminder = false;
+  bool _canBeRated = false;
+  bool _canBeDeleted = false;
+  bool _canBeReminded = false;
+  late Content _content;
 
-  Post.fromJson(Map<String, dynamic> json, this.idKlub, {this.isCompact}) {
+  Post.fromJson(Map<String, dynamic> json, this.idKlub, {this.isCompact = false}) {
     this._id_wu = json['id'];
     this._nick = json['username'];
     this._time = DateTime.parse(json['inserted_at'] ?? '0').millisecondsSinceEpoch;

@@ -29,7 +29,7 @@ class _PollState extends State<Poll> {
   }
 
   Widget buildAnswers(BuildContext context) {
-    var totalRespondents = _poll.pollComputedValues.totalRespondents;
+    var totalRespondents = _poll.pollComputedValues != null ? _poll.pollComputedValues!.totalRespondents : 0;
 
     return ListView.builder(
       physics: NeverScrollableScrollPhysics(),
@@ -95,7 +95,7 @@ class _PollState extends State<Poll> {
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: PostHtml(ContentRegular(_poll.instructions)),
             ),
-          Text('Hlasů: ${_poll.pollComputedValues.totalVotes}\nHlasujících: ${_poll.pollComputedValues.totalRespondents}'),
+          if (_poll.pollComputedValues != null) Text('Hlasů: ${_poll.pollComputedValues!.totalVotes}\nHlasujících: ${_poll.pollComputedValues!.totalRespondents}'),
           SizedBox(height: 8,),
           buildAnswers(context),
           if (_poll.canVote)

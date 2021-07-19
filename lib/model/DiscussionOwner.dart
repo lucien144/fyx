@@ -1,7 +1,7 @@
 class DiscussionOwner {
-  String _username;
+  late String _username;
 
-  DiscussionOwner({String username}) {
+  DiscussionOwner({String username = ''}) {
     this._username = username;
   }
 

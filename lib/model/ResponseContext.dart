@@ -1,8 +1,8 @@
 class ResponseContext {
-  User _user;
-  List<ActiveFriends> _activeFriends;
+  late User _user;
+  late List<ActiveFriends> _activeFriends;
 
-  ResponseContext({User user, List<ActiveFriends> activeFriends}) {
+  ResponseContext({required User user, List<ActiveFriends> activeFriends = const <ActiveFriends>[]}) {
     this._user = user;
     this._activeFriends = activeFriends;
   }
@@ -12,9 +12,8 @@ class ResponseContext {
   List<ActiveFriends> get activeFriends => _activeFriends;
 
   ResponseContext.fromJson(Map<String, dynamic> json) {
-    _user = json['user'] != null ? new User.fromJson(json['user']) : null;
+    _user = json['user'] != null ? new User.fromJson(json['user']) : User();
     if (json['active_friends'] != null) {
-      _activeFriends = new List<ActiveFriends>();
       json['active_friends'].forEach((v) {
         _activeFriends.add(new ActiveFriends.fromJson(v));
       });
@@ -23,13 +22,13 @@ class ResponseContext {
 }
 
 class User {
-  String _username;
-  int _mailUnread;
-  String _mailLastFrom;
-  int _notificationsUnread;
-  String _notificationsLastVisit;
+  String _username = '';
+  int _mailUnread = 0;
+  String _mailLastFrom = '';
+  int _notificationsUnread = 0;
+  String _notificationsLastVisit = '';
 
-  User({String username, int mailUnread, String mailLastFrom, int notificationsUnread, String notificationsLastVisit}) {
+  User({String username = '', int mailUnread = 0, String mailLastFrom = '', int notificationsUnread = 0, String notificationsLastVisit = ''}) {
     this._username = username;
     this._mailUnread = mailUnread;
     this._mailLastFrom = mailLastFrom;
@@ -57,14 +56,14 @@ class User {
 }
 
 class ActiveFriends {
-  String _username;
-  String _lastActivity;
-  String _lastAccessMethod;
-  String _statusDetails;
-  String _location;
-  String _locationUrl;
+  String _username = '';
+  String _lastActivity = '';
+  String _lastAccessMethod = '';
+  String _statusDetails = '';
+  String _location = '';
+  String _locationUrl = '';
 
-  ActiveFriends({String username, String lastActivity, String lastAccessMethod, String statusDetails, String location, String locationUrl}) {
+  ActiveFriends({String username = '', String lastActivity = '', String lastAccessMethod = '', String statusDetails = '', String location = '', String locationUrl = ''}) {
     this._username = username;
     this._lastActivity = lastActivity;
     this._lastAccessMethod = lastAccessMethod;

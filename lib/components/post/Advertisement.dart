@@ -44,9 +44,9 @@ class Advertisement extends StatelessWidget {
       return RichText(
         text: TextSpan(children: [
           TextSpan(text: 'Reference: ', style: TextStyle(color: Colors.black38, fontSize: 10)),
-          if (content.references.positive > 0) TextSpan(text: '+${content.references.positive}', style: TextStyle(color: T.COLOR_PRIMARY, fontSize: 10)),
-          if (content.references.positive > 0 && content.references.negative < 0) TextSpan(text: ' / ', style: TextStyle(color: Colors.black38, fontSize: 10)),
-          if (content.references.negative < 0) TextSpan(text: '-${content.references.negative}', style: TextStyle(color: T.COLOR_ACCENT, fontSize: 10))
+          if (content.references != null && content.references!.positive > 0) TextSpan(text: '+${content.references!.positive}', style: TextStyle(color: T.COLOR_PRIMARY, fontSize: 10)),
+          if (content.references != null && content.references!.positive > 0 && content.references!.negative < 0) TextSpan(text: ' / ', style: TextStyle(color: Colors.black38, fontSize: 10)),
+          if (content.references != null && content.references!.negative < 0) TextSpan(text: '-${content.references!.negative}', style: TextStyle(color: T.COLOR_ACCENT, fontSize: 10))
         ]),
       );
     }
