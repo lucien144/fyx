@@ -1,5 +1,3 @@
-import 'package:flutter/cupertino.dart';
-
 class RatingResponse {
   final int currentRating;
   final String myRating; // positive / negative
@@ -7,9 +5,9 @@ class RatingResponse {
   final bool _needsConfirmation;
 
   RatingResponse(
-      {this.currentRating,
-      this.myRating,
-      this.isGiven,
+      {required this.currentRating,
+      required this.myRating,
+      required this.isGiven,
       needsConfirmation = false})
       : _needsConfirmation = needsConfirmation;
 

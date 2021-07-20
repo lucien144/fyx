@@ -7,7 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
-import 'package:fyx/model/MainRepository.dart';
+import 'package:sentry/sentry.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
@@ -19,7 +19,7 @@ class GalleryPage extends StatefulWidget {
 }
 
 class _GalleryPageState extends State<GalleryPage> {
-  GalleryArguments _arguments;
+  GalleryArguments? _arguments;
   int _page = 1;
   bool _saving = false;
   final _controller = PageController();
@@ -33,10 +33,10 @@ class _GalleryPageState extends State<GalleryPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_arguments.images.length > 1) {
-        _arguments.images.asMap().forEach((key, image) {
-          if (image.image == _arguments.imageUrl) {
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      if (_arguments != null && _arguments!.images.length > 1) {
+        _arguments!.images.asMap().forEach((key, image) {
+          if (image.image == _arguments!.imageUrl) {
             _controller.jumpToPage(key);
           }
         });
@@ -49,7 +49,8 @@ class _GalleryPageState extends State<GalleryPage> {
   @override
   Widget build(BuildContext context) {
     if (_arguments == null) {
-      _arguments = ModalRoute.of(context).settings.arguments;
+      _arguments =
+          ModalRoute.of(context)!.settings.arguments as GalleryArguments;
     }
 
     return Stack(
@@ -67,10 +68,10 @@ class _GalleryPageState extends State<GalleryPage> {
               builder: (BuildContext context, int index) {
                 return PhotoViewGalleryPageOptions(
                     imageProvider: CachedNetworkImageProvider(
-                        _arguments.images[index].image),
+                        _arguments!.images[index].image),
                     onTapDown: (_, __, ___) => close(context));
               },
-              itemCount: _arguments.images.length,
+              itemCount: _arguments!.images.length,
               loadingBuilder: (context, chunkEvent) =>
                   CupertinoActivityIndicator(
                 radius: 16,
@@ -102,7 +103,7 @@ class _GalleryPageState extends State<GalleryPage> {
               padding: EdgeInsets.zero,
               onPressed: () => close(context),
               child: Text(
-                '$_page / ${_arguments.images.length}',
+                '$_page / ${_arguments!.images.length}',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white),
               ),
@@ -128,7 +129,7 @@ class _GalleryPageState extends State<GalleryPage> {
                 setState(() => _saving = true);
                 try {
                   var response = await Dio().get(
-                      _arguments.images[_page - 1].image,
+                      _arguments!.images[_page - 1].image,
                       options: Options(responseType: ResponseType.bytes));
                   final result = await ImageGallerySaver.saveImage(
                       Uint8List.fromList(response.data),
@@ -141,7 +142,7 @@ class _GalleryPageState extends State<GalleryPage> {
                   T.success(L.TOAST_IMAGE_SAVE_OK);
                 } catch (error) {
                   T.error(L.TOAST_IMAGE_SAVE_ERROR);
-                  Sentry.captureException(exception: error);
+                  Sentry.captureException(error);
                 } finally {
                   setState(() => _saving = false);
                 }

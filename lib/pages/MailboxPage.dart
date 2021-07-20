@@ -15,14 +15,14 @@ import 'package:hive_flutter/hive_flutter.dart';
 class MailboxPage extends StatefulWidget {
   final int refreshData;
 
-  MailboxPage({this.refreshData});
+  MailboxPage({this.refreshData = 0});
 
   @override
   _MailboxPageState createState() => _MailboxPageState();
 }
 
 class _MailboxPageState extends State<MailboxPage> {
-  int _refreshData;
+  int _refreshData = 0;
 
   @override
   void initState() {
@@ -56,7 +56,7 @@ class _MailboxPageState extends State<MailboxPage> {
           sliverListBuilder: (List data) {
             return ValueListenableBuilder(
               valueListenable: MainRepository().settings.box.listenable(keys: ['blockedMails', 'blockedUsers']),
-              builder: (BuildContext context, value, Widget child) {
+              builder: (BuildContext context, value, Widget? child) {
                 var filtered = data;
                 if (data[0] is MailListItem) {
                   filtered = data
@@ -95,7 +95,11 @@ class _MailboxPageState extends State<MailboxPage> {
                 arguments: NewMessageSettings(
                     onClose: this.refreshData,
                     hasInputField: true,
-                    onSubmit: (String inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                    onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                      if (inputField == null) {
+                        return false;
+                      }
+
                       var response = await ApiController().sendMail(inputField, message, attachments: attachments);
                       return response.isOk;
                     })),

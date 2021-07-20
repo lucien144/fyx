@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -127,11 +129,13 @@ class _LoginPageState extends State<LoginPage> {
           setState(() => _isRunning = true);
 
           if (_useTokenToLogin && _tokenController.text.length > 0) {
-            ApiController().setCredentials(Credentials(_loginController.text, _tokenController.text)).then((Credentials credentials) {
-              // TODO: Refactor 👇? This is edge case usage...
-              ApiController().provider.setCredentials(credentials);
-              MainRepository().credentials = credentials;
-              Navigator.of(context).pushNamed('/home');
+            ApiController().setCredentials(Credentials(_loginController.text, _tokenController.text)).then((Credentials? credentials) {
+              if (credentials != null) {
+                // TODO: Refactor 👇? This is edge case usage...
+                ApiController().provider.setCredentials(credentials);
+                MainRepository().credentials = credentials;
+                Navigator.of(context).pushNamed('/home');
+              }
             }).whenComplete(() {
               setState(() => _isRunning = false);
             });

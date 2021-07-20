@@ -36,20 +36,20 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObserver {
-  PageController _bookmarksController;
+  late PageController _bookmarksController;
 
-  ETabs activeTab;
-  int _pageIndex;
+  ETabs activeTab = ETabs.history;
+  int _pageIndex = 0;
   Map<String, int> _refreshData = {'bookmarks': 0, 'mail': 0};
   bool _filterUnread = false;
-  DefaultView _defaultView;
+  DefaultView _defaultView = DefaultView.history;
   List<int> _toggledCategories = [];
-  HomePageArguments _arguments;
+  HomePageArguments? _arguments;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance?.addObserver(this);
 
     _defaultView = MainRepository().settings.defaultView == DefaultView.latest ? MainRepository().settings.latestView : MainRepository().settings.defaultView;
     _filterUnread = [DefaultView.bookmarksUnread, DefaultView.historyUnread].indexOf(_defaultView) >= 0;
@@ -63,9 +63,9 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
     _bookmarksController.addListener(() {
       // If the CupertinoTabView is sliding and the animation is finished, change the active tab
-      if (_bookmarksController.page % 1 == 0 && activeTab != ETabs.values[_bookmarksController.page.toInt()]) {
+      if (_bookmarksController.page! % 1 == 0 && activeTab != ETabs.values[_bookmarksController.page!.toInt()]) {
         setState(() {
-          activeTab = ETabs.values[_bookmarksController.page.toInt()];
+          activeTab = ETabs.values[_bookmarksController.page!.toInt()];
         });
       }
     });
@@ -89,7 +89,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
   void dispose() {
     _bookmarksController.dispose();
     FyxApp.routeObserver.unsubscribe(this);
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance?.removeObserver(this);
     super.dispose();
   }
 
@@ -97,7 +97,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // If we omit the Route check, there's very rare issue during authorization
     // See: https://github.com/lucien144/fyx/issues/57
-    if (state == AppLifecycleState.resumed && ModalRoute.of(context).isCurrent) {
+    if (state == AppLifecycleState.resumed && ModalRoute.of(context)!.isCurrent) {
       this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? ERefreshData.mail : ERefreshData.bookmarks);
     }
   }
@@ -176,10 +176,10 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
     if (_pageIndex == null) {
       if (_arguments == null) {
-        _arguments = ModalRoute.of(context).settings.arguments as HomePageArguments;
+        _arguments = ModalRoute.of(context)?.settings.arguments as HomePageArguments;
         _pageIndex = _arguments?.pageIndex ?? HomePage.PAGE_BOOKMARK;
       } else {
-        _pageIndex = _arguments.pageIndex;
+        _pageIndex = _arguments?.pageIndex;
       }
     }
 
@@ -248,7 +248,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                       middle: CupertinoSegmentedControl(
                         groupValue: activeTab,
                         onValueChanged: (value) {
-                          _bookmarksController.animateToPage(ETabs.values.indexOf(value), duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+                          _bookmarksController.animateToPage(ETabs.values.indexOf(value as ETabs), duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
                         },
                         children: {
                           ETabs.history: Padding(
@@ -270,7 +270,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                       // HISTORY PULL TO REFRESH
                       // -----
                       PullToRefreshList(
-                          rebuild: _refreshData['bookmarks'],
+                          rebuild: _refreshData['bookmarks'] ?? 0,
                           dataProvider: (lastId) async {
                             List<DiscussionListItem> withReplies = [];
                             var result = await ApiController().loadHistory();
@@ -292,7 +292,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                       // BOOKMARKS PULL TO REFRESH
                       // -----
                       PullToRefreshList(
-                          rebuild: _refreshData['bookmarks'],
+                          rebuild: _refreshData['bookmarks'] ?? 0,
                           dataProvider: (lastId) async {
                             var categories = [];
                             var result = await ApiController().loadBookmarks();
@@ -366,7 +366,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                         ),
                         middle: Text('Pošta')),
                     child: MailboxPage(
-                      refreshData: _refreshData['mail'],
+                      refreshData: _refreshData['mail'] ?? 0,
                     ));
               });
             default:

@@ -21,8 +21,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 class DiscussionPageArguments {
   final int discussionId;
-  final int postId;
-  final String filterByUser;
+  final int? postId;
+  final String? filterByUser;
 
   DiscussionPageArguments(this.discussionId, {this.postId, this.filterByUser});
 }
@@ -33,7 +33,7 @@ class DiscussionPage extends StatefulWidget {
 }
 
 class _DiscussionPageState extends State<DiscussionPage> {
-  final AsyncMemoizer _memoizer = AsyncMemoizer<DiscussionResponse>();
+  final AsyncMemoizer<DiscussionResponse> _memoizer = AsyncMemoizer<DiscussionResponse>();
   int _refreshList = 0;
   bool _hasInitData = false;
 
@@ -60,16 +60,20 @@ class _DiscussionPageState extends State<DiscussionPage> {
 
   @override
   Widget build(BuildContext context) {
-    DiscussionPageArguments pageArguments = ModalRoute.of(context).settings.arguments;
+    DiscussionPageArguments? pageArguments = ModalRoute.of(context)?.settings.arguments as DiscussionPageArguments?;
+
+    if (pageArguments == null) {
+      return T.feedbackScreen(title: 'Chyba, nelze načíst diskuzi.');
+    }
 
     return FutureBuilder<DiscussionResponse>(
         future: _fetchData(pageArguments.discussionId, pageArguments.postId, pageArguments.filterByUser),
         builder: (BuildContext context, AsyncSnapshot<DiscussionResponse> snapshot) {
           if (snapshot.hasData) {
-            if (snapshot.data.discussion.accessDenied) {
+            if (snapshot.data!.discussion.accessDenied) {
               return T.feedbackScreen(title: L.ACCESS_DENIED_ERROR, icon: Icons.do_not_disturb_alt, label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
             }
-            return this._createDiscussionPage(snapshot.data, pageArguments);
+            return this._createDiscussionPage(snapshot.data!, pageArguments);
           } else if (snapshot.hasError) {
             return T.feedbackScreen(isWarning: true, title: snapshot.error.toString(), label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
           } else {
@@ -105,7 +109,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
             sliverListBuilder: (List data) {
               return ValueListenableBuilder(
                 valueListenable: MainRepository().settings.box.listenable(keys: ['blockedPosts', 'blockedUsers']),
-                builder: (BuildContext context, value, Widget child) {
+                builder: (BuildContext context, value, Widget? child) {
                   var filtered = data;
                   if (data[0] is PostListItem) {
                     filtered = data
@@ -149,7 +153,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
                   .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.isNew))
                   .toList();
 
-              int id;
+              int? id;
               try {
                 id = Post.fromJson((result as List).last, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode).id;
               } catch (error) {}
@@ -168,7 +172,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
                   onPressed: () => Navigator.of(context).pushNamed('/new-message',
                       arguments: NewMessageSettings(
                           onClose: this.refresh,
-                          onSubmit: (String inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                          onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
                             var result = await ApiController().postDiscussionMessage(pageArguments.discussionId, message, attachments: attachments);
                             return result.isOk;
                           })),
@@ -181,15 +185,15 @@ class _DiscussionPageState extends State<DiscussionPage> {
     );
   }
 
-  Widget getPinnedWidget(DiscussionResponse discussionResponse) {
+  Widget? getPinnedWidget(DiscussionResponse discussionResponse) {
     switch (discussionResponse.discussion.advertisement.runtimeType) {
       case ContentAdvertisement:
         return Padding(
           padding: const EdgeInsets.all(16),
           child: Advertisement(
-            discussionResponse.discussion.advertisement,
+            discussionResponse.discussion.advertisement!,
             title: discussionResponse.discussion.name,
-            username: discussionResponse.discussion.owner is DiscussionOwner ? discussionResponse.discussion.owner.username : '',
+            username: discussionResponse.discussion.owner != null ? discussionResponse.discussion.owner!.username : '',
           ),
         );
       default:

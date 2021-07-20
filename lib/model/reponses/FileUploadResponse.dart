@@ -1,53 +1,37 @@
 class FileUploadResponse {
-  int id;
-  String fileType;
-  int idSpecific;
-  int idSpecific2;
-  String filename;
-  int size;
-  int uploadedAt;
-  String mimetype;
-  int imageWidth;
-  int imageHeight;
-  String imageAvgColorHex;
-  bool imageEmbed;
-  String url;
-  String thumbUrl;
-  bool _isImage;
+  int id = 0;
+  String fileType = '';
+  int idSpecific = 0;
+  int idSpecific2 = 0;
+  String filename = '';
+  int size = 0;
+  int uploadedAt = 0;
+  String mimetype = '';
+  int imageWidth = 0;
+  int imageHeight = 0;
+  String imageAvgColorHex = '';
+  bool imageEmbed = false;
+  String url = '';
+  String thumbUrl = '';
+  bool _isImage = false;
 
   bool get isImage => _isImage;
 
-  FileUploadResponse(
-      {this.id,
-      this.fileType,
-      this.idSpecific,
-      this.idSpecific2,
-      this.filename,
-      this.size,
-      this.uploadedAt,
-      this.mimetype,
-      this.imageWidth,
-      this.imageHeight,
-      this.imageAvgColorHex,
-      this.imageEmbed,
-      this.url,
-      this.thumbUrl});
-
   FileUploadResponse.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    fileType = json['file_type'];
-    idSpecific = json['id_specific'];
-    idSpecific2 = json['id_specific2'];
-    filename = json['filename'];
-    size = json['size'];
+    id = json['id'] ?? 0;
+    fileType = json['file_type'] ?? '';
+    idSpecific = json['id_specific'] ?? 0;
+    idSpecific2 = json['id_specific2'] ?? 0;
+    filename = json['filename'] ?? '';
+    size = json['size'] ?? 0;
     uploadedAt = DateTime.parse(json['uploaded_at'] ?? '0').millisecondsSinceEpoch;
-    mimetype = json['mimetype'];
-    imageWidth = json['image_width'];
-    imageHeight = json['image_height'];
-    imageAvgColorHex = json['image_avg_color_hex'];
-    imageEmbed = json['image_embed'];
-    url = json['url'];
-    thumbUrl = json['thumb_url'];
+    mimetype = json['mimetype'] ?? '';
+    imageWidth = json['image_width'] ?? 0;
+    imageHeight = json['image_height'] ?? 0;
+    imageAvgColorHex = json['image_avg_color_hex'] ?? '';
+    imageEmbed = json['image_embed'] ?? false;
+    url = json['url'] ?? '';
+    thumbUrl = json['thumb_url'] ?? '';
     _isImage = thumbUrl.isNotEmpty;
   }
 

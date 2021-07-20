@@ -20,7 +20,7 @@ class InfoPage extends StatefulWidget {
 
 class _InfoPageState extends State<InfoPage> {
   var _client = Client();
-  Future<Response> _response;
+  Future<Response>? _response;
 
   @override
   void initState() {
@@ -29,10 +29,10 @@ class _InfoPageState extends State<InfoPage> {
 
   @override
   Widget build(BuildContext context) {
-    InfoPageSettings settings = ModalRoute.of(context).settings.arguments;
+    InfoPageSettings settings = ModalRoute.of(context)!.settings.arguments as InfoPageSettings;
 
     if (_response == null) {
-      _response = _client.get(settings.url);
+      _response = _client.get(Uri.parse(settings.url));
       AnalyticsProvider().setScreen(settings.title, 'InfoPage');
     }
 
@@ -50,7 +50,7 @@ class _InfoPageState extends State<InfoPage> {
             future: _response,
             builder: (BuildContext context, AsyncSnapshot<Response> snapshot) {
               if (snapshot.hasData) {
-                return Markdown(data: snapshot.data.body, onTapLink: (String url) => T.openLink(url));
+                return Markdown(data: snapshot.data!.body, onTapLink: (String text, String? url, String title) => url != null ? T.openLink(url) : null);
               }
               if (snapshot.hasError) {
                 return T.feedbackScreen(
@@ -58,7 +58,7 @@ class _InfoPageState extends State<InfoPage> {
                     isWarning: true,
                     title: L.GENERAL_ERROR,
                     onPress: () async {
-                      setState(() => _response = _client.get(settings.url));
+                      setState(() => _response = _client.get(Uri.parse(settings.url)));
                     });
               }
               return T.feedbackScreen(isLoading: true);
