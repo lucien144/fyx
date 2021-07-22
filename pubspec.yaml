@@ -66,9 +66,8 @@ dependencies:
   cupertino_icons: ^1.0.3
 
 dependency_overrides:
-  # https://github.com/dnfield/flutter_svg/issues/368#issuecomment-650297001
-  # https://github.com/Sub6Resources/flutter_html/issues/358
-  #flutter_svg: ^0.19.0
+  # https://github.com/flutter/flutter/issues/44435#issuecomment-817583694
+  webview_flutter: ^2.0.10
 
 dev_dependencies:
   hive_generator: ^1.1.0

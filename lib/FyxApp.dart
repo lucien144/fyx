@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/cupertino.dart';
@@ -30,7 +31,7 @@ import 'controllers/NotificationsService.dart';
 enum Environment { dev, staging, production }
 
 class FyxApp extends StatefulWidget {
-  static late Environment _env;
+  static Environment _env = Environment.dev;
 
   static set env(val) => FyxApp._env = val;
 
@@ -44,7 +45,7 @@ class FyxApp extends StatefulWidget {
 
   static FirebaseAnalytics analytics = FirebaseAnalytics();
 
-  static late RouteObserver<PageRoute> _routeObserver;
+  static RouteObserver<PageRoute> _routeObserver = RouteObserver<PageRoute>();
 
   static late NotificationService _notificationsService;
 
@@ -55,13 +56,12 @@ class FyxApp extends StatefulWidget {
   }
 
   static get routeObserver {
-    if (_routeObserver == null) {
-      _routeObserver = RouteObserver<PageRoute>();
-    }
     return _routeObserver;
   }
 
   static init() async {
+    await Firebase.initializeApp();
+
     // This must be initialized after WidgetsFlutterBinding.ensureInitialized
     FlutterError.onError = (details, {bool forceReport = false}) {
       try {
@@ -89,7 +89,7 @@ class FyxApp extends StatefulWidget {
 
     // TODO: Move to build using FutureBuilder.
     var results = await Future.wait([ApiController().getCredentials(), PackageInfo.fromPlatform(), DeviceInfo.init(), SettingsProvider().init()]);
-    MainRepository().credentials = results[0] as Credentials;
+    MainRepository().credentials = results[0] == null ? null : results[0] as Credentials;
     MainRepository().packageInfo = results[1] as PackageInfo;
     MainRepository().deviceInfo = results[2] as DeviceInfo;
     MainRepository().settings = results[3] as SettingsProvider;
@@ -175,25 +175,28 @@ class _FyxAppState extends State<FyxApp> {
         providers: [
           ChangeNotifierProvider<NotificationsModel>(create: (context) => NotificationsModel()),
         ],
-        child: CupertinoApp(
-          title: 'Fyx',
-          theme: CupertinoThemeData(
-              primaryColor: T.COLOR_PRIMARY,
-              brightness: Brightness.light,
-              textTheme: CupertinoTextThemeData(primaryColor: Colors.white, textStyle: TextStyle(color: T.COLOR_BLACK, fontSize: 16))),
-          home: MainRepository().credentials is Credentials && MainRepository().credentials.isValid ? HomePage() : LoginPage(),
-          debugShowCheckedModeBanner: FyxApp.isDev,
-          onUnknownRoute: (RouteSettings settings) => CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings),
-          onGenerateRoute: routes,
-          navigatorKey: FyxApp.navigatorKey,
-          navigatorObservers: [
-            FyxApp.routeObserver,
-            FirebaseAnalyticsObserver(
-                analytics: FyxApp.analytics,
-                onError: (error) async => await Sentry.captureException(
-                      error,
-                    ))
-          ],
+        child: Directionality(
+          textDirection: TextDirection.ltr,
+          child: CupertinoApp(
+            title: 'Fyx',
+            theme: CupertinoThemeData(
+                primaryColor: T.COLOR_PRIMARY,
+                brightness: Brightness.light,
+                textTheme: CupertinoTextThemeData(primaryColor: Colors.white, textStyle: TextStyle(color: T.COLOR_BLACK, fontSize: 16))),
+            home: MainRepository().credentials != null && MainRepository().credentials!.isValid ? HomePage() : LoginPage(),
+            debugShowCheckedModeBanner: FyxApp.isDev,
+            onUnknownRoute: (RouteSettings settings) => CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings),
+            onGenerateRoute: routes,
+            navigatorKey: FyxApp.navigatorKey,
+            navigatorObservers: [
+              FyxApp.routeObserver,
+              FirebaseAnalyticsObserver(
+                  analytics: FyxApp.analytics,
+                  onError: (error) async => await Sentry.captureException(
+                        error,
+                      ))
+            ],
+          ),
         ),
       ),
     );

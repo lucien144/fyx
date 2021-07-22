@@ -46,7 +46,7 @@ class PostAvatarActionSheet extends StatelessWidget {
           },
         ),
         Visibility(
-          visible: user != MainRepository().credentials.nickname,
+          visible: user != MainRepository().credentials!.nickname,
           child: CupertinoActionSheetAction(
               child: TextIcon(
                 '${L.POST_SHEET_BLOCK} @${user}',

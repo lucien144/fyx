@@ -7,7 +7,7 @@ enum INTERNAL_URI_PARSER { discussionId, postId }
 class Helpers {
   static stripHtmlTags(String html) {
     final document = parse(html);
-    return parse(document.body.text).documentElement.text.trim();
+    return parse(document.body?.text).documentElement?.text.trim();
   }
 
   static String absoluteTime(int time) {
@@ -71,7 +71,7 @@ class Helpers {
     return {};
   }
 
-  static String fileExtension(String filePath) {
+  static String? fileExtension(String filePath) {
     final regexp = RegExp(r'\.(?<ext>[a-z]{3,})$', caseSensitive: false);
     final matches = regexp.allMatches(filePath);
 

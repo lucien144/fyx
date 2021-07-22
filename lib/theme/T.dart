@@ -8,6 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:sentry/sentry.dart';
 
 // Theme helpers
 class T {
@@ -76,12 +77,12 @@ class T {
       return true;
     } catch (e) {
       T.error(L.INAPPBROWSER_ERROR);
-      Sentry.captureException(exception: e);
+      Sentry.captureException(e);
       return false;
     }
   }
 
-  static prefillGithubIssue({MainRepository appContext, String title = '', String body = '', String user = '-', String url = ''}) async {
+  static prefillGithubIssue({MainRepository? appContext, String title = '', String body = '', String user = '-', String url = ''}) async {
     var version = '-';
     var system = '-';
     var phone = '-';
@@ -104,7 +105,7 @@ class T {
   static Widget somethingsWrongButton(String content, {String url = ''}) {
     return GestureDetector(
       onTap: () => T.prefillGithubIssue(
-          title: 'Chyba zobrazení příspěvku', body: '**Zdroj:**\n```$content```', user: MainRepository().credentials.nickname, url: url, appContext: MainRepository()),
+          title: 'Chyba zobrazení příspěvku', body: '**Zdroj:**\n```$content```', user: MainRepository().credentials!.nickname, url: url, appContext: MainRepository()),
       child: Column(children: <Widget>[
         Icon(Icons.warning),
         Text(
@@ -115,7 +116,7 @@ class T {
     );
   }
 
-  static Widget feedbackScreen({bool isLoading = false, bool isWarning = false, String label = '', String title = '', Function onPress, IconData icon = Icons.warning}) {
+  static Widget feedbackScreen({bool isLoading = false, bool isWarning = false, String label = '', String title = '', VoidCallback? onPress, IconData icon = Icons.warning}) {
     return Container(
       width: double.infinity,
       color: Colors.white,

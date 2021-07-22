@@ -7,14 +7,14 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await DotEnv().load();
+  await dotenv.load();
 
   runZonedGuarded(
     () async {
       await FyxApp.init();
       SentryFlutter.init((options)
       {
-        options.dsn = DotEnv().env['SENTRY_KEY'];
+        options.dsn = dotenv.env['SENTRY_KEY'];
         options.environment = 'development';
       }, appRunner: () => runApp(FyxApp()..setEnv(Environment.dev)));
     },

@@ -135,7 +135,7 @@ class ContentBoxLayout extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[topLeftWidget ?? Container(), SizedBox(), _isPreview ? Container() : (topRightWidget ?? Container())],
+                    children: <Widget>[topLeftWidget, SizedBox(), _isPreview ? Container() : (topRightWidget)],
                   ),
                 ),
                 if (this.onTap == null)

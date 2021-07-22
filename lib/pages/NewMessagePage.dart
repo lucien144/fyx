@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
@@ -18,7 +19,8 @@ import 'package:path/path.dart';
 
 enum ISOLATE_ARG { images, width, quality }
 
-typedef F = Future<bool> Function(String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachment);
+typedef F = Future<bool> Function(String? inputField, String message,
+    List<Map<ATTACHMENT, dynamic>> attachment);
 
 class NewMessageSettings {
   String inputFieldPlaceholder;
@@ -68,7 +70,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
     if (file != null) {
       String ext = 'jpg';
       try {
-        ext = Helpers.fileExtension(file.path);
+        ext = Helpers.fileExtension(file.path) ?? '';
       } catch (error) {}
 
       final list = await file.readAsBytes();
@@ -79,7 +81,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
             ATTACHMENT.mime: mime,
             ATTACHMENT.extension: ext,
             ATTACHMENT.mediatype:
-                MediaType(mime!.split('/')[0], mime!.split('/')[1]),
+                MediaType(mime!.split('/')[0], mime.split('/')[1]),
           }));
     }
     setState(() => _loadingImage = false);
@@ -186,7 +188,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                                       await compute(handleImages, _images);
                                 }
                                 var response = await _settings.onSubmit(
-                                    _settings!.hasInputField == true
+                                    _settings.hasInputField == true
                                         ? _recipientController.text
                                         : null,
                                     _messageController.text,
@@ -414,12 +416,11 @@ class _NewMessagePageState extends State<NewMessagePage> {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: Image(
-            image: MemoryImage(bytes),
+            image: MemoryImage(Uint8List.fromList(bytes)),
             width: 35,
             height: 35,
             fit: BoxFit.cover,
-            frameBuilder: (BuildContext context, Widget child, int frame,
-                bool wasSynchronouslyLoaded) {
+            frameBuilder: (BuildContext context, Widget child, int? frame, bool wasSynchronouslyLoaded) {
               if (frame == null) {
                 return CupertinoActivityIndicator();
               }

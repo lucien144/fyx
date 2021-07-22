@@ -73,7 +73,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     // Request for push notifications
     MainRepository().notifications.request();
 
-    AnalyticsProvider().setUser(MainRepository().credentials.nickname);
+    AnalyticsProvider().setUser(MainRepository().credentials!.nickname);
     AnalyticsProvider().setUserProperty('photoWidth', MainRepository().settings.photoWidth.toString());
     AnalyticsProvider().setUserProperty('photoQuality', MainRepository().settings.photoQuality.toString());
     AnalyticsProvider().setUserProperty('autocorrect', MainRepository().settings.useAutocorrect.toString());
@@ -144,7 +144,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   Widget actionSheet(BuildContext context) {
     return CupertinoActionSheet(
-        title: Text('Přihlášen jako: ${MainRepository().credentials.nickname}'),
+        title: Text('Přihlášen jako: ${MainRepository().credentials!.nickname}'),
         actions: <Widget>[
           CupertinoActionSheetAction(
               child: Text(L.SETTINGS),
@@ -155,7 +155,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
           CupertinoActionSheetAction(
               child: Text('⚠️ ${L.SETTINGS_BUGREPORT}'),
               onPressed: () {
-                T.prefillGithubIssue(appContext: MainRepository(), user: MainRepository().credentials.nickname);
+                T.prefillGithubIssue(appContext: MainRepository(), user: MainRepository().credentials!.nickname);
                 AnalyticsProvider().logEvent('reportBug');
               }),
         ],
@@ -237,7 +237,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                               counter: notifications.newNotices)),
                       trailing: GestureDetector(
                         child: ca.CircleAvatar(
-                          MainRepository().credentials.avatar,
+                          MainRepository().credentials!.avatar,
                           size: 30,
                           isHighlighted: true,
                         ),
@@ -357,7 +357,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                         backgroundColor: Colors.white,
                         trailing: GestureDetector(
                           child: ca.CircleAvatar(
-                            MainRepository().credentials.avatar,
+                            MainRepository().credentials!.avatar,
                             size: 30,
                           ),
                           onTap: () {

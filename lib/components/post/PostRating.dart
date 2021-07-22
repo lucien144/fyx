@@ -67,7 +67,7 @@ class _PostRatingState extends State<PostRating> {
             width: 4,
           ),
           Visibility(
-            visible: _post.rating != 0 || MainRepository().credentials.nickname != _post.nick,
+            visible: _post.rating != 0 || MainRepository().credentials!.nickname != _post.nick,
             child: Opacity(
               opacity: _givingRating ? 0 : 1,
               child: Text(

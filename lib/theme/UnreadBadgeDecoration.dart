@@ -5,10 +5,10 @@ class UnreadBadgeDecoration extends Decoration {
   final Color badgeColor;
   final double badgeSize;
 
-  const UnreadBadgeDecoration({@required this.badgeColor, @required this.badgeSize});
+  const UnreadBadgeDecoration({required this.badgeColor, required this.badgeSize});
 
   @override
-  BoxPainter createBoxPainter([onChanged]) => _UnreadBadgePainter(badgeColor, badgeSize);
+  BoxPainter createBoxPainter([VoidCallback? onChanged]) => _UnreadBadgePainter(badgeColor, badgeSize);
 }
 
 class _UnreadBadgePainter extends BoxPainter {
