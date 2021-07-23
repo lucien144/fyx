@@ -77,7 +77,7 @@ class FyxApp extends StatefulWidget {
       }
     };
 
-    if (FyxApp.isDev) {
+    if (FyxApp.isProduction) {
       ErrorWidget.builder = (FlutterErrorDetails details) {
         String stack = '${DateTime.now()}: ${details.exceptionAsString()}';
         return T.somethingsWrongButton(stack);
