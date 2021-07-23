@@ -1,6 +1,6 @@
 class ResponseContext {
   late User _user;
-  late List<ActiveFriends> _activeFriends;
+  List<ActiveFriends> _activeFriends = <ActiveFriends>[];
 
   ResponseContext({required User user, List<ActiveFriends> activeFriends = const <ActiveFriends>[]}) {
     this._user = user;
@@ -15,7 +15,7 @@ class ResponseContext {
     _user = json['user'] != null ? new User.fromJson(json['user']) : User();
     if (json['active_friends'] != null) {
       json['active_friends'].forEach((v) {
-        _activeFriends.add(new ActiveFriends.fromJson(v));
+        _activeFriends.add(ActiveFriends.fromJson(v));
       });
     }
   }
