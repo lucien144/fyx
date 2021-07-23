@@ -24,11 +24,11 @@ class Post {
   late Content _content;
 
   Post.fromJson(Map<String, dynamic> json, this.idKlub, {this.isCompact = false}) {
-    this._id_wu = json['id'];
-    this._nick = json['username'];
+    this._id_wu = json['id'] ?? 0;
+    this._nick = json['username'] ?? '';
     this._time = DateTime.parse(json['inserted_at'] ?? '0').millisecondsSinceEpoch;
     this._wu_rating = json['rating'] ?? 0;
-    this._wu_type = json['type'];
+    this._wu_type = json['type'] ?? '';
     this._isNew = json['new'] ?? false;
     this.myRating = json['my_rating'] ?? 'none'; // positive / negative / negative_visible / none TODO: enums
     this._reminder = json['reminder'] ?? false;

@@ -46,7 +46,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
   TextEditingController _recipientController = TextEditingController();
   TextEditingController _messageController = TextEditingController();
   List<Map<ATTACHMENT, dynamic>> _images = [];
-  late NewMessageSettings _settings;
+  NewMessageSettings? _settings;
   final List<int> widths = [640, 768, 1024, 1280];
   int _widthIndex = 2;
   final List<int> qualities = [60, 70, 80, 90, 100];
@@ -127,7 +127,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
       return true;
     }
 
-    return ((_settings.hasInputField == true ? _recipient.length : 1) *
+    return ((_settings!.hasInputField == true ? _recipient.length : 1) *
             (_message.length + _images.length)) ==
         0;
   }
@@ -155,7 +155,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
     if (_settings == null) {
       _settings =
           ModalRoute.of(context)!.settings.arguments as NewMessageSettings;
-      _recipientController.text = _settings.inputFieldPlaceholder.toUpperCase();
+      _recipientController.text = _settings!.inputFieldPlaceholder.toUpperCase();
     }
 
     return Container(
@@ -187,15 +187,15 @@ class _NewMessagePageState extends State<NewMessagePage> {
                                   _images =
                                       await compute(handleImages, _images);
                                 }
-                                var response = await _settings.onSubmit(
-                                    _settings.hasInputField == true
+                                var response = await _settings!.onSubmit(
+                                    _settings!.hasInputField == true
                                         ? _recipientController.text
                                         : null,
                                     _messageController.text,
                                     _images.length > 0 ? _images : []);
                                 if (response) {
-                                  if (_settings.onClose != null) {
-                                    _settings.onClose!();
+                                  if (_settings!.onClose != null) {
+                                    _settings!.onClose!();
                                   }
                                   Navigator.of(context).pop();
                                 }
@@ -205,7 +205,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                     ],
                   ),
                   Visibility(
-                      visible: _settings.hasInputField == true,
+                      visible: _settings!.hasInputField == true,
                       child: CupertinoTextField(
                         controller: _recipientController,
                         inputFormatters: [
@@ -214,8 +214,8 @@ class _NewMessagePageState extends State<NewMessagePage> {
                         ],
                         textCapitalization: TextCapitalization.characters,
                         placeholder: 'Adresát',
-                        autofocus: _settings.hasInputField == true &&
-                            _settings.inputFieldPlaceholder == null,
+                        autofocus: _settings!.hasInputField == true &&
+                            _settings!.inputFieldPlaceholder == null,
                         autocorrect: MainRepository().settings.useAutocorrect,
                         focusNode: _recipientFocusNode,
                       )),
@@ -225,8 +225,8 @@ class _NewMessagePageState extends State<NewMessagePage> {
                   CupertinoTextField(
                     controller: _messageController,
                     maxLines: 10,
-                    autofocus: _settings.hasInputField != true ||
-                        _settings.inputFieldPlaceholder != null,
+                    autofocus: _settings!.hasInputField != true ||
+                        _settings!.inputFieldPlaceholder != null,
                     textCapitalization: TextCapitalization.sentences,
                     autocorrect: MainRepository().settings.useAutocorrect,
                     focusNode: _messageFocusNode,
@@ -399,7 +399,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                 ],
               ),
               SizedBox(height: 16),
-              if (_settings.replyWidget != null) _settings.replyWidget!
+              if (_settings!.replyWidget != null) _settings!.replyWidget!
             ].where((Object o) => o != null).toList(),
           ),
         ),

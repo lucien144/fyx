@@ -17,7 +17,7 @@ class PostRating extends StatefulWidget {
 }
 
 class _PostRatingState extends State<PostRating> {
-  late final Post _post;
+  Post? _post;
   bool _givingRating = false;
 
   @override
@@ -41,20 +41,20 @@ class _PostRatingState extends State<PostRating> {
       child: Row(
         children: <Widget>[
           Visibility(
-            visible: _post.canBeRated,
+            visible: _post!.canBeRated,
             child: GestureDetector(
               child: Icon(
                 Icons.thumb_up,
-                color: _post.myRating == 'positive' ? Colors.green : Colors.black38,
+                color: _post!.myRating == 'positive' ? Colors.green : Colors.black38,
               ),
               onTap: _givingRating
                   ? null
                   : () {
                       setState(() => _givingRating = true);
-                      ApiController().giveRating(_post.idKlub, _post.id, remove: _post.myRating != 'none').then((response) {
+                      ApiController().giveRating(_post!.idKlub, _post!.id, remove: _post!.myRating != 'none').then((response) {
                         setState(() {
-                          _post.rating = response.currentRating;
-                          _post.myRating = response.myRating;
+                          _post!.rating = response.currentRating;
+                          _post!.myRating = response.myRating;
                         });
                       }).catchError((error) {
                         print(error);
@@ -67,12 +67,12 @@ class _PostRatingState extends State<PostRating> {
             width: 4,
           ),
           Visibility(
-            visible: _post.rating != 0 || MainRepository().credentials!.nickname != _post.nick,
+            visible: _post!.rating != 0 || MainRepository().credentials!.nickname != _post!.nick,
             child: Opacity(
               opacity: _givingRating ? 0 : 1,
               child: Text(
-                _post.rating > 0 ? '+${_post.rating}' : _post.rating.toString(),
-                style: TextStyle(fontSize: 14, color: _post.rating > 0 ? Colors.green : (_post.rating < 0 ? Colors.redAccent : Colors.black38)),
+                _post!.rating > 0 ? '+${_post!.rating}' : _post!.rating.toString(),
+                style: TextStyle(fontSize: 14, color: _post!.rating > 0 ? Colors.green : (_post!.rating < 0 ? Colors.redAccent : Colors.black38)),
               ),
             ),
           ),
@@ -80,17 +80,17 @@ class _PostRatingState extends State<PostRating> {
             width: 4,
           ),
           Visibility(
-            visible: _post.canBeRated,
+            visible: _post!.canBeRated,
             child: GestureDetector(
               child: Icon(
                 Icons.thumb_down,
-                color: ['negative', 'negative_visible'].contains(_post.myRating) ? Colors.redAccent : Colors.black38,
+                color: ['negative', 'negative_visible'].contains(_post!.myRating) ? Colors.redAccent : Colors.black38,
               ),
               onTap: _givingRating
                   ? null
                   : () {
                       setState(() => _givingRating = true);
-                      ApiController().giveRating(_post.idKlub, _post.id, positive: false, remove: _post.myRating != 'none').then((response) {
+                      ApiController().giveRating(_post!.idKlub, _post!.id, positive: false, remove: _post!.myRating != 'none').then((response) {
                         if (response.needsConfirmation) {
                           showCupertinoDialog(
                             context: context,
@@ -110,10 +110,10 @@ class _PostRatingState extends State<PostRating> {
                                     isDestructiveAction: true,
                                     child: new Text('Hodnotit'),
                                     onPressed: () {
-                                      ApiController().giveRating(_post.idKlub, _post.id, positive: false, confirm: true, remove: _post.myRating != 'none').then((response) {
+                                      ApiController().giveRating(_post!.idKlub, _post!.id, positive: false, confirm: true, remove: _post!.myRating != 'none').then((response) {
                                         setState(() {
-                                          _post.rating = response.currentRating;
-                                          _post.myRating = response.myRating;
+                                          _post!.rating = response.currentRating;
+                                          _post!.myRating = response.myRating;
                                         });
                                       }).catchError((error) {
                                         print(error);
@@ -128,8 +128,8 @@ class _PostRatingState extends State<PostRating> {
                           );
                         } else {
                           setState(() {
-                            _post.rating = response.currentRating;
-                            _post.myRating = response.myRating;
+                            _post!.rating = response.currentRating;
+                            _post!.myRating = response.myRating;
                             _givingRating = false;
                           });
                         }

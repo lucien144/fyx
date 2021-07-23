@@ -20,7 +20,7 @@ class PostHeroAttachment extends StatelessWidget {
   final dynamic attachment;
   final List<model.Image> _images;
   final bool _crop;
-  final Function _onTap;
+  final Function? _onTap;
   final bool _openGallery;
   Size size;
   bool showStrip;
@@ -36,8 +36,8 @@ class PostHeroAttachment extends StatelessWidget {
     if (attachment is model.Image) {
       return GestureDetector(
         onTap: () {
-          if (_onTap is Function) {
-            _onTap();
+          if (_onTap != null) {
+            _onTap!();
           }
           if (_openGallery) {
             Navigator.of(context, rootNavigator: true).pushNamed('/gallery', arguments: GalleryArguments((attachment as model.Image).image, images: _images));
