@@ -34,17 +34,17 @@ class ContentPoll extends Content {
 
   bool get canVote {
     bool _canVote = pollComputedValues != null && !pollComputedValues!.userDidVote;
-    if (allowAnswersUntil != null) {
+    if (allowAnswersUntil > 0) {
       _canVote = _canVote && allowAnswersUntil > DateTime.now().millisecondsSinceEpoch;
     }
     return _canVote;
   }
 
   ContentPoll.fromJson(Map<String, dynamic> json, {this.postId = 0, this.discussionId = 0}) : super(PostTypeEnum.poll, isCompact: false) {
-    _question = json['question'];
-    _instructions = json['instructions'];
-    _publicResults = json['public_results'];
-    _allowedVotes = json['allowed_votes'];
+    _question = json['question'] ?? '';
+    _instructions = json['instructions'] ?? '';
+    _publicResults = json['public_results'] ?? false;
+    _allowedVotes = json['allowed_votes'] ?? 0;
     _allowAnswersUntil = json['allow_answers_until'] != null ? DateTime.parse(json['allow_answers_until']).millisecondsSinceEpoch : 0;
     _showAnswersAfter = json['show_answers_after'] != null ? DateTime.parse(json['show_answers_after']).millisecondsSinceEpoch : 0;
     if (json['answers'] != null) {

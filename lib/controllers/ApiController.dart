@@ -281,7 +281,7 @@ class ApiController {
   Future<ContentPoll> votePoll(discussionId, postId, votes) async {
     Response response = await provider.votePoll(discussionId, postId, votes);
     Map<String, dynamic> json = response.data;
-    return ContentPoll.fromJson(json['content_raw']['data'], discussionId: json['discussion_id'], postId: json['post_id']);
+    return ContentPoll.fromJson(json['content_raw']['data'], discussionId: json['discussion_id'] ?? 0, postId: json['post_id'] ?? 0);
   }
 
   throwAuthException(LoginResponse loginResponse, {String message: ''}) {
