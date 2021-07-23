@@ -7,9 +7,9 @@ class BookmarksHistoryResponse {
 
   BookmarksHistoryResponse.fromJson(Map<String, dynamic> json) {
     if (json.containsKey('discussions') && json['discussions'] is List) {
-      _discussions = json['discussions'];
-      _categories = json['categories'];
-      _context = ResponseContext.fromJson(json['context']);
+      _discussions = json['discussions'] ?? [];
+      _categories = json['categories'] ?? [];
+      _context = ResponseContext.fromJson(json['context'] ?? {});
     }
   }
 

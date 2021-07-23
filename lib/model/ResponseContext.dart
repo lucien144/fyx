@@ -85,11 +85,11 @@ class ActiveFriends {
   String get locationUrl => _locationUrl;
 
   ActiveFriends.fromJson(Map<String, dynamic> json) {
-    _username = json['username'];
-    _lastActivity = json['last_activity'];
-    _lastAccessMethod = json['last_access_method'];
-    _statusDetails = json['status_details'];
-    _location = json['location'];
-    _locationUrl = json['location_url'];
+    _username = json['username'] ?? '';
+    _lastActivity = json['last_activity'] ?? '';
+    _lastAccessMethod = json['last_access_method'] ?? '';
+    _statusDetails = json['status_details'] ?? '';
+    _location = json['location'] ?? '';
+    _locationUrl = json['location_url'] ?? '';
   }
 }
