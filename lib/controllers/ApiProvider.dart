@@ -50,7 +50,7 @@ class ApiProvider implements IApiProvider {
         print('[API] -> Bearer: ${_credentials!.token}');
         options.headers['Authorization'] = 'Bearer ${_credentials!.token}';
       }
-
+      return handler.next(options);
     }, onResponse: (Response response, ResponseInterceptorHandler handler) async {
       if (response.data.containsKey('context')) {
         if (onContextData != null) {
@@ -60,21 +60,21 @@ class ApiProvider implements IApiProvider {
 
       // All seems ok.
       if (response.statusCode == 200) {
-        return;
+        return handler.next(response);
       }
 
       // Malformed response
       if (onError != null) {
         onError!(L.API_ERROR);
       }
-      return;
+      return handler.next(response);
     }, onError: (DioError e, ErrorInterceptorHandler handler) async {
       // Not Authorized
       if (e.response?.statusCode == 401) {
         if (onAuthError != null) {
           onAuthError!(e.response!.data['message']);
         }
-        return;
+        return handler.next(e);
       }
 
       // Other problem
@@ -82,12 +82,12 @@ class ApiProvider implements IApiProvider {
         if (onError != null) {
           onError!(e.response!.data['message']);
         }
-        return;
+        return handler.next(e);
       }
 
       // Negative rating confirmation
       if (e.response?.statusCode == 403) {
-        return;
+        return handler.next(e);
       }
 
       if (onError != null) {
