@@ -120,6 +120,7 @@ class _TutorialPageState extends State<TutorialPage> {
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(gradient: T.GRADIENT),
         child: CarouselSlider.builder(
+          carouselController: _carouselController,
           options: CarouselOptions(
             enableInfiniteScroll: false,
             height: 500,
