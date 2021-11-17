@@ -19,7 +19,8 @@ class PullToRefreshList extends StatefulWidget {
   int _rebuild;
   final Widget? pinnedWidget;
 
-  PullToRefreshList({required this.dataProvider, isInfinite = false, int rebuild = 0, this.sliverListBuilder, bool disabled = false, this.pinnedWidget})
+  PullToRefreshList(
+      {required this.dataProvider, isInfinite = false, int rebuild = 0, this.sliverListBuilder, bool disabled = false, this.pinnedWidget})
       : _isInfinite = isInfinite,
         _rebuild = rebuild,
         _disabled = disabled,
@@ -30,7 +31,7 @@ class PullToRefreshList extends StatefulWidget {
 }
 
 class _PullToRefreshListState extends State<PullToRefreshList> {
-  ScrollController _controller = ScrollController();
+  ScrollController? _controller;
   bool _isLoading = true;
   bool _hasPulledDown = false;
   bool _hasError = false;
@@ -51,37 +52,43 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
   void initState() {
     super.initState();
 
-    if (widget._isInfinite) {
-      _controller.addListener(() {
-        // TODO: Refactor, use ScrollNotification ?
-        // Display loading and load next page if we are at the end of the list
-        if (_controller.position.userScrollDirection == ScrollDirection.reverse && _controller.position.outOfRange) {
-          if (_slivers.last is! SliverPadding) {
-            setState(() => _slivers.add(SliverPadding(padding: EdgeInsets.symmetric(vertical: 16), sliver: SliverToBoxAdapter(child: CupertinoActivityIndicator()))));
-            this.loadData(append: true);
+    () async {
+      await Future.delayed(Duration.zero);
+      _controller = PrimaryScrollController.of(context);
+
+      if (widget._isInfinite) {
+        _controller!.addListener(() {
+          // TODO: Refactor, use ScrollNotification ?
+          // Display loading and load next page if we are at the end of the list
+          if (_controller!.position.userScrollDirection == ScrollDirection.reverse && _controller!.position.outOfRange) {
+            if (_slivers.last is! SliverPadding) {
+              setState(() => _slivers
+                  .add(SliverPadding(padding: EdgeInsets.symmetric(vertical: 16), sliver: SliverToBoxAdapter(child: CupertinoActivityIndicator()))));
+              this.loadData(append: true);
+            }
           }
-        }
-      });
-    }
+        });
+      }
 
-    // Add the refresh control on first position
-    _slivers.add(CupertinoSliverRefreshControl(
-      builder: Platform.isIOS ? CupertinoSliverRefreshControl.buildRefreshIndicator : buildAndroidRefreshIndicator,
-      onRefresh: () {
-        setState(() => _hasPulledDown = true);
-        if (!widget._disabled) {
-          return this.loadData();
-        }
-        return Future.wait([]);
-      },
-    ));
+      // Add the refresh control on first position
+      _slivers.add(CupertinoSliverRefreshControl(
+        builder: Platform.isIOS ? CupertinoSliverRefreshControl.buildRefreshIndicator : buildAndroidRefreshIndicator,
+        onRefresh: () {
+          setState(() => _hasPulledDown = true);
+          if (!widget._disabled) {
+            return this.loadData();
+          }
+          return Future.wait([]);
+        },
+      ));
 
-    this.loadData();
+      this.loadData();
+    }();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller!.dispose();
     super.dispose();
   }
 
