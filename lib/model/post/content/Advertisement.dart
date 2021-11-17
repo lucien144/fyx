@@ -42,7 +42,7 @@ class ContentAdvertisement extends Content {
     _shipping = json['shipping'] ?? '';
     _description = json['description'] ?? '';
     _description_raw = json['description_raw'] ?? '';
-    _posts_count = json['posts_count'];
+    _posts_count = json['posts_count'] ?? 0;
     _parameters = List.castFrom(json['parameters'] ?? []);
 
     try {
