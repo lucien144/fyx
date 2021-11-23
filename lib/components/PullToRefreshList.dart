@@ -178,8 +178,8 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
       List<Widget> _list = [];
 
       _data.cast<Map>().forEach((block) {
-        _list.add(SliverStickyHeaderBuilder(
-          builder: (context, state) => block['header'],
+        _list.add(SliverStickyHeader(
+          header: block['header'],
           sliver: SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, i) => block['items'][i],
