@@ -99,6 +99,7 @@ class FyxApp extends StatefulWidget {
       // TODO: Do not register if the token is already saved.
       onTokenRefresh: (fcmToken) => ApiController().refreshFcmToken(fcmToken),
     );
+    _notificationsService.configure();
     _notificationsService.onNewMail = () =>
         FyxApp.navigatorKey.currentState!.pushReplacementNamed('/home',
             arguments: HomePageArguments(HomePage.PAGE_MAIL));
