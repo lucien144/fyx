@@ -20,6 +20,7 @@ class _PollState extends State<Poll> {
   List<int> _votes = [];
   bool _loading = false;
   ContentPoll? _poll;
+  ScrollController controller = ScrollController();
 
 
   @override
@@ -33,6 +34,7 @@ class _PollState extends State<Poll> {
 
     return ListView.builder(
       physics: NeverScrollableScrollPhysics(),
+        controller: controller,
         itemBuilder: (context, index) {
           final answer = _poll!.answers[index];
           return Padding(
