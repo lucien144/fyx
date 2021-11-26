@@ -174,13 +174,10 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
       ApiController().buildContext = context;
     }
 
-    if (_pageIndex == null) {
-      if (_arguments == null) {
-        _arguments = ModalRoute.of(context)?.settings.arguments as HomePageArguments;
-        _pageIndex = _arguments?.pageIndex ?? HomePage.PAGE_BOOKMARK;
-      } else {
-        _pageIndex = _arguments?.pageIndex;
-      }
+    final Object? _objArguments = ModalRoute.of(context)?.settings.arguments;
+    if (_objArguments != null) {
+      _arguments = _objArguments as HomePageArguments;
+      _pageIndex = _arguments?.pageIndex;
     }
 
     return WillPopScope(
