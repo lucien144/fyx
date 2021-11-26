@@ -22,6 +22,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _compactMode = false;
   bool _underTheHood = false;
   bool _autocorrect = false;
+  DefaultView _defaultView = DefaultView.latest;
 
   @override
   void initState() {
@@ -29,6 +30,7 @@ class _SettingsPageState extends State<SettingsPage> {
     _compactMode = MainRepository().settings.useCompactMode;
     _underTheHood = false;
     _autocorrect = MainRepository().settings.useAutocorrect;
+    _defaultView = MainRepository().settings.defaultView;
     AnalyticsProvider().setScreen('Settings', 'SettingsPage');
   }
 
@@ -89,9 +91,10 @@ class _SettingsPageState extends State<SettingsPage> {
               CSSelectionItem<DefaultView>(text: 'Sledované (nepřečtené)', value: DefaultView.bookmarksUnread),
             ],
             onSelected: (index) {
+              setState(() => _defaultView = index);
               MainRepository().settings.defaultView = index;
             },
-            currentSelection: MainRepository().settings.defaultView,
+            currentSelection: _defaultView,
           ),
           CSHeader('Paměť'),
           CSControl(
