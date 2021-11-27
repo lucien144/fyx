@@ -180,10 +180,7 @@ class _FyxAppState extends State<FyxApp> {
           textDirection: TextDirection.ltr,
           child: CupertinoApp(
             title: 'Fyx',
-            theme: CupertinoThemeData(
-                primaryColor: T.COLOR_PRIMARY,
-                brightness: Brightness.light,
-                textTheme: CupertinoTextThemeData(primaryColor: Colors.white, textStyle: TextStyle(color: T.COLOR_BLACK, fontSize: 16))),
+            theme: T.darkTheme(),
             home: MainRepository().credentials != null && MainRepository().credentials!.isValid ? HomePage() : LoginPage(),
             debugShowCheckedModeBanner: FyxApp.isDev,
             onUnknownRoute: (RouteSettings settings) => CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings),

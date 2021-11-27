@@ -159,7 +159,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
     }
 
     return Container(
-      color: Colors.white,
+      color: CupertinoTheme.of(context).scaffoldBackgroundColor ,
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(8.0),

@@ -15,6 +15,7 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/Helpers.dart';
+import 'package:fyx/theme/IconReply.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 
@@ -48,14 +49,19 @@ class _PostListItemState extends State<PostListItem> {
       isPreview: widget._isPreview,
       isHighlighted: widget._isHighlighted,
       topLeftWidget: GestureFeedback(
-        onTap: () => showCupertinoModalPopup(context: context, builder: (BuildContext context) => PostAvatarActionSheet(user: _post!.nick, idKlub: _post!.idKlub,)),
+        onTap: () => showCupertinoModalPopup(
+            context: context,
+            builder: (BuildContext context) => PostAvatarActionSheet(
+                  user: _post!.nick,
+                  idKlub: _post!.idKlub,
+                )),
         child: PostAvatar(
           _post!.nick,
           description: Helpers.relativeTime(_post!.time),
         ),
       ),
       topRightWidget: GestureDetector(
-          child: Icon(Icons.more_vert, color: Colors.black38),
+          child: Icon(Icons.more_vert, color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38)),
           onTap: () => showCupertinoModalPopup(
               context: context,
               builder: (BuildContext context) => PostActionSheet(
@@ -81,12 +87,17 @@ class _PostListItemState extends State<PostListItem> {
                             ),
                             onClose: this.widget.onUpdate,
                             onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
-                              var result = await ApiController().postDiscussionMessage(_post!.idKlub, message, attachments: attachments, replyPost: _post);
+                              var result =
+                                  await ApiController().postDiscussionMessage(_post!.idKlub, message, attachments: attachments, replyPost: _post);
                               return result.isOk;
                             })),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[T.ICO_REPLY, Text('Odpovědět', style: TextStyle(color: Colors.black38, fontSize: 14))],
+                      children: <Widget>[
+                        IconReply(),
+                        Text('Odpovědět',
+                            style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38), fontSize: 14))
+                      ],
                     )),
               ),
               Visibility(
@@ -95,31 +106,32 @@ class _PostListItemState extends State<PostListItem> {
                   width: 16,
                 ),
               ),
-              if (_post!.canBeReminded) GestureDetector(
-                child: FeedbackIndicator(
-                  isLoading: _isSaving,
-                  child: Row(
-                    children: <Widget>[
-                      Icon(
-                        _post!.hasReminder ? Icons.bookmark : Icons.bookmark_border,
-                        color: Colors.black38,
-                      ),
-                      Text('Uložit', style: TextStyle(color: Colors.black38, fontSize: 14))
-                    ],
+              if (_post!.canBeReminded)
+                GestureDetector(
+                  child: FeedbackIndicator(
+                    isLoading: _isSaving,
+                    child: Row(
+                      children: <Widget>[
+                        Icon(
+                          _post!.hasReminder ? Icons.bookmark : Icons.bookmark_border,
+                          color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38),
+                        ),
+                        Text('Uložit', style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38), fontSize: 14))
+                      ],
+                    ),
                   ),
-                ),
-                onTap: () {
-                  setState(() {
-                    _post!.hasReminder = !_post!.hasReminder;
-                    _isSaving = true;
-                  });
-                  ApiController().setPostReminder(_post!.idKlub, _post!.id, _post!.hasReminder).catchError((error) {
-                    T.error(L.REMINDER_ERROR);
-                    setState(() => _post!.hasReminder = !_post!.hasReminder);
-                  }).whenComplete(() => setState(() => _isSaving = false));
-                  AnalyticsProvider().logEvent('reminder');
-                },
-              )
+                  onTap: () {
+                    setState(() {
+                      _post!.hasReminder = !_post!.hasReminder;
+                      _isSaving = true;
+                    });
+                    ApiController().setPostReminder(_post!.idKlub, _post!.id, _post!.hasReminder).catchError((error) {
+                      T.error(L.REMINDER_ERROR);
+                      setState(() => _post!.hasReminder = !_post!.hasReminder);
+                    }).whenComplete(() => setState(() => _isSaving = false));
+                    AnalyticsProvider().logEvent('reminder');
+                  },
+                )
             ],
           )
         ],

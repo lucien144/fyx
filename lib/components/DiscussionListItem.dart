@@ -35,7 +35,7 @@ class DiscussionListItem extends StatelessWidget {
                           maxFontSize: 12,
                           maxLines: 1,
                           minFontSize: 1,
-                          style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                          style: TextStyle(color: CupertinoTheme.of(context).scaffoldBackgroundColor, fontSize: 12, fontWeight: FontWeight.w600),
                         ),
                       ),
                     )),
@@ -45,7 +45,7 @@ class DiscussionListItem extends StatelessWidget {
             Expanded(
                 child: Text(
               discussion.name,
-              overflow: TextOverflow.ellipsis,
+              overflow: TextOverflow.ellipsis
             )),
             Visibility(visible: discussion.links > 0, child: Icon(Icons.link)),
             Visibility(visible: discussion.images > 0, child: Icon(Icons.image)),

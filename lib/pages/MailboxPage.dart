@@ -9,7 +9,6 @@ import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/Mail.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
-import 'package:fyx/theme/T.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class MailboxPage extends StatefulWidget {
@@ -89,7 +88,7 @@ class _MailboxPageState extends State<MailboxPage> {
         bottom: 20,
         child: SafeArea(
           child: FloatingActionButton(
-            backgroundColor: T.COLOR_PRIMARY,
+            backgroundColor: CupertinoTheme.of(context).primaryColor,
             child: Icon(Icons.add),
             onPressed: () => Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
                 arguments: NewMessageSettings(

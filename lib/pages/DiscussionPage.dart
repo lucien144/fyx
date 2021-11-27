@@ -72,11 +72,13 @@ class _DiscussionPageState extends State<DiscussionPage> {
         builder: (BuildContext context, AsyncSnapshot<DiscussionResponse> snapshot) {
           if (snapshot.hasData) {
             if (snapshot.data!.discussion.accessDenied) {
-              return T.feedbackScreen(title: L.ACCESS_DENIED_ERROR, icon: Icons.do_not_disturb_alt, label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
+              return T.feedbackScreen(
+                  title: L.ACCESS_DENIED_ERROR, icon: Icons.do_not_disturb_alt, label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
             }
             return this._createDiscussionPage(snapshot.data!, pageArguments);
           } else if (snapshot.hasError) {
-            return T.feedbackScreen(isWarning: true, title: snapshot.error.toString(), label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
+            return T.feedbackScreen(
+                isWarning: true, title: snapshot.error.toString(), label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
           } else {
             return T.feedbackScreen(isLoading: true);
           }
@@ -90,9 +92,8 @@ class _DiscussionPageState extends State<DiscussionPage> {
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-          backgroundColor: Colors.white,
           leading: CupertinoNavigationBarBackButton(
-            color: T.COLOR_PRIMARY,
+            color: CupertinoTheme.of(context).primaryColor,
             onPressed: () {
               Navigator.of(context).pop();
             },
@@ -100,7 +101,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
           middle: Container(
               alignment: Alignment.center,
               width: MediaQuery.of(context).size.width - 120,
-              child: Text(discussionResponse.discussion.name.replaceAll('', '\u{200B}'), overflow: TextOverflow.ellipsis))),
+              child: Text(discussionResponse.discussion.name.replaceAll('', '\u{200B}'), style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color),overflow: TextOverflow.ellipsis))),
       child: Stack(
         children: [
           PullToRefreshList(
@@ -168,7 +169,8 @@ class _DiscussionPageState extends State<DiscussionPage> {
               bottom: 20,
               child: SafeArea(
                 child: FloatingActionButton(
-                  backgroundColor: T.COLOR_PRIMARY,
+                  backgroundColor: CupertinoTheme.of(context).primaryColor,
+                  foregroundColor: CupertinoTheme.of(context).scaffoldBackgroundColor,
                   child: Icon(Icons.add),
                   onPressed: () => Navigator.of(context).pushNamed('/new-message',
                       arguments: NewMessageSettings(

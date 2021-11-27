@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:flutter/widgets.dart';
 import 'package:fyx/components/CircleAvatar.dart';
@@ -28,7 +29,7 @@ class PostAvatar extends StatelessWidget {
             children: <material.Widget>[
               Text(
                 nick,
-                style: TextStyle(color: isHighlighted ? T.COLOR_PRIMARY : material.Colors.black),
+                style: TextStyle(color: isHighlighted ? CupertinoTheme.of(context).primaryColor : CupertinoTheme.of(context).textTheme.textStyle.color),
               ),
               Visibility(
                 visible: isHighlighted,
@@ -41,7 +42,7 @@ class PostAvatar extends StatelessWidget {
           if (this.description is String)
             Text(
               description,
-              style: TextStyle(color: material.Colors.black38, fontSize: 10),
+              style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38), fontSize: 10),
             )
           else if (this.descriptionWidget is Widget) this.descriptionWidget!
         ],

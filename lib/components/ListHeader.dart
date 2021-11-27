@@ -13,12 +13,12 @@ class ListHeader extends StatelessWidget {
     return GestureDetector(
       onTap: () => this.onTap!(),
       child: Container(
-        decoration: BoxDecoration(color: CupertinoTheme.of(context).primaryColor, border: Border(bottom: BorderSide(width: 1, color: Colors.white38))),
+        decoration: BoxDecoration(color: CupertinoTheme.of(context).primaryColor, border: Border(bottom: BorderSide(width: 1, color: CupertinoTheme.of(context).scaffoldBackgroundColor.withOpacity(0.38)))),
         padding: EdgeInsets.all(8),
         alignment: Alignment.centerLeft,
         child: Text(
           label,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: CupertinoTheme.of(context).scaffoldBackgroundColor),
         ),
       ),
     );

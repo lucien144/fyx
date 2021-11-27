@@ -197,7 +197,6 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
             setState(() => _pageIndex = index);
             this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? ERefreshData.mail : ERefreshData.bookmarks);
           },
-          backgroundColor: Colors.white,
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: Icon(_filterUnread ? Icons.bookmarks : Icons.bookmarks_outlined, size: 34),
@@ -221,7 +220,6 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
               return CupertinoTabView(builder: (context) {
                 return CupertinoPageScaffold(
                   navigationBar: CupertinoNavigationBar(
-                      backgroundColor: Colors.white,
                       leading: Consumer<NotificationsModel>(
                           builder: (context, notifications, child) => NotificationBadge(
                               widget: GestureDetector(
@@ -351,7 +349,6 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
               return CupertinoTabView(builder: (context) {
                 return CupertinoPageScaffold(
                     navigationBar: CupertinoNavigationBar(
-                        backgroundColor: Colors.white,
                         trailing: GestureDetector(
                           child: ca.CircleAvatar(
                             MainRepository().credentials!.avatar,
@@ -361,7 +358,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                             showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet(context));
                           },
                         ),
-                        middle: Text('Pošta')),
+                        middle: Text('Pošta', style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color),)),
                     child: MailboxPage(
                       refreshData: _refreshData['mail'] ?? 0,
                     ));
