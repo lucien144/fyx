@@ -95,7 +95,7 @@ class _PostActionSheetState extends State<PostActionSheet> {
               onPressed: () async {
                 try {
                   setState(() => _reportIndicator = true);
-                  await ApiController().sendMail('FYXBOT', 'Inappropriate post/mail report: ID $widget.postId by user @$widget.user.');
+                  await ApiController().sendMail('FYXBOT', 'Inappropriate post/mail report: ID ${widget.postId} by user @${widget.user}.');
                   T.success(L.TOAST_POST_FLAGGED);
                 } catch (error) {
                   T.error(L.TOAST_POST_FLAG_ERROR);
