@@ -23,8 +23,9 @@ class DiscussionPageArguments {
   final int discussionId;
   final int? postId;
   final String? filterByUser;
+  final String? search;
 
-  DiscussionPageArguments(this.discussionId, {this.postId, this.filterByUser});
+  DiscussionPageArguments(this.discussionId, {this.postId, this.filterByUser, this.search});
 }
 
 class DiscussionPage extends StatefulWidget {
@@ -37,9 +38,9 @@ class _DiscussionPageState extends State<DiscussionPage> {
   int _refreshList = 0;
   bool _hasInitData = false;
 
-  Future<DiscussionResponse> _fetchData(discussionId, postId, user) {
+  Future<DiscussionResponse> _fetchData(discussionId, postId, user, {String? search}) {
     return this._memoizer.runOnce(() {
-      return ApiController().loadDiscussion(discussionId, lastId: postId, user: user);
+      return ApiController().loadDiscussion(discussionId, lastId: postId, user: user, search: search);
     });
   }
 
@@ -67,7 +68,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
     }
 
     return FutureBuilder<DiscussionResponse>(
-        future: _fetchData(pageArguments.discussionId, pageArguments.postId, pageArguments.filterByUser),
+        future: _fetchData(pageArguments.discussionId, pageArguments.postId, pageArguments.filterByUser, search: pageArguments.search),
         builder: (BuildContext context, AsyncSnapshot<DiscussionResponse> snapshot) {
           if (snapshot.hasData) {
             if (snapshot.data!.discussion.accessDenied) {

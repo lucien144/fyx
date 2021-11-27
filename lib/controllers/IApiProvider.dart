@@ -19,7 +19,7 @@ abstract class IApiProvider {
   Future<Response> registerFcmToken(String token);
   Future<Response> fetchBookmarks();
   Future<Response> fetchHistory();
-  Future<Response> fetchDiscussion(int id, {int? lastId, String? user});
+  Future<Response> fetchDiscussion(int id, {int? lastId, String? user, String? search});
   Future<Response> fetchDiscussionHome(int id);
   Future<Response> fetchMail({int? lastId});
   Future<Response> fetchNotices();

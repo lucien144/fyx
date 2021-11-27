@@ -23,6 +23,14 @@ void main() {
     expect(result[INTERNAL_URI_PARSER.postId], null);
   });
 
+  test('Should parse NEW internal deeplinks with text search', () {
+    int id = 1234;
+    var result = Helpers.parseDiscussionUri('/discussion/$id?text=%23hashtag');
+    expect(result[INTERNAL_URI_PARSER.discussionId], id);
+    expect(result[INTERNAL_URI_PARSER.postId], null);
+    expect(result[INTERNAL_URI_PARSER.search], '#hashtag');
+  });
+
   test('Should NOT parse internal deeplinks', () {
     var result = Helpers.parseDiscussionUri('/discussion/');
     expect(result.isEmpty, true);

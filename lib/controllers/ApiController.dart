@@ -167,8 +167,8 @@ class ApiController {
     return BookmarksAllResponse.fromJson(response.data);
   }
 
-  Future<DiscussionResponse> loadDiscussion(int id, {int? lastId, String? user}) async {
-    var response = await provider.fetchDiscussion(id, lastId: lastId, user: user);
+  Future<DiscussionResponse> loadDiscussion(int id, {int? lastId, String? user, String? search}) async {
+    var response = await provider.fetchDiscussion(id, lastId: lastId, user: user, search: search);
     if (response.statusCode == 400) {
       return DiscussionResponse.accessDenied();
     }

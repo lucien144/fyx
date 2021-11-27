@@ -179,10 +179,8 @@ class PostHtml extends StatelessWidget {
         // Click through to another discussion
         var parserResult = Helpers.parseDiscussionUri(link);
         if (parserResult.isNotEmpty) {
-          var arguments = DiscussionPageArguments(
-              parserResult[INTERNAL_URI_PARSER.discussionId]!);
-          Navigator.of(context.buildContext, rootNavigator: true)
-              .pushNamed('/discussion', arguments: arguments);
+          var arguments = DiscussionPageArguments(parserResult[INTERNAL_URI_PARSER.discussionId]!, search: parserResult[INTERNAL_URI_PARSER.search]);
+          Navigator.of(context.buildContext, rootNavigator: true).pushNamed('/discussion', arguments: arguments);
           return;
         }
 

@@ -113,8 +113,8 @@ class ApiProvider implements IApiProvider {
     return await dio.get('$URL/bookmarks/history/more');
   }
 
-  Future<Response> fetchDiscussion(int discussionId, {int? lastId, String? user}) async {
-    Map<String, dynamic> params = {'order': lastId == null ? 'newest' : 'older_than', 'from_id': lastId, 'user': user};
+  Future<Response> fetchDiscussion(int discussionId, {int? lastId, String? user, String? search}) async {
+    Map<String, dynamic> params = {'order': lastId == null ? 'newest' : 'older_than', 'from_id': lastId, 'user': user, 'text': search};
     return await dio.get('$URL/discussion/$discussionId', queryParameters: params);
   }
 
