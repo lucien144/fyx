@@ -1,6 +1,7 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:html/dom.dart' as dom;
@@ -112,7 +113,11 @@ class _VideoPlayerState extends State<VideoPlayer> {
                 ],
               );
             } else if (snapshot.hasError) {
-              return T.somethingsWrongButton(widget.element.outerHtml);
+              if (snapshot.error is PlatformException) {
+                final error = (snapshot.error as PlatformException);
+                return T.somethingsWrongButton(widget.element.outerHtml, icon: Icons.play_disabled, title: 'Video se nepodařilo nahrát.\n${error.message}', stack: error.stacktrace ?? '');
+              }
+              return T.somethingsWrongButton(widget.element.outerHtml, icon: Icons.play_disabled, title: 'Video se nepodařilo nahrát.', stack: snapshot.error.toString());
             }
             return Center(child: CupertinoActivityIndicator());
           }),

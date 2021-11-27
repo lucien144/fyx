@@ -102,14 +102,16 @@ class T {
     T.openLink(link);
   }
 
-  static Widget somethingsWrongButton(String content, {String url = ''}) {
+  static Widget somethingsWrongButton(String content, {String url = '', IconData icon = Icons.warning, String title = 'Chyba zobrazení příspěvku.', String stack = ''}) {
     return GestureDetector(
       onTap: () => T.prefillGithubIssue(
-          title: 'Chyba zobrazení příspěvku', body: '**Zdroj:**\n```$content```', user: MainRepository().credentials!.nickname, url: url, appContext: MainRepository()),
-      child: Column(children: <Widget>[
-        Icon(Icons.warning),
+          title: title, body: '**Zdroj:**\n```$content```\n\n**Stack:**\n```$stack```', user: MainRepository().credentials!.nickname, url: url, appContext: MainRepository()),
+      child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+        Icon(icon, size: 48,),
         Text(
-          'Nastal problém se zobrazením příspěvku.\n Vyplňte prosím github issue kliknutím sem...',
+          '$title\n Problém nahlásíte kliknutím zde.',
           textAlign: TextAlign.center,
         )
       ]),
