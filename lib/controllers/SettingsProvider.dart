@@ -5,8 +5,8 @@ import "package:hive_flutter/hive_flutter.dart";
 
 class SettingsProvider {
   static final SettingsProvider _singleton = SettingsProvider._internal();
-  Settings _settings;
-  Box<dynamic> _box;
+  late Settings _settings;
+  late Box<dynamic> _box;
 
   Box<dynamic> get box => _box;
 

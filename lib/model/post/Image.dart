@@ -1,18 +1,16 @@
 import 'package:quiver/core.dart';
 
 class Image {
-  final String _image;
+  final String image;
   final String _thumb;
 
-  Image(this._image, this._thumb) : assert(_image != '');
+  Image(this.image, {thumb = ''}): _thumb = thumb;
 
-  String get thumb => _thumb.isEmpty ? _image : _thumb;
-
-  String get image => _image;
+  String get thumb => _thumb.isEmpty ? image : _thumb;
 
   @override
-  int get hashCode => hash2(_image.hashCode, _thumb.hashCode);
+  int get hashCode => hash2(image.hashCode, _thumb.hashCode);
 
   @override
-  bool operator ==(other) => other is Image && other.thumb == _thumb && other.image == image;
+  bool operator ==(other) => other is Image && other._thumb == _thumb && other.image == image;
 }

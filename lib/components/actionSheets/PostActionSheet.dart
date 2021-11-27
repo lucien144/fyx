@@ -14,7 +14,7 @@ class ShareData {
   final Content body;
   final String link;
 
-  ShareData({this.subject, this.body, this.link});
+  ShareData({required this.subject, required this.body, required this.link});
 }
 
 class PostActionSheet extends StatefulWidget {
@@ -24,7 +24,7 @@ class PostActionSheet extends StatefulWidget {
   final Function flagPostCallback;
   final ShareData shareData;
 
-  PostActionSheet({Key key, this.user, this.postId, this.flagPostCallback, this.parentContext, this.shareData}) : super(key: key);
+  PostActionSheet({Key? key, required this.user, required this.postId, required this.flagPostCallback, required this.parentContext, required this.shareData}) : super(key: key);
 
   @override
   _PostActionSheetState createState() => _PostActionSheetState();
@@ -66,7 +66,7 @@ class _PostActionSheetState extends State<PostActionSheet> {
                     body = widget.shareData.body.videos.fold('', (previousValue, element) => '$previousValue ${element.link}').trim();
                   }
 
-                  final RenderBox box = context.findRenderObject();
+                  final RenderBox box = context.findRenderObject() as RenderBox;
                   Share.share(body, subject: widget.shareData.subject, sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
                   Navigator.pop(context);
                   AnalyticsProvider().logEvent('shareSheet');
@@ -95,7 +95,7 @@ class _PostActionSheetState extends State<PostActionSheet> {
               onPressed: () async {
                 try {
                   setState(() => _reportIndicator = true);
-                  await ApiController().sendMail('FYXBOT', 'Inappropriate post/mail report: ID $widget.postId by user @$widget.user.');
+                  await ApiController().sendMail('FYXBOT', 'Inappropriate post/mail report: ID ${widget.postId} by user @${widget.user}.');
                   T.success(L.TOAST_POST_FLAGGED);
                 } catch (error) {
                   T.error(L.TOAST_POST_FLAG_ERROR);

@@ -14,7 +14,7 @@ class PostAvatarActionSheet extends StatelessWidget {
   final String user;
   final int idKlub;
 
-  const PostAvatarActionSheet({Key key, @required this.user, this.idKlub}) : super(key: key);
+  const PostAvatarActionSheet({Key? key, required this.user, required this.idKlub}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,9 @@ class PostAvatarActionSheet extends StatelessWidget {
                     hasInputField: true,
                     inputFieldPlaceholder: this.user,
                     onClose: () => T.success('👍 Zpráva poslána.'),
-                    onSubmit: (String inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                    onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                      if (inputField == null) return false;
+
                       var response = await ApiController().sendMail(inputField, message, attachments: attachments);
                       return response.isOk;
                     }));
@@ -44,7 +46,7 @@ class PostAvatarActionSheet extends StatelessWidget {
           },
         ),
         Visibility(
-          visible: user != MainRepository().credentials.nickname,
+          visible: user != MainRepository().credentials!.nickname,
           child: CupertinoActionSheetAction(
               child: TextIcon(
                 '${L.POST_SHEET_BLOCK} @${user}',

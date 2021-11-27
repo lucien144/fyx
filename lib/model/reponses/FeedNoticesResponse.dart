@@ -2,8 +2,8 @@ import 'package:fyx/model/ResponseContext.dart';
 
 class FeedNoticesResponse {
   List<NoticeItem> _data = [];
-  int lastVisit;
-  ResponseContext _context;
+  int lastVisit = 0;
+  late ResponseContext _context;
 
   List<NoticeItem> get data => _data;
 
@@ -12,7 +12,6 @@ class FeedNoticesResponse {
   ResponseContext get context => _context;
 
   FeedNoticesResponse.fromJson(Map<String, dynamic> json) {
-    _data = List();
     json['notifications'].forEach((v) {
       _data.add(new NoticeItem.fromJson(v));
     });
@@ -22,18 +21,18 @@ class FeedNoticesResponse {
 }
 
 class NoticeItem {
-  int _domain_id;
-  int _id;
-  int _discussion_id;
-  String _discussion_name;
-  String _username;
-  String _post_type;
-  bool _reminder;
-  int _inserted_at;
-  int _rating;
-  String _content;
-  List<NoticeReplies> _replies;
-  List<NoticeThumbsUp> _thumbsUp;
+  int _domain_id = 0;
+  int _id = 0;
+  int _discussion_id = 0;
+  String _discussion_name = '';
+  String _username = '';
+  String _post_type = '';
+  bool _reminder = false;
+  int _inserted_at = 0;
+  int _rating = 0;
+  String _content = '';
+  List<NoticeReplies> _replies = [];
+  List<NoticeThumbsUp> _thumbsUp = [];
 
   int get domainId => _domain_id;
 
@@ -65,22 +64,20 @@ class NoticeItem {
     _domain_id = json['data']['domain_id'] ?? 0;
     _id = json['data']['id'] ?? 0;
     _discussion_id = json['data']['discussion_id'] ?? 0;
-    _discussion_name = json['data']['discussion_name'];
-    _username = json['data']['username'];
+    _discussion_name = json['data']['discussion_name'] ?? '';
+    _username = json['data']['username'] ?? '';
     _inserted_at = DateTime.parse(json['data']['inserted_at'] ?? '0').millisecondsSinceEpoch;;
     _rating = json['data']['rating'] ?? 0;
-    _content = json['data']['content'];
-    _post_type = json['data']['post_type'];
-    _reminder = json['data']['reminder'];
+    _content = json['data']['content'] ?? '';
+    _post_type = json['data']['post_type'] ?? '';
+    _reminder = json['data']['reminder'] ?? false;
 
-    _replies = new List<NoticeReplies>();
     if (json['details']['replies'] != null) {
       json['details']['replies'].forEach((v) {
         _replies.add(new NoticeReplies.fromJson(v));
       });
     }
 
-    _thumbsUp = new List<NoticeThumbsUp>();
     if (json['details']['thumbs_up'] != null) {
       json['details']['thumbs_up'].forEach((v) {
         _thumbsUp.add(new NoticeThumbsUp.fromJson(v));
@@ -90,19 +87,11 @@ class NoticeItem {
 }
 
 class NoticeReplies {
-  String _username;
-  int _inserted_at;
-  int _id;
-  int _discussion_id;
-  String _content;
-
-  NoticeReplies({String username, int inserted_at, int id, int discussion_id, String content}) {
-    this._username = username;
-    this._inserted_at = inserted_at;
-    this._id = id;
-    this._discussion_id = discussion_id;
-    this._content = content;
-  }
+  String _username = '';
+  int _inserted_at = 0;
+  int _id = 0;
+  int _discussion_id = 0;
+  String _content = '';
 
   String get nick => _username;
 
@@ -115,11 +104,11 @@ class NoticeReplies {
   String get text => _content;
 
   NoticeReplies.fromJson(Map<String, dynamic> json) {
-    this._username = json['username'];
+    this._username = json['username'] ?? '';
     this._inserted_at = DateTime.parse(json['inserted_at'] ?? '0').millisecondsSinceEpoch;
     this._id = json['id'] ?? 0;
     this._discussion_id = json['discussion_id'] ?? 0;
-    this._content = json['content'];
+    this._content = json['content'] ?? '';
   }
 
   Map<String, dynamic> toJson() {
@@ -134,13 +123,8 @@ class NoticeReplies {
 }
 
 class NoticeThumbsUp {
-  String _username;
-  int _inserted_at;
-
-  NoticeThumbsUp({String username, int inserted_at}) {
-    this._username = username;
-    this._inserted_at = inserted_at;
-  }
+  String _username = '';
+  int _inserted_at = 0;
 
   String get nick => _username;
 

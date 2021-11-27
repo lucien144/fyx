@@ -2,8 +2,8 @@ import 'package:fyx/model/ResponseContext.dart';
 import 'package:fyx/model/reponses/FileUploadResponse.dart';
 
 class WaitingFilesResponse {
-  ResponseContext _context;
-  List<FileUploadResponse> _files;
+  late ResponseContext _context;
+  List<FileUploadResponse> _files = [];
 
   WaitingFilesResponse.fromJson(Map<String, dynamic> json) {
     _context = ResponseContext.fromJson(json['context']);

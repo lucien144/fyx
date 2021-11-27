@@ -13,7 +13,7 @@ import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 
 class NoticesPage extends StatefulWidget {
-  NoticesPage({Key key}) : super(key: key);
+  NoticesPage({Key? key}) : super(key: key);
 
   @override
   _NoticesPageState createState() => _NoticesPageState();
@@ -29,19 +29,19 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance?.addObserver(this);
     AnalyticsProvider().setScreen('Notices', 'NoticesPage');
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance?.removeObserver(this);
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed && ModalRoute.of(context).isCurrent) {
+    if (state == AppLifecycleState.resumed && ModalRoute.of(context)!.isCurrent) {
       this.refresh();
     }
   }

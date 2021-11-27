@@ -4,17 +4,15 @@ enum VIDEO_TYPE { youtube }
 
 class Video {
   final VIDEO_TYPE type;
-  final String id;
   final String image;
-  final String thumb;
-  final Link _link;
+  final String id;
+  final String? thumb;
+  final Link? _link;
 
-  Video({this.type, this.id, this.image, this.thumb, String link})
-      : _link = link != null && link != '' ? Link(link) : null,
-        assert(type != null),
-        assert(image != null);
+  Video({required this.id, required this.type, required this.image, this.thumb, String? link})
+      : _link = link != null && link != '' ? Link(link) : null;
 
-  Link get link {
+  Link? get link {
     if (_link != null) {
       return _link;
     }

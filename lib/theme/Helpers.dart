@@ -2,12 +2,12 @@ import 'package:fyx/theme/L.dart';
 import 'package:html/parser.dart';
 import 'package:intl/intl.dart';
 
-enum INTERNAL_URI_PARSER { discussionId, postId }
+enum INTERNAL_URI_PARSER { discussionId, postId, search }
 
 class Helpers {
   static stripHtmlTags(String html) {
     final document = parse(html);
-    return parse(document.body.text).documentElement.text.trim();
+    return parse(document.body?.text).documentElement?.text.trim();
   }
 
   static String absoluteTime(int time) {
@@ -58,20 +58,22 @@ class Helpers {
     return {};
   }
 
-  static Map<INTERNAL_URI_PARSER, int> parseDiscussionUri(String uri) {
-    RegExp test = new RegExp(r"(\?l=topic;id=([0-9]+))|(/discussion/([0-9]+))$");
+  static Map<INTERNAL_URI_PARSER, dynamic> parseDiscussionUri(String uri) {
+    RegExp test = new RegExp(r"(\?l=topic;id=([0-9]+))|(/discussion/([0-9]+)(\?(.*))?)$");
+    final parsed = Uri.parse(uri);
+
     Iterable<RegExpMatch> matches = test.allMatches(uri);
     if (matches.length == 1) {
       int discussionId = int.parse(matches.elementAt(0).group(2) ?? '0');
       if (discussionId == 0) {
         discussionId = int.parse(matches.elementAt(0).group(4) ?? '0');
       }
-      return {INTERNAL_URI_PARSER.discussionId: discussionId};
+      return {INTERNAL_URI_PARSER.discussionId: discussionId, INTERNAL_URI_PARSER.search: parsed.queryParameters['text']};
     }
     return {};
   }
 
-  static String fileExtension(String filePath) {
+  static String? fileExtension(String filePath) {
     final regexp = RegExp(r'\.(?<ext>[a-z]{3,})$', caseSensitive: false);
     final matches = regexp.allMatches(filePath);
 

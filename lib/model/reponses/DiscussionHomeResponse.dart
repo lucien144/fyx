@@ -2,10 +2,10 @@ import 'package:fyx/model/Discussion.dart';
 import 'package:fyx/model/ResponseContext.dart';
 
 class DiscussionHomeResponse {
-  Discussion _discussion;
-  ResponseContext _context;
-  List<String> _home;
-  List<String> _header;
+  late Discussion _discussion;
+  late ResponseContext _context;
+  List<String> _home = [];
+  List<String> _header = [];
 
   DiscussionHomeResponse.fromJson(Map<String, dynamic> json) {
     this._home = List<String>.from(json['home'] ?? []);

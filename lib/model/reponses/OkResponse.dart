@@ -1,5 +1,5 @@
 class OkResponse {
-  bool _isOk;
+  bool _isOk = false;
 
   OkResponse();
 

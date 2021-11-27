@@ -1,36 +1,36 @@
 class FileAttachment {
-  int _id;
-  String _fileType;
-  int _idSpecific;
-  int _idSpecific2;
-  String _filename;
-  int _size;
-  String _uploadedAt;
-  String _mimetype;
-  int _imageWidth;
-  int _imageHeight;
-  String _imageAvgColorHex;
-  bool _imageEmbed;
-  String _imageEmbedOption;
-  String _url;
-  String _thumbUrl;
+  late int _id;
+  late String _fileType;
+  late int _idSpecific;
+  late int _idSpecific2;
+  late String _filename;
+  late int _size;
+  late String _uploadedAt;
+  late String _mimetype;
+  late int _imageWidth;
+  late int _imageHeight;
+  late String _imageAvgColorHex;
+  late bool _imageEmbed;
+  late String _imageEmbedOption;
+  late String _url;
+  late String _thumbUrl;
 
   FileAttachment(
-      {int id,
-      String fileType,
-      int idSpecific,
-      int idSpecific2,
-      String filename,
-      int size,
-      String uploadedAt,
-      String mimetype,
-      int imageWidth,
-      int imageHeight,
-      String imageAvgColorHex,
-      bool imageEmbed,
-      String imageEmbedOption,
-      String url,
-      String thumbUrl}) {
+      {int id = 0,
+      String fileType = '',
+      int idSpecific = 0,
+      int idSpecific2 = 0,
+      String filename = '',
+      int size = 0,
+      String uploadedAt = '',
+      String mimetype = '',
+      int imageWidth = 0,
+      int imageHeight = 0,
+      String imageAvgColorHex = '',
+      bool imageEmbed = false,
+      String imageEmbedOption = '',
+      String url = '',
+      String thumbUrl = ''}) {
     this._id = id;
     this._fileType = fileType;
     this._idSpecific = idSpecific;
@@ -54,7 +54,7 @@ class FileAttachment {
 
   int get idSpecific => _idSpecific;
 
-  Null get idSpecific2 => _idSpecific2;
+  int get idSpecific2 => _idSpecific2;
 
   String get filename => _filename;
 

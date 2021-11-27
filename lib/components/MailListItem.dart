@@ -15,9 +15,9 @@ import 'package:fyx/theme/T.dart';
 class MailListItem extends StatefulWidget {
   final Mail mail;
   final bool isPreview;
-  final Function onUpdate;
+  final Function? onUpdate;
 
-  const MailListItem(this.mail, {this.isPreview, this.onUpdate});
+  const MailListItem(this.mail, {this.isPreview = false, this.onUpdate});
 
   @override
   _MailListItemState createState() => _MailListItemState();
@@ -31,9 +31,11 @@ class _MailListItemState extends State<MailListItem> {
       isPreview: widget.isPreview == true,
       content: widget.mail.content,
       topLeftWidget: PostAvatar(
-        widget.mail.direction == MailDirection.from ? widget.mail.participant : MainRepository().credentials.nickname,
-        description: '→ ${widget.mail.direction == MailDirection.to ? widget.mail.participant : MainRepository().credentials.nickname}, ~${Helpers.relativeTime(widget.mail.time)}'
-      ),
+          widget.mail.direction == MailDirection.from
+              ? widget.mail.participant
+              : MainRepository().credentials!.nickname,
+          description:
+              '→ ${widget.mail.direction == MailDirection.to ? widget.mail.participant : MainRepository().credentials!.nickname}, ~${Helpers.relativeTime(widget.mail.time)}'),
       topRightWidget: Row(
         children: <Widget>[
           Visibility(
@@ -51,8 +53,12 @@ class _MailListItemState extends State<MailListItem> {
                       parentContext: context,
                       user: widget.mail.participant,
                       postId: widget.mail.id,
-                      shareData: ShareData(subject: '@${widget.mail.participant}', body: widget.mail.content, link: widget.mail.link),
-                      flagPostCallback: (mailId) => MainRepository().settings.blockMail(mailId),
+                      shareData: ShareData(
+                          subject: '@${widget.mail.participant}',
+                          body: widget.mail.content,
+                          link: widget.mail.link),
+                      flagPostCallback: (mailId) =>
+                          MainRepository().settings.blockMail(mailId),
                     )),
           ),
         ],
@@ -63,21 +69,34 @@ class _MailListItemState extends State<MailListItem> {
               GestureDetector(
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[T.ICO_REPLY, Text('Odpovědět', style: TextStyle(color: Colors.black38, fontSize: 14))],
+                  children: <Widget>[
+                    T.ICO_REPLY,
+                    Text('Odpovědět',
+                        style: TextStyle(color: Colors.black38, fontSize: 14))
+                  ],
                 ),
-                onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
-                    arguments: NewMessageSettings(
-                        onSubmit: (String inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
-                          var response = await ApiController().sendMail(inputField, message, attachments: attachments);
-                          return response.isOk;
-                        },
-                        onClose: this.widget.onUpdate,
-                        inputFieldPlaceholder: widget.mail.participant,
-                        hasInputField: true,
-                        replyWidget: MailListItem(
-                          widget.mail,
-                          isPreview: true,
-                        ))),
+                onTap: () => Navigator.of(context, rootNavigator: true)
+                    .pushNamed('/new-message',
+                        arguments: NewMessageSettings(
+                            onSubmit: (String? inputField,
+                                String message,
+                                List<Map<ATTACHMENT, dynamic>>
+                                    attachments) async {
+                              if (inputField == null) {
+                                return false;
+                              }
+                              var response = await ApiController().sendMail(
+                                  inputField, message,
+                                  attachments: attachments);
+                              return response.isOk;
+                            },
+                            onClose: this.widget.onUpdate!,
+                            inputFieldPlaceholder: widget.mail.participant,
+                            hasInputField: true,
+                            replyWidget: MailListItem(
+                              widget.mail,
+                              isPreview: true,
+                            ))),
               )
             ]),
     );

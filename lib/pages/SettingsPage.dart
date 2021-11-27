@@ -19,10 +19,10 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  bool _compactMode;
-  bool _underTheHood;
-  bool _autocorrect;
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  bool _compactMode = false;
+  bool _underTheHood = false;
+  bool _autocorrect = false;
+  DefaultView _defaultView = DefaultView.latest;
 
   @override
   void initState() {
@@ -30,6 +30,7 @@ class _SettingsPageState extends State<SettingsPage> {
     _compactMode = MainRepository().settings.useCompactMode;
     _underTheHood = false;
     _autocorrect = MainRepository().settings.useAutocorrect;
+    _defaultView = MainRepository().settings.defaultView;
     AnalyticsProvider().setScreen('Settings', 'SettingsPage');
   }
 
@@ -90,16 +91,17 @@ class _SettingsPageState extends State<SettingsPage> {
               CSSelectionItem<DefaultView>(text: 'Sledované (nepřečtené)', value: DefaultView.bookmarksUnread),
             ],
             onSelected: (index) {
+              setState(() => _defaultView = index);
               MainRepository().settings.defaultView = index;
             },
-            currentSelection: MainRepository().settings.defaultView,
+            currentSelection: _defaultView,
           ),
           CSHeader('Paměť'),
           CSControl(
             nameWidget: Text('Blokovaných uživatelů'),
             contentWidget: ValueListenableBuilder(
                 valueListenable: MainRepository().settings.box.listenable(keys: ['blockedUsers']),
-                builder: (BuildContext context, value, Widget child) {
+                builder: (BuildContext context, value, Widget? child) {
                   return Text(MainRepository().settings.blockedUsers.length.toString());
                 }),
           ),
@@ -107,7 +109,7 @@ class _SettingsPageState extends State<SettingsPage> {
             nameWidget: Text('Skrytých příspěvků'),
             contentWidget: ValueListenableBuilder(
                 valueListenable: MainRepository().settings.box.listenable(keys: ['blockedPosts']),
-                builder: (BuildContext context, value, Widget child) {
+                builder: (BuildContext context, value, Widget? child) {
                   return Text(MainRepository().settings.blockedPosts.length.toString());
                 }),
           ),
@@ -115,7 +117,7 @@ class _SettingsPageState extends State<SettingsPage> {
             nameWidget: Text('Skrytých mailů'),
             contentWidget: ValueListenableBuilder(
                 valueListenable: MainRepository().settings.box.listenable(keys: ['blockedMails']),
-                builder: (BuildContext context, value, Widget child) {
+                builder: (BuildContext context, value, Widget? child) {
                   return Text(MainRepository().settings.blockedMails.length.toString());
                 }),
           ),
@@ -138,7 +140,7 @@ class _SettingsPageState extends State<SettingsPage> {
             CSButtonType.DEFAULT,
             L.SETTINGS_BUGREPORT,
             () {
-              T.prefillGithubIssue(appContext: MainRepository(), user: MainRepository().credentials.nickname);
+              T.prefillGithubIssue(appContext: MainRepository(), user: MainRepository().credentials!.nickname);
               AnalyticsProvider().logEvent('reportBug');
             },
             style: bugreportStyle,
@@ -172,14 +174,14 @@ class _SettingsPageState extends State<SettingsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 GestureDetector(
-                    child: CSDescription('API token: ${MainRepository().credentials.token}'),
-                    onTap: () => Clipboard.setData(ClipboardData(text: MainRepository().credentials.token))),
-                FutureBuilder<String>(
-                    future: _firebaseMessaging.getToken(),
-                    builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-                      if (snapshot.hasData) {
+                    child: CSDescription('API token: ${MainRepository().credentials!.token}'),
+                    onTap: () => Clipboard.setData(ClipboardData(text: MainRepository().credentials!.token))),
+                FutureBuilder<String?>(
+                    future: FirebaseMessaging.instance.getToken(),
+                    builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
+                      if (snapshot.hasData && snapshot.data != null) {
                         return GestureDetector(
-                            child: CSDescription('FCM token: ${snapshot.data.substring(0, 30)}...'), onTap: () => Clipboard.setData(ClipboardData(text: snapshot.data)));
+                            child: CSDescription('FCM token: ${snapshot.data!.substring(0, 30)}...'), onTap: () => Clipboard.setData(ClipboardData(text: snapshot.data)));
                       }
                       if (snapshot.hasError) {
                         return CSDescription('FCM token: error :(');

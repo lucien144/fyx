@@ -1,9 +1,9 @@
 // ignore_for_file: non_constant_identifier_names
 
 class Category {
-  int _id_cat;
-  String _jmeno;
-  int _sort_code;
+  late int _id_cat;
+  late String _jmeno;
+  late int _sort_code;
 
   Category.fromJson(Map<String, dynamic> json) {
     this._id_cat = int.parse(json['id_cat']);

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
@@ -11,29 +12,29 @@ import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart';
-import 'package:image/image.dart' as img;
 
 enum ISOLATE_ARG { images, width, quality }
 
-typedef F = Future<bool> Function(
-    String inputField, String message, List<Map<ATTACHMENT, dynamic>> attachment);
+typedef F = Future<bool> Function(String? inputField, String message,
+    List<Map<ATTACHMENT, dynamic>> attachment);
 
 class NewMessageSettings {
   String inputFieldPlaceholder;
   bool hasInputField;
-  Widget replyWidget;
-  Function onClose;
+  Widget? replyWidget;
+  Function? onClose;
   F onSubmit;
 
   NewMessageSettings(
       {this.replyWidget,
       this.onClose,
-      this.onSubmit,
-      this.hasInputField,
-      this.inputFieldPlaceholder});
+      required this.onSubmit,
+      this.hasInputField = false,
+      this.inputFieldPlaceholder = ''});
 }
 
 class NewMessagePage extends StatefulWidget {
@@ -45,7 +46,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
   TextEditingController _recipientController = TextEditingController();
   TextEditingController _messageController = TextEditingController();
   List<Map<ATTACHMENT, dynamic>> _images = [];
-  NewMessageSettings _settings;
+  NewMessageSettings? _settings;
   final List<int> widths = [640, 768, 1024, 1280];
   int _widthIndex = 2;
   final List<int> qualities = [60, 70, 80, 90, 100];
@@ -69,7 +70,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
     if (file != null) {
       String ext = 'jpg';
       try {
-        ext = Helpers.fileExtension(file.path);
+        ext = Helpers.fileExtension(file.path) ?? '';
       } catch (error) {}
 
       final list = await file.readAsBytes();
@@ -79,7 +80,8 @@ class _NewMessagePageState extends State<NewMessagePage> {
             ATTACHMENT.filename: '${basename(file.path)}.$ext',
             ATTACHMENT.mime: mime,
             ATTACHMENT.extension: ext,
-            ATTACHMENT.mediatype: MediaType(mime.split('/')[0], mime.split('/')[1]),
+            ATTACHMENT.mediatype:
+                MediaType(mime!.split('/')[0], mime.split('/')[1]),
           }));
     }
     setState(() => _loadingImage = false);
@@ -125,7 +127,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
       return true;
     }
 
-    return ((_settings.hasInputField == true ? _recipient.length : 1) *
+    return ((_settings!.hasInputField == true ? _recipient.length : 1) *
             (_message.length + _images.length)) ==
         0;
   }
@@ -134,7 +136,10 @@ class _NewMessagePageState extends State<NewMessagePage> {
   static FutureOr<List<Map<ATTACHMENT, dynamic>>> handleImages(
       List<Map<ATTACHMENT, dynamic>> images) {
     return images.map<Map<ATTACHMENT, dynamic>>((image) {
-      var baked = img.bakeOrientation(img.decodeImage(image[ATTACHMENT.bytes]));
+      var decode = img.decodeImage(image[ATTACHMENT.bytes]);
+      var baked = decode == null
+          ? image[ATTACHMENT.bytes]
+          : img.bakeOrientation(decode);
       return {
         ATTACHMENT.bytes: img.encodeJpg(baked),
         ATTACHMENT.filename: image[ATTACHMENT.filename],
@@ -149,9 +154,8 @@ class _NewMessagePageState extends State<NewMessagePage> {
   Widget build(BuildContext context) {
     if (_settings == null) {
       _settings =
-          ModalRoute.of(context).settings.arguments as NewMessageSettings;
-      _recipientController.text =
-          _settings.inputFieldPlaceholder?.toUpperCase();
+          ModalRoute.of(context)!.settings.arguments as NewMessageSettings;
+      _recipientController.text = _settings!.inputFieldPlaceholder.toUpperCase();
     }
 
     return Container(
@@ -183,15 +187,15 @@ class _NewMessagePageState extends State<NewMessagePage> {
                                   _images =
                                       await compute(handleImages, _images);
                                 }
-                                var response = await _settings.onSubmit(
-                                    _settings.hasInputField == true
+                                var response = await _settings!.onSubmit(
+                                    _settings!.hasInputField == true
                                         ? _recipientController.text
                                         : null,
                                     _messageController.text,
-                                    _images.length > 0 ? _images : null);
+                                    _images.length > 0 ? _images : []);
                                 if (response) {
-                                  if (_settings.onClose is Function) {
-                                    _settings.onClose();
+                                  if (_settings!.onClose != null) {
+                                    _settings!.onClose!();
                                   }
                                   Navigator.of(context).pop();
                                 }
@@ -201,7 +205,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                     ],
                   ),
                   Visibility(
-                      visible: _settings.hasInputField == true,
+                      visible: _settings!.hasInputField == true,
                       child: CupertinoTextField(
                         controller: _recipientController,
                         inputFormatters: [
@@ -210,8 +214,8 @@ class _NewMessagePageState extends State<NewMessagePage> {
                         ],
                         textCapitalization: TextCapitalization.characters,
                         placeholder: 'Adresát',
-                        autofocus: _settings.hasInputField == true &&
-                            _settings.inputFieldPlaceholder == null,
+                        autofocus: _settings!.hasInputField == true &&
+                            _settings!.inputFieldPlaceholder == null,
                         autocorrect: MainRepository().settings.useAutocorrect,
                         focusNode: _recipientFocusNode,
                       )),
@@ -221,8 +225,8 @@ class _NewMessagePageState extends State<NewMessagePage> {
                   CupertinoTextField(
                     controller: _messageController,
                     maxLines: 10,
-                    autofocus: _settings.hasInputField != true ||
-                        _settings.inputFieldPlaceholder != null,
+                    autofocus: _settings!.hasInputField != true ||
+                        _settings!.inputFieldPlaceholder != null,
                     textCapitalization: TextCapitalization.sentences,
                     autocorrect: MainRepository().settings.useAutocorrect,
                     focusNode: _messageFocusNode,
@@ -269,7 +273,11 @@ class _NewMessagePageState extends State<NewMessagePage> {
                           CupertinoActivityIndicator()
                         else
                           Row(
-                            children: _images.map((Map<ATTACHMENT, dynamic> image) => _buildPreviewWidget(image[ATTACHMENT.bytes])).toList(),
+                            children: _images
+                                .map((Map<ATTACHMENT, dynamic> image) =>
+                                    _buildPreviewWidget(
+                                        image[ATTACHMENT.bytes]))
+                                .toList(),
                           ),
                         Expanded(child: Container()),
                         CupertinoButton(
@@ -391,7 +399,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                 ],
               ),
               SizedBox(height: 16),
-              _settings.replyWidget
+              if (_settings!.replyWidget != null) _settings!.replyWidget!
             ].where((Object o) => o != null).toList(),
           ),
         ),
@@ -403,16 +411,16 @@ class _NewMessagePageState extends State<NewMessagePage> {
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: GestureDetector(
-        onTap: () => setState(() => _images.removeWhere((image) => image[ATTACHMENT.bytes] == bytes)),
+        onTap: () => setState(() =>
+            _images.removeWhere((image) => image[ATTACHMENT.bytes] == bytes)),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: Image(
-            image: MemoryImage(bytes),
+            image: MemoryImage(Uint8List.fromList(bytes)),
             width: 35,
             height: 35,
             fit: BoxFit.cover,
-            frameBuilder: (BuildContext context, Widget child, int frame,
-                bool wasSynchronouslyLoaded) {
+            frameBuilder: (BuildContext context, Widget child, int? frame, bool wasSynchronouslyLoaded) {
               if (frame == null) {
                 return CupertinoActivityIndicator();
               }

@@ -1,13 +1,13 @@
 class AccessRights {
-  int _discussionId;
-  bool _arRead;
-  bool _arWrite;
-  bool _arDelete;
-  bool _arEdit;
-  bool _arRights;
-  int _daysLeft;
+  int? _discussionId;
+  bool? _arRead;
+  bool? _arWrite;
+  bool? _arDelete;
+  bool? _arEdit;
+  bool? _arRights;
+  int? _daysLeft;
 
-  AccessRights({int discussionId, bool arRead, bool arWrite, bool arDelete, bool arEdit, bool arRights, int daysLeft}) {
+  AccessRights({discussionId, arRead, arWrite, arDelete, arEdit, arRights, daysLeft}) {
     this._discussionId = discussionId;
     this._arRead = arRead;
     this._arWrite = arWrite;
@@ -17,19 +17,19 @@ class AccessRights {
     this._daysLeft = daysLeft;
   }
 
-  int get discussionId => _discussionId;
+  get discussionId => _discussionId;
 
-  bool get canRead => _arRead;
+  get canRead => _arRead;
 
-  bool get canWrite => _arWrite;
+  get canWrite => _arWrite;
 
-  bool get canDelete => _arDelete;
+  get canDelete => _arDelete;
 
-  bool get canEdit => _arEdit;
+  get canEdit => _arEdit;
 
-  bool get canRights => _arRights;
+  get canRights => _arRights;
 
-  int get daysLeft => _daysLeft;
+  get daysLeft => _daysLeft;
 
   AccessRights.fromJson(Map<String, dynamic> json) {
     _discussionId = json['discussion_id'];

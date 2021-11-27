@@ -1,9 +1,9 @@
 // ignore_for_file: non_constant_identifier_names
 
 class Active {
-  int _time;
-  String _location;
-  String _location_url;
+  late int _time;
+  late String _location;
+  late String _location_url;
 
   Active.fromJson(Map<String, dynamic> json) {
     _time = DateTime.parse(json['last_activity'] ?? '0').millisecondsSinceEpoch;

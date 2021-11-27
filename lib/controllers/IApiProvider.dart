@@ -8,20 +8,20 @@ typedef TOnContextData = void Function(Map<String, dynamic>);
 enum ATTACHMENT { bytes, filename, mime, extension, mediatype }
 
 abstract class IApiProvider {
-  TOnError onError;
-  TOnAuthError onAuthError;
-  TOnContextData onContextData;
+  TOnError? onError;
+  TOnAuthError? onAuthError;
+  TOnContextData? onContextData;
 
-  Credentials getCredentials();
-  Credentials setCredentials(Credentials val);
+  Credentials? getCredentials();
+  Credentials? setCredentials(Credentials? val);
   Future<Response> login(String username);
   Future<Response> logout();
   Future<Response> registerFcmToken(String token);
   Future<Response> fetchBookmarks();
   Future<Response> fetchHistory();
-  Future<Response> fetchDiscussion(int id, {int lastId, String user});
+  Future<Response> fetchDiscussion(int id, {int? lastId, String? user, String? search});
   Future<Response> fetchDiscussionHome(int id);
-  Future<Response> fetchMail({int lastId});
+  Future<Response> fetchMail({int? lastId});
   Future<Response> fetchNotices();
   Future<Response> deleteFile(int id);
   Future<Response> fetchMailWaitingFiles();

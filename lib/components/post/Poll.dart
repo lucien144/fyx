@@ -19,7 +19,8 @@ class Poll extends StatefulWidget {
 class _PollState extends State<Poll> {
   List<int> _votes = [];
   bool _loading = false;
-  ContentPoll _poll;
+  ContentPoll? _poll;
+  ScrollController controller = ScrollController();
 
 
   @override
@@ -29,20 +30,21 @@ class _PollState extends State<Poll> {
   }
 
   Widget buildAnswers(BuildContext context) {
-    var totalRespondents = _poll.pollComputedValues.totalRespondents;
+    var totalRespondents = _poll!.pollComputedValues != null ? _poll!.pollComputedValues!.totalRespondents : 0;
 
     return ListView.builder(
       physics: NeverScrollableScrollPhysics(),
+        controller: controller,
         itemBuilder: (context, index) {
-          final answer = _poll.answers[index];
+          final answer = _poll!.answers[index];
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 4.0),
             child: GestureDetector(
-              onTap: !_poll.canVote ? null : () => setState(() {
+              onTap: !_poll!.canVote ? null : () => setState(() {
                 if (_votes.contains(index)) {
                   _votes.remove(index);
                 } else {
-                  if (_votes.length >= _poll.allowedVotes) {
+                  if (_votes.length >= _poll!.allowedVotes) {
                     _votes.removeLast();
                     _votes.add(index);
                   } else {
@@ -53,7 +55,7 @@ class _PollState extends State<Poll> {
               child: Container(
                 padding: const EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
-                    color: _votes.contains(index) ? Color(0xff76b9b9) : Color(0xffa9ccd3), border: _poll.canVote ? Border.all(color: T.COLOR_PRIMARY) : null),
+                    color: _votes.contains(index) ? Color(0xff76b9b9) : Color(0xffa9ccd3), border: _poll!.canVote ? Border.all(color: T.COLOR_PRIMARY) : null),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   PostHtml(ContentRegular(answer.answer)),
                   if (answer.result != null)
@@ -79,7 +81,7 @@ class _PollState extends State<Poll> {
             ),
           );
         },
-        itemCount: _poll.answers.length,
+        itemCount: _poll!.answers.length,
         shrinkWrap: true,
         padding: const EdgeInsets.all(0));
   }
@@ -89,16 +91,16 @@ class _PollState extends State<Poll> {
     return Container(
         alignment: Alignment.centerLeft,
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          Text(_poll.question, style: DefaultTextStyle.of(context).style.copyWith(fontSize: 20, fontWeight: FontWeight.bold)),
-          if (_poll.instructions != null)
+          Text(_poll!.question, style: DefaultTextStyle.of(context).style.copyWith(fontSize: 20, fontWeight: FontWeight.bold)),
+          if (_poll!.instructions != null)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: PostHtml(ContentRegular(_poll.instructions)),
+              child: PostHtml(ContentRegular(_poll!.instructions)),
             ),
-          Text('Hlasů: ${_poll.pollComputedValues.totalVotes}\nHlasujících: ${_poll.pollComputedValues.totalRespondents}'),
+          if (_poll!.pollComputedValues != null) Text('Hlasů: ${_poll!.pollComputedValues!.totalVotes}\nHlasujících: ${_poll!.pollComputedValues!.totalRespondents}'),
           SizedBox(height: 8,),
           buildAnswers(context),
-          if (_poll.canVote)
+          if (_poll!.canVote)
             Padding(
               padding: const EdgeInsets.only(top: 16.0),
               child: CupertinoButton(
@@ -106,7 +108,7 @@ class _PollState extends State<Poll> {
                   setState(() => _loading = true);
                   try {
                     var votes = _votes.map((index) => index + 1).toList(); // Votes starting from 1 and not from 0.
-                    var poll = await ApiController().votePoll(_poll.discussionId, _poll.postId, votes);
+                    var poll = await ApiController().votePoll(_poll!.discussionId, _poll!.postId, votes);
                     setState(() => _poll = poll);
                   } catch (error) {
                     T.error(error.toString());
@@ -114,7 +116,7 @@ class _PollState extends State<Poll> {
                     setState(() => _loading = false);
                   }
                 },
-                child: _loading ? CupertinoActivityIndicator() : Text('Hlasovat ${_votes.length}/${_poll.allowedVotes}'),
+                child: _loading ? CupertinoActivityIndicator() : Text('Hlasovat ${_votes.length}/${_poll!.allowedVotes}'),
                 color: T.COLOR_PRIMARY,
                 padding: EdgeInsets.all(0),
                 disabledColor: Colors.black26,

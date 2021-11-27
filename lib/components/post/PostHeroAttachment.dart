@@ -13,14 +13,14 @@ class GalleryArguments {
   final String imageUrl;
   final List<model.Image> images;
 
-  GalleryArguments(this.imageUrl, {this.images});
+  GalleryArguments(this.imageUrl, {this.images = const []});
 }
 
 class PostHeroAttachment extends StatelessWidget {
   final dynamic attachment;
   final List<model.Image> _images;
   final bool _crop;
-  final Function _onTap;
+  final Function? _onTap;
   final bool _openGallery;
   Size size;
   bool showStrip;
@@ -36,8 +36,8 @@ class PostHeroAttachment extends StatelessWidget {
     if (attachment is model.Image) {
       return GestureDetector(
         onTap: () {
-          if (_onTap is Function) {
-            _onTap();
+          if (_onTap != null) {
+            _onTap!();
           }
           if (_openGallery) {
             Navigator.of(context, rootNavigator: true).pushNamed('/gallery', arguments: GalleryArguments((attachment as model.Image).image, images: _images));
@@ -69,13 +69,14 @@ class PostHeroAttachment extends StatelessWidget {
     }
 
     if (attachment is Video) {
+      var link = (attachment as Video).link;
       return PostHeroAttachmentBox(
-        title: (attachment as Video).link.title,
+        title: link == null ? '' : link.title,
         showStrip: this.showStrip,
         icon: Icons.play_circle_filled,
         image: (attachment as Video).thumb,
         size: size,
-        onTap: () => T.openLink((attachment as Video).link.url),
+        onTap: link == null ? null : () => T.openLink(link.url),
       );
     }
 

@@ -4,14 +4,14 @@ import 'package:fyx/theme/T.dart';
 class Spoiler extends StatefulWidget {
   final String text;
 
-  Spoiler(this.text, {Key key}) : super(key: key);
+  Spoiler(this.text, {Key? key}) : super(key: key);
 
   @override
   _SpoilerState createState() => _SpoilerState();
 }
 
 class _SpoilerState extends State<Spoiler> {
-  String _text;
+  late final String _text;
   bool _toggle = false;
 
   @override
