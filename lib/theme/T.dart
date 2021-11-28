@@ -127,7 +127,6 @@ class T {
   static Widget feedbackScreen({bool isLoading = false, bool isWarning = false, String label = '', String title = '', VoidCallback? onPress, IconData icon = Icons.warning}) {
     return Container(
       width: double.infinity,
-      color: Colors.white,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
