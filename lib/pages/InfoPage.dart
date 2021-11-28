@@ -38,10 +38,9 @@ class _InfoPageState extends State<InfoPage> {
 
     return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
-            backgroundColor: Colors.white,
-            middle: Text(settings.title),
+            middle: Text(settings.title, style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color)),
             leading: CupertinoNavigationBarBackButton(
-              color: T.COLOR_PRIMARY,
+              color: CupertinoTheme.of(context).primaryColor,
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -50,7 +49,7 @@ class _InfoPageState extends State<InfoPage> {
             future: _response,
             builder: (BuildContext context, AsyncSnapshot<Response> snapshot) {
               if (snapshot.hasData) {
-                return Markdown(data: snapshot.data!.body, onTapLink: (String text, String? url, String title) => url != null ? T.openLink(url) : null);
+                return Markdown(data: snapshot.data!.body, styleSheet: MarkdownStyleSheet.fromCupertinoTheme(CupertinoTheme.of(context)), onTapLink: (String text, String? url, String title) => url != null ? T.openLink(url) : null);
               }
               if (snapshot.hasError) {
                 return T.feedbackScreen(
