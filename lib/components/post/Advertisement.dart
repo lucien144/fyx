@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/post/PostAvatar.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
@@ -28,7 +29,7 @@ class Advertisement extends StatelessWidget {
             style: DefaultTextStyle
                 .of(context)
                 .style
-                .copyWith(fontSize: 16, fontWeight: FontWeight.bold, color: T.COLOR_PRIMARY)),
+                .copyWith(fontSize: 16, fontWeight: FontWeight.bold, color: CupertinoTheme.of(context).primaryColor)),
         decoration: BoxDecoration(color: Color(0xffa9ccd3), borderRadius: BorderRadius.circular(6)));
   }
 
@@ -44,8 +45,8 @@ class Advertisement extends StatelessWidget {
       return RichText(
         text: TextSpan(children: [
           TextSpan(text: 'Reference: ', style: TextStyle(color: Colors.black38, fontSize: 10)),
-          if (content.references != null && content.references!.positive > 0) TextSpan(text: '+${content.references!.positive}', style: TextStyle(color: T.COLOR_PRIMARY, fontSize: 10)),
-          if (content.references != null && content.references!.positive > 0 && content.references!.negative < 0) TextSpan(text: ' / ', style: TextStyle(color: Colors.black38, fontSize: 10)),
+          if (content.references != null && content.references!.positive > 0) TextSpan(text: '+${content.references!.positive}', style: TextStyle(color: CupertinoTheme.of(context).primaryColor, fontSize: 10)),
+          if (content.references != null && content.references!.positive > 0 && content.references!.negative < 0) TextSpan(text: ' / ', style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38), fontSize: 10)),
           if (content.references != null && content.references!.negative < 0) TextSpan(text: '-${content.references!.negative}', style: TextStyle(color: T.COLOR_ACCENT, fontSize: 10))
         ]),
       );
@@ -72,7 +73,7 @@ class Advertisement extends StatelessWidget {
           ),
         ],
       ),
-      //decoration: BoxDecoration(color: T.COLOR_LIGHT, borderRadius: BorderRadius.circular(6), border: Border.all(color: T.COLOR_PRIMARY)),
+      //decoration: BoxDecoration(color: T.COLOR_LIGHT, borderRadius: BorderRadius.circular(6), border: Border.all(color: CupertinoTheme.of(context).primaryColor)),
     );
   }
 
@@ -114,7 +115,7 @@ class Advertisement extends StatelessWidget {
                 style: DefaultTextStyle
                     .of(context)
                     .style
-                    .copyWith(fontSize: 12, color: Colors.white),
+                    .copyWith(fontSize: 12, color: CupertinoTheme.of(context).textTheme.textStyle.color),
               ),
               decoration: BoxDecoration(color: content.type == AdTypeEnum.offer ? T.COLOR_SECONDARY : Color(0xff00B99D), borderRadius: BorderRadius.circular(6)),
             ),
