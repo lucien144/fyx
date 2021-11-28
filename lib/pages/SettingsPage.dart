@@ -8,10 +8,13 @@ import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
+import 'package:fyx/model/enums/ThemeEnum.dart';
+import 'package:fyx/model/provider/ThemeModel.dart';
 import 'package:fyx/pages/InfoPage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -23,6 +26,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _underTheHood = false;
   bool _autocorrect = false;
   DefaultView _defaultView = DefaultView.latest;
+  ThemeEnum _theme = ThemeEnum.light;
 
   @override
   void initState() {
@@ -31,6 +35,7 @@ class _SettingsPageState extends State<SettingsPage> {
     _underTheHood = false;
     _autocorrect = MainRepository().settings.useAutocorrect;
     _defaultView = MainRepository().settings.defaultView;
+    _theme = MainRepository().settings.theme;
     AnalyticsProvider().setScreen('Settings', 'SettingsPage');
   }
 
@@ -96,17 +101,18 @@ class _SettingsPageState extends State<SettingsPage> {
             currentSelection: _defaultView,
           ),
           CSHeader('Barevný režim'),
-          CSSelection<DefaultView>(
-            items: const <CSSelectionItem<DefaultView>>[
-              CSSelectionItem<DefaultView>(text: 'Světlý', value: DefaultView.latest),
-              CSSelectionItem<DefaultView>(text: 'Tmavý', value: DefaultView.history),
-              CSSelectionItem<DefaultView>(text: 'Podle systému', value: DefaultView.history),
+          CSSelection<ThemeEnum>(
+            items: const <CSSelectionItem<ThemeEnum>>[
+              CSSelectionItem<ThemeEnum>(text: 'Světlý', value: ThemeEnum.light),
+              CSSelectionItem<ThemeEnum>(text: 'Tmavý', value: ThemeEnum.dark),
+              CSSelectionItem<ThemeEnum>(text: 'Podle systému', value: ThemeEnum.system),
             ],
-            onSelected: (index) {
-              setState(() => _defaultView = index);
-              MainRepository().settings.defaultView = index;
+            onSelected: (theme) {
+              setState(() => _theme = theme);
+              MainRepository().settings.theme = theme;
+              Provider.of<ThemeModel>(context, listen: false).setTheme(theme);
             },
-            currentSelection: _defaultView,
+            currentSelection: _theme,
           ),
           CSHeader('Paměť'),
           CSControl(

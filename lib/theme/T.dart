@@ -33,6 +33,7 @@ class T {
 
   static CupertinoThemeData lightTheme() {
     return CupertinoThemeData(
+        barBackgroundColor: Color(0xfff0f4f5),
         primaryColor: T.COLOR_PRIMARY,
         scaffoldBackgroundColor: Colors.white,
         brightness: Brightness.light,

@@ -12,7 +12,9 @@ import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/libs/DeviceInfo.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/enums/ThemeEnum.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
+import 'package:fyx/model/provider/ThemeModel.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/pages/GalleryPage.dart';
 import 'package:fyx/pages/HomePage.dart';
@@ -175,12 +177,13 @@ class _FyxAppState extends State<FyxApp> {
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider<NotificationsModel>(create: (context) => NotificationsModel()),
+          ChangeNotifierProvider<ThemeModel>(create: (context) => ThemeModel(MainRepository().settings.theme)),
         ],
-        child: Directionality(
+        builder: (ctx, widget) => Directionality(
           textDirection: TextDirection.ltr,
           child: CupertinoApp(
             title: 'Fyx',
-            theme: T.darkTheme(),
+            theme: ctx.watch<ThemeModel>().theme == ThemeEnum.light ? T.lightTheme() : T.darkTheme(),
             home: MainRepository().credentials != null && MainRepository().credentials!.isValid ? HomePage() : LoginPage(),
             debugShowCheckedModeBanner: FyxApp.isDev,
             onUnknownRoute: (RouteSettings settings) => CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings),
