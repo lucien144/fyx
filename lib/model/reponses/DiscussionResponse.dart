@@ -11,6 +11,11 @@ class DiscussionResponse {
     this._posts = [];
   }
 
+  // TODO: Return something more relevant.
+  DiscussionResponse.error() {
+    DiscussionResponse.accessDenied();
+  }
+
   DiscussionResponse.fromJson(Map<String, dynamic> json) {
     this._discussion = Discussion.fromJson(json['discussion_common']);
     this._posts = json['posts'] ?? [];
