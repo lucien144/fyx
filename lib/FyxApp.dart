@@ -102,9 +102,8 @@ class FyxApp extends StatefulWidget {
       onTokenRefresh: (fcmToken) => ApiController().refreshFcmToken(fcmToken),
     );
     _notificationsService.configure();
-    _notificationsService.onNewMail = () =>
-        FyxApp.navigatorKey.currentState!.pushReplacementNamed('/home',
-            arguments: HomePageArguments(HomePage.PAGE_MAIL));
+    _notificationsService.onNewMail =
+        () => FyxApp.navigatorKey.currentState!.pushReplacementNamed('/home', arguments: HomePageArguments(HomePage.PAGE_MAIL));
     _notificationsService.onNewPost = ({discussionId, postId}) {
       if (discussionId! > 0 && postId! > 0) {
         FyxApp.navigatorKey.currentState!.pushNamed('/discussion', arguments: DiscussionPageArguments(discussionId, postId: postId + 1));
@@ -127,7 +126,9 @@ class FyxApp extends StatefulWidget {
   _FyxAppState createState() => _FyxAppState();
 }
 
-class _FyxAppState extends State<FyxApp> {
+class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
+  Brightness? _platformBrightness;
+
   Route routes(RouteSettings settings) {
     switch (settings.name) {
       case '/token':
@@ -148,7 +149,11 @@ class _FyxAppState extends State<FyxApp> {
       case '/gallery':
         print('[Router] Gallery');
         return PageRouteBuilder(
-            transitionDuration: const Duration(milliseconds: 0), opaque: false, pageBuilder: (_, __, ___) => GalleryPage(), settings: settings, fullscreenDialog: true);
+            transitionDuration: const Duration(milliseconds: 0),
+            opaque: false,
+            pageBuilder: (_, __, ___) => GalleryPage(),
+            settings: settings,
+            fullscreenDialog: true);
       case '/settings':
         print('[Router] Settings');
         return CupertinoPageRoute(builder: (_) => SettingsPage(), settings: settings);
@@ -162,6 +167,13 @@ class _FyxAppState extends State<FyxApp> {
         print('[Router] Discussion');
         return CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings);
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance?.addObserver(this);
+    _platformBrightness ??= WidgetsBinding.instance?.window.platformBrightness;
   }
 
   @override
@@ -183,7 +195,12 @@ class _FyxAppState extends State<FyxApp> {
           textDirection: TextDirection.ltr,
           child: CupertinoApp(
             title: 'Fyx',
-            theme: ctx.watch<ThemeModel>().theme == ThemeEnum.light ? T.lightTheme() : T.darkTheme(),
+            theme: (() {
+              if (ctx.watch<ThemeModel>().theme == ThemeEnum.system) {
+                return _platformBrightness == Brightness.light ? T.lightTheme() : T.darkTheme();
+              }
+              return ctx.watch<ThemeModel>().theme == ThemeEnum.light ? T.lightTheme() : T.darkTheme();
+            })(),
             home: MainRepository().credentials != null && MainRepository().credentials!.isValid ? HomePage() : LoginPage(),
             debugShowCheckedModeBanner: FyxApp.isDev,
             onUnknownRoute: (RouteSettings settings) => CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings),
@@ -207,5 +224,12 @@ class _FyxAppState extends State<FyxApp> {
   void dispose() {
     super.dispose();
     FyxApp._notificationsService.dispose();
+    WidgetsBinding.instance?.removeObserver(this);
+  }
+
+  @override
+  void didChangePlatformBrightness() {
+    setState(() => _platformBrightness = WidgetsBinding.instance?.window.platformBrightness);
+    super.didChangePlatformBrightness(); // make sure you call this
   }
 }
