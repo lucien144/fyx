@@ -110,7 +110,7 @@ class ApiProvider implements IApiProvider {
   }
 
   Future<Response> fetchHistory() async {
-    return await dio.get('$URL/bookmarks/history/more');
+    return await dio.get('$URL/bookmarks/history', queryParameters: {'more_results': true, 'show_read': true, 'show_booked': true});
   }
 
   Future<Response> fetchDiscussion(int discussionId, {int? lastId, String? user, String? search}) async {
