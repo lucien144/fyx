@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_analytics/observer.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fyx/SkinnedApp.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
@@ -25,9 +25,12 @@ import 'package:fyx/pages/NoticesPage.dart';
 import 'package:fyx/pages/SettingsPage.dart';
 import 'package:fyx/pages/TutorialPage.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/NyxSkin.dart';
+import 'package:fyx/theme/skin/Skin.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry/sentry.dart';
+
 import 'controllers/NotificationsService.dart';
 
 enum Environment { dev, staging, production }
@@ -122,14 +125,7 @@ class FyxApp extends StatefulWidget {
     AnalyticsProvider.provider = analytics;
   }
 
-  @override
-  _FyxAppState createState() => _FyxAppState();
-}
-
-class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
-  Brightness? _platformBrightness;
-
-  Route routes(RouteSettings settings) {
+  static Route routes(RouteSettings settings) {
     switch (settings.name) {
       case '/token':
         print('[Router] Token');
@@ -170,6 +166,13 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
   }
 
   @override
+  _FyxAppState createState() => _FyxAppState();
+}
+
+class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
+  Brightness? _platformBrightness;
+
+  @override
   void initState() {
     super.initState();
     WidgetsBinding.instance?.addObserver(this);
@@ -193,28 +196,16 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
         ],
         builder: (ctx, widget) => Directionality(
           textDirection: TextDirection.ltr,
-          child: CupertinoApp(
-            title: 'Fyx',
-            theme: (() {
-              if (ctx.watch<ThemeModel>().theme == ThemeEnum.system) {
-                return _platformBrightness == Brightness.light ? T.lightTheme() : T.darkTheme();
+          child: Skin(
+            skin: NyxSkin.create(),
+            brightness: (() {
+              if (ctx.watch<ThemeModel>().theme == ThemeEnum.system && _platformBrightness != null) {
+                return _platformBrightness!;
               }
-              return ctx.watch<ThemeModel>().theme == ThemeEnum.light ? T.lightTheme() : T.darkTheme();
+              return ctx.watch<ThemeModel>().theme == ThemeEnum.light ? Brightness.light : Brightness.dark;
             })(),
-            home: MainRepository().credentials != null && MainRepository().credentials!.isValid ? HomePage() : LoginPage(),
-            debugShowCheckedModeBanner: FyxApp.isDev,
-            onUnknownRoute: (RouteSettings settings) => CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings),
-            onGenerateRoute: routes,
-            navigatorKey: FyxApp.navigatorKey,
-            navigatorObservers: [
-              FyxApp.routeObserver,
-              FirebaseAnalyticsObserver(
-                  analytics: FyxApp.analytics,
-                  onError: (error) async => await Sentry.captureException(
-                        error,
-                      ))
-            ],
-          ),
+            child: SkinnedApp()
+          )
         ),
       ),
     );
