@@ -7,8 +7,8 @@ import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:sentry/sentry.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // Theme helpers
 class T {
@@ -31,24 +31,6 @@ class T {
       BoxDecoration(borderRadius: BorderRadius.circular(8), color: Colors.white, border: Border.all(color: COLOR_SECONDARY), boxShadow: [BOX_SHADOW]);
   static final LinearGradient GRADIENT = LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xff1AD592), Color(0xff2F4858)]);
 
-  static CupertinoThemeData lightTheme() {
-    return CupertinoThemeData(
-        barBackgroundColor: Color(0xfff0f4f5),
-        primaryColor: T.COLOR_PRIMARY,
-        scaffoldBackgroundColor: Colors.white,
-        brightness: Brightness.light,
-        textTheme: CupertinoTextThemeData(textStyle: TextStyle(color: Colors.black, fontSize: 16)));
-  }
-
-  static CupertinoThemeData darkTheme() {
-    return CupertinoThemeData(
-        barBackgroundColor: Color(0xff2d333b),
-        primaryContrastingColor: Color(0xFF1c2128),
-        scaffoldBackgroundColor: Color(0xFF1C2128),
-        primaryColor: Color(0xff316775),
-        brightness: Brightness.dark,
-        textTheme: CupertinoTextThemeData(textStyle: TextStyle(color: Color(0xFFadbac7), fontSize: 16)));
-  }
 
   // ************************
   // Theme mixins

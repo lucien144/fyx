@@ -6,6 +6,8 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/post/content/Poll.dart';
 import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/NyxColors.dart';
+import 'package:fyx/theme/skin/Skin.dart';
 
 class Poll extends StatefulWidget {
   final ContentPoll content;
@@ -30,6 +32,7 @@ class _PollState extends State<Poll> {
   }
 
   Widget buildAnswers(BuildContext context) {
+    NyxColors colors = Skin.of(context).theme.colors;
     var totalRespondents = _poll!.pollComputedValues != null ? _poll!.pollComputedValues!.totalRespondents : 0;
 
     return ListView.builder(
@@ -55,7 +58,7 @@ class _PollState extends State<Poll> {
               child: Container(
                 padding: const EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
-                    color: _votes.contains(index) ? Color(0xff76b9b9) : Color(0xffa9ccd3), border: _poll!.canVote ? Border.all(color: T.COLOR_PRIMARY) : null),
+                    color: _votes.contains(index) ? colors.pollAnswerSelected : colors.pollAnswer, border: _poll!.canVote ? Border.all(color: colors.primaryColor) : null),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   PostHtml(ContentRegular(answer.answer)),
                   if (answer.result != null)
@@ -66,7 +69,7 @@ class _PollState extends State<Poll> {
                           child: FractionallySizedBox(
                             widthFactor: totalRespondents > 0 ? (answer.result.respondentsCount / totalRespondents) + 0.005 : .005,
                             child: Container(
-                              color: answer.result.isMyVote ? T.COLOR_ACCENT : T.COLOR_PRIMARY,
+                              color: answer.result.isMyVote ? colors.accentColor : colors.primaryColor,
                               height: 10,
                             ),
                           ),
@@ -88,6 +91,8 @@ class _PollState extends State<Poll> {
 
   @override
   Widget build(BuildContext context) {
+    NyxColors colors = Skin.of(context).theme.colors;
+
     return Container(
         alignment: Alignment.centerLeft,
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -117,13 +122,13 @@ class _PollState extends State<Poll> {
                   }
                 },
                 child: _loading ? CupertinoActivityIndicator() : Text('Hlasovat ${_votes.length}/${_poll!.allowedVotes}'),
-                color: T.COLOR_PRIMARY,
+                color: colors.primaryColor,
                 padding: EdgeInsets.all(0),
-                disabledColor: Colors.black26,
+                disabledColor: colors.disabledColor,
               ),
             )
         ]),
-        color: Color(0xffcde5e9),
+        color: colors.pollBackground,
         padding: EdgeInsets.all(15));
   }
 }
