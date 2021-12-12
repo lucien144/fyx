@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/NyxColors.dart';
+import 'package:fyx/theme/skin/Skin.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:video_player/video_player.dart';
 
@@ -43,6 +45,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
       return false;
     }
 
+    NyxColors colors = Skin.of(context).theme.colors;
     await videoPlayerController!.initialize();
 
     final size = MediaQuery.of(context).size;
@@ -54,10 +57,10 @@ class _VideoPlayerState extends State<VideoPlayer> {
         videoPlayerController: videoPlayerController!,
         aspectRatio: aspectRatio,
         placeholder: Container(
-          color: T.COLOR_PRIMARY,
+          color: colors.primaryColor,
           child: Icon(
             Icons.camera_roll,
-            color: Colors.white.withAlpha(75),
+            color: colors.scaffoldBackgroundColor.withAlpha(75),
             size: 32,
           ),
           alignment: Alignment.center,
@@ -82,8 +85,10 @@ class _VideoPlayerState extends State<VideoPlayer> {
       return T.somethingsWrongButton(widget.element.outerHtml);
     }
 
+    NyxColors colors = Skin.of(context).theme.colors;
     return Card(
       elevation: 0,
+      color: colors.scaffoldBackgroundColor,
       child: FutureBuilder(
           future: initVideo(context),
           builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
@@ -96,15 +101,18 @@ class _VideoPlayerState extends State<VideoPlayer> {
                   ),
                   GestureDetector(
                     onTap: () => T.openLink(widget.videoUrl!),
-                    child: RichText(
-                      overflow: TextOverflow.ellipsis,
-                      text: TextSpan(children: [
-                        TextSpan(text: 'Zdroj: ', style: DefaultTextStyle.of(context).style.merge(TextStyle(fontSize: 12))),
-                        TextSpan(
-                          text: widget.videoUrl!.replaceAll('', '\u{200B}'),
-                          style: TextStyle(fontSize: 12, color: T.COLOR_PRIMARY, decoration: TextDecoration.underline),
-                        )
-                      ]),
+                    child: Padding(
+                      padding: const EdgeInsets.all(4),
+                      child: RichText(
+                        overflow: TextOverflow.ellipsis,
+                        text: TextSpan(children: [
+                          TextSpan(text: 'Zdroj: ', style: DefaultTextStyle.of(context).style.merge(TextStyle(fontSize: 12, color: colors.textColor))),
+                          TextSpan(
+                            text: widget.videoUrl!.replaceAll('', '\u{200B}'),
+                            style: TextStyle(fontSize: 12, color: colors.primaryColor, decoration: TextDecoration.underline),
+                          )
+                        ]),
+                      ),
                     ),
                   ),
                   SizedBox(

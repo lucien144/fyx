@@ -7,6 +7,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/theme/skin/NyxColors.dart';
+import 'package:fyx/theme/skin/Skin.dart';
 import 'package:sentry/sentry.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
@@ -53,6 +55,7 @@ class _GalleryPageState extends State<GalleryPage> {
           ModalRoute.of(context)!.settings.arguments as GalleryArguments;
     }
 
+    NyxColors colors = Skin.of(context).theme.colors;
     return Stack(
       children: [
         Container(
@@ -85,7 +88,7 @@ class _GalleryPageState extends State<GalleryPage> {
           right: 30,
           child: CupertinoButton(
             padding: EdgeInsets.zero,
-            color: T.COLOR_PRIMARY,
+            color: colors.primaryColor,
             child: Icon(
               CupertinoIcons.clear_thick,
               color: Colors.white,
@@ -99,7 +102,7 @@ class _GalleryPageState extends State<GalleryPage> {
             bottom: 30,
             left: (MediaQuery.of(context).size.width - 100) / 2,
             child: CupertinoButton(
-              color: T.COLOR_PRIMARY,
+              color: colors.primaryColor,
               padding: EdgeInsets.zero,
               onPressed: () => close(context),
               child: Text(
@@ -113,7 +116,7 @@ class _GalleryPageState extends State<GalleryPage> {
             right: 30,
             child: CupertinoButton(
               padding: EdgeInsets.zero,
-              color: T.COLOR_PRIMARY,
+              color: colors.primaryColor,
               child: _saving
                   ? CupertinoActivityIndicator()
                   : Icon(

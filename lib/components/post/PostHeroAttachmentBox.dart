@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/NyxColors.dart';
+import 'package:fyx/theme/skin/Skin.dart';
 
 class PostHeroAttachmentBox extends StatelessWidget {
   final String title;
@@ -14,6 +16,8 @@ class PostHeroAttachmentBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    NyxColors colors = Skin.of(context).theme.colors;
+
     return GestureDetector(
       onTap: this.onTap,
       child: Container(
@@ -21,7 +25,7 @@ class PostHeroAttachmentBox extends StatelessWidget {
         height: this.size.height,
         decoration: BoxDecoration(
           image: this.image == null ? null : DecorationImage(image: NetworkImage(this.image!), fit: BoxFit.cover),
-          color: T.COLOR_PRIMARY,
+          color: colors.primaryColor,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Column(

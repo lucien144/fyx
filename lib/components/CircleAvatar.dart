@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/NyxColors.dart';
+import 'package:fyx/theme/skin/Skin.dart';
 
 class CircleAvatar extends StatelessWidget {
   final String url;
@@ -15,12 +17,13 @@ class CircleAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    NyxColors colors = Skin.of(context).theme.colors;
     return Container(
       padding: EdgeInsets.all(1),
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(22), color: _isHighlighted ? T.COLOR_PRIMARY : Colors.black),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(22), color: _isHighlighted ? colors.primaryColor : colors.textColor),
       child: Container(
         padding: EdgeInsets.all(2),
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(22), color: _isHighlighted ? T.COLOR_PRIMARY : Colors.white),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(22), color: _isHighlighted ? colors.primaryColor : colors.scaffoldBackgroundColor),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: CachedNetworkImage(

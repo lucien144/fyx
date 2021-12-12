@@ -11,6 +11,8 @@ import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/NyxColors.dart';
+import 'package:fyx/theme/skin/Skin.dart';
 
 class NoticesPage extends StatefulWidget {
   NoticesPage({Key? key}) : super(key: key);
@@ -48,11 +50,13 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    NyxColors colors = Skin.of(context).theme.colors;
+
     return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
             middle: Text(L.NOTICES, style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color),),
             leading: CupertinoNavigationBarBackButton(
-              color: T.COLOR_PRIMARY,
+              color: colors.primaryColor,
               onPressed: () {
                 Navigator.of(context, rootNavigator: true).pop();
               },
