@@ -97,6 +97,7 @@ class Advertisement extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               if (heading.isNotEmpty) Flexible(child: buildTitleWidget(context)),
