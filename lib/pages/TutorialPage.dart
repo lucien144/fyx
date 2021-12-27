@@ -123,7 +123,7 @@ class _TutorialPageState extends State<TutorialPage> {
       ),
       child: Container(
         padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(gradient: T.GRADIENT),
+        decoration: BoxDecoration(gradient: colors.gradient),
         child: CarouselSlider.builder(
           carouselController: _carouselController,
           options: CarouselOptions(
@@ -172,7 +172,7 @@ class _TutorialPageState extends State<TutorialPage> {
       child: CupertinoButton(
         padding: EdgeInsets.all(0),
         child: body != null ? body : text,
-        color: Colors.white,
+        color: colors.scaffoldBackgroundColor,
         onPressed: () => onTap is Function
             ? onTap()
             : _carouselController.nextPage(
@@ -190,7 +190,7 @@ class _TutorialPageState extends State<TutorialPage> {
         Text(
           title,
           style: TextStyle(
-              fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+              fontSize: 24, fontWeight: FontWeight.bold, color: colors.scaffoldBackgroundColor),
           textAlign: TextAlign.center,
         ),
         SizedBox(height: 16),
@@ -217,7 +217,7 @@ class _TutorialPageState extends State<TutorialPage> {
         Text(
           title,
           style: TextStyle(
-              fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+              fontSize: 24, fontWeight: FontWeight.bold, color: colors.scaffoldBackgroundColor),
           textAlign: TextAlign.center,
         ),
         SizedBox(height: 16),
@@ -270,7 +270,7 @@ class _TutorialPageState extends State<TutorialPage> {
         Text(
           title,
           style: TextStyle(
-              fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+              fontSize: 24, fontWeight: FontWeight.bold, color: colors.scaffoldBackgroundColor),
           textAlign: TextAlign.center,
         ),
         SizedBox(height: 16),

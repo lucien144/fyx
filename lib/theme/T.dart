@@ -23,9 +23,6 @@ class T {
   static const Color COLOR_BLACK = Color(0xFF282828);
   static const Color COLOR_ACCENT = Color(0xffB60F0F);
 
-  // Others
-  static final LinearGradient GRADIENT = LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xff1AD592), Color(0xff2F4858)]);
-
 
   // ************************
   // Theme mixins

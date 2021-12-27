@@ -15,6 +15,7 @@ class NyxColors {
   final Color pollAnswerSelected;
   final Color disabledColor;
   final BoxDecoration shadow;
+  final LinearGradient gradient;
 
   NyxColors({
     this.accentColor = const Color(0xffB60F0F),
@@ -28,9 +29,10 @@ class NyxColors {
     this.pollAnswer = const Color(0xffa9ccd3),
     this.pollAnswerSelected = const Color(0xff76b9b9),
     this.disabledColor = Colors.black26,
-  }) : shadow = BoxDecoration(
+  })  : shadow = BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(8)),
             color: scaffoldBackgroundColor,
             border: Border.fromBorderSide(BorderSide(color: primaryColor, width: 1, style: BorderStyle.solid)),
-            boxShadow: [BoxShadow(color: Color.fromRGBO(0, 0, 0, 0.5), offset: Offset(0, 0), blurRadius: 16)]);
+            boxShadow: [BoxShadow(color: Color.fromRGBO(0, 0, 0, 0.5), offset: Offset(0, 0), blurRadius: 16)]),
+        gradient = LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xff1AD592), primaryColor]);
 }

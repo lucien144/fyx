@@ -21,6 +21,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _loginController = TextEditingController();
   final TextEditingController _tokenController = TextEditingController();
+  late NyxColors colors;
   bool _isRunning = false;
   bool _useTokenToLogin = false;
 
@@ -41,12 +42,14 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    colors = Skin.of(context).theme.colors;
+
     return WillPopScope(
       onWillPop: () async => false,
       child: Container(
         padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(gradient: T.GRADIENT),
-        child: formFactory(context),
+        decoration: BoxDecoration(gradient: colors.gradient),
+        child: formFactory(),
       ),
     );
   }
@@ -58,8 +61,7 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  Widget formFactory(context) {
-    NyxColors colors = Skin.of(context).theme.colors;
+  Widget formFactory() {
     final textfieldDecoration = BoxDecoration(borderRadius: BorderRadius.circular(4), color: Colors.white, border: Border.all(color: colors.secondaryColor));
 
     var offset = (MediaQuery.of(context).viewInsets.bottom / 3);
