@@ -117,7 +117,7 @@ class ContentBoxLayout extends StatelessWidget {
     NyxColors colors = Skin.of(context).theme.colors;
 
     return Container(
-      decoration: _isPreview ? T.CARD_SHADOW_DECORATION : null,
+      decoration: _isPreview ? colors.shadow : null,
       child: Column(
         children: <Widget>[
           Visibility(
@@ -128,7 +128,7 @@ class ContentBoxLayout extends StatelessWidget {
             ),
           ),
           Container(
-            color: _isHighlighted ? T.COLOR_SECONDARY.withOpacity(0.1) : null,
+            color: _isHighlighted ? colors.secondaryColor.withOpacity(0.1) : null,
             foregroundDecoration: _isHighlighted ? UnreadBadgeDecoration(badgeColor: colors.primaryColor, badgeSize: 16) : null,
             child: Column(
               children: <Widget>[

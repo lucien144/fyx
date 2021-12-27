@@ -10,6 +10,8 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/reponses/LoginResponse.dart';
 import 'package:fyx/pages/TutorialPage.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/NyxColors.dart';
+import 'package:fyx/theme/skin/Skin.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -57,6 +59,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget formFactory(context) {
+    NyxColors colors = Skin.of(context).theme.colors;
+    final textfieldDecoration = BoxDecoration(borderRadius: BorderRadius.circular(4), color: Colors.white, border: Border.all(color: colors.secondaryColor));
+
     var offset = (MediaQuery.of(context).viewInsets.bottom / 3);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -66,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
           padding: EdgeInsets.all(16),
           child: Image.asset(
             'assets/logo.png',
-            color: T.COLOR_SECONDARY,
+            color: colors.secondaryColor,
           ),
           decoration:
               BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(32), boxShadow: [BoxShadow(color: Colors.black, offset: Offset(0, 0), blurRadius: 16)]),
@@ -82,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
                 textCapitalization: TextCapitalization.characters,
                 placeholder: 'NICKNAME',
                 controller: _loginController,
-                decoration: T.TEXTFIELD_DECORATION,
+                decoration: textfieldDecoration,
                 autocorrect: false,
               ),
               Visibility(
@@ -92,7 +97,7 @@ class _LoginPageState extends State<LoginPage> {
                   enabled: !_isRunning,
                   placeholder: 'TOKEN',
                   controller: _tokenController,
-                  decoration: T.TEXTFIELD_DECORATION,
+                  decoration: textfieldDecoration,
                   autocorrect: false,
                 ),
               )
@@ -112,6 +117,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildButton(context) {
+    NyxColors colors = Skin.of(context).theme.colors;
+
     return Container(
       width: 200,
       child: CupertinoButton(
@@ -119,7 +126,7 @@ class _LoginPageState extends State<LoginPage> {
             ? CupertinoActivityIndicator()
             : Text(
                 'Přihlásit',
-                style: TextStyle(color: T.COLOR_SECONDARY),
+                style: TextStyle(color: colors.secondaryColor),
               ),
         onPressed: () {
           if (_isRunning) {

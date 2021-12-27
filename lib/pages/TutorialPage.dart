@@ -8,6 +8,8 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/NyxColors.dart';
+import 'package:fyx/theme/skin/Skin.dart';
 
 class TutorialPageArguments {
   final String token;
@@ -23,6 +25,7 @@ class TutorialPage extends StatefulWidget {
 
 class _TutorialPageState extends State<TutorialPage> {
   final CarouselController _carouselController = CarouselController();
+  late NyxColors colors;
   List<Widget> _slides = [];
 
   bool _loggingIn = false;
@@ -62,7 +65,7 @@ class _TutorialPageState extends State<TutorialPage> {
                         ? CupertinoActivityIndicator()
                         : Icon(
                             Icons.lock,
-                            color: T.COLOR_SECONDARY,
+                            color: colors.secondaryColor,
                             size: 16,
                           ), onTap: () {
                     var onError = (error) => setState(() {
@@ -80,7 +83,7 @@ class _TutorialPageState extends State<TutorialPage> {
                 : slideButton(L.TUTORIAL_NYX,
                     icon: Icon(
                       Icons.launch,
-                      color: T.COLOR_SECONDARY,
+                      color: colors.secondaryColor,
                       size: 16,
                     ), onTap: () async {
                     setState(() => _hasOpenedNyx = true);
@@ -94,6 +97,8 @@ class _TutorialPageState extends State<TutorialPage> {
 
   @override
   Widget build(BuildContext context) {
+    colors = Skin.of(context).theme.colors;
+
     if (_arguments == null) {
       _arguments = ModalRoute.of(context)!.settings.arguments as TutorialPageArguments?;
     }
@@ -149,7 +154,7 @@ class _TutorialPageState extends State<TutorialPage> {
     Widget? body;
     Text text = Text(
       label,
-      style: TextStyle(color: T.COLOR_SECONDARY),
+      style: TextStyle(color: colors.secondaryColor),
     );
 
     if (icon != null) {
@@ -200,7 +205,7 @@ class _TutorialPageState extends State<TutorialPage> {
     return Container(
         height: 250,
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
-        decoration: T.CARD_SHADOW_DECORATION,
+        decoration: colors.shadow,
         child: child);
   }
 
@@ -243,7 +248,7 @@ class _TutorialPageState extends State<TutorialPage> {
         slideButton(L.GENERAL_COPY,
             icon: Icon(
               Icons.content_copy,
-              color: T.COLOR_SECONDARY,
+              color: colors.secondaryColor,
               size: 16,
             ), onTap: () {
           var data = ClipboardData(text: _arguments!.token);

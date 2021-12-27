@@ -9,6 +9,8 @@ import 'package:fyx/model/post/Image.dart' as i;
 import 'package:fyx/model/post/content/Advertisement.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/NyxColors.dart';
+import 'package:fyx/theme/skin/Skin.dart';
 
 class Advertisement extends StatelessWidget {
   final ContentAdvertisement content;
@@ -79,6 +81,8 @@ class Advertisement extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    NyxColors colors = Skin.of(context).theme.colors;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -118,7 +122,7 @@ class Advertisement extends StatelessWidget {
                     .style
                     .copyWith(fontSize: 12, color: CupertinoTheme.of(context).textTheme.textStyle.color),
               ),
-              decoration: BoxDecoration(color: content.type == AdTypeEnum.offer ? T.COLOR_SECONDARY : Color(0xff00B99D), borderRadius: BorderRadius.circular(6)),
+              decoration: BoxDecoration(color: content.type == AdTypeEnum.offer ? colors.secondaryColor : Color(0xff00B99D), borderRadius: BorderRadius.circular(6)),
             ),
             if (content.location.isNotEmpty)
               Padding(
