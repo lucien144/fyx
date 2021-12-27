@@ -47,9 +47,7 @@ class _TutorialPageState extends State<TutorialPage> {
             L.TUTORIAL_WELCOME,
             slideButton(L.GENERAL_BEGIN, onTap: () {
               AnalyticsProvider().logTutorialBegin();
-              _carouselController.nextPage(
-                  duration: Duration(milliseconds: 800),
-                  curve: Curves.fastOutSlowIn);
+              _carouselController.nextPage(duration: Duration(milliseconds: 800), curve: Curves.fastOutSlowIn);
             })),
         this.slideToken('1/6'),
         this.slideTutorial('2/6', 1, L.TUTORIAL_TOKEN),
@@ -65,7 +63,7 @@ class _TutorialPageState extends State<TutorialPage> {
                         ? CupertinoActivityIndicator()
                         : Icon(
                             Icons.lock,
-                            color: colors.secondaryColor,
+                            color: colors.primaryColor,
                             size: 16,
                           ), onTap: () {
                     var onError = (error) => setState(() {
@@ -83,12 +81,11 @@ class _TutorialPageState extends State<TutorialPage> {
                 : slideButton(L.TUTORIAL_NYX,
                     icon: Icon(
                       Icons.launch,
-                      color: colors.secondaryColor,
+                      color: colors.primaryColor,
                       size: 16,
                     ), onTap: () async {
                     setState(() => _hasOpenedNyx = true);
-                    String url =
-                        'https://www.nyx.cz/profile/${_arguments!.username}/settings/authorizations';
+                    String url = 'https://www.nyx.cz/profile/${_arguments!.username}/settings/authorizations';
                     T.openLink(url);
                   }))
       ];
@@ -108,17 +105,21 @@ class _TutorialPageState extends State<TutorialPage> {
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        previousPageTitle: L.GENERAL_LOGIN,
+        leading: CupertinoNavigationBarBackButton(
+          previousPageTitle: L.GENERAL_LOGIN,
+          color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
         backgroundColor: Colors.transparent,
-        border: Border.all(
-            color: Colors.transparent, width: 0, style: BorderStyle.none),
+        border: Border.all(color: Colors.transparent, width: 0, style: BorderStyle.none),
         trailing: _isLastSlide
             ? null
             : CupertinoButton(
                 padding: EdgeInsets.all(0),
-                child: Text(L.GENERAL_SKIP),
-                onPressed: () =>
-                    _carouselController.jumpToPage(_slides.length - 1),
+                child: Text(L.GENERAL_SKIP, style: TextStyle(color: colors.scaffoldBackgroundColor)),
+                onPressed: () => _carouselController.jumpToPage(_slides.length - 1),
               ),
       ),
       child: Container(
@@ -154,7 +155,7 @@ class _TutorialPageState extends State<TutorialPage> {
     Widget? body;
     Text text = Text(
       label,
-      style: TextStyle(color: colors.secondaryColor),
+      style: TextStyle(color: colors.primaryColor),
     );
 
     if (icon != null) {
@@ -173,11 +174,8 @@ class _TutorialPageState extends State<TutorialPage> {
         padding: EdgeInsets.all(0),
         child: body != null ? body : text,
         color: colors.scaffoldBackgroundColor,
-        onPressed: () => onTap is Function
-            ? onTap()
-            : _carouselController.nextPage(
-                duration: Duration(milliseconds: 800),
-                curve: Curves.fastOutSlowIn),
+        onPressed: () =>
+            onTap is Function ? onTap() : _carouselController.nextPage(duration: Duration(milliseconds: 800), curve: Curves.fastOutSlowIn),
       ),
     );
   }
@@ -189,24 +187,19 @@ class _TutorialPageState extends State<TutorialPage> {
       children: <Widget>[
         Text(
           title,
-          style: TextStyle(
-              fontSize: 24, fontWeight: FontWeight.bold, color: colors.scaffoldBackgroundColor),
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: colors.scaffoldBackgroundColor),
           textAlign: TextAlign.center,
         ),
         SizedBox(height: 16),
         this.slideCard(Text(copy, textAlign: TextAlign.center)),
         SizedBox(height: 16),
-        footer != null ? footer : slideButton(L.GENERAL_BEGIN)
+        footer
       ],
     );
   }
 
   Widget slideCard(Widget child) {
-    return Container(
-        height: 250,
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
-        decoration: colors.shadow,
-        child: child);
+    return Container(height: 250, padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16), decoration: colors.shadow, child: child);
   }
 
   Widget slideToken(String title) {
@@ -216,8 +209,7 @@ class _TutorialPageState extends State<TutorialPage> {
       children: <Widget>[
         Text(
           title,
-          style: TextStyle(
-              fontSize: 24, fontWeight: FontWeight.bold, color: colors.scaffoldBackgroundColor),
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: colors.scaffoldBackgroundColor),
           textAlign: TextAlign.center,
         ),
         SizedBox(height: 16),
@@ -235,8 +227,7 @@ class _TutorialPageState extends State<TutorialPage> {
                     SelectableText(
                       _arguments!.token,
                       textAlign: TextAlign.center,
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
                     ),
                   ],
                 ),
@@ -248,14 +239,12 @@ class _TutorialPageState extends State<TutorialPage> {
         slideButton(L.GENERAL_COPY,
             icon: Icon(
               Icons.content_copy,
-              color: colors.secondaryColor,
+              color: colors.primaryColor,
               size: 16,
             ), onTap: () {
           var data = ClipboardData(text: _arguments!.token);
           Clipboard.setData(data).then((_) {
-            _carouselController.nextPage(
-                duration: Duration(milliseconds: 800),
-                curve: Curves.fastOutSlowIn);
+            _carouselController.nextPage(duration: Duration(milliseconds: 800), curve: Curves.fastOutSlowIn);
           });
         })
       ],
@@ -269,8 +258,7 @@ class _TutorialPageState extends State<TutorialPage> {
       children: <Widget>[
         Text(
           title,
-          style: TextStyle(
-              fontSize: 24, fontWeight: FontWeight.bold, color: colors.scaffoldBackgroundColor),
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: colors.scaffoldBackgroundColor),
           textAlign: TextAlign.center,
         ),
         SizedBox(height: 16),

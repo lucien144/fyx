@@ -12,12 +12,14 @@ class FyxSkin extends SkinData {
       barBackgroundColor: const Color(0xff2d333b),
       textColor: const Color(0xFFadbac7),
       primaryColor: const Color(0xff316775),
+      highlightColor: const Color(0xff00242e),
       primaryContrastingColor: const Color(0xFF1c2128),
       pollBackground: const Color(0xff2d333b),
       pollAnswer: const Color(0xff677578),
       pollAnswerSelected: const Color(0xff316775),
       scaffoldBackgroundColor: const Color(0xFF1C2128),
       disabledColor: const Color(0xFFadbac7),
+      gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xff316775), Color(0xff00242e)])
     );
 
     return FyxSkin(

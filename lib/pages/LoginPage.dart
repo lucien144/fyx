@@ -62,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget formFactory() {
-    final textfieldDecoration = BoxDecoration(borderRadius: BorderRadius.circular(4), color: Colors.white, border: Border.all(color: colors.secondaryColor));
+    final textfieldDecoration = BoxDecoration(borderRadius: BorderRadius.circular(4), color: colors.scaffoldBackgroundColor, border: Border.all(color: colors.scaffoldBackgroundColor));
 
     var offset = (MediaQuery.of(context).viewInsets.bottom / 3);
     return Column(
@@ -73,10 +73,10 @@ class _LoginPageState extends State<LoginPage> {
           padding: EdgeInsets.all(16),
           child: Image.asset(
             'assets/logo.png',
-            color: colors.secondaryColor,
+            color: colors.primaryColor,
           ),
           decoration:
-              BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(32), boxShadow: [BoxShadow(color: Colors.black, offset: Offset(0, 0), blurRadius: 16)]),
+              BoxDecoration(color: colors.scaffoldBackgroundColor, borderRadius: BorderRadius.circular(32), boxShadow: [BoxShadow(color: Colors.black, offset: Offset(0, 0), blurRadius: 16)]),
         ),
         AnimatedPadding(
           padding: EdgeInsets.only(top: 128 - offset),
@@ -94,13 +94,16 @@ class _LoginPageState extends State<LoginPage> {
               ),
               Visibility(
                 visible: _useTokenToLogin,
-                child: CupertinoTextField(
-                  obscureText: true,
-                  enabled: !_isRunning,
-                  placeholder: 'TOKEN',
-                  controller: _tokenController,
-                  decoration: textfieldDecoration,
-                  autocorrect: false,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: CupertinoTextField(
+                    obscureText: true,
+                    enabled: !_isRunning,
+                    placeholder: 'TOKEN',
+                    controller: _tokenController,
+                    decoration: textfieldDecoration,
+                    autocorrect: false,
+                  ),
                 ),
               )
             ],
@@ -128,7 +131,7 @@ class _LoginPageState extends State<LoginPage> {
             ? CupertinoActivityIndicator()
             : Text(
                 'Přihlásit',
-                style: TextStyle(color: colors.secondaryColor),
+                style: TextStyle(color: colors.primaryColor),
               ),
         onPressed: () {
           if (_isRunning) {
@@ -158,7 +161,7 @@ class _LoginPageState extends State<LoginPage> {
             T.error(error.toString());
           }).whenComplete(() => setState(() => _isRunning = false));
         },
-        color: Colors.white,
+        color: colors.scaffoldBackgroundColor,
       ),
     );
   }

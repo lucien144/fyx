@@ -122,9 +122,9 @@ class Advertisement extends StatelessWidget {
                 style: DefaultTextStyle
                     .of(context)
                     .style
-                    .copyWith(fontSize: 12, color: CupertinoTheme.of(context).textTheme.textStyle.color),
+                    .copyWith(fontSize: 12, color: content.type == AdTypeEnum.offer ? colors.scaffoldBackgroundColor : colors.textColor),
               ),
-              decoration: BoxDecoration(color: content.type == AdTypeEnum.offer ? colors.secondaryColor : Color(0xff00B99D), borderRadius: BorderRadius.circular(6)),
+              decoration: BoxDecoration(color: content.type == AdTypeEnum.offer ? colors.primaryColor : colors.highlightColor, borderRadius: BorderRadius.circular(6)),
             ),
             if (content.location.isNotEmpty)
               Padding(

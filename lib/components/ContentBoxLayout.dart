@@ -128,7 +128,7 @@ class ContentBoxLayout extends StatelessWidget {
             ),
           ),
           Container(
-            color: _isHighlighted ? colors.secondaryColor.withOpacity(0.1) : null,
+            color: _isHighlighted ? colors.primaryColor.withOpacity(0.1) : null,
             foregroundDecoration: _isHighlighted ? UnreadBadgeDecoration(badgeColor: colors.primaryColor, badgeSize: 16) : null,
             child: Column(
               children: <Widget>[
