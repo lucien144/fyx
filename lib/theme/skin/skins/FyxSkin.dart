@@ -9,6 +9,7 @@ class FyxSkin extends SkinData {
   factory FyxSkin.create() {
     final lightColors = SkinColors();
     final darkColors = SkinColors(
+      dangerColor: const Color(0xffe5534b),
       barBackgroundColor: const Color(0xff2d333b),
       textColor: const Color(0xFFadbac7),
       primaryColor: const Color(0xff316775),

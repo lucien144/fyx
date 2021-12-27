@@ -9,6 +9,8 @@ import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 
 class PostAvatarActionSheet extends StatelessWidget {
   final String user;
@@ -18,6 +20,8 @@ class PostAvatarActionSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     return CupertinoActionSheet(
       title: Text(this.user),
       actions: [
@@ -51,7 +55,7 @@ class PostAvatarActionSheet extends StatelessWidget {
               child: TextIcon(
                 '${L.POST_SHEET_BLOCK} @${user}',
                 icon: Icons.block,
-                iconColor: Colors.redAccent,
+                iconColor: colors.dangerColor,
               ),
               isDestructiveAction: true,
               onPressed: () {

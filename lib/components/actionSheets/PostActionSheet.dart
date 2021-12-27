@@ -7,6 +7,8 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:share/share.dart';
 
 class ShareData {
@@ -35,6 +37,8 @@ class _PostActionSheetState extends State<PostActionSheet> {
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     return CupertinoActionSheet(
         actions: <Widget>[
           Visibility(
@@ -76,7 +80,7 @@ class _PostActionSheetState extends State<PostActionSheet> {
               child: TextIcon(
                 L.POST_SHEET_HIDE,
                 icon: Icons.visibility_off,
-                iconColor: Colors.redAccent,
+                iconColor: colors.dangerColor,
               ),
               isDestructiveAction: true,
               onPressed: () {
@@ -89,7 +93,7 @@ class _PostActionSheetState extends State<PostActionSheet> {
               child: TextIcon(
                 _reportIndicator ? L.POST_SHEET_FLAG_SAVING : L.POST_SHEET_FLAG,
                 icon: Icons.warning,
-                iconColor: Colors.redAccent,
+                iconColor: colors.dangerColor,
               ),
               isDestructiveAction: true,
               onPressed: () async {

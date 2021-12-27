@@ -11,6 +11,8 @@ import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/Helpers.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
@@ -152,6 +154,8 @@ class _NewMessagePageState extends State<NewMessagePage> {
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     if (_settings == null) {
       _settings =
           ModalRoute.of(context)!.settings.arguments as NewMessageSettings;
@@ -265,7 +269,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                           child: Container(
                             width: 16,
                             height: 1,
-                            color: Colors.black38,
+                            color: colors.greyColor,
                           ),
                         ),
                         SizedBox(width: 12),

@@ -48,7 +48,7 @@ class Advertisement extends StatelessWidget {
     if (content.references is UserReferences) {
       return RichText(
         text: TextSpan(children: [
-          TextSpan(text: 'Reference: ', style: TextStyle(color: Colors.black38, fontSize: 10)),
+          TextSpan(text: 'Reference: ', style: TextStyle(color: colors.greyColor, fontSize: 10)),
           if (content.references != null && content.references!.positive > 0) TextSpan(text: '+${content.references!.positive}', style: TextStyle(color: CupertinoTheme.of(context).primaryColor, fontSize: 10)),
           if (content.references != null && content.references!.positive > 0 && content.references!.negative < 0) TextSpan(text: ' / ', style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38), fontSize: 10)),
           if (content.references != null && content.references!.negative < 0) TextSpan(text: '-${content.references!.negative}', style: TextStyle(color: colors.dangerColor, fontSize: 10))

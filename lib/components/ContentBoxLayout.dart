@@ -168,7 +168,7 @@ class ContentBoxLayout extends StatelessWidget {
                 SizedBox(
                   height: 8,
                 ),
-                this.bottomWidget != null ? Divider(color: Colors.black38) : Container(),
+                this.bottomWidget != null ? Divider(color: colors.greyColor) : Container(),
                 this.bottomWidget != null ? Container(child: this.bottomWidget, padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16)) : Container(),
                 SizedBox(
                   height: 8,

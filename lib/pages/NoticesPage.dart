@@ -76,7 +76,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
                   isHighlighted: highlight,
                   topRightWidget: Text(
                     item.wuRating > 0 ? '+${item.wuRating}' : item.wuRating.toString(),
-                    style: TextStyle(fontSize: 14, color: item.wuRating > 0 ? Colors.green : (item.wuRating < 0 ? Colors.redAccent : Colors.black38)),
+                    style: TextStyle(fontSize: 14, color: item.wuRating > 0 ? colors.successColor : (item.wuRating < 0 ? colors.dangerColor : colors.greyColor)),
                   ),
                   topLeftWidget: Expanded(
                     child: GestureDetector(

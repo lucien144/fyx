@@ -6,6 +6,7 @@ class SkinColors {
   final Color primaryColor;
   //final Color secondaryColor;
   final Color highlightColor;
+  final Color successColor;
   final Color dangerColor;
   final Color barBackgroundColor;
   final Color scaffoldBackgroundColor;
@@ -14,12 +15,14 @@ class SkinColors {
   final Color pollAnswer;
   final Color pollAnswerSelected;
   final Color disabledColor;
+  final Color greyColor;
   final BoxDecoration shadow;
   final LinearGradient gradient;
   Color? primaryContrastingColor;
 
   SkinColors({
-    this.dangerColor = const Color(0xffB60F0F),
+    this.dangerColor = Colors.redAccent,
+    this.successColor = Colors.green,
     this.primaryColor = const Color(0xFF196378),
     //this.secondaryColor = const Color(0xff007F90),
     this.highlightColor = const Color(0xff1AD592),
@@ -31,6 +34,7 @@ class SkinColors {
     this.pollAnswer = const Color(0xffa9ccd3),
     this.pollAnswerSelected = const Color(0xff76b9b9),
     this.disabledColor = Colors.black26,
+    this.greyColor = Colors.black38,
     this.gradient = const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xff1AD592), Color(0xFF196378)]),
   })  : shadow = BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(8)),
