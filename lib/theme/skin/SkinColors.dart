@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class SkinColors {
   final Color primaryColor;
   final Color secondaryColor;
-  final Color accentColor;
+  final Color dangerColor;
   final Color barBackgroundColor;
   Color? primaryContrastingColor;
   final Color scaffoldBackgroundColor;
@@ -18,7 +18,7 @@ class SkinColors {
   final LinearGradient gradient;
 
   SkinColors({
-    this.accentColor = const Color(0xffB60F0F),
+    this.dangerColor = const Color(0xffB60F0F),
     this.primaryColor = const Color(0xFF196378),
     this.secondaryColor = const Color(0xff007F90),
     this.barBackgroundColor = const Color(0xfff0f4f5),
