@@ -7,7 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
-import 'package:fyx/theme/skin/NyxColors.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:sentry/sentry.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -102,7 +102,7 @@ class T {
   static Widget feedbackScreen(BuildContext context, {bool isLoading = false, bool isWarning = false, String label = '', String title = '', VoidCallback? onPress, IconData icon = Icons.warning}) {
     return Container(
       width: double.infinity,
-      color: (Skin.of(context).theme.colors as NyxColors).scaffoldBackgroundColor,
+      color: (Skin.of(context).theme.colors as SkinColors).scaffoldBackgroundColor,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
-import 'package:fyx/theme/skin/NyxColors.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:sentry/sentry.dart';
 import 'package:fyx/theme/L.dart';
@@ -96,7 +96,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
 
   @override
   Widget build(BuildContext context) {
-    NyxColors colors = Skin.of(context).theme.colors;
+    SkinColors colors = Skin.of(context).theme.colors;
 
     if (widget._rebuild > _lastRebuild && !_isLoading) {
       setState(() => _lastRebuild = widget._rebuild);
@@ -272,7 +272,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
     double refreshTriggerPullDistance,
     double refreshIndicatorExtent,
   ) {
-    NyxColors colors = Skin.of(context).theme.colors;
+    SkinColors colors = Skin.of(context).theme.colors;
     const Curve opacityCurve = const Interval(0.4, 0.8, curve: Curves.easeInOut);
     return Align(
       alignment: Alignment.bottomCenter,

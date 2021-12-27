@@ -25,7 +25,7 @@ import 'package:fyx/pages/NoticesPage.dart';
 import 'package:fyx/pages/SettingsPage.dart';
 import 'package:fyx/pages/TutorialPage.dart';
 import 'package:fyx/theme/T.dart';
-import 'package:fyx/theme/skin/NyxSkin.dart';
+import 'package:fyx/theme/skin/skins/FyxSkin.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
@@ -197,7 +197,7 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
         builder: (ctx, widget) => Directionality(
           textDirection: TextDirection.ltr,
           child: Skin(
-            skin: NyxSkin.create(),
+            skin: FyxSkin.create(),
             brightness: (() {
               if (ctx.watch<ThemeModel>().theme == ThemeEnum.system && _platformBrightness != null) {
                 return _platformBrightness!;

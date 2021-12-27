@@ -8,7 +8,7 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
-import 'package:fyx/theme/skin/NyxColors.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 
 class TutorialPageArguments {
@@ -25,7 +25,7 @@ class TutorialPage extends StatefulWidget {
 
 class _TutorialPageState extends State<TutorialPage> {
   final CarouselController _carouselController = CarouselController();
-  late NyxColors colors;
+  late SkinColors colors;
   List<Widget> _slides = [];
 
   bool _loggingIn = false;

@@ -1,14 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fyx/theme/skin/NyxColors.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 
-class NyxSkin extends SkinData {
-  NyxSkin({lightData, darkData}) : super(lightData: lightData, darkData: darkData);
+class FyxSkin extends SkinData {
+  FyxSkin({lightData, darkData}) : super(lightData: lightData, darkData: darkData);
 
-  factory NyxSkin.create() {
-    final lightColors = NyxColors();
-    final darkColors = NyxColors(
+  factory FyxSkin.create() {
+    final lightColors = SkinColors();
+    final darkColors = SkinColors(
       barBackgroundColor: const Color(0xff2d333b),
       textColor: const Color(0xFFadbac7),
       primaryColor: const Color(0xff316775),
@@ -20,8 +20,8 @@ class NyxSkin extends SkinData {
       disabledColor: const Color(0xFFadbac7),
     );
 
-    return NyxSkin(
-        lightData: SkinBrightnessData<NyxColors>(
+    return FyxSkin(
+        lightData: SkinBrightnessData<SkinColors>(
             data: CupertinoThemeData(
                 barBackgroundColor: lightColors.barBackgroundColor,
                 primaryColor: lightColors.primaryColor,
@@ -29,7 +29,7 @@ class NyxSkin extends SkinData {
                 brightness: Brightness.light,
                 textTheme: CupertinoTextThemeData(textStyle: TextStyle(color: lightColors.textColor, fontSize: 16))),
             colors: lightColors),
-        darkData: SkinBrightnessData<NyxColors>(
+        darkData: SkinBrightnessData<SkinColors>(
             data: CupertinoThemeData(
                 barBackgroundColor: darkColors.barBackgroundColor,
                 primaryContrastingColor: darkColors.primaryContrastingColor,

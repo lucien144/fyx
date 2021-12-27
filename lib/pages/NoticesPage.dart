@@ -11,7 +11,7 @@ import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
-import 'package:fyx/theme/skin/NyxColors.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 
 class NoticesPage extends StatefulWidget {
@@ -50,7 +50,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    NyxColors colors = Skin.of(context).theme.colors;
+    SkinColors colors = Skin.of(context).theme.colors;
 
     return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(

@@ -6,7 +6,7 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/post/content/Poll.dart';
 import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/theme/T.dart';
-import 'package:fyx/theme/skin/NyxColors.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 
 class Poll extends StatefulWidget {
@@ -32,7 +32,7 @@ class _PollState extends State<Poll> {
   }
 
   Widget buildAnswers(BuildContext context) {
-    NyxColors colors = Skin.of(context).theme.colors;
+    SkinColors colors = Skin.of(context).theme.colors;
     var totalRespondents = _poll!.pollComputedValues != null ? _poll!.pollComputedValues!.totalRespondents : 0;
 
     return ListView.builder(
@@ -91,7 +91,7 @@ class _PollState extends State<Poll> {
 
   @override
   Widget build(BuildContext context) {
-    NyxColors colors = Skin.of(context).theme.colors;
+    SkinColors colors = Skin.of(context).theme.colors;
 
     return Container(
         alignment: Alignment.centerLeft,

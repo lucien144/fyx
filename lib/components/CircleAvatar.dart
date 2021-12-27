@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/theme/T.dart';
-import 'package:fyx/theme/skin/NyxColors.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 
 class CircleAvatar extends StatelessWidget {
@@ -17,7 +17,7 @@ class CircleAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    NyxColors colors = Skin.of(context).theme.colors;
+    SkinColors colors = Skin.of(context).theme.colors;
     return Container(
       padding: EdgeInsets.all(1),
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(22), color: _isHighlighted ? colors.primaryColor : colors.textColor),

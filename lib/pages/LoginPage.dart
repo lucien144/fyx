@@ -10,7 +10,7 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/reponses/LoginResponse.dart';
 import 'package:fyx/pages/TutorialPage.dart';
 import 'package:fyx/theme/T.dart';
-import 'package:fyx/theme/skin/NyxColors.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 
 class LoginPage extends StatefulWidget {
@@ -21,7 +21,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _loginController = TextEditingController();
   final TextEditingController _tokenController = TextEditingController();
-  late NyxColors colors;
+  late SkinColors colors;
   bool _isRunning = false;
   bool _useTokenToLogin = false;
 
@@ -119,7 +119,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildButton(context) {
-    NyxColors colors = Skin.of(context).theme.colors;
+    SkinColors colors = Skin.of(context).theme.colors;
 
     return Container(
       width: 200,

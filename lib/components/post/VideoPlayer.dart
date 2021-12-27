@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/theme/T.dart';
-import 'package:fyx/theme/skin/NyxColors.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:video_player/video_player.dart';
@@ -45,7 +45,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
       return false;
     }
 
-    NyxColors colors = Skin.of(context).theme.colors;
+    SkinColors colors = Skin.of(context).theme.colors;
     await videoPlayerController!.initialize();
 
     final size = MediaQuery.of(context).size;
@@ -85,7 +85,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
       return T.somethingsWrongButton(widget.element.outerHtml);
     }
 
-    NyxColors colors = Skin.of(context).theme.colors;
+    SkinColors colors = Skin.of(context).theme.colors;
     return Card(
       elevation: 0,
       color: colors.scaffoldBackgroundColor,

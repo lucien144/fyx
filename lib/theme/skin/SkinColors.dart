@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-class NyxColors {
+class SkinColors {
   final Color primaryColor;
   final Color secondaryColor;
   final Color accentColor;
@@ -17,7 +17,7 @@ class NyxColors {
   final BoxDecoration shadow;
   final LinearGradient gradient;
 
-  NyxColors({
+  SkinColors({
     this.accentColor = const Color(0xffB60F0F),
     this.primaryColor = const Color(0xFF196378),
     this.secondaryColor = const Color(0xff007F90),

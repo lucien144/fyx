@@ -14,7 +14,7 @@ import 'package:fyx/model/post/content/Advertisement.dart';
 import 'package:fyx/model/post/content/Poll.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/UnreadBadgeDecoration.dart';
-import 'package:fyx/theme/skin/NyxColors.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 
 enum LAYOUT_TYPES { textOnly, oneImageOnly, attachmentsOnly, attachmentsAndText }
@@ -114,7 +114,7 @@ class ContentBoxLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    NyxColors colors = Skin.of(context).theme.colors;
+    SkinColors colors = Skin.of(context).theme.colors;
 
     return Container(
       decoration: _isPreview ? colors.shadow : null,
