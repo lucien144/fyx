@@ -15,5 +15,5 @@ class Settings {
   int photoQuality = 90;
   // Width of uploaded image
   int photoWidth = 640;
-  ThemeEnum theme = ThemeEnum.light;
+  ThemeEnum theme = ThemeEnum.system;
 }
