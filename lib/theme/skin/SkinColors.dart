@@ -26,7 +26,7 @@ class SkinColors {
     this.barBackgroundColor = const Color(0xfff0f4f5),
     this.scaffoldBackgroundColor = Colors.white,
     this.primaryContrastingColor,
-    this.textColor = const Color(0xFF1C2128),
+    this.textColor = const Color(0xFF282828),
     this.pollBackground = const Color(0xffcde5e9),
     this.pollAnswer = const Color(0xffa9ccd3),
     this.pollAnswerSelected = const Color(0xff76b9b9),

@@ -15,15 +15,6 @@ import 'package:url_launcher/url_launcher.dart';
 // Theme helpers
 class T {
   // ************************
-  // Colors
-  // ************************
-
-  // Color scheme -> https://mycolor.space/?hex=%231AD592&sub=1
-  static const Color COLOR_LIGHT = Color(0xffE9F3F5);
-  static const Color COLOR_BLACK = Color(0xFF282828);
-
-
-  // ************************
   // Theme mixins
   // ************************
   static error(String message, {int duration: 7}) {

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 
 class Spoiler extends StatefulWidget {
   final String text;
@@ -22,6 +24,8 @@ class _SpoilerState extends State<Spoiler> {
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     return GestureDetector(
       onTap: () => setState(() => _toggle = !_toggle),
       child: RichText(
@@ -29,7 +33,7 @@ class _SpoilerState extends State<Spoiler> {
           TextSpan(text: 'Spoiler ⮕ ', style: DefaultTextStyle.of(context).style),
           TextSpan(
             text: '$_text',
-            style: DefaultTextStyle.of(context).style.apply(backgroundColor: _toggle ? Colors.transparent : T.COLOR_BLACK),
+            style: DefaultTextStyle.of(context).style.apply(backgroundColor: _toggle ? Colors.transparent : colors.textColor),
           ),
         ]),
       ),
