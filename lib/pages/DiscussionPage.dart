@@ -64,24 +64,24 @@ class _DiscussionPageState extends State<DiscussionPage> {
     DiscussionPageArguments? pageArguments = ModalRoute.of(context)?.settings.arguments as DiscussionPageArguments?;
 
     if (pageArguments == null) {
-      return T.feedbackScreen(title: 'Chyba, nelze načíst diskuzi.');
+      return T.feedbackScreen(context, title: 'Chyba, nelze načíst diskuzi.');
     }
 
     return FutureBuilder<DiscussionResponse>(
         future: _fetchData(pageArguments.discussionId, pageArguments.postId, pageArguments.filterByUser, search: pageArguments.search),
         builder: (BuildContext context, AsyncSnapshot<DiscussionResponse> snapshot) {
           if (snapshot.hasError) {
-            return T.feedbackScreen(
+            return T.feedbackScreen(context,
                 isWarning: true, title: snapshot.error.toString(), label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
           }
           if (snapshot.hasData) {
             if (snapshot.data!.discussion.accessDenied) {
-              return T.feedbackScreen(
+              return T.feedbackScreen(context,
                   title: L.ACCESS_DENIED_ERROR, icon: Icons.do_not_disturb_alt, label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
             }
             return this._createDiscussionPage(snapshot.data!, pageArguments);
           }
-          return _pageScaffold(title: L.GENERAL_LOADING, body: T.feedbackScreen(isLoading: true));
+          return _pageScaffold(title: L.GENERAL_LOADING, body: T.feedbackScreen(context, isLoading: true));
         });
   }
 
@@ -97,8 +97,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
           middle: Container(
               alignment: Alignment.center,
               width: MediaQuery.of(context).size.width - 120,
-              child: Text(title,
-                  style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color), overflow: TextOverflow.ellipsis))),
+              child: Text(title, style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color), overflow: TextOverflow.ellipsis))),
       child: body,
     );
   }
@@ -108,89 +107,91 @@ class _DiscussionPageState extends State<DiscussionPage> {
     // TODO: Not ideal, probably better to use Provider. Or not?
     SyntaxHighlighter.languageContext = discussionResponse.discussion.name;
 
-    return _pageScaffold(title: discussionResponse.discussion.name.replaceAll('', '\u{200B}'), body: Stack(
-      children: [
-        PullToRefreshList(
-          rebuild: _refreshList,
-          isInfinite: true,
-          pinnedWidget: getPinnedWidget(discussionResponse),
-          sliverListBuilder: (List data) {
-            return ValueListenableBuilder(
-              valueListenable: MainRepository().settings.box.listenable(keys: ['blockedPosts', 'blockedUsers']),
-              builder: (BuildContext context, value, Widget? child) {
-                var filtered = data;
-                if (data[0] is PostListItem) {
-                  filtered = data
-                      .where((item) => !MainRepository().settings.isPostBlocked((item as PostListItem).post.id))
-                      .where((item) => !MainRepository().settings.isUserBlocked((item as PostListItem).post.nick))
-                      .toList();
-                }
-                return SliverList(
-                  delegate: SliverChildBuilderDelegate(
+    return _pageScaffold(
+        title: discussionResponse.discussion.name.replaceAll('', '\u{200B}'),
+        body: Stack(
+          children: [
+            PullToRefreshList(
+              rebuild: _refreshList,
+              isInfinite: true,
+              pinnedWidget: getPinnedWidget(discussionResponse),
+              sliverListBuilder: (List data) {
+                return ValueListenableBuilder(
+                  valueListenable: MainRepository().settings.box.listenable(keys: ['blockedPosts', 'blockedUsers']),
+                  builder: (BuildContext context, value, Widget? child) {
+                    var filtered = data;
+                    if (data[0] is PostListItem) {
+                      filtered = data
+                          .where((item) => !MainRepository().settings.isPostBlocked((item as PostListItem).post.id))
+                          .where((item) => !MainRepository().settings.isUserBlocked((item as PostListItem).post.nick))
+                          .toList();
+                    }
+                    return SliverList(
+                      delegate: SliverChildBuilderDelegate(
                         (context, i) => filtered[i],
-                    childCount: filtered.length,
-                  ),
+                        childCount: filtered.length,
+                      ),
+                    );
+                  },
                 );
               },
-            );
-          },
-          dataProvider: (lastId) async {
-            var result;
-            if (lastId != null) {
-              // If we load next page(s)
-              var response = await ApiController().loadDiscussion(pageArguments.discussionId, lastId: lastId, user: pageArguments.filterByUser);
-              result = response.posts;
-            } else {
-              // If we load init data or we refresh data on pull
-              if (!this._hasInitData) {
-                // If we load init data, use the data from FutureBuilder
-                result = discussionResponse.posts;
-                this._hasInitData = true;
-              } else {
-                // If we just pull to refresh, load a fresh data
-                var response = await ApiController().loadDiscussion(pageArguments.discussionId, user: pageArguments.filterByUser);
-                result = response.posts;
-              }
-            }
-            List<Widget> data = (result as List)
-                .map((post) {
-              return Post.fromJson(post, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode);
-            })
-                .where((post) => !MainRepository().settings.isPostBlocked(post.id))
-                .where((post) => !MainRepository().settings.isUserBlocked(post.nick))
-                .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.isNew))
-                .toList();
+              dataProvider: (lastId) async {
+                var result;
+                if (lastId != null) {
+                  // If we load next page(s)
+                  var response = await ApiController().loadDiscussion(pageArguments.discussionId, lastId: lastId, user: pageArguments.filterByUser);
+                  result = response.posts;
+                } else {
+                  // If we load init data or we refresh data on pull
+                  if (!this._hasInitData) {
+                    // If we load init data, use the data from FutureBuilder
+                    result = discussionResponse.posts;
+                    this._hasInitData = true;
+                  } else {
+                    // If we just pull to refresh, load a fresh data
+                    var response = await ApiController().loadDiscussion(pageArguments.discussionId, user: pageArguments.filterByUser);
+                    result = response.posts;
+                  }
+                }
+                List<Widget> data = (result as List)
+                    .map((post) {
+                      return Post.fromJson(post, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode);
+                    })
+                    .where((post) => !MainRepository().settings.isPostBlocked(post.id))
+                    .where((post) => !MainRepository().settings.isUserBlocked(post.nick))
+                    .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.isNew))
+                    .toList();
 
-            int? id;
-            try {
-              id = Post.fromJson((result as List).last, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode).id;
-            } catch (error) {}
-            return DataProviderResult(data, lastId: id);
-          },
-        ),
-        Visibility(
-          visible: discussionResponse.discussion.accessRights.canWrite != false || discussionResponse.discussion.rights.canWrite != false,
-          child: Positioned(
-            right: 20,
-            bottom: 20,
-            child: SafeArea(
-              child: FloatingActionButton(
-                backgroundColor: CupertinoTheme.of(context).primaryColor,
-                foregroundColor: CupertinoTheme.of(context).scaffoldBackgroundColor,
-                child: Icon(Icons.add),
-                onPressed: () => Navigator.of(context).pushNamed('/new-message',
-                    arguments: NewMessageSettings(
-                        onClose: this.refresh,
-                        onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
-                          var result = await ApiController().postDiscussionMessage(pageArguments.discussionId, message, attachments: attachments);
-                          return result.isOk;
-                        })),
+                int? id;
+                try {
+                  id = Post.fromJson((result as List).last, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode).id;
+                } catch (error) {}
+                return DataProviderResult(data, lastId: id);
+              },
+            ),
+            Visibility(
+              visible: discussionResponse.discussion.accessRights.canWrite != false || discussionResponse.discussion.rights.canWrite != false,
+              child: Positioned(
+                right: 20,
+                bottom: 20,
+                child: SafeArea(
+                  child: FloatingActionButton(
+                    backgroundColor: CupertinoTheme.of(context).primaryColor,
+                    foregroundColor: CupertinoTheme.of(context).scaffoldBackgroundColor,
+                    child: Icon(Icons.add),
+                    onPressed: () => Navigator.of(context).pushNamed('/new-message',
+                        arguments: NewMessageSettings(
+                            onClose: this.refresh,
+                            onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                              var result = await ApiController().postDiscussionMessage(pageArguments.discussionId, message, attachments: attachments);
+                              return result.isOk;
+                            })),
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
-      ],
-    ));
+          ],
+        ));
   }
 
   Widget? getPinnedWidget(DiscussionResponse discussionResponse) {

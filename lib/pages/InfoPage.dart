@@ -53,6 +53,7 @@ class _InfoPageState extends State<InfoPage> {
               }
               if (snapshot.hasError) {
                 return T.feedbackScreen(
+                    context,
                     label: L.GENERAL_REFRESH,
                     isWarning: true,
                     title: L.GENERAL_ERROR,
@@ -60,7 +61,7 @@ class _InfoPageState extends State<InfoPage> {
                       setState(() => _response = _client.get(Uri.parse(settings.url)));
                     });
               }
-              return T.feedbackScreen(isLoading: true);
+              return T.feedbackScreen(context, isLoading: true);
             }));
   }
 }

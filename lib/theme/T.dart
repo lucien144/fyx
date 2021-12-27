@@ -7,6 +7,8 @@ import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
+import 'package:fyx/theme/skin/NyxColors.dart';
+import 'package:fyx/theme/skin/Skin.dart';
 import 'package:sentry/sentry.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -17,7 +19,6 @@ class T {
   // ************************
 
   // Color scheme -> https://mycolor.space/?hex=%231AD592&sub=1
-  static const Color COLOR_PRIMARY = Color(0xFF196378);
   static const Color COLOR_SECONDARY = Color(0xff007F90);
   static const Color COLOR_LIGHT = Color(0xffE9F3F5);
   static const Color COLOR_BLACK = Color(0xFF282828);
@@ -107,9 +108,10 @@ class T {
     );
   }
 
-  static Widget feedbackScreen({bool isLoading = false, bool isWarning = false, String label = '', String title = '', VoidCallback? onPress, IconData icon = Icons.warning}) {
+  static Widget feedbackScreen(BuildContext context, {bool isLoading = false, bool isWarning = false, String label = '', String title = '', VoidCallback? onPress, IconData icon = Icons.warning}) {
     return Container(
       width: double.infinity,
+      color: (Skin.of(context).theme.colors as NyxColors).scaffoldBackgroundColor,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -133,7 +135,6 @@ class T {
               child: isWarning
                   ? Container(
                       padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(color: T.COLOR_LIGHT, border: Border.all(width: 1, color: T.COLOR_PRIMARY), borderRadius: BorderRadius.circular(8)),
                       child: Text(
                         title,
                         style: TextStyle(fontFamily: 'JetBrainsMono', fontSize: 14),
@@ -144,7 +145,6 @@ class T {
           Visibility(
             visible: !isLoading && onPress is Function,
             child: CupertinoButton(
-              color: T.COLOR_PRIMARY,
               child: Text(label),
               onPressed: onPress,
             ),
