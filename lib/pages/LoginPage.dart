@@ -10,6 +10,8 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/reponses/LoginResponse.dart';
 import 'package:fyx/pages/TutorialPage.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:fyx/theme/skin/Skin.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -19,6 +21,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _loginController = TextEditingController();
   final TextEditingController _tokenController = TextEditingController();
+  late SkinColors colors;
   bool _isRunning = false;
   bool _useTokenToLogin = false;
 
@@ -39,12 +42,14 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    colors = Skin.of(context).theme.colors;
+
     return WillPopScope(
       onWillPop: () async => false,
       child: Container(
         padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(gradient: T.GRADIENT),
-        child: formFactory(context),
+        decoration: BoxDecoration(gradient: colors.gradient),
+        child: formFactory(),
       ),
     );
   }
@@ -56,7 +61,9 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  Widget formFactory(context) {
+  Widget formFactory() {
+    final textfieldDecoration = BoxDecoration(borderRadius: BorderRadius.circular(4), color: colors.background, border: Border.all(color: colors.background));
+
     var offset = (MediaQuery.of(context).viewInsets.bottom / 3);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -66,10 +73,10 @@ class _LoginPageState extends State<LoginPage> {
           padding: EdgeInsets.all(16),
           child: Image.asset(
             'assets/logo.png',
-            color: T.COLOR_SECONDARY,
+            color: colors.primary,
           ),
           decoration:
-              BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(32), boxShadow: [BoxShadow(color: Colors.black, offset: Offset(0, 0), blurRadius: 16)]),
+              BoxDecoration(color: colors.background, borderRadius: BorderRadius.circular(32), boxShadow: [BoxShadow(color: colors.dark, offset: Offset(0, 0), blurRadius: 16)]),
         ),
         AnimatedPadding(
           padding: EdgeInsets.only(top: 128 - offset),
@@ -82,18 +89,21 @@ class _LoginPageState extends State<LoginPage> {
                 textCapitalization: TextCapitalization.characters,
                 placeholder: 'NICKNAME',
                 controller: _loginController,
-                decoration: T.TEXTFIELD_DECORATION,
+                decoration: textfieldDecoration,
                 autocorrect: false,
               ),
               Visibility(
                 visible: _useTokenToLogin,
-                child: CupertinoTextField(
-                  obscureText: true,
-                  enabled: !_isRunning,
-                  placeholder: 'TOKEN',
-                  controller: _tokenController,
-                  decoration: T.TEXTFIELD_DECORATION,
-                  autocorrect: false,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: CupertinoTextField(
+                    obscureText: true,
+                    enabled: !_isRunning,
+                    placeholder: 'TOKEN',
+                    controller: _tokenController,
+                    decoration: textfieldDecoration,
+                    autocorrect: false,
+                  ),
                 ),
               )
             ],
@@ -112,6 +122,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildButton(context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     return Container(
       width: 200,
       child: CupertinoButton(
@@ -119,7 +131,7 @@ class _LoginPageState extends State<LoginPage> {
             ? CupertinoActivityIndicator()
             : Text(
                 'Přihlásit',
-                style: TextStyle(color: T.COLOR_SECONDARY),
+                style: TextStyle(color: colors.primary),
               ),
         onPressed: () {
           if (_isRunning) {
@@ -146,10 +158,10 @@ class _LoginPageState extends State<LoginPage> {
             Navigator.of(context).pushNamed('/token', arguments: new TutorialPageArguments(token: response.authCode, username: _loginController.text));
           }).catchError((error) {
             print(error);
-            T.error(error.toString());
+            T.error(error.toString(), bg: colors.danger);
           }).whenComplete(() => setState(() => _isRunning = false));
         },
-        color: Colors.white,
+        color: colors.background,
       ),
     );
   }

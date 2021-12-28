@@ -1,4 +1,5 @@
 import 'package:fyx/model/enums/DefaultView.dart';
+import 'package:fyx/model/enums/ThemeEnum.dart';
 
 class Settings {
   bool useCompactMode = false;
@@ -14,4 +15,5 @@ class Settings {
   int photoQuality = 90;
   // Width of uploaded image
   int photoWidth = 640;
+  ThemeEnum theme = ThemeEnum.system;
 }

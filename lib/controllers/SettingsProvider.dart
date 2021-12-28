@@ -1,7 +1,8 @@
 import 'package:fyx/model/Settings.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
-import "package:hive/hive.dart";
-import "package:hive_flutter/hive_flutter.dart";
+import 'package:fyx/model/enums/ThemeEnum.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class SettingsProvider {
   static final SettingsProvider _singleton = SettingsProvider._internal();
@@ -9,6 +10,12 @@ class SettingsProvider {
   late Box<dynamic> _box;
 
   Box<dynamic> get box => _box;
+
+  ThemeEnum get theme => _settings.theme;
+  set theme(ThemeEnum theme) {
+    _box.put('theme', theme);
+    _settings.theme = theme;
+  }
 
   DefaultView get defaultView => _settings.defaultView;
   set defaultView(DefaultView view) {
@@ -61,9 +68,11 @@ class SettingsProvider {
   Future<SettingsProvider> init() async {
     await Hive.initFlutter();
     Hive.registerAdapter(DefaultViewAdapter());
+    Hive.registerAdapter(ThemeEnumAdapter());
     _box = await Hive.openBox('settings');
 
     _settings = new Settings();
+    _settings.theme = _box.get('theme', defaultValue: Settings().theme);
     _settings.defaultView = _box.get('defaultView', defaultValue: Settings().defaultView);
     _settings.latestView = _box.get('latestView', defaultValue: Settings().latestView);
     _settings.useCompactMode = _box.get('useCompactMode', defaultValue: Settings().useCompactMode);

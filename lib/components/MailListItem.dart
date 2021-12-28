@@ -10,7 +10,11 @@ import 'package:fyx/model/Mail.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/Helpers.dart';
+import 'package:fyx/theme/IconReply.dart';
+import 'package:fyx/theme/IconUnread.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 
 class MailListItem extends StatefulWidget {
   final Mail mail;
@@ -26,6 +30,8 @@ class MailListItem extends StatefulWidget {
 class _MailListItemState extends State<MailListItem> {
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     return ContentBoxLayout(
       isHighlighted: widget.mail.isNew,
       isPreview: widget.isPreview == true,
@@ -40,13 +46,13 @@ class _MailListItemState extends State<MailListItem> {
         children: <Widget>[
           Visibility(
             visible: widget.mail.isUnread,
-            child: T.ICO_UNREAD,
+            child: IconUnread(),
           ),
           SizedBox(
             width: 4,
           ),
           GestureDetector(
-            child: Icon(Icons.more_vert, color: Colors.black38),
+            child: Icon(Icons.more_vert, color: colors.text.withOpacity(0.38)),
             onTap: () => showCupertinoModalPopup(
                 context: context,
                 builder: (BuildContext context) => PostActionSheet(
@@ -70,9 +76,9 @@ class _MailListItemState extends State<MailListItem> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    T.ICO_REPLY,
+                    IconReply(),
                     Text('Odpovědět',
-                        style: TextStyle(color: Colors.black38, fontSize: 14))
+                        style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 14))
                   ],
                 ),
                 onTap: () => Navigator.of(context, rootNavigator: true)

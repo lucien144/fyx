@@ -7,6 +7,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:fyx/theme/skin/Skin.dart';
 import 'package:sentry/sentry.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
@@ -53,10 +55,11 @@ class _GalleryPageState extends State<GalleryPage> {
           ModalRoute.of(context)!.settings.arguments as GalleryArguments;
     }
 
+    SkinColors colors = Skin.of(context).theme.colors;
     return Stack(
       children: [
         Container(
-          decoration: BoxDecoration(color: Colors.black.withOpacity(0.90)),
+          decoration: BoxDecoration(color: colors.dark.withOpacity(0.90)),
           constraints: BoxConstraints.expand(
             height: MediaQuery.of(context).size.height,
           ),
@@ -85,10 +88,10 @@ class _GalleryPageState extends State<GalleryPage> {
           right: 30,
           child: CupertinoButton(
             padding: EdgeInsets.zero,
-            color: T.COLOR_PRIMARY,
+            color: colors.primary,
             child: Icon(
               CupertinoIcons.clear_thick,
-              color: Colors.white,
+              color: colors.background,
               size: 32,
             ),
             onPressed: () => close(context),
@@ -99,13 +102,13 @@ class _GalleryPageState extends State<GalleryPage> {
             bottom: 30,
             left: (MediaQuery.of(context).size.width - 100) / 2,
             child: CupertinoButton(
-              color: T.COLOR_PRIMARY,
+              color: colors.primary,
               padding: EdgeInsets.zero,
               onPressed: () => close(context),
               child: Text(
                 '$_page / ${_arguments!.images.length}',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: colors.background),
               ),
             )),
         Positioned(
@@ -113,12 +116,12 @@ class _GalleryPageState extends State<GalleryPage> {
             right: 30,
             child: CupertinoButton(
               padding: EdgeInsets.zero,
-              color: T.COLOR_PRIMARY,
+              color: colors.primary,
               child: _saving
                   ? CupertinoActivityIndicator()
                   : Icon(
                       Icons.save_alt_rounded,
-                      color: Colors.white,
+                      color: colors.background,
                       size: 32,
                     ),
               onPressed: () async {
@@ -139,9 +142,9 @@ class _GalleryPageState extends State<GalleryPage> {
                     throw Exception(resultMap['errorMessage']);
                   }
 
-                  T.success(L.TOAST_IMAGE_SAVE_OK);
+                  T.success(L.TOAST_IMAGE_SAVE_OK, bg: colors.success);
                 } catch (error) {
-                  T.error(L.TOAST_IMAGE_SAVE_ERROR);
+                  T.error(L.TOAST_IMAGE_SAVE_ERROR, bg: colors.danger);
                   Sentry.captureException(error);
                 } finally {
                   setState(() => _saving = false);

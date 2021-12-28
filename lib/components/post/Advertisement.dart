@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/post/PostAvatar.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
@@ -8,6 +9,8 @@ import 'package:fyx/model/post/Image.dart' as i;
 import 'package:fyx/model/post/content/Advertisement.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:fyx/theme/skin/Skin.dart';
 
 class Advertisement extends StatelessWidget {
   final ContentAdvertisement content;
@@ -22,14 +25,16 @@ class Advertisement extends StatelessWidget {
   const Advertisement(this.content, {this.title, this.username = ''});
 
   Widget buildPriceWidget(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     return Container(
         padding: const EdgeInsets.all(6),
         child: Text('${content.price.toString()} ${content.currency}',
             style: DefaultTextStyle
                 .of(context)
                 .style
-                .copyWith(fontSize: 16, fontWeight: FontWeight.bold, color: T.COLOR_PRIMARY)),
-        decoration: BoxDecoration(color: Color(0xffa9ccd3), borderRadius: BorderRadius.circular(6)));
+                .copyWith(fontSize: 16, fontWeight: FontWeight.bold, color: colors.background)),
+        decoration: BoxDecoration(color: colors.primary, borderRadius: BorderRadius.circular(6)));
   }
 
   Widget buildTitleWidget(BuildContext context) {
@@ -40,13 +45,15 @@ class Advertisement extends StatelessWidget {
   }
 
   Widget buildRefrencesWidget(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     if (content.references is UserReferences) {
       return RichText(
         text: TextSpan(children: [
-          TextSpan(text: 'Reference: ', style: TextStyle(color: Colors.black38, fontSize: 10)),
-          if (content.references != null && content.references!.positive > 0) TextSpan(text: '+${content.references!.positive}', style: TextStyle(color: T.COLOR_PRIMARY, fontSize: 10)),
-          if (content.references != null && content.references!.positive > 0 && content.references!.negative < 0) TextSpan(text: ' / ', style: TextStyle(color: Colors.black38, fontSize: 10)),
-          if (content.references != null && content.references!.negative < 0) TextSpan(text: '-${content.references!.negative}', style: TextStyle(color: T.COLOR_ACCENT, fontSize: 10))
+          TextSpan(text: 'Reference: ', style: TextStyle(color: colors.grey, fontSize: 10)),
+          if (content.references != null && content.references!.positive > 0) TextSpan(text: '+${content.references!.positive}', style: TextStyle(color: colors.primary, fontSize: 10)),
+          if (content.references != null && content.references!.positive > 0 && content.references!.negative < 0) TextSpan(text: ' / ', style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10)),
+          if (content.references != null && content.references!.negative < 0) TextSpan(text: '-${content.references!.negative}', style: TextStyle(color: colors.danger, fontSize: 10))
         ]),
       );
     }
@@ -72,12 +79,14 @@ class Advertisement extends StatelessWidget {
           ),
         ],
       ),
-      //decoration: BoxDecoration(color: T.COLOR_LIGHT, borderRadius: BorderRadius.circular(6), border: Border.all(color: T.COLOR_PRIMARY)),
+      //decoration: BoxDecoration(color: T.COLOR_LIGHT, borderRadius: BorderRadius.circular(6), border: Border.all(color: colors.primaryColor)),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -96,6 +105,7 @@ class Advertisement extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               if (heading.isNotEmpty) Flexible(child: buildTitleWidget(context)),
@@ -114,9 +124,9 @@ class Advertisement extends StatelessWidget {
                 style: DefaultTextStyle
                     .of(context)
                     .style
-                    .copyWith(fontSize: 12, color: Colors.white),
+                    .copyWith(fontSize: 12, color: content.type == AdTypeEnum.offer ? colors.background : colors.text),
               ),
-              decoration: BoxDecoration(color: content.type == AdTypeEnum.offer ? T.COLOR_SECONDARY : Color(0xff00B99D), borderRadius: BorderRadius.circular(6)),
+              decoration: BoxDecoration(color: content.type == AdTypeEnum.offer ? colors.primary : colors.highlight, borderRadius: BorderRadius.circular(6)),
             ),
             if (content.location.isNotEmpty)
               Padding(

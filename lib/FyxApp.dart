@@ -1,18 +1,20 @@
 import 'dart:async';
 
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_analytics/observer.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fyx/SkinnedApp.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/libs/DeviceInfo.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/enums/ThemeEnum.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
+import 'package:fyx/model/provider/ThemeModel.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/pages/GalleryPage.dart';
 import 'package:fyx/pages/HomePage.dart';
@@ -23,9 +25,12 @@ import 'package:fyx/pages/NoticesPage.dart';
 import 'package:fyx/pages/SettingsPage.dart';
 import 'package:fyx/pages/TutorialPage.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/skins/FyxSkin.dart';
+import 'package:fyx/theme/skin/Skin.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry/sentry.dart';
+
 import 'controllers/NotificationsService.dart';
 
 enum Environment { dev, staging, production }
@@ -100,9 +105,8 @@ class FyxApp extends StatefulWidget {
       onTokenRefresh: (fcmToken) => ApiController().refreshFcmToken(fcmToken),
     );
     _notificationsService.configure();
-    _notificationsService.onNewMail = () =>
-        FyxApp.navigatorKey.currentState!.pushReplacementNamed('/home',
-            arguments: HomePageArguments(HomePage.PAGE_MAIL));
+    _notificationsService.onNewMail =
+        () => FyxApp.navigatorKey.currentState!.pushReplacementNamed('/home', arguments: HomePageArguments(HomePage.PAGE_MAIL));
     _notificationsService.onNewPost = ({discussionId, postId}) {
       if (discussionId! > 0 && postId! > 0) {
         FyxApp.navigatorKey.currentState!.pushNamed('/discussion', arguments: DiscussionPageArguments(discussionId, postId: postId + 1));
@@ -121,12 +125,7 @@ class FyxApp extends StatefulWidget {
     AnalyticsProvider.provider = analytics;
   }
 
-  @override
-  _FyxAppState createState() => _FyxAppState();
-}
-
-class _FyxAppState extends State<FyxApp> {
-  Route routes(RouteSettings settings) {
+  static Route routes(RouteSettings settings) {
     switch (settings.name) {
       case '/token':
         print('[Router] Token');
@@ -146,7 +145,11 @@ class _FyxAppState extends State<FyxApp> {
       case '/gallery':
         print('[Router] Gallery');
         return PageRouteBuilder(
-            transitionDuration: const Duration(milliseconds: 0), opaque: false, pageBuilder: (_, __, ___) => GalleryPage(), settings: settings, fullscreenDialog: true);
+            transitionDuration: const Duration(milliseconds: 0),
+            opaque: false,
+            pageBuilder: (_, __, ___) => GalleryPage(),
+            settings: settings,
+            fullscreenDialog: true);
       case '/settings':
         print('[Router] Settings');
         return CupertinoPageRoute(builder: (_) => SettingsPage(), settings: settings);
@@ -163,6 +166,20 @@ class _FyxAppState extends State<FyxApp> {
   }
 
   @override
+  _FyxAppState createState() => _FyxAppState();
+}
+
+class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
+  Brightness? _platformBrightness;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance?.addObserver(this);
+    _platformBrightness ??= WidgetsBinding.instance?.window.platformBrightness;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
@@ -175,29 +192,20 @@ class _FyxAppState extends State<FyxApp> {
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider<NotificationsModel>(create: (context) => NotificationsModel()),
+          ChangeNotifierProvider<ThemeModel>(create: (context) => ThemeModel(MainRepository().settings.theme)),
         ],
-        child: Directionality(
+        builder: (ctx, widget) => Directionality(
           textDirection: TextDirection.ltr,
-          child: CupertinoApp(
-            title: 'Fyx',
-            theme: CupertinoThemeData(
-                primaryColor: T.COLOR_PRIMARY,
-                brightness: Brightness.light,
-                textTheme: CupertinoTextThemeData(primaryColor: Colors.white, textStyle: TextStyle(color: T.COLOR_BLACK, fontSize: 16))),
-            home: MainRepository().credentials != null && MainRepository().credentials!.isValid ? HomePage() : LoginPage(),
-            debugShowCheckedModeBanner: FyxApp.isDev,
-            onUnknownRoute: (RouteSettings settings) => CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings),
-            onGenerateRoute: routes,
-            navigatorKey: FyxApp.navigatorKey,
-            navigatorObservers: [
-              FyxApp.routeObserver,
-              FirebaseAnalyticsObserver(
-                  analytics: FyxApp.analytics,
-                  onError: (error) async => await Sentry.captureException(
-                        error,
-                      ))
-            ],
-          ),
+          child: Skin(
+            skin: FyxSkin.create(),
+            brightness: (() {
+              if (ctx.watch<ThemeModel>().theme == ThemeEnum.system && _platformBrightness != null) {
+                return _platformBrightness!;
+              }
+              return ctx.watch<ThemeModel>().theme == ThemeEnum.light ? Brightness.light : Brightness.dark;
+            })(),
+            child: SkinnedApp()
+          )
         ),
       ),
     );
@@ -207,5 +215,12 @@ class _FyxAppState extends State<FyxApp> {
   void dispose() {
     super.dispose();
     FyxApp._notificationsService.dispose();
+    WidgetsBinding.instance?.removeObserver(this);
+  }
+
+  @override
+  void didChangePlatformBrightness() {
+    setState(() => _platformBrightness = WidgetsBinding.instance?.window.platformBrightness);
+    super.didChangePlatformBrightness(); // make sure you call this
   }
 }

@@ -6,6 +6,8 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 
 class PostRating extends StatefulWidget {
   final Post post;
@@ -36,6 +38,8 @@ class _PostRatingState extends State<PostRating> {
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     return FeedbackIndicator(
       isLoading: _givingRating,
       child: Row(
@@ -45,7 +49,7 @@ class _PostRatingState extends State<PostRating> {
             child: GestureDetector(
               child: Icon(
                 Icons.thumb_up,
-                color: _post!.myRating == 'positive' ? Colors.green : Colors.black38,
+                color: _post!.myRating == 'positive' ? colors.success : colors.text.withOpacity(0.38),
               ),
               onTap: _givingRating
                   ? null
@@ -58,7 +62,7 @@ class _PostRatingState extends State<PostRating> {
                         });
                       }).catchError((error) {
                         print(error);
-                        T.error(L.RATING_ERROR);
+                        T.error(L.RATING_ERROR, bg: colors.danger);
                       }).whenComplete(() => setState(() => _givingRating = false));
                     },
             ),
@@ -72,7 +76,7 @@ class _PostRatingState extends State<PostRating> {
               opacity: _givingRating ? 0 : 1,
               child: Text(
                 _post!.rating > 0 ? '+${_post!.rating}' : _post!.rating.toString(),
-                style: TextStyle(fontSize: 14, color: _post!.rating > 0 ? Colors.green : (_post!.rating < 0 ? Colors.redAccent : Colors.black38)),
+                style: TextStyle(fontSize: 14, color: _post!.rating > 0 ? colors.success : (_post!.rating < 0 ? colors.danger : colors.text.withOpacity(0.38))),
               ),
             ),
           ),
@@ -84,7 +88,7 @@ class _PostRatingState extends State<PostRating> {
             child: GestureDetector(
               child: Icon(
                 Icons.thumb_down,
-                color: ['negative', 'negative_visible'].contains(_post!.myRating) ? Colors.redAccent : Colors.black38,
+                color: ['negative', 'negative_visible'].contains(_post!.myRating) ? colors.danger : colors.text.withOpacity(0.38),
               ),
               onTap: _givingRating
                   ? null
@@ -117,7 +121,7 @@ class _PostRatingState extends State<PostRating> {
                                         });
                                       }).catchError((error) {
                                         print(error);
-                                        T.error(L.RATING_ERROR);
+                                        T.error(L.RATING_ERROR, bg: colors.danger);
                                       }).whenComplete(() {
                                         setState(() => _givingRating = false);
                                         Navigator.of(context, rootNavigator: true).pop();
@@ -135,7 +139,7 @@ class _PostRatingState extends State<PostRating> {
                         }
                       }).catchError((error) {
                         setState(() => _givingRating = false);
-                        T.error(L.RATING_ERROR);
+                        T.error(L.RATING_ERROR, bg: colors.danger);
                       });
                     },
             ),

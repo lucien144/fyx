@@ -11,6 +11,8 @@ import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:fyx/theme/skin/Skin.dart';
 
 class NoticesPage extends StatefulWidget {
   NoticesPage({Key? key}) : super(key: key);
@@ -48,12 +50,13 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
-            backgroundColor: Colors.white,
-            middle: Text(L.NOTICES),
+            middle: Text(L.NOTICES, style: TextStyle(color: colors.text)),
             leading: CupertinoNavigationBarBackButton(
-              color: T.COLOR_PRIMARY,
+              color: colors.primary,
               onPressed: () {
                 Navigator.of(context, rootNavigator: true).pop();
               },
@@ -73,7 +76,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
                   isHighlighted: highlight,
                   topRightWidget: Text(
                     item.wuRating > 0 ? '+${item.wuRating}' : item.wuRating.toString(),
-                    style: TextStyle(fontSize: 14, color: item.wuRating > 0 ? Colors.green : (item.wuRating < 0 ? Colors.redAccent : Colors.black38)),
+                    style: TextStyle(fontSize: 14, color: item.wuRating > 0 ? colors.success : (item.wuRating < 0 ? colors.danger : colors.grey)),
                   ),
                   topLeftWidget: Expanded(
                     child: GestureDetector(

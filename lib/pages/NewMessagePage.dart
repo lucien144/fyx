@@ -11,6 +11,8 @@ import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/Helpers.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
@@ -152,6 +154,8 @@ class _NewMessagePageState extends State<NewMessagePage> {
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     if (_settings == null) {
       _settings =
           ModalRoute.of(context)!.settings.arguments as NewMessageSettings;
@@ -159,7 +163,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
     }
 
     return Container(
-      color: Colors.white,
+      color: colors.background ,
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -265,7 +269,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                           child: Container(
                             width: 16,
                             height: 1,
-                            color: Colors.black38,
+                            color: colors.grey,
                           ),
                         ),
                         SizedBox(width: 12),
@@ -288,9 +292,11 @@ class _NewMessagePageState extends State<NewMessagePage> {
                             onPressed: () => showCupertinoModalPopup(
                                 context: context,
                                 builder: (BuildContext context) {
+                                  SkinColors colors = Skin.of(context).theme.colors;
+
                                   return Container(
                                     height: 250.0,
-                                    color: Colors.white,
+                                    color: colors.background,
                                     child: Column(
                                       children: [
                                         Padding(
@@ -324,7 +330,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                                               style: TextStyle(
                                                   fontSize: 13,
                                                   fontStyle: FontStyle.italic,
-                                                  color: Colors.black45)),
+                                                  color: colors.text.withOpacity(.60))),
                                         ),
                                         Expanded(
                                           child: Row(
@@ -339,7 +345,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                                                     ),
                                                     itemExtent: 32.0,
                                                     backgroundColor:
-                                                        Colors.white,
+                                                        colors.background,
                                                     onSelectedItemChanged:
                                                         (int index) {
                                                       setState(() {
@@ -366,7 +372,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                                                     ),
                                                     itemExtent: 32.0,
                                                     backgroundColor:
-                                                        Colors.white,
+                                                        colors.background,
                                                     onSelectedItemChanged:
                                                         (int index) {
                                                       setState(() {

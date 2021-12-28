@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:fyx/theme/skin/Skin.dart';
 import 'package:sentry/sentry.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
@@ -94,13 +96,15 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     if (widget._rebuild > _lastRebuild && !_isLoading) {
       setState(() => _lastRebuild = widget._rebuild);
       this.loadData();
     }
 
     if (_hasError) {
-      return T.feedbackScreen(isLoading: _isLoading, onPress: loadData, label: L.GENERAL_REFRESH);
+      return T.feedbackScreen(context, isLoading: _isLoading, onPress: loadData, label: L.GENERAL_REFRESH);
     }
 
     if (_slivers.length == 1 && !_isLoading) {
@@ -145,8 +149,8 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
                 width: MediaQuery.of(context).size.width,
                 height: 1,
                 child: LinearProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                  backgroundColor: T.COLOR_PRIMARY,
+                  valueColor: AlwaysStoppedAnimation<Color>(colors.light),
+                  backgroundColor: colors.primary,
                 ),
               ),
             ),
@@ -268,6 +272,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
     double refreshTriggerPullDistance,
     double refreshIndicatorExtent,
   ) {
+    SkinColors colors = Skin.of(context).theme.colors;
     const Curve opacityCurve = const Interval(0.4, 0.8, curve: Curves.easeInOut);
     return Align(
       alignment: Alignment.bottomCenter,
@@ -276,15 +281,15 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
         child: refreshState == RefreshIndicatorMode.drag
             ? Opacity(
                 opacity: opacityCurve.transform(min(pulledExtent / refreshTriggerPullDistance, 1.0)),
-                child: const Icon(
+                child: Icon(
                   Icons.arrow_downward,
-                  color: CupertinoColors.inactiveGray,
+                  color: colors.text.withOpacity(.35),
                   size: 24.0,
                 ),
               )
             : Opacity(
                 opacity: opacityCurve.transform(min(pulledExtent / refreshIndicatorExtent, 1.0)),
-                child: CircularProgressIndicator(strokeWidth: 2.0, valueColor: AlwaysStoppedAnimation<Color>(T.COLOR_PRIMARY)),
+                child: CircularProgressIndicator(strokeWidth: 2.0, valueColor: AlwaysStoppedAnimation<Color>(colors.primary)),
               ),
       ),
     );

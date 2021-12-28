@@ -14,6 +14,8 @@ import 'package:fyx/model/post/content/Advertisement.dart';
 import 'package:fyx/model/post/content/Poll.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/UnreadBadgeDecoration.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:fyx/theme/skin/Skin.dart';
 
 enum LAYOUT_TYPES { textOnly, oneImageOnly, attachmentsOnly, attachmentsAndText }
 
@@ -112,8 +114,10 @@ class ContentBoxLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     return Container(
-      decoration: _isPreview ? T.CARD_SHADOW_DECORATION : null,
+      decoration: _isPreview ? colors.shadow : null,
       child: Column(
         children: <Widget>[
           Visibility(
@@ -124,8 +128,8 @@ class ContentBoxLayout extends StatelessWidget {
             ),
           ),
           Container(
-            color: _isHighlighted ? T.COLOR_SECONDARY.withOpacity(0.1) : null,
-            foregroundDecoration: _isHighlighted ? UnreadBadgeDecoration(badgeColor: T.COLOR_PRIMARY, badgeSize: 16) : null,
+            color: _isHighlighted ? colors.primary.withOpacity(0.1) : null,
+            foregroundDecoration: _isHighlighted ? UnreadBadgeDecoration(badgeColor: colors.primary, badgeSize: 16) : null,
             child: Column(
               children: <Widget>[
                 SizedBox(
@@ -164,7 +168,7 @@ class ContentBoxLayout extends StatelessWidget {
                 SizedBox(
                   height: 8,
                 ),
-                this.bottomWidget != null ? Divider(color: Colors.black38) : Container(),
+                this.bottomWidget != null ? Divider(color: colors.grey) : Container(),
                 this.bottomWidget != null ? Container(child: this.bottomWidget, padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16)) : Container(),
                 SizedBox(
                   height: 8,

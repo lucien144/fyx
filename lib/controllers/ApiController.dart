@@ -168,11 +168,20 @@ class ApiController {
   }
 
   Future<DiscussionResponse> loadDiscussion(int id, {int? lastId, String? user, String? search}) async {
-    var response = await provider.fetchDiscussion(id, lastId: lastId, user: user, search: search);
-    if (response.statusCode == 400) {
-      return DiscussionResponse.accessDenied();
+    try {
+      var response = await provider.fetchDiscussion(id, lastId: lastId, user: user, search: search);
+      if (response.statusCode == 400) {
+        return DiscussionResponse.accessDenied();
+      }
+      return DiscussionResponse.fromJson(response.data);
+    } catch (error) {
+      if (error is DioError) {
+        if (error.response?.statusCode == 400) {
+          return DiscussionResponse.accessDenied();
+        }
+      }
     }
-    return DiscussionResponse.fromJson(response.data);
+    return DiscussionResponse.error();
   }
 
   Future<DiscussionHomeResponse> getDiscussionHome(int id) async {
@@ -221,7 +230,10 @@ class ApiController {
     Response response = await provider.giveRating(discussionId, postId, positive, confirm, remove);
     var data = response.data;
     return RatingResponse(
-        isGiven: data['error'] ?? true, needsConfirmation: data['code'] == 'NeedsConfirmation', currentRating: data['rating'] ?? 0, myRating: data['my_rating'] ?? 'none');
+        isGiven: data['error'] ?? true,
+        needsConfirmation: data['code'] == 'NeedsConfirmation',
+        currentRating: data['rating'] ?? 0,
+        myRating: data['my_rating'] ?? 'none');
   }
 
   void logout({bool removeAuthrorization = true}) {

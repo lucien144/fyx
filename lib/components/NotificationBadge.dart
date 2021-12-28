@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 
 class NotificationBadge extends StatelessWidget {
   final Widget widget;
@@ -9,6 +11,8 @@ class NotificationBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     return Stack(
       alignment: Alignment.center,
       children: <Widget>[
@@ -21,10 +25,10 @@ class NotificationBadge extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.all(3),
               constraints: BoxConstraints(minWidth: 16),
-              decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(16)),
+              decoration: BoxDecoration(color: colors.danger, borderRadius: BorderRadius.circular(16)),
               child: Text(
                 counter.toString(),
-                style: TextStyle(color: Colors.white, fontSize: 10),
+                style: TextStyle(color: colors.background, fontSize: 10),
                 textAlign: TextAlign.center,
               ),
             ),

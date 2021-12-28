@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:fyx/theme/skin/Skin.dart';
 
 class PostHeroAttachmentBox extends StatelessWidget {
   final String title;
@@ -14,6 +16,8 @@ class PostHeroAttachmentBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     return GestureDetector(
       onTap: this.onTap,
       child: Container(
@@ -21,7 +25,7 @@ class PostHeroAttachmentBox extends StatelessWidget {
         height: this.size.height,
         decoration: BoxDecoration(
           image: this.image == null ? null : DecorationImage(image: NetworkImage(this.image!), fit: BoxFit.cover),
-          color: T.COLOR_PRIMARY,
+          color: colors.primary,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Column(
@@ -29,19 +33,22 @@ class PostHeroAttachmentBox extends StatelessWidget {
             Expanded(
               child: Icon(
                 icon,
-                color: Colors.white,
+                color: colors.light.withOpacity(.85),
                 size: 40,
               ),
             ),
             if (this.showStrip) Container(
-              color: Color.fromRGBO(255, 255, 255, 0.6),
-              width: double.infinity,
+              decoration: BoxDecoration(
+                  color: colors.light.withOpacity(.6),
+                borderRadius: BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(8)),
+                ),
+                width: double.infinity,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                 child: Text(
                   title,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 14),
+                  style: TextStyle(fontSize: 14, color: colors.dark),
                 ),
               ),
             )
