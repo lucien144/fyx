@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/FyxApp.dart';
-import 'package:fyx/components/CircleAvatar.dart' as ca;
+import 'package:fyx/components/Avatar.dart' as ca;
 import 'package:fyx/components/DiscussionListItem.dart';
 import 'package:fyx/components/ListHeader.dart';
 import 'package:fyx/components/NotificationBadge.dart';
@@ -235,7 +235,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                               isVisible: notifications.newNotices > 0,
                               counter: notifications.newNotices)),
                       trailing: GestureDetector(
-                        child: ca.CircleAvatar(
+                        child: ca.Avatar(
                           MainRepository().credentials!.avatar,
                           size: 26
                         ),
@@ -353,7 +353,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                 return CupertinoPageScaffold(
                     navigationBar: CupertinoNavigationBar(
                         trailing: GestureDetector(
-                          child: ca.CircleAvatar(
+                          child: ca.Avatar(
                             MainRepository().credentials!.avatar,
                             size: 26,
                           ),

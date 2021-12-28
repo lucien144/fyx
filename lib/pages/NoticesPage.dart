@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fyx/components/CircleAvatar.dart' as component;
+import 'package:fyx/components/Avatar.dart' as component;
 import 'package:fyx/components/ContentBoxLayout.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
@@ -111,7 +111,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
               waitDuration: Duration(milliseconds: 0),
               child: Padding(
                 padding: const EdgeInsets.only(left: 5, bottom: 5),
-                child: component.CircleAvatar(
+                child: component.Avatar(
                   Helpers.avatarUrl(thumbUp.nick),
                   size: 22,
                   isHighlighted: thumbUp.time > lastVisit,
@@ -149,7 +149,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
               SizedBox(
                 width: 5,
               ),
-              component.CircleAvatar(
+              component.Avatar(
                 Helpers.avatarUrl(reply.nick),
                 size: 22,
                 isHighlighted: reply.time > lastVisit,

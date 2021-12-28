@@ -5,12 +5,12 @@ import 'package:flutter/widgets.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 
-class CircleAvatar extends StatelessWidget {
+class Avatar extends StatelessWidget {
   final String url;
   final bool isHighlighted;
   final double size;
 
-  CircleAvatar(this.url, {this.size = 32.0, this.isHighlighted = false});
+  Avatar(this.url, {this.size = 32.0, this.isHighlighted = false});
 
   @override
   Widget build(BuildContext context) {

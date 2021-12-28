@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:flutter/widgets.dart';
-import 'package:fyx/components/CircleAvatar.dart';
+import 'package:fyx/components/Avatar.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -22,7 +22,7 @@ class PostAvatar extends StatelessWidget {
     SkinColors colors = Skin.of(context).theme.colors;
 
     return Row(children: <Widget>[
-      CircleAvatar(image),
+      Avatar(image),
       SizedBox(
         width: 4,
       ),
