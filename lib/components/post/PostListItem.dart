@@ -49,98 +49,122 @@ class _PostListItemState extends State<PostListItem> {
   Widget build(BuildContext context) {
     SkinColors colors = Skin.of(context).theme.colors;
 
-    return ContentBoxLayout(
-      isPreview: widget._isPreview,
-      isHighlighted: widget._isHighlighted,
-      topLeftWidget: GestureFeedback(
-        onTap: () => showCupertinoModalPopup(
-            context: context,
-            builder: (BuildContext context) => PostAvatarActionSheet(
-                  user: _post!.nick,
-                  idKlub: _post!.idKlub,
-                )),
-        child: PostAvatar(
-          _post!.nick,
-          description: Helpers.relativeTime(_post!.time),
-        ),
-      ),
-      topRightWidget: GestureDetector(
-          child: Icon(Icons.more_vert, color: colors.text.withOpacity(0.38)),
+    return GestureDetector(
+      onDoubleTap: () {
+        if (!_post!.canBeRated) {
+          return null;
+        }
+
+        ApiController().giveRating(_post!.idKlub, _post!.id, remove: _post!.myRating != 'none').then((response) {
+          if (_post!.myRating != 'none') {
+            T.success('Hodocení odebráno.', bg: colors.success);
+          } else {
+            T.success('Hodocení uděleno.', bg: colors.success);
+          }
+
+          setState(() {
+            _post!.rating = response.currentRating;
+            _post!.myRating = response.myRating;
+          });
+        }).catchError((error) {
+          print(error);
+          T.error(L.RATING_ERROR, bg: colors.danger);
+        });
+      },
+      behavior: HitTestBehavior.opaque,
+      child: ContentBoxLayout(
+        isPreview: widget._isPreview,
+        isHighlighted: widget._isHighlighted,
+        topLeftWidget: GestureFeedback(
           onTap: () => showCupertinoModalPopup(
               context: context,
-              builder: (BuildContext context) => PostActionSheet(
-                  parentContext: context,
-                  user: _post!.nick,
-                  postId: _post!.id,
-                  shareData: ShareData(subject: '@${_post!.nick}', body: _post!.content, link: _post!.link),
-                  flagPostCallback: (postId) => MainRepository().settings.blockPost(postId)))),
-      bottomWidget: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          PostRating(_post!),
-          Row(
-            children: <Widget>[
-              Visibility(
-                visible: widget._isPreview != true && _post!.canReply,
-                child: GestureDetector(
-                    onTap: () => Navigator.of(context).pushNamed('/new-message',
-                        arguments: NewMessageSettings(
-                            replyWidget: PostListItem(
-                              _post!,
-                              isPreview: true,
-                            ),
-                            onClose: this.widget.onUpdate,
-                            onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
-                              var result =
-                                  await ApiController().postDiscussionMessage(_post!.idKlub, message, attachments: attachments, replyPost: _post);
-                              return result.isOk;
-                            })),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        IconReply(),
-                        Text('Odpovědět',
-                            style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 14))
-                      ],
-                    )),
-              ),
-              Visibility(
-                visible: widget._isPreview != true,
-                child: SizedBox(
-                  width: 16,
+              builder: (BuildContext context) => PostAvatarActionSheet(
+                    user: _post!.nick,
+                    idKlub: _post!.idKlub,
+                  )),
+          child: PostAvatar(
+            _post!.nick,
+            description: Helpers.relativeTime(_post!.time),
+          ),
+        ),
+        topRightWidget: GestureDetector(
+            child: Icon(Icons.more_vert, color: colors.text.withOpacity(0.38)),
+            onTap: () => showCupertinoModalPopup(
+                context: context,
+                builder: (BuildContext context) => PostActionSheet(
+                    parentContext: context,
+                    user: _post!.nick,
+                    postId: _post!.id,
+                    shareData: ShareData(subject: '@${_post!.nick}', body: _post!.content, link: _post!.link),
+                    flagPostCallback: (postId) => MainRepository().settings.blockPost(postId)))),
+        bottomWidget: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            PostRating(_post!),
+            Row(
+              children: <Widget>[
+                Visibility(
+                  visible: widget._isPreview != true && _post!.canReply,
+                  child: GestureDetector(
+                      onTap: () => Navigator.of(context).pushNamed('/new-message',
+                          arguments: NewMessageSettings(
+                              replyWidget: PostListItem(
+                                _post!,
+                                isPreview: true,
+                              ),
+                              onClose: this.widget.onUpdate,
+                              onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                                var result =
+                                    await ApiController().postDiscussionMessage(_post!.idKlub, message, attachments: attachments, replyPost: _post);
+                                return result.isOk;
+                              })),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          IconReply(),
+                          Text('Odpovědět',
+                              style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 14))
+                        ],
+                      )),
                 ),
-              ),
-              if (_post!.canBeReminded)
-                GestureDetector(
-                  child: FeedbackIndicator(
-                    isLoading: _isSaving,
-                    child: Row(
-                      children: <Widget>[
-                        Icon(
-                          _post!.hasReminder ? Icons.bookmark : Icons.bookmark_border,
-                          color: colors.text.withOpacity(0.38),
-                        ),
-                        Text('Uložit', style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 14))
-                      ],
-                    ),
+                Visibility(
+                  visible: widget._isPreview != true,
+                  child: SizedBox(
+                    width: 16,
                   ),
-                  onTap: () {
-                    setState(() {
-                      _post!.hasReminder = !_post!.hasReminder;
-                      _isSaving = true;
-                    });
-                    ApiController().setPostReminder(_post!.idKlub, _post!.id, _post!.hasReminder).catchError((error) {
-                      T.error(L.REMINDER_ERROR, bg: colors.danger);
-                      setState(() => _post!.hasReminder = !_post!.hasReminder);
-                    }).whenComplete(() => setState(() => _isSaving = false));
-                    AnalyticsProvider().logEvent('reminder');
-                  },
-                )
-            ],
-          )
-        ],
+                ),
+                if (_post!.canBeReminded)
+                  GestureDetector(
+                    child: FeedbackIndicator(
+                      isLoading: _isSaving,
+                      child: Row(
+                        children: <Widget>[
+                          Icon(
+                            _post!.hasReminder ? Icons.bookmark : Icons.bookmark_border,
+                            color: colors.text.withOpacity(0.38),
+                          ),
+                          Text('Uložit', style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 14))
+                        ],
+                      ),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        _post!.hasReminder = !_post!.hasReminder;
+                        _isSaving = true;
+                      });
+                      ApiController().setPostReminder(_post!.idKlub, _post!.id, _post!.hasReminder).catchError((error) {
+                        T.error(L.REMINDER_ERROR, bg: colors.danger);
+                        setState(() => _post!.hasReminder = !_post!.hasReminder);
+                      }).whenComplete(() => setState(() => _isSaving = false));
+                      AnalyticsProvider().logEvent('reminder');
+                    },
+                  )
+              ],
+            )
+          ],
+        ),
+        content: _post!.content,
       ),
-      content: _post!.content,
     );
   }
 
