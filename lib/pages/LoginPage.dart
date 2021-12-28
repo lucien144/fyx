@@ -76,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
             color: colors.primaryColor,
           ),
           decoration:
-              BoxDecoration(color: colors.scaffoldBackgroundColor, borderRadius: BorderRadius.circular(32), boxShadow: [BoxShadow(color: Colors.black, offset: Offset(0, 0), blurRadius: 16)]),
+              BoxDecoration(color: colors.scaffoldBackgroundColor, borderRadius: BorderRadius.circular(32), boxShadow: [BoxShadow(color: colors.darkColor, offset: Offset(0, 0), blurRadius: 16)]),
         ),
         AnimatedPadding(
           padding: EdgeInsets.only(top: 128 - offset),

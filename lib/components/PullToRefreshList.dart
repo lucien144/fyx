@@ -149,7 +149,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
                 width: MediaQuery.of(context).size.width,
                 height: 1,
                 child: LinearProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  valueColor: AlwaysStoppedAnimation<Color>(colors.lightColor),
                   backgroundColor: colors.primaryColor,
                 ),
               ),
@@ -281,9 +281,9 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
         child: refreshState == RefreshIndicatorMode.drag
             ? Opacity(
                 opacity: opacityCurve.transform(min(pulledExtent / refreshTriggerPullDistance, 1.0)),
-                child: const Icon(
+                child: Icon(
                   Icons.arrow_downward,
-                  color: CupertinoColors.inactiveGray,
+                  color: colors.textColor.withOpacity(.35),
                   size: 24.0,
                 ),
               )

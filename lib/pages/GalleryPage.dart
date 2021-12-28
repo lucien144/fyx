@@ -59,7 +59,7 @@ class _GalleryPageState extends State<GalleryPage> {
     return Stack(
       children: [
         Container(
-          decoration: BoxDecoration(color: Colors.black.withOpacity(0.90)),
+          decoration: BoxDecoration(color: colors.darkColor.withOpacity(0.90)),
           constraints: BoxConstraints.expand(
             height: MediaQuery.of(context).size.height,
           ),
