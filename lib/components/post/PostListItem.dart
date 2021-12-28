@@ -87,20 +87,20 @@ class _PostListItemState extends State<PostListItem> {
             description: Helpers.relativeTime(_post!.time),
           ),
         ),
-        topRightWidget: GestureDetector(
-            child: Icon(Icons.more_vert, color: colors.text.withOpacity(0.38)),
-            onTap: () => showCupertinoModalPopup(
-                context: context,
-                builder: (BuildContext context) => PostActionSheet(
-                    parentContext: context,
-                    user: _post!.nick,
-                    postId: _post!.id,
-                    shareData: ShareData(subject: '@${_post!.nick}', body: _post!.content, link: _post!.link),
-                    flagPostCallback: (postId) => MainRepository().settings.blockPost(postId)))),
+        topRightWidget: PostRating(_post!),
         bottomWidget: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            PostRating(_post!),
+            GestureDetector(
+                child: Icon(Icons.more_horiz, color: colors.text.withOpacity(0.38)),
+                onTap: () => showCupertinoModalPopup(
+                    context: context,
+                    builder: (BuildContext context) => PostActionSheet(
+                        parentContext: context,
+                        user: _post!.nick,
+                        postId: _post!.id,
+                        shareData: ShareData(subject: '@${_post!.nick}', body: _post!.content, link: _post!.link),
+                        flagPostCallback: (postId) => MainRepository().settings.blockPost(postId)))),
             Row(
               children: <Widget>[
                 Visibility(
