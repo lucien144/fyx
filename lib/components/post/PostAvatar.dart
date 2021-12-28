@@ -22,7 +22,7 @@ class PostAvatar extends StatelessWidget {
     SkinColors colors = Skin.of(context).theme.colors;
 
     return Row(children: <Widget>[
-      CircleAvatar(image, isHighlighted: isHighlighted),
+      CircleAvatar(image),
       SizedBox(
         width: 4,
       ),

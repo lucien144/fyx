@@ -237,8 +237,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                       trailing: GestureDetector(
                         child: ca.CircleAvatar(
                           MainRepository().credentials!.avatar,
-                          size: 30,
-                          isHighlighted: true,
+                          size: 26
                         ),
                         onTap: () {
                           showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet(context));
@@ -356,7 +355,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                         trailing: GestureDetector(
                           child: ca.CircleAvatar(
                             MainRepository().credentials!.avatar,
-                            size: 30,
+                            size: 26,
                           ),
                           onTap: () {
                             showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet(context));
