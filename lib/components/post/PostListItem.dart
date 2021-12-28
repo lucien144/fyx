@@ -18,6 +18,8 @@ import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/IconReply.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 
 class PostListItem extends StatefulWidget {
   final Post post;
@@ -45,6 +47,8 @@ class _PostListItemState extends State<PostListItem> {
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     return ContentBoxLayout(
       isPreview: widget._isPreview,
       isHighlighted: widget._isHighlighted,
@@ -126,7 +130,7 @@ class _PostListItemState extends State<PostListItem> {
                       _isSaving = true;
                     });
                     ApiController().setPostReminder(_post!.idKlub, _post!.id, _post!.hasReminder).catchError((error) {
-                      T.error(L.REMINDER_ERROR);
+                      T.error(L.REMINDER_ERROR, bg: colors.dangerColor);
                       setState(() => _post!.hasReminder = !_post!.hasReminder);
                     }).whenComplete(() => setState(() => _isSaving = false));
                     AnalyticsProvider().logEvent('reminder');

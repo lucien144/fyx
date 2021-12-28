@@ -48,7 +48,7 @@ class _PostActionSheetState extends State<PostActionSheet> {
                 onPressed: () {
                   var data = ClipboardData(text: widget.shareData.link);
                   Clipboard.setData(data).then((_) {
-                    T.success(L.TOAST_COPIED);
+                    T.success(L.TOAST_COPIED, bg: colors.successColor);
                     Navigator.pop(context);
                   });
                   AnalyticsProvider().logEvent('copyLink');
@@ -85,7 +85,7 @@ class _PostActionSheetState extends State<PostActionSheet> {
               isDestructiveAction: true,
               onPressed: () {
                 widget.flagPostCallback(widget.postId);
-                T.success(L.TOAST_POST_HIDDEN);
+                T.success(L.TOAST_POST_HIDDEN, bg: colors.successColor);
                 Navigator.pop(context);
                 AnalyticsProvider().logEvent('hidePost');
               }),
@@ -100,9 +100,9 @@ class _PostActionSheetState extends State<PostActionSheet> {
                 try {
                   setState(() => _reportIndicator = true);
                   await ApiController().sendMail('FYXBOT', 'Inappropriate post/mail report: ID ${widget.postId} by user @${widget.user}.');
-                  T.success(L.TOAST_POST_FLAGGED);
+                  T.success(L.TOAST_POST_FLAGGED, bg: colors.successColor);
                 } catch (error) {
-                  T.error(L.TOAST_POST_FLAG_ERROR);
+                  T.error(L.TOAST_POST_FLAG_ERROR, bg: colors.dangerColor);
                 } finally {
                   setState(() => _reportIndicator = false);
                   Navigator.pop(context);

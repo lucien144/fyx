@@ -67,7 +67,7 @@ class _TutorialPageState extends State<TutorialPage> {
                             size: 16,
                           ), onTap: () {
                     var onError = (error) => setState(() {
-                          T.error('Přihlášení se nezdařilo. Chyba: $error');
+                          T.error('Přihlášení se nezdařilo. Chyba: $error', bg: colors.dangerColor);
                           _hasOpenedNyx = false;
                           _loggingIn = false;
                         });

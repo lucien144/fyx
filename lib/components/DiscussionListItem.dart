@@ -19,7 +19,7 @@ class DiscussionListItem extends StatelessWidget {
     return GestureDetector(
       onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/discussion', arguments: DiscussionPageArguments(discussion.idKlub)),
       child: Container(
-        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.black12))),
+        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.greyColor.withOpacity(.12)))),
         padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         child: Row(
           children: <Widget>[

@@ -17,24 +17,24 @@ class T {
   // ************************
   // Theme mixins
   // ************************
-  static error(String message, {int duration: 7}) {
+  static error(String message, {int duration: 7, Color bg: Colors.red}) {
     Fluttertoast.showToast(
         msg: message,
         toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.TOP,
         timeInSecForIosWeb: duration,
-        backgroundColor: Colors.red,
+        backgroundColor: bg,
         textColor: Colors.white,
         fontSize: 14.0);
   }
 
-  static success(String message, {int duration: 7}) {
+  static success(String message, {int duration: 7, Color bg: Colors.green}) {
     Fluttertoast.showToast(
         msg: message,
         toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.TOP,
         timeInSecForIosWeb: duration,
-        backgroundColor: Colors.green,
+        backgroundColor: bg,
         textColor: Colors.white,
         fontSize: 14.0);
   }

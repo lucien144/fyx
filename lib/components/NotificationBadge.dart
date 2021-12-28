@@ -28,7 +28,7 @@ class NotificationBadge extends StatelessWidget {
               decoration: BoxDecoration(color: colors.dangerColor, borderRadius: BorderRadius.circular(16)),
               child: Text(
                 counter.toString(),
-                style: TextStyle(color: Colors.white, fontSize: 10),
+                style: TextStyle(color: colors.scaffoldBackgroundColor, fontSize: 10),
                 textAlign: TextAlign.center,
               ),
             ),

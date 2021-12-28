@@ -163,7 +163,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
     }
 
     return Container(
-      color: CupertinoTheme.of(context).scaffoldBackgroundColor ,
+      color: colors.scaffoldBackgroundColor ,
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -292,9 +292,11 @@ class _NewMessagePageState extends State<NewMessagePage> {
                             onPressed: () => showCupertinoModalPopup(
                                 context: context,
                                 builder: (BuildContext context) {
+                                  SkinColors colors = Skin.of(context).theme.colors;
+
                                   return Container(
                                     height: 250.0,
-                                    color: Colors.white,
+                                    color: colors.scaffoldBackgroundColor,
                                     child: Column(
                                       children: [
                                         Padding(
@@ -328,7 +330,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                                               style: TextStyle(
                                                   fontSize: 13,
                                                   fontStyle: FontStyle.italic,
-                                                  color: Colors.black45)),
+                                                  color: colors.textColor.withOpacity(.60))),
                                         ),
                                         Expanded(
                                           child: Row(
@@ -343,7 +345,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                                                     ),
                                                     itemExtent: 32.0,
                                                     backgroundColor:
-                                                        Colors.white,
+                                                        colors.scaffoldBackgroundColor,
                                                     onSelectedItemChanged:
                                                         (int index) {
                                                       setState(() {
@@ -370,7 +372,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                                                     ),
                                                     itemExtent: 32.0,
                                                     backgroundColor:
-                                                        Colors.white,
+                                                        colors.scaffoldBackgroundColor,
                                                     onSelectedItemChanged:
                                                         (int index) {
                                                       setState(() {

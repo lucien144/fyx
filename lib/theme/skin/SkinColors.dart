@@ -16,6 +16,8 @@ class SkinColors {
   final Color pollAnswerSelected;
   final Color disabledColor;
   final Color greyColor;
+  final Color lightColor;
+  final Color darkColor;
   final BoxDecoration shadow;
   final LinearGradient gradient;
   Color? primaryContrastingColor;
@@ -35,6 +37,8 @@ class SkinColors {
     this.pollAnswerSelected = const Color(0xff76b9b9),
     this.disabledColor = Colors.black26,
     this.greyColor = Colors.black38,
+    this.lightColor = Colors.white,
+    this.darkColor = const Color(0xFF282828),
     this.gradient = const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xff1AD592), Color(0xFF196378)]),
   })  : shadow = BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(8)),

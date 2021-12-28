@@ -91,7 +91,7 @@ class _GalleryPageState extends State<GalleryPage> {
             color: colors.primaryColor,
             child: Icon(
               CupertinoIcons.clear_thick,
-              color: Colors.white,
+              color: colors.scaffoldBackgroundColor,
               size: 32,
             ),
             onPressed: () => close(context),
@@ -108,7 +108,7 @@ class _GalleryPageState extends State<GalleryPage> {
               child: Text(
                 '$_page / ${_arguments!.images.length}',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: colors.scaffoldBackgroundColor),
               ),
             )),
         Positioned(
@@ -121,7 +121,7 @@ class _GalleryPageState extends State<GalleryPage> {
                   ? CupertinoActivityIndicator()
                   : Icon(
                       Icons.save_alt_rounded,
-                      color: Colors.white,
+                      color: colors.scaffoldBackgroundColor,
                       size: 32,
                     ),
               onPressed: () async {
@@ -142,9 +142,9 @@ class _GalleryPageState extends State<GalleryPage> {
                     throw Exception(resultMap['errorMessage']);
                   }
 
-                  T.success(L.TOAST_IMAGE_SAVE_OK);
+                  T.success(L.TOAST_IMAGE_SAVE_OK, bg: colors.successColor);
                 } catch (error) {
-                  T.error(L.TOAST_IMAGE_SAVE_ERROR);
+                  T.error(L.TOAST_IMAGE_SAVE_ERROR, bg: colors.dangerColor);
                   Sentry.captureException(error);
                 } finally {
                   setState(() => _saving = false);

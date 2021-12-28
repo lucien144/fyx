@@ -158,7 +158,7 @@ class _LoginPageState extends State<LoginPage> {
             Navigator.of(context).pushNamed('/token', arguments: new TutorialPageArguments(token: response.authCode, username: _loginController.text));
           }).catchError((error) {
             print(error);
-            T.error(error.toString());
+            T.error(error.toString(), bg: colors.dangerColor);
           }).whenComplete(() => setState(() => _isRunning = false));
         },
         color: colors.scaffoldBackgroundColor,

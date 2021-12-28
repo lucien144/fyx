@@ -116,7 +116,7 @@ class _PollState extends State<Poll> {
                     var poll = await ApiController().votePoll(_poll!.discussionId, _poll!.postId, votes);
                     setState(() => _poll = poll);
                   } catch (error) {
-                    T.error(error.toString());
+                    T.error(error.toString(), bg: colors.dangerColor);
                   } finally {
                     setState(() => _loading = false);
                   }

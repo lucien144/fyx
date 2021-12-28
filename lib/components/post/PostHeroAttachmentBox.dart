@@ -33,19 +33,22 @@ class PostHeroAttachmentBox extends StatelessWidget {
             Expanded(
               child: Icon(
                 icon,
-                color: Colors.white,
+                color: colors.lightColor.withOpacity(.85),
                 size: 40,
               ),
             ),
             if (this.showStrip) Container(
-              color: Color.fromRGBO(255, 255, 255, 0.6),
-              width: double.infinity,
+              decoration: BoxDecoration(
+                  color: colors.lightColor.withOpacity(.6),
+                borderRadius: BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(8)),
+                ),
+                width: double.infinity,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                 child: Text(
                   title,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 14),
+                  style: TextStyle(fontSize: 14, color: colors.darkColor),
                 ),
               ),
             )

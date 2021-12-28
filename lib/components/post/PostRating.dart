@@ -62,7 +62,7 @@ class _PostRatingState extends State<PostRating> {
                         });
                       }).catchError((error) {
                         print(error);
-                        T.error(L.RATING_ERROR);
+                        T.error(L.RATING_ERROR, bg: colors.dangerColor);
                       }).whenComplete(() => setState(() => _givingRating = false));
                     },
             ),
@@ -121,7 +121,7 @@ class _PostRatingState extends State<PostRating> {
                                         });
                                       }).catchError((error) {
                                         print(error);
-                                        T.error(L.RATING_ERROR);
+                                        T.error(L.RATING_ERROR, bg: colors.dangerColor);
                                       }).whenComplete(() {
                                         setState(() => _givingRating = false);
                                         Navigator.of(context, rootNavigator: true).pop();
@@ -139,7 +139,7 @@ class _PostRatingState extends State<PostRating> {
                         }
                       }).catchError((error) {
                         setState(() => _givingRating = false);
-                        T.error(L.RATING_ERROR);
+                        T.error(L.RATING_ERROR, bg: colors.dangerColor);
                       });
                     },
             ),

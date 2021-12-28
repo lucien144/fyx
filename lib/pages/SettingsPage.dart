@@ -13,6 +13,8 @@ import 'package:fyx/model/provider/ThemeModel.dart';
 import 'package:fyx/pages/InfoPage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -41,6 +43,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
     CSWidgetStyle postsStyle = CSWidgetStyle(icon: Icon(Icons.view_compact, color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38)));
     CSWidgetStyle autocorrectStyle = CSWidgetStyle(icon: Icon(Icons.spellcheck, color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38)));
     CSWidgetStyle bugreportStyle = CSWidgetStyle(icon: Icon(Icons.bug_report, color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38)));
@@ -141,7 +144,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           CSButton(CSButtonType.DESTRUCTIVE, 'Reset', () {
             MainRepository().settings.resetBlockedContent();
-            T.success(L.SETTINGS_CACHE_RESET);
+            T.success(L.SETTINGS_CACHE_RESET, bg: colors.successColor);
             AnalyticsProvider().logEvent('resetBlockedContent');
           }),
           const CSHeader('Informace'),
