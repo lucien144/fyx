@@ -162,10 +162,9 @@ class _NewMessagePageState extends State<NewMessagePage> {
       _recipientController.text = _settings!.inputFieldPlaceholder.toUpperCase();
     }
 
-    return Container(
-      color: colors.background ,
+    return CupertinoPageScaffold(
       child: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: <Widget>[
