@@ -84,7 +84,7 @@ class _GalleryPageState extends State<GalleryPage> {
           ),
         ),
         Positioned(
-          top: 30,
+          top: 50,
           right: 30,
           child: CupertinoButton(
             padding: EdgeInsets.zero,

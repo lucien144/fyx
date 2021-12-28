@@ -92,6 +92,7 @@ class _MailboxPageState extends State<MailboxPage> {
         child: SafeArea(
           child: FloatingActionButton(
             backgroundColor: colors.primary,
+            foregroundColor: colors.background,
             child: Icon(Icons.add),
             onPressed: () => Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
                 arguments: NewMessageSettings(
