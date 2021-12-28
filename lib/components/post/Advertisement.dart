@@ -25,14 +25,16 @@ class Advertisement extends StatelessWidget {
   const Advertisement(this.content, {this.title, this.username = ''});
 
   Widget buildPriceWidget(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     return Container(
         padding: const EdgeInsets.all(6),
         child: Text('${content.price.toString()} ${content.currency}',
             style: DefaultTextStyle
                 .of(context)
                 .style
-                .copyWith(fontSize: 16, fontWeight: FontWeight.bold, color: CupertinoTheme.of(context).primaryColor)),
-        decoration: BoxDecoration(color: Color(0xffa9ccd3), borderRadius: BorderRadius.circular(6)));
+                .copyWith(fontSize: 16, fontWeight: FontWeight.bold, color: colors.background)),
+        decoration: BoxDecoration(color: colors.primary, borderRadius: BorderRadius.circular(6)));
   }
 
   Widget buildTitleWidget(BuildContext context) {

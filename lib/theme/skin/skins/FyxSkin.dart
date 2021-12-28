@@ -9,19 +9,18 @@ class FyxSkin extends SkinData {
   factory FyxSkin.create() {
     final lightColors = SkinColors();
     final darkColors = SkinColors(
-      danger: const Color(0xffe5534b),
-      barBackground: const Color(0xff2d333b),
-      text: const Color(0xFFadbac7),
-      primary: const Color(0xff316775),
-      highlight: const Color(0xff00242e),
-      primaryContrasting: const Color(0xFF1c2128),
-      pollBackground: const Color(0xff2d333b),
-      pollAnswer: const Color(0xff677578),
-      pollAnswerSelected: const Color(0xff316775),
-      background: const Color(0xFF1C2128),
-      disabled: const Color(0xFFadbac7),
-      gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xff316775), Color(0xff00242e)])
-    );
+        primary: const Color(0xff316775),
+        background: const Color(0xFF1C2128),
+        barBackground: const Color(0xff2d333b),
+        text: const Color(0xFFadbac7),
+        danger: const Color(0xffe5534b),
+        highlight: const Color(0xff00242e),
+        disabled: const Color(0xFFadbac7),
+        pollBackground: const Color(0xff2d333b),
+        pollAnswer: const Color(0xff677578),
+        pollAnswerSelected: const Color(0xff316775),
+        primaryContrasting: const Color(0xFF1c2128),
+        gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xff316775), Color(0xff00242e)]));
 
     return FyxSkin(
         lightData: SkinBrightnessData<SkinColors>(
