@@ -63,6 +63,11 @@ class ApiProvider implements IApiProvider {
         return handler.next(response);
       }
 
+      // Negative rating confirmation
+      if (response.statusCode == 403 && ['NeedsConfirmation'].contains(response.data?['code'])) {
+        return handler.next(response);
+      }
+
       // Malformed response
       if (onError != null) {
         onError!(L.API_ERROR);
@@ -82,11 +87,6 @@ class ApiProvider implements IApiProvider {
         if (onError != null) {
           onError!(e.response!.data['message']);
         }
-        return handler.next(e);
-      }
-
-      // Negative rating confirmation
-      if (e.response?.statusCode == 403) {
         return handler.next(e);
       }
 
@@ -139,7 +139,7 @@ class ApiProvider implements IApiProvider {
     String action = positive ? 'positive' : 'negative';
     action = remove ? 'remove' : action;
     action = confirm ? 'negative_visible' : action;
-    return await dio.post('$URL/discussion/$discussionId/rating/$postId/$action');
+    return await dio.post('$URL/discussion/$discussionId/rating/$postId/$action', options: Options(validateStatus: (status) => status! < 500));
   }
 
   Future<Response> logout() async {
