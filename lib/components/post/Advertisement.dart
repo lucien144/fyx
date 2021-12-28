@@ -48,10 +48,10 @@ class Advertisement extends StatelessWidget {
     if (content.references is UserReferences) {
       return RichText(
         text: TextSpan(children: [
-          TextSpan(text: 'Reference: ', style: TextStyle(color: colors.greyColor, fontSize: 10)),
+          TextSpan(text: 'Reference: ', style: TextStyle(color: colors.grey, fontSize: 10)),
           if (content.references != null && content.references!.positive > 0) TextSpan(text: '+${content.references!.positive}', style: TextStyle(color: CupertinoTheme.of(context).primaryColor, fontSize: 10)),
           if (content.references != null && content.references!.positive > 0 && content.references!.negative < 0) TextSpan(text: ' / ', style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38), fontSize: 10)),
-          if (content.references != null && content.references!.negative < 0) TextSpan(text: '-${content.references!.negative}', style: TextStyle(color: colors.dangerColor, fontSize: 10))
+          if (content.references != null && content.references!.negative < 0) TextSpan(text: '-${content.references!.negative}', style: TextStyle(color: colors.danger, fontSize: 10))
         ]),
       );
     }
@@ -122,9 +122,9 @@ class Advertisement extends StatelessWidget {
                 style: DefaultTextStyle
                     .of(context)
                     .style
-                    .copyWith(fontSize: 12, color: content.type == AdTypeEnum.offer ? colors.scaffoldBackgroundColor : colors.textColor),
+                    .copyWith(fontSize: 12, color: content.type == AdTypeEnum.offer ? colors.background : colors.text),
               ),
-              decoration: BoxDecoration(color: content.type == AdTypeEnum.offer ? colors.primaryColor : colors.highlightColor, borderRadius: BorderRadius.circular(6)),
+              decoration: BoxDecoration(color: content.type == AdTypeEnum.offer ? colors.primary : colors.highlight, borderRadius: BorderRadius.circular(6)),
             ),
             if (content.location.isNotEmpty)
               Padding(

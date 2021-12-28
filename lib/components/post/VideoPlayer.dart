@@ -57,10 +57,10 @@ class _VideoPlayerState extends State<VideoPlayer> {
         videoPlayerController: videoPlayerController!,
         aspectRatio: aspectRatio,
         placeholder: Container(
-          color: colors.primaryColor,
+          color: colors.primary,
           child: Icon(
             Icons.camera_roll,
-            color: colors.scaffoldBackgroundColor.withAlpha(75),
+            color: colors.background.withAlpha(75),
             size: 32,
           ),
           alignment: Alignment.center,
@@ -88,7 +88,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
     SkinColors colors = Skin.of(context).theme.colors;
     return Card(
       elevation: 0,
-      color: colors.scaffoldBackgroundColor,
+      color: colors.background,
       child: FutureBuilder(
           future: initVideo(context),
           builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
@@ -106,10 +106,10 @@ class _VideoPlayerState extends State<VideoPlayer> {
                       child: RichText(
                         overflow: TextOverflow.ellipsis,
                         text: TextSpan(children: [
-                          TextSpan(text: 'Zdroj: ', style: DefaultTextStyle.of(context).style.merge(TextStyle(fontSize: 12, color: colors.textColor))),
+                          TextSpan(text: 'Zdroj: ', style: DefaultTextStyle.of(context).style.merge(TextStyle(fontSize: 12, color: colors.text))),
                           TextSpan(
                             text: widget.videoUrl!.replaceAll('', '\u{200B}'),
-                            style: TextStyle(fontSize: 12, color: colors.primaryColor, decoration: TextDecoration.underline),
+                            style: TextStyle(fontSize: 12, color: colors.primary, decoration: TextDecoration.underline),
                           )
                         ]),
                       ),

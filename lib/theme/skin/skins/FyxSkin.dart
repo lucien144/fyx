@@ -9,37 +9,37 @@ class FyxSkin extends SkinData {
   factory FyxSkin.create() {
     final lightColors = SkinColors();
     final darkColors = SkinColors(
-      dangerColor: const Color(0xffe5534b),
-      barBackgroundColor: const Color(0xff2d333b),
-      textColor: const Color(0xFFadbac7),
-      primaryColor: const Color(0xff316775),
-      highlightColor: const Color(0xff00242e),
-      primaryContrastingColor: const Color(0xFF1c2128),
+      danger: const Color(0xffe5534b),
+      barBackground: const Color(0xff2d333b),
+      text: const Color(0xFFadbac7),
+      primary: const Color(0xff316775),
+      highlight: const Color(0xff00242e),
+      primaryContrasting: const Color(0xFF1c2128),
       pollBackground: const Color(0xff2d333b),
       pollAnswer: const Color(0xff677578),
       pollAnswerSelected: const Color(0xff316775),
-      scaffoldBackgroundColor: const Color(0xFF1C2128),
-      disabledColor: const Color(0xFFadbac7),
+      background: const Color(0xFF1C2128),
+      disabled: const Color(0xFFadbac7),
       gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xff316775), Color(0xff00242e)])
     );
 
     return FyxSkin(
         lightData: SkinBrightnessData<SkinColors>(
             data: CupertinoThemeData(
-                barBackgroundColor: lightColors.barBackgroundColor,
-                primaryColor: lightColors.primaryColor,
-                scaffoldBackgroundColor: lightColors.scaffoldBackgroundColor,
+                barBackgroundColor: lightColors.barBackground,
+                primaryColor: lightColors.primary,
+                scaffoldBackgroundColor: lightColors.background,
                 brightness: Brightness.light,
-                textTheme: CupertinoTextThemeData(textStyle: TextStyle(color: lightColors.textColor, fontSize: 16))),
+                textTheme: CupertinoTextThemeData(textStyle: TextStyle(color: lightColors.text, fontSize: 16))),
             colors: lightColors),
         darkData: SkinBrightnessData<SkinColors>(
             data: CupertinoThemeData(
-                barBackgroundColor: darkColors.barBackgroundColor,
-                primaryContrastingColor: darkColors.primaryContrastingColor,
-                scaffoldBackgroundColor: darkColors.scaffoldBackgroundColor,
-                primaryColor: darkColors.primaryColor,
+                barBackgroundColor: darkColors.barBackground,
+                primaryContrastingColor: darkColors.primaryContrasting,
+                scaffoldBackgroundColor: darkColors.background,
+                primaryColor: darkColors.primary,
                 brightness: Brightness.dark,
-                textTheme: CupertinoTextThemeData(textStyle: TextStyle(color: darkColors.textColor, fontSize: 16))),
+                textTheme: CupertinoTextThemeData(textStyle: TextStyle(color: darkColors.text, fontSize: 16))),
             colors: darkColors));
   }
 }

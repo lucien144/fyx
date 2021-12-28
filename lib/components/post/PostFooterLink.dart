@@ -23,10 +23,10 @@ class PostFooterLink extends StatelessWidget {
           children: <Widget>[
             Container(
                 padding: EdgeInsets.all(4),
-                decoration: BoxDecoration(color: colors.primaryColor, borderRadius: BorderRadius.circular(4)),
+                decoration: BoxDecoration(color: colors.primary, borderRadius: BorderRadius.circular(4)),
                 child: Icon(
                   Icons.link,
-                  color: colors.scaffoldBackgroundColor,
+                  color: colors.background,
                 )),
             SizedBox(
               width: 4,

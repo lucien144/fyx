@@ -33,7 +33,7 @@ class PostAvatarActionSheet extends StatelessWidget {
                 arguments: NewMessageSettings(
                     hasInputField: true,
                     inputFieldPlaceholder: this.user,
-                    onClose: () => T.success('👍 Zpráva poslána.', bg: colors.successColor),
+                    onClose: () => T.success('👍 Zpráva poslána.', bg: colors.success),
                     onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
                       if (inputField == null) return false;
 
@@ -55,7 +55,7 @@ class PostAvatarActionSheet extends StatelessWidget {
               child: TextIcon(
                 '${L.POST_SHEET_BLOCK} @${user}',
                 icon: Icons.block,
-                iconColor: colors.dangerColor,
+                iconColor: colors.danger,
               ),
               isDestructiveAction: true,
               onPressed: () {
@@ -75,7 +75,7 @@ class PostAvatarActionSheet extends StatelessWidget {
                               isDestructiveAction: true,
                               onPressed: () {
                                 MainRepository().settings.blockUser(user);
-                                T.success(L.TOAST_USER_BLOCKED, bg: colors.successColor);
+                                T.success(L.TOAST_USER_BLOCKED, bg: colors.success);
                                 Navigator.of(context).pop();
                                 AnalyticsProvider().logEvent('blockUser');
                               },

@@ -128,8 +128,8 @@ class ContentBoxLayout extends StatelessWidget {
             ),
           ),
           Container(
-            color: _isHighlighted ? colors.primaryColor.withOpacity(0.1) : null,
-            foregroundDecoration: _isHighlighted ? UnreadBadgeDecoration(badgeColor: colors.primaryColor, badgeSize: 16) : null,
+            color: _isHighlighted ? colors.primary.withOpacity(0.1) : null,
+            foregroundDecoration: _isHighlighted ? UnreadBadgeDecoration(badgeColor: colors.primary, badgeSize: 16) : null,
             child: Column(
               children: <Widget>[
                 SizedBox(
@@ -168,7 +168,7 @@ class ContentBoxLayout extends StatelessWidget {
                 SizedBox(
                   height: 8,
                 ),
-                this.bottomWidget != null ? Divider(color: colors.greyColor) : Container(),
+                this.bottomWidget != null ? Divider(color: colors.grey) : Container(),
                 this.bottomWidget != null ? Container(child: this.bottomWidget, padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16)) : Container(),
                 SizedBox(
                   height: 8,

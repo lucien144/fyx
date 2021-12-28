@@ -33,7 +33,7 @@ class _SpoilerState extends State<Spoiler> {
           TextSpan(text: 'Spoiler ⮕ ', style: DefaultTextStyle.of(context).style),
           TextSpan(
             text: '$_text',
-            style: DefaultTextStyle.of(context).style.apply(backgroundColor: _toggle ? Colors.transparent : colors.textColor),
+            style: DefaultTextStyle.of(context).style.apply(backgroundColor: _toggle ? Colors.transparent : colors.text),
           ),
         ]),
       ),

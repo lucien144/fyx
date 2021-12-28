@@ -58,7 +58,7 @@ class _PollState extends State<Poll> {
               child: Container(
                 padding: const EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
-                    color: _votes.contains(index) ? colors.pollAnswerSelected : colors.pollAnswer, border: _poll!.canVote ? Border.all(color: colors.primaryColor) : null),
+                    color: _votes.contains(index) ? colors.pollAnswerSelected : colors.pollAnswer, border: _poll!.canVote ? Border.all(color: colors.primary) : null),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   PostHtml(ContentRegular(answer.answer)),
                   if (answer.result != null)
@@ -69,7 +69,7 @@ class _PollState extends State<Poll> {
                           child: FractionallySizedBox(
                             widthFactor: totalRespondents > 0 ? (answer.result.respondentsCount / totalRespondents) + 0.005 : .005,
                             child: Container(
-                              color: answer.result.isMyVote ? colors.highlightColor : colors.primaryColor,
+                              color: answer.result.isMyVote ? colors.highlight : colors.primary,
                               height: 10,
                             ),
                           ),
@@ -116,15 +116,15 @@ class _PollState extends State<Poll> {
                     var poll = await ApiController().votePoll(_poll!.discussionId, _poll!.postId, votes);
                     setState(() => _poll = poll);
                   } catch (error) {
-                    T.error(error.toString(), bg: colors.dangerColor);
+                    T.error(error.toString(), bg: colors.danger);
                   } finally {
                     setState(() => _loading = false);
                   }
                 },
                 child: _loading ? CupertinoActivityIndicator() : Text('Hlasovat ${_votes.length}/${_poll!.allowedVotes}'),
-                color: colors.primaryColor,
+                color: colors.primary,
                 padding: EdgeInsets.all(0),
-                disabledColor: colors.disabledColor,
+                disabledColor: colors.disabled,
               ),
             )
         ]),

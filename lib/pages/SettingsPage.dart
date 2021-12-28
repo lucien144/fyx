@@ -144,7 +144,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           CSButton(CSButtonType.DESTRUCTIVE, 'Reset', () {
             MainRepository().settings.resetBlockedContent();
-            T.success(L.SETTINGS_CACHE_RESET, bg: colors.successColor);
+            T.success(L.SETTINGS_CACHE_RESET, bg: colors.success);
             AnalyticsProvider().logEvent('resetBlockedContent');
           }),
           const CSHeader('Informace'),

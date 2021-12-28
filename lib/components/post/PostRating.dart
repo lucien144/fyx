@@ -49,7 +49,7 @@ class _PostRatingState extends State<PostRating> {
             child: GestureDetector(
               child: Icon(
                 Icons.thumb_up,
-                color: _post!.myRating == 'positive' ? colors.successColor : CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38),
+                color: _post!.myRating == 'positive' ? colors.success : CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38),
               ),
               onTap: _givingRating
                   ? null
@@ -62,7 +62,7 @@ class _PostRatingState extends State<PostRating> {
                         });
                       }).catchError((error) {
                         print(error);
-                        T.error(L.RATING_ERROR, bg: colors.dangerColor);
+                        T.error(L.RATING_ERROR, bg: colors.danger);
                       }).whenComplete(() => setState(() => _givingRating = false));
                     },
             ),
@@ -76,7 +76,7 @@ class _PostRatingState extends State<PostRating> {
               opacity: _givingRating ? 0 : 1,
               child: Text(
                 _post!.rating > 0 ? '+${_post!.rating}' : _post!.rating.toString(),
-                style: TextStyle(fontSize: 14, color: _post!.rating > 0 ? colors.successColor : (_post!.rating < 0 ? colors.dangerColor : CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38))),
+                style: TextStyle(fontSize: 14, color: _post!.rating > 0 ? colors.success : (_post!.rating < 0 ? colors.danger : CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38))),
               ),
             ),
           ),
@@ -88,7 +88,7 @@ class _PostRatingState extends State<PostRating> {
             child: GestureDetector(
               child: Icon(
                 Icons.thumb_down,
-                color: ['negative', 'negative_visible'].contains(_post!.myRating) ? colors.dangerColor : CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38),
+                color: ['negative', 'negative_visible'].contains(_post!.myRating) ? colors.danger : CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38),
               ),
               onTap: _givingRating
                   ? null
@@ -121,7 +121,7 @@ class _PostRatingState extends State<PostRating> {
                                         });
                                       }).catchError((error) {
                                         print(error);
-                                        T.error(L.RATING_ERROR, bg: colors.dangerColor);
+                                        T.error(L.RATING_ERROR, bg: colors.danger);
                                       }).whenComplete(() {
                                         setState(() => _givingRating = false);
                                         Navigator.of(context, rootNavigator: true).pop();
@@ -139,7 +139,7 @@ class _PostRatingState extends State<PostRating> {
                         }
                       }).catchError((error) {
                         setState(() => _givingRating = false);
-                        T.error(L.RATING_ERROR, bg: colors.dangerColor);
+                        T.error(L.RATING_ERROR, bg: colors.danger);
                       });
                     },
             ),

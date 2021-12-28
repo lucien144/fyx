@@ -62,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget formFactory() {
-    final textfieldDecoration = BoxDecoration(borderRadius: BorderRadius.circular(4), color: colors.scaffoldBackgroundColor, border: Border.all(color: colors.scaffoldBackgroundColor));
+    final textfieldDecoration = BoxDecoration(borderRadius: BorderRadius.circular(4), color: colors.background, border: Border.all(color: colors.background));
 
     var offset = (MediaQuery.of(context).viewInsets.bottom / 3);
     return Column(
@@ -73,10 +73,10 @@ class _LoginPageState extends State<LoginPage> {
           padding: EdgeInsets.all(16),
           child: Image.asset(
             'assets/logo.png',
-            color: colors.primaryColor,
+            color: colors.primary,
           ),
           decoration:
-              BoxDecoration(color: colors.scaffoldBackgroundColor, borderRadius: BorderRadius.circular(32), boxShadow: [BoxShadow(color: colors.darkColor, offset: Offset(0, 0), blurRadius: 16)]),
+              BoxDecoration(color: colors.background, borderRadius: BorderRadius.circular(32), boxShadow: [BoxShadow(color: colors.dark, offset: Offset(0, 0), blurRadius: 16)]),
         ),
         AnimatedPadding(
           padding: EdgeInsets.only(top: 128 - offset),
@@ -131,7 +131,7 @@ class _LoginPageState extends State<LoginPage> {
             ? CupertinoActivityIndicator()
             : Text(
                 'Přihlásit',
-                style: TextStyle(color: colors.primaryColor),
+                style: TextStyle(color: colors.primary),
               ),
         onPressed: () {
           if (_isRunning) {
@@ -158,10 +158,10 @@ class _LoginPageState extends State<LoginPage> {
             Navigator.of(context).pushNamed('/token', arguments: new TutorialPageArguments(token: response.authCode, username: _loginController.text));
           }).catchError((error) {
             print(error);
-            T.error(error.toString(), bg: colors.dangerColor);
+            T.error(error.toString(), bg: colors.danger);
           }).whenComplete(() => setState(() => _isRunning = false));
         },
-        color: colors.scaffoldBackgroundColor,
+        color: colors.background,
       ),
     );
   }

@@ -25,7 +25,7 @@ class PostHeroAttachmentBox extends StatelessWidget {
         height: this.size.height,
         decoration: BoxDecoration(
           image: this.image == null ? null : DecorationImage(image: NetworkImage(this.image!), fit: BoxFit.cover),
-          color: colors.primaryColor,
+          color: colors.primary,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Column(
@@ -33,13 +33,13 @@ class PostHeroAttachmentBox extends StatelessWidget {
             Expanded(
               child: Icon(
                 icon,
-                color: colors.lightColor.withOpacity(.85),
+                color: colors.light.withOpacity(.85),
                 size: 40,
               ),
             ),
             if (this.showStrip) Container(
               decoration: BoxDecoration(
-                  color: colors.lightColor.withOpacity(.6),
+                  color: colors.light.withOpacity(.6),
                 borderRadius: BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(8)),
                 ),
                 width: double.infinity,
@@ -48,7 +48,7 @@ class PostHeroAttachmentBox extends StatelessWidget {
                 child: Text(
                   title,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 14, color: colors.darkColor),
+                  style: TextStyle(fontSize: 14, color: colors.dark),
                 ),
               ),
             )

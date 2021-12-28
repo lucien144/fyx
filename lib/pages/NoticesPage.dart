@@ -56,7 +56,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
         navigationBar: CupertinoNavigationBar(
             middle: Text(L.NOTICES, style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color),),
             leading: CupertinoNavigationBarBackButton(
-              color: colors.primaryColor,
+              color: colors.primary,
               onPressed: () {
                 Navigator.of(context, rootNavigator: true).pop();
               },
@@ -76,7 +76,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
                   isHighlighted: highlight,
                   topRightWidget: Text(
                     item.wuRating > 0 ? '+${item.wuRating}' : item.wuRating.toString(),
-                    style: TextStyle(fontSize: 14, color: item.wuRating > 0 ? colors.successColor : (item.wuRating < 0 ? colors.dangerColor : colors.greyColor)),
+                    style: TextStyle(fontSize: 14, color: item.wuRating > 0 ? colors.success : (item.wuRating < 0 ? colors.danger : colors.grey)),
                   ),
                   topLeftWidget: Expanded(
                     child: GestureDetector(

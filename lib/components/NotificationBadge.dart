@@ -25,10 +25,10 @@ class NotificationBadge extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.all(3),
               constraints: BoxConstraints(minWidth: 16),
-              decoration: BoxDecoration(color: colors.dangerColor, borderRadius: BorderRadius.circular(16)),
+              decoration: BoxDecoration(color: colors.danger, borderRadius: BorderRadius.circular(16)),
               child: Text(
                 counter.toString(),
-                style: TextStyle(color: colors.scaffoldBackgroundColor, fontSize: 10),
+                style: TextStyle(color: colors.background, fontSize: 10),
                 textAlign: TextAlign.center,
               ),
             ),

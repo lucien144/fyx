@@ -20,10 +20,10 @@ class CircleAvatar extends StatelessWidget {
     SkinColors colors = Skin.of(context).theme.colors;
     return Container(
       padding: EdgeInsets.all(1),
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(22), color: _isHighlighted ? colors.primaryColor : colors.textColor),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(22), color: _isHighlighted ? colors.primary : colors.text),
       child: Container(
         padding: EdgeInsets.all(2),
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(22), color: _isHighlighted ? colors.primaryColor : colors.scaffoldBackgroundColor),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(22), color: _isHighlighted ? colors.primary : colors.background),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
           child: CachedNetworkImage(

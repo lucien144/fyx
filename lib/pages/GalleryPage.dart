@@ -59,7 +59,7 @@ class _GalleryPageState extends State<GalleryPage> {
     return Stack(
       children: [
         Container(
-          decoration: BoxDecoration(color: colors.darkColor.withOpacity(0.90)),
+          decoration: BoxDecoration(color: colors.dark.withOpacity(0.90)),
           constraints: BoxConstraints.expand(
             height: MediaQuery.of(context).size.height,
           ),
@@ -88,10 +88,10 @@ class _GalleryPageState extends State<GalleryPage> {
           right: 30,
           child: CupertinoButton(
             padding: EdgeInsets.zero,
-            color: colors.primaryColor,
+            color: colors.primary,
             child: Icon(
               CupertinoIcons.clear_thick,
-              color: colors.scaffoldBackgroundColor,
+              color: colors.background,
               size: 32,
             ),
             onPressed: () => close(context),
@@ -102,13 +102,13 @@ class _GalleryPageState extends State<GalleryPage> {
             bottom: 30,
             left: (MediaQuery.of(context).size.width - 100) / 2,
             child: CupertinoButton(
-              color: colors.primaryColor,
+              color: colors.primary,
               padding: EdgeInsets.zero,
               onPressed: () => close(context),
               child: Text(
                 '$_page / ${_arguments!.images.length}',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: colors.scaffoldBackgroundColor),
+                style: TextStyle(color: colors.background),
               ),
             )),
         Positioned(
@@ -116,12 +116,12 @@ class _GalleryPageState extends State<GalleryPage> {
             right: 30,
             child: CupertinoButton(
               padding: EdgeInsets.zero,
-              color: colors.primaryColor,
+              color: colors.primary,
               child: _saving
                   ? CupertinoActivityIndicator()
                   : Icon(
                       Icons.save_alt_rounded,
-                      color: colors.scaffoldBackgroundColor,
+                      color: colors.background,
                       size: 32,
                     ),
               onPressed: () async {
@@ -142,9 +142,9 @@ class _GalleryPageState extends State<GalleryPage> {
                     throw Exception(resultMap['errorMessage']);
                   }
 
-                  T.success(L.TOAST_IMAGE_SAVE_OK, bg: colors.successColor);
+                  T.success(L.TOAST_IMAGE_SAVE_OK, bg: colors.success);
                 } catch (error) {
-                  T.error(L.TOAST_IMAGE_SAVE_ERROR, bg: colors.dangerColor);
+                  T.error(L.TOAST_IMAGE_SAVE_ERROR, bg: colors.danger);
                   Sentry.captureException(error);
                 } finally {
                   setState(() => _saving = false);
