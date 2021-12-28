@@ -31,6 +31,7 @@ class VideoPlayer extends StatefulWidget {
 class _VideoPlayerState extends State<VideoPlayer> {
   VideoPlayerController? videoPlayerController;
   ChewieController? chewieController;
+  late SkinColors colors;
 
   @override
   void initState() {
@@ -51,7 +52,8 @@ class _VideoPlayerState extends State<VideoPlayer> {
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final height = size.height;
-    final aspectRatio = videoPlayerController!.value.isInitialized ? videoPlayerController!.value.aspectRatio : (width > height ? width / height : height / width);
+    final aspectRatio =
+        videoPlayerController!.value.isInitialized ? videoPlayerController!.value.aspectRatio : (width > height ? width / height : height / width);
 
     chewieController = ChewieController(
         videoPlayerController: videoPlayerController!,
@@ -81,11 +83,11 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
+    colors = Skin.of(context).theme.colors;
     if (widget.videoUrl?.isEmpty ?? true) {
       return T.somethingsWrongButton(widget.element.outerHtml);
     }
 
-    SkinColors colors = Skin.of(context).theme.colors;
     return Card(
       elevation: 0,
       color: colors.background,
@@ -99,22 +101,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
                   SizedBox(
                     height: 8,
                   ),
-                  GestureDetector(
-                    onTap: () => T.openLink(widget.videoUrl!),
-                    child: Padding(
-                      padding: const EdgeInsets.all(4),
-                      child: RichText(
-                        overflow: TextOverflow.ellipsis,
-                        text: TextSpan(children: [
-                          TextSpan(text: 'Zdroj: ', style: DefaultTextStyle.of(context).style.merge(TextStyle(fontSize: 12, color: colors.text))),
-                          TextSpan(
-                            text: widget.videoUrl!.replaceAll('', '\u{200B}'),
-                            style: TextStyle(fontSize: 12, color: colors.primary, decoration: TextDecoration.underline),
-                          )
-                        ]),
-                      ),
-                    ),
-                  ),
+                  _sourceButton(),
                   SizedBox(
                     height: 8,
                   )
@@ -123,12 +110,39 @@ class _VideoPlayerState extends State<VideoPlayer> {
             } else if (snapshot.hasError) {
               if (snapshot.error is PlatformException) {
                 final error = (snapshot.error as PlatformException);
-                return T.somethingsWrongButton(widget.element.outerHtml, icon: Icons.play_disabled, title: 'Video se nepodařilo nahrát.\n${error.message}', stack: error.stacktrace ?? '');
+                return Column(children: [
+                  T.somethingsWrongButton(widget.element.outerHtml,
+                      icon: Icons.play_disabled, title: 'Video se nepodařilo nahrát.\n${error.message}', stack: error.stacktrace ?? ''),
+                  _sourceButton()
+                ]);
               }
-              return T.somethingsWrongButton(widget.element.outerHtml, icon: Icons.play_disabled, title: 'Video se nepodařilo nahrát.', stack: snapshot.error.toString());
+              return Column(children: [
+                T.somethingsWrongButton(widget.element.outerHtml,
+                    icon: Icons.play_disabled, title: 'Video se nepodařilo nahrát.', stack: snapshot.error.toString()),
+                _sourceButton()
+              ]);
             }
             return Center(child: CupertinoActivityIndicator());
           }),
+    );
+  }
+
+  Widget _sourceButton() {
+    return GestureDetector(
+      onTap: () => T.openLink(widget.videoUrl!),
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: RichText(
+          overflow: TextOverflow.ellipsis,
+          text: TextSpan(children: [
+            TextSpan(text: 'Zdroj: ', style: DefaultTextStyle.of(context).style.merge(TextStyle(fontSize: 12, color: colors.text))),
+            TextSpan(
+              text: widget.videoUrl!.replaceAll('', '\u{200B}'),
+              style: TextStyle(fontSize: 12, color: colors.primary, decoration: TextDecoration.underline),
+            )
+          ]),
+        ),
+      ),
     );
   }
 }
