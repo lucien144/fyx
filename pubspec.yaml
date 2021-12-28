@@ -51,6 +51,7 @@ dependencies:
   firebase_messaging: ^11.1.0
   flutter_highlight: ^0.7.0
   image_gallery_saver: ^1.7.1
+  path_provider: ^2.0.8
 
   # Dart-lang core plugins 👇
   http_parser: ^4.0.0

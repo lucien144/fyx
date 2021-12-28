@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -9,6 +10,8 @@ import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:fyx/theme/skin/Skin.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sentry/sentry.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
@@ -51,8 +54,7 @@ class _GalleryPageState extends State<GalleryPage> {
   @override
   Widget build(BuildContext context) {
     if (_arguments == null) {
-      _arguments =
-          ModalRoute.of(context)!.settings.arguments as GalleryArguments;
+      _arguments = ModalRoute.of(context)!.settings.arguments as GalleryArguments;
     }
 
     SkinColors colors = Skin.of(context).theme.colors;
@@ -70,13 +72,10 @@ class _GalleryPageState extends State<GalleryPage> {
               scrollPhysics: const BouncingScrollPhysics(),
               builder: (BuildContext context, int index) {
                 return PhotoViewGalleryPageOptions(
-                    imageProvider: CachedNetworkImageProvider(
-                        _arguments!.images[index].image),
-                    onTapDown: (_, __, ___) => close(context));
+                    imageProvider: CachedNetworkImageProvider(_arguments!.images[index].image), onTapDown: (_, __, ___) => close(context));
               },
               itemCount: _arguments!.images.length,
-              loadingBuilder: (context, chunkEvent) =>
-                  CupertinoActivityIndicator(
+              loadingBuilder: (context, chunkEvent) => CupertinoActivityIndicator(
                 radius: 16,
               ),
               onPageChanged: (i) => setState(() => _page = i + 1),
@@ -131,17 +130,16 @@ class _GalleryPageState extends State<GalleryPage> {
 
                 setState(() => _saving = true);
                 try {
-                  var response = await Dio().get(
-                      _arguments!.images[_page - 1].image,
-                      options: Options(responseType: ResponseType.bytes));
-                  final result = await ImageGallerySaver.saveImage(
-                      Uint8List.fromList(response.data),
-                      quality: 100);
-                  final resultMap = Map<String, dynamic>.from(result);
-                  if (!resultMap['isSuccess']) {
-                    throw Exception(resultMap['errorMessage']);
-                  }
+                  var appDocDir = await getTemporaryDirectory();
+                  String url = _arguments!.images[_page - 1].image;
+                  String filename = basename(url).split('?')[0].split('#')[0];
+                  String savePath = appDocDir.path + '/$filename';
 
+                  await Dio().download(url, savePath);
+                  final result = await ImageGallerySaver.saveFile(savePath, isReturnPathOfIOS: Platform.isIOS);
+                  if (!result['isSuccess']) {
+                    throw Error();
+                  }
                   T.success(L.TOAST_IMAGE_SAVE_OK, bg: colors.success);
                 } catch (error) {
                   T.error(L.TOAST_IMAGE_SAVE_ERROR, bg: colors.danger);
