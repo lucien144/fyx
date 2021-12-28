@@ -49,7 +49,7 @@ class _PostRatingState extends State<PostRating> {
             child: GestureDetector(
               child: Icon(
                 Icons.thumb_up,
-                color: _post!.myRating == 'positive' ? colors.success : CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38),
+                color: _post!.myRating == 'positive' ? colors.success : colors.text.withOpacity(0.38),
               ),
               onTap: _givingRating
                   ? null
@@ -76,7 +76,7 @@ class _PostRatingState extends State<PostRating> {
               opacity: _givingRating ? 0 : 1,
               child: Text(
                 _post!.rating > 0 ? '+${_post!.rating}' : _post!.rating.toString(),
-                style: TextStyle(fontSize: 14, color: _post!.rating > 0 ? colors.success : (_post!.rating < 0 ? colors.danger : CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38))),
+                style: TextStyle(fontSize: 14, color: _post!.rating > 0 ? colors.success : (_post!.rating < 0 ? colors.danger : colors.text.withOpacity(0.38))),
               ),
             ),
           ),
@@ -88,7 +88,7 @@ class _PostRatingState extends State<PostRating> {
             child: GestureDetector(
               child: Icon(
                 Icons.thumb_down,
-                color: ['negative', 'negative_visible'].contains(_post!.myRating) ? colors.danger : CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38),
+                color: ['negative', 'negative_visible'].contains(_post!.myRating) ? colors.danger : colors.text.withOpacity(0.38),
               ),
               onTap: _givingRating
                   ? null

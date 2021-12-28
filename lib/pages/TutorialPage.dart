@@ -107,7 +107,7 @@ class _TutorialPageState extends State<TutorialPage> {
       navigationBar: CupertinoNavigationBar(
         leading: CupertinoNavigationBarBackButton(
           previousPageTitle: L.GENERAL_LOGIN,
-          color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+          color: colors.background,
           onPressed: () {
             Navigator.of(context).pop();
           },

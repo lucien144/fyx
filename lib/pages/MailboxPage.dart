@@ -9,6 +9,8 @@ import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/Mail.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class MailboxPage extends StatefulWidget {
@@ -47,6 +49,7 @@ class _MailboxPageState extends State<MailboxPage> {
     // Reset the language context.
     // TODO: Not ideal. Get rid of the static.
     SyntaxHighlighter.languageContext = '';
+    SkinColors colors = Skin.of(context).theme.colors;
 
     return Stack(children: [
       PullToRefreshList(
@@ -88,7 +91,7 @@ class _MailboxPageState extends State<MailboxPage> {
         bottom: 20,
         child: SafeArea(
           child: FloatingActionButton(
-            backgroundColor: CupertinoTheme.of(context).primaryColor,
+            backgroundColor: colors.primary,
             child: Icon(Icons.add),
             onPressed: () => Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
                 arguments: NewMessageSettings(

@@ -16,6 +16,8 @@ import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/pages/MailboxPage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:provider/provider.dart';
 
 enum ETabs { history, bookmarks }
@@ -170,6 +172,8 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     if (ApiController().buildContext == null || ApiController().buildContext.hashCode != context.hashCode) {
       ApiController().buildContext = context;
     }
@@ -358,7 +362,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                             showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet(context));
                           },
                         ),
-                        middle: Text('Pošta', style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color),)),
+                        middle: Text('Pošta', style: TextStyle(color: colors.text),)),
                     child: MailboxPage(
                       refreshData: _refreshData['mail'] ?? 0,
                     ));

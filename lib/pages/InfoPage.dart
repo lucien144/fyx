@@ -4,6 +4,8 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:http/http.dart';
 
 class InfoPageSettings {
@@ -29,6 +31,7 @@ class _InfoPageState extends State<InfoPage> {
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
     InfoPageSettings settings = ModalRoute.of(context)!.settings.arguments as InfoPageSettings;
 
     if (_response == null) {
@@ -38,9 +41,9 @@ class _InfoPageState extends State<InfoPage> {
 
     return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
-            middle: Text(settings.title, style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color)),
+            middle: Text(settings.title, style: TextStyle(color: colors.text)),
             leading: CupertinoNavigationBarBackButton(
-              color: CupertinoTheme.of(context).primaryColor,
+              color: colors.primary,
               onPressed: () {
                 Navigator.of(context).pop();
               },

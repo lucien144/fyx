@@ -54,7 +54,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
 
     return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
-            middle: Text(L.NOTICES, style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color),),
+            middle: Text(L.NOTICES, style: TextStyle(color: colors.text)),
             leading: CupertinoNavigationBarBackButton(
               color: colors.primary,
               onPressed: () {

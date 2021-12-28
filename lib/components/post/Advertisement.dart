@@ -51,8 +51,8 @@ class Advertisement extends StatelessWidget {
       return RichText(
         text: TextSpan(children: [
           TextSpan(text: 'Reference: ', style: TextStyle(color: colors.grey, fontSize: 10)),
-          if (content.references != null && content.references!.positive > 0) TextSpan(text: '+${content.references!.positive}', style: TextStyle(color: CupertinoTheme.of(context).primaryColor, fontSize: 10)),
-          if (content.references != null && content.references!.positive > 0 && content.references!.negative < 0) TextSpan(text: ' / ', style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38), fontSize: 10)),
+          if (content.references != null && content.references!.positive > 0) TextSpan(text: '+${content.references!.positive}', style: TextStyle(color: colors.primary, fontSize: 10)),
+          if (content.references != null && content.references!.positive > 0 && content.references!.negative < 0) TextSpan(text: ' / ', style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10)),
           if (content.references != null && content.references!.negative < 0) TextSpan(text: '-${content.references!.negative}', style: TextStyle(color: colors.danger, fontSize: 10))
         ]),
       );
@@ -79,7 +79,7 @@ class Advertisement extends StatelessWidget {
           ),
         ],
       ),
-      //decoration: BoxDecoration(color: T.COLOR_LIGHT, borderRadius: BorderRadius.circular(6), border: Border.all(color: CupertinoTheme.of(context).primaryColor)),
+      //decoration: BoxDecoration(color: T.COLOR_LIGHT, borderRadius: BorderRadius.circular(6), border: Border.all(color: colors.primaryColor)),
     );
   }
 

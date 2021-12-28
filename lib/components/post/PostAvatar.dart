@@ -4,6 +4,8 @@ import 'package:flutter/widgets.dart';
 import 'package:fyx/components/CircleAvatar.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 
 class PostAvatar extends StatelessWidget {
   final String nick;
@@ -17,6 +19,8 @@ class PostAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     return Row(children: <Widget>[
       CircleAvatar(image, isHighlighted: isHighlighted),
       SizedBox(
@@ -29,7 +33,7 @@ class PostAvatar extends StatelessWidget {
             children: <material.Widget>[
               Text(
                 nick,
-                style: TextStyle(color: isHighlighted ? CupertinoTheme.of(context).primaryColor : CupertinoTheme.of(context).textTheme.textStyle.color),
+                style: TextStyle(color: isHighlighted ? colors.primary : colors.text),
               ),
               Visibility(
                 visible: isHighlighted,
@@ -42,7 +46,7 @@ class PostAvatar extends StatelessWidget {
           if (this.description is String)
             Text(
               description,
-              style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38), fontSize: 10),
+              style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10),
             )
           else if (this.descriptionWidget is Widget) this.descriptionWidget!
         ],

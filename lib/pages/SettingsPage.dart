@@ -44,21 +44,21 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     SkinColors colors = Skin.of(context).theme.colors;
-    CSWidgetStyle postsStyle = CSWidgetStyle(icon: Icon(Icons.view_compact, color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38)));
-    CSWidgetStyle autocorrectStyle = CSWidgetStyle(icon: Icon(Icons.spellcheck, color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38)));
-    CSWidgetStyle bugreportStyle = CSWidgetStyle(icon: Icon(Icons.bug_report, color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38)));
-    CSWidgetStyle aboutStyle = CSWidgetStyle(icon: Icon(Icons.info, color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38)));
-    CSWidgetStyle patronsStyle = CSWidgetStyle(icon: Icon(Icons.volunteer_activism, color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38)));
-    CSWidgetStyle termsStyle = CSWidgetStyle(icon: Icon(Icons.gavel, color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38)));
+    CSWidgetStyle postsStyle = CSWidgetStyle(icon: Icon(Icons.view_compact, color: colors.text.withOpacity(0.38)));
+    CSWidgetStyle autocorrectStyle = CSWidgetStyle(icon: Icon(Icons.spellcheck, color: colors.text.withOpacity(0.38)));
+    CSWidgetStyle bugreportStyle = CSWidgetStyle(icon: Icon(Icons.bug_report, color: colors.text.withOpacity(0.38)));
+    CSWidgetStyle aboutStyle = CSWidgetStyle(icon: Icon(Icons.info, color: colors.text.withOpacity(0.38)));
+    CSWidgetStyle patronsStyle = CSWidgetStyle(icon: Icon(Icons.volunteer_activism, color: colors.text.withOpacity(0.38)));
+    CSWidgetStyle termsStyle = CSWidgetStyle(icon: Icon(Icons.gavel, color: colors.text.withOpacity(0.38)));
 
     var pkg = MainRepository().packageInfo;
     var version = '${pkg.version} (${pkg.buildNumber})';
 
     return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
-            middle: Text(L.SETTINGS, style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color),),
+            middle: Text(L.SETTINGS, style: TextStyle(color: colors.text),),
             leading: CupertinoNavigationBarBackButton(
-              color: CupertinoTheme.of(context).primaryColor,
+              color: colors.primary,
               onPressed: () {
                 Navigator.of(context, rootNavigator: true).pop();
               },
@@ -66,7 +66,7 @@ class _SettingsPageState extends State<SettingsPage> {
         child: CupertinoSettings(items: <Widget>[
           const CSHeader('Příspěvky'),
           CSControl(
-            nameWidget: Text('Autocorrect', style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color),),
+            nameWidget: Text('Autocorrect', style: TextStyle(color: colors.text),),
             contentWidget: CupertinoSwitch(
                 value: _autocorrect,
                 onChanged: (bool value) {
@@ -76,7 +76,7 @@ class _SettingsPageState extends State<SettingsPage> {
             style: autocorrectStyle,
           ),
           CSControl(
-            nameWidget: Text('Kompaktní zobrazení', style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color),),
+            nameWidget: Text('Kompaktní zobrazení', style: TextStyle(color: colors.text),),
             contentWidget: CupertinoSwitch(
                 value: _compactMode,
                 onChanged: (bool value) {
@@ -119,27 +119,27 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           CSHeader('Paměť'),
           CSControl(
-            nameWidget: Text('Blokovaných uživatelů', style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color),),
+            nameWidget: Text('Blokovaných uživatelů', style: TextStyle(color: colors.text),),
             contentWidget: ValueListenableBuilder(
                 valueListenable: MainRepository().settings.box.listenable(keys: ['blockedUsers']),
                 builder: (BuildContext context, value, Widget? child) {
-                  return Text(MainRepository().settings.blockedUsers.length.toString(), style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color),);
+                  return Text(MainRepository().settings.blockedUsers.length.toString(), style: TextStyle(color: colors.text),);
                 }),
           ),
           CSControl(
-            nameWidget: Text('Skrytých příspěvků', style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color),),
+            nameWidget: Text('Skrytých příspěvků', style: TextStyle(color: colors.text),),
             contentWidget: ValueListenableBuilder(
                 valueListenable: MainRepository().settings.box.listenable(keys: ['blockedPosts']),
                 builder: (BuildContext context, value, Widget? child) {
-                  return Text(MainRepository().settings.blockedPosts.length.toString(), style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color),);
+                  return Text(MainRepository().settings.blockedPosts.length.toString(), style: TextStyle(color: colors.text),);
                 }),
           ),
           CSControl(
-            nameWidget: Text('Skrytých mailů', style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color),),
+            nameWidget: Text('Skrytých mailů', style: TextStyle(color: colors.text),),
             contentWidget: ValueListenableBuilder(
                 valueListenable: MainRepository().settings.box.listenable(keys: ['blockedMails']),
                 builder: (BuildContext context, value, Widget? child) {
-                  return Text(MainRepository().settings.blockedMails.length.toString(), style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color),);
+                  return Text(MainRepository().settings.blockedMails.length.toString(), style: TextStyle(color: colors.text),);
                 }),
           ),
           CSButton(CSButtonType.DESTRUCTIVE, 'Reset', () {

@@ -17,6 +17,8 @@ import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class DiscussionPageArguments {
@@ -35,6 +37,7 @@ class DiscussionPage extends StatefulWidget {
 
 class _DiscussionPageState extends State<DiscussionPage> {
   final AsyncMemoizer<DiscussionResponse> _memoizer = AsyncMemoizer<DiscussionResponse>();
+  late SkinColors colors;
   int _refreshList = 0;
   bool _hasInitData = false;
 
@@ -61,6 +64,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
 
   @override
   Widget build(BuildContext context) {
+    colors = Skin.of(context).theme.colors;
     DiscussionPageArguments? pageArguments = ModalRoute.of(context)?.settings.arguments as DiscussionPageArguments?;
 
     if (pageArguments == null) {
@@ -89,7 +93,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
           leading: CupertinoNavigationBarBackButton(
-            color: CupertinoTheme.of(context).primaryColor,
+            color: colors.primary,
             onPressed: () {
               Navigator.of(context).pop();
             },
@@ -97,7 +101,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
           middle: Container(
               alignment: Alignment.center,
               width: MediaQuery.of(context).size.width - 120,
-              child: Text(title, style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color), overflow: TextOverflow.ellipsis))),
+              child: Text(title, style: TextStyle(color: colors.text), overflow: TextOverflow.ellipsis))),
       child: body,
     );
   }
@@ -176,8 +180,8 @@ class _DiscussionPageState extends State<DiscussionPage> {
                 bottom: 20,
                 child: SafeArea(
                   child: FloatingActionButton(
-                    backgroundColor: CupertinoTheme.of(context).primaryColor,
-                    foregroundColor: CupertinoTheme.of(context).scaffoldBackgroundColor,
+                    backgroundColor: colors.primary,
+                    foregroundColor: colors.background,
                     child: Icon(Icons.add),
                     onPressed: () => Navigator.of(context).pushNamed('/new-message',
                         arguments: NewMessageSettings(

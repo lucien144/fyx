@@ -13,6 +13,8 @@ import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/IconReply.dart';
 import 'package:fyx/theme/IconUnread.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 
 class MailListItem extends StatefulWidget {
   final Mail mail;
@@ -28,6 +30,8 @@ class MailListItem extends StatefulWidget {
 class _MailListItemState extends State<MailListItem> {
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     return ContentBoxLayout(
       isHighlighted: widget.mail.isNew,
       isPreview: widget.isPreview == true,
@@ -48,7 +52,7 @@ class _MailListItemState extends State<MailListItem> {
             width: 4,
           ),
           GestureDetector(
-            child: Icon(Icons.more_vert, color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38)),
+            child: Icon(Icons.more_vert, color: colors.text.withOpacity(0.38)),
             onTap: () => showCupertinoModalPopup(
                 context: context,
                 builder: (BuildContext context) => PostActionSheet(
@@ -74,7 +78,7 @@ class _MailListItemState extends State<MailListItem> {
                   children: <Widget>[
                     IconReply(),
                     Text('Odpovědět',
-                        style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38), fontSize: 14))
+                        style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 14))
                   ],
                 ),
                 onTap: () => Navigator.of(context, rootNavigator: true)

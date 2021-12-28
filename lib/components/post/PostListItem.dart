@@ -65,7 +65,7 @@ class _PostListItemState extends State<PostListItem> {
         ),
       ),
       topRightWidget: GestureDetector(
-          child: Icon(Icons.more_vert, color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38)),
+          child: Icon(Icons.more_vert, color: colors.text.withOpacity(0.38)),
           onTap: () => showCupertinoModalPopup(
               context: context,
               builder: (BuildContext context) => PostActionSheet(
@@ -100,7 +100,7 @@ class _PostListItemState extends State<PostListItem> {
                       children: <Widget>[
                         IconReply(),
                         Text('Odpovědět',
-                            style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38), fontSize: 14))
+                            style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 14))
                       ],
                     )),
               ),
@@ -118,9 +118,9 @@ class _PostListItemState extends State<PostListItem> {
                       children: <Widget>[
                         Icon(
                           _post!.hasReminder ? Icons.bookmark : Icons.bookmark_border,
-                          color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38),
+                          color: colors.text.withOpacity(0.38),
                         ),
-                        Text('Uložit', style: TextStyle(color: CupertinoTheme.of(context).textTheme.textStyle.color!.withOpacity(0.38), fontSize: 14))
+                        Text('Uložit', style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 14))
                       ],
                     ),
                   ),
