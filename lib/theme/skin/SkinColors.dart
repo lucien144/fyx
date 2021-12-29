@@ -29,7 +29,7 @@ class SkinColors {
     this.text = const Color(0xFF282828),
     this.success = Colors.green,
     this.danger = Colors.redAccent,
-    this.highlight = const Color(0xff1AD592),
+    this.highlight = const Color(0xff33BB9A),
     this.light = Colors.white,
     this.dark = const Color(0xFF282828),
     this.grey = Colors.black38,

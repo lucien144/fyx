@@ -14,7 +14,7 @@ class FyxSkin extends SkinData {
         barBackground: const Color(0xff2d333b),
         text: const Color(0xFFadbac7),
         danger: const Color(0xffe5534b),
-        highlight: const Color(0xff00242e),
+        highlight: const Color(0xff33BB9A),
         disabled: const Color(0xFFadbac7),
         pollBackground: const Color(0xff2d333b),
         pollAnswer: const Color(0xff677578),
