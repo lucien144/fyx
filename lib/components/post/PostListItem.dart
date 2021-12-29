@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -84,23 +86,39 @@ class _PostListItemState extends State<PostListItem> {
                   )),
           child: PostAvatar(
             _post!.nick,
-            description: Helpers.relativeTime(_post!.time),
+            descriptionWidget: Row(
+              children: [
+                if (_post!.rating != 0) Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+                  decoration:
+                      BoxDecoration(
+                          color: _post!.rating > 0 ? colors.success.withOpacity(Helpers.ratingRange(_post!.rating)) : colors.danger.withOpacity(Helpers.ratingRange(_post!.rating.abs())),
+                        borderRadius: BorderRadius.circular(2)
+                      ),
+                  child: Text(_post!.rating > 0 ? '+${_post!.rating}' : _post!.rating.toString(), style: TextStyle(fontSize: 10)),
+                ),
+                if (_post!.rating != 0) SizedBox(width: 8),
+                Text(Helpers.absoluteTime(_post!.time), style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10),),
+                SizedBox(width: 8),
+                Text('~${Helpers.relativeTime(_post!.time)}', style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10),)
+              ],
+            ),
           ),
         ),
-        topRightWidget: PostRating(_post!),
+        topRightWidget: GestureDetector(
+            child: Icon(Icons.more_vert, color: colors.text.withOpacity(0.38)),
+            onTap: () => showCupertinoModalPopup(
+                context: context,
+                builder: (BuildContext context) => PostActionSheet(
+                    parentContext: context,
+                    user: _post!.nick,
+                    postId: _post!.id,
+                    shareData: ShareData(subject: '@${_post!.nick}', body: _post!.content, link: _post!.link),
+                    flagPostCallback: (postId) => MainRepository().settings.blockPost(postId)))),
         bottomWidget: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            GestureDetector(
-                child: Icon(Icons.more_horiz, color: colors.text.withOpacity(0.38)),
-                onTap: () => showCupertinoModalPopup(
-                    context: context,
-                    builder: (BuildContext context) => PostActionSheet(
-                        parentContext: context,
-                        user: _post!.nick,
-                        postId: _post!.id,
-                        shareData: ShareData(subject: '@${_post!.nick}', body: _post!.content, link: _post!.link),
-                        flagPostCallback: (postId) => MainRepository().settings.blockPost(postId)))),
+            PostRating(_post!, onRatingChange: (post) => setState(() => _post = post)),
             Row(
               children: <Widget>[
                 Visibility(
@@ -120,11 +138,7 @@ class _PostListItemState extends State<PostListItem> {
                               })),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                          IconReply(),
-                          Text('Odpovědět',
-                              style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 14))
-                        ],
+                        children: <Widget>[IconReply(), Text('Odpovědět', style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 14))],
                       )),
                 ),
                 Visibility(

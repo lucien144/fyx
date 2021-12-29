@@ -11,8 +11,9 @@ import 'package:fyx/theme/skin/SkinColors.dart';
 
 class PostRating extends StatefulWidget {
   final Post post;
+  Function? onRatingChange;
 
-  PostRating(this.post, {Key? key}) : super(key: key);
+  PostRating(this.post, {Key? key, this.onRatingChange}) : super(key: key);
 
   @override
   _PostRatingState createState() => _PostRatingState();
@@ -60,6 +61,9 @@ class _PostRatingState extends State<PostRating> {
                           _post!.rating = response.currentRating;
                           _post!.myRating = response.myRating;
                         });
+                        if (widget.onRatingChange != null) {
+                          widget.onRatingChange!(_post);
+                        }
                       }).catchError((error) {
                         print(error);
                         T.error(L.RATING_ERROR, bg: colors.danger);
@@ -119,6 +123,9 @@ class _PostRatingState extends State<PostRating> {
                                           _post!.rating = response.currentRating;
                                           _post!.myRating = response.myRating;
                                         });
+                                        if (widget.onRatingChange != null) {
+                                          widget.onRatingChange!(_post);
+                                        }
                                       }).catchError((error) {
                                         print(error);
                                         T.error(L.RATING_ERROR, bg: colors.danger);
@@ -136,6 +143,9 @@ class _PostRatingState extends State<PostRating> {
                             _post!.myRating = response.myRating;
                             _givingRating = false;
                           });
+                          if (widget.onRatingChange != null) {
+                            widget.onRatingChange!(_post);
+                          }
                         }
                       }).catchError((error) {
                         setState(() => _givingRating = false);

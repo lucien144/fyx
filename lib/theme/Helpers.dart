@@ -11,9 +11,9 @@ class Helpers {
   }
 
   static String absoluteTime(int time) {
-    final DateTime now = DateTime.fromMillisecondsSinceEpoch(time);
-    final DateFormat formatter = DateFormat('d. M. y H:m');
-    return formatter.format(now);
+    final DateTime then = DateTime.fromMillisecondsSinceEpoch(time);
+    final DateFormat formatter = DateFormat(then.year == DateTime.now().year ? 'd. M. HH:mm' : 'd. M. y HH:mm');
+    return formatter.format(then);
   }
 
   static String relativeTime(int time) {
@@ -41,6 +41,24 @@ class Helpers {
 
     var years = (months / 12).round();
     return '${years}Y';
+  }
+
+  static double ratingRange(int rating) {
+    final opacity = {
+      0.2: [0, 20],
+      0.4: [20, 80],
+      0.6: [80, 150],
+      0.8: [150, 250],
+      0.9: [250, 350],
+    };
+
+    for (var entry in opacity.entries) {
+      if (rating == rating.clamp(entry.value[0], entry.value[1])) {
+        return entry.key;
+      }
+    }
+
+    return 1.0;
   }
 
   static Map<INTERNAL_URI_PARSER, int> parseDiscussionPostUri(String uri) {

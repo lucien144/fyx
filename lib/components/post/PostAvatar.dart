@@ -10,12 +10,12 @@ import 'package:fyx/theme/skin/SkinColors.dart';
 class PostAvatar extends StatelessWidget {
   final String nick;
   final bool isHighlighted;
-  String description;
+  String? description;
   Widget? descriptionWidget;
 
   String get image => Helpers.avatarUrl(nick);
 
-  PostAvatar(this.nick, {this.isHighlighted = false, this.description = '', this.descriptionWidget});
+  PostAvatar(this.nick, {this.isHighlighted = false, this.description, this.descriptionWidget});
 
   @override
   Widget build(BuildContext context) {
@@ -43,12 +43,15 @@ class PostAvatar extends StatelessWidget {
               )
             ],
           ),
-          if (this.description is String)
-            Text(
-              description,
-              style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10),
+          if (this.description != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 4.0),
+              child: Text(
+                this.description!,
+                style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10),
+              ),
             )
-          else if (this.descriptionWidget is Widget) this.descriptionWidget!
+          else if (this.descriptionWidget != null) Padding(padding: const EdgeInsets.only(top: 4.0),child: this.descriptionWidget!)
         ],
       )
     ]);
