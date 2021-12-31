@@ -12,6 +12,7 @@ import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sentry/sentry.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
@@ -130,17 +131,22 @@ class _GalleryPageState extends State<GalleryPage> {
 
                 setState(() => _saving = true);
                 try {
-                  var appDocDir = await getTemporaryDirectory();
-                  String url = _arguments!.images[_page - 1].image;
-                  String filename = basename(url).split('?')[0].split('#')[0];
-                  String savePath = appDocDir.path + '/$filename';
+                  PermissionStatus status = await Permission.storage.request();
+                  if (status.isGranted) {
+                    var appDocDir = await getTemporaryDirectory();
+                    String url = _arguments!.images[_page - 1].image;
+                    String filename = basename(url).split('?')[0].split('#')[0];
+                    String savePath = appDocDir.path + '/$filename';
 
-                  await Dio().download(url, savePath);
-                  final result = await ImageGallerySaver.saveFile(savePath, isReturnPathOfIOS: Platform.isIOS);
-                  if (!result['isSuccess']) {
-                    throw Error();
+                    await Dio().download(url, savePath);
+                    final result = await ImageGallerySaver.saveFile(savePath, isReturnPathOfIOS: Platform.isIOS);
+                    if (!result['isSuccess']) {
+                      throw Error();
+                    }
+                    T.success(L.TOAST_IMAGE_SAVE_OK, bg: colors.success);
+                  } else {
+                    T.error('Nelze uložit. Povolte ukládání, prosím.', bg: colors.danger);
                   }
-                  T.success(L.TOAST_IMAGE_SAVE_OK, bg: colors.success);
                 } catch (error) {
                   T.error(L.TOAST_IMAGE_SAVE_ERROR, bg: colors.danger);
                   Sentry.captureException(error);
