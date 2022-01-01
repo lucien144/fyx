@@ -135,7 +135,7 @@ class _GalleryPageState extends State<GalleryPage> {
                   if (status.isGranted) {
                     var appDocDir = await getTemporaryDirectory();
                     String url = _arguments!.images[_page - 1].image;
-                    String filename = basename(url).split('?')[0].split('#')[0];
+                    String filename = Uri.parse(url).queryParameters['name'] ?? basename(url).split('?')[0].split('#')[0];
                     String savePath = appDocDir.path + '/$filename';
 
                     await Dio().download(url, savePath);
