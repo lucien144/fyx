@@ -226,12 +226,14 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                   navigationBar: CupertinoNavigationBar(
                       leading: Consumer<NotificationsModel>(
                           builder: (context, notifications, child) => NotificationBadge(
-                              widget: GestureDetector(
+                              widget: CupertinoButton(
+                                  padding: EdgeInsets.zero,
+                                  minSize: kMinInteractiveDimensionCupertino - 10,
                                   child: Icon(
                                     Icons.notifications_none,
                                     size: 30,
                                   ),
-                                  onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/notices')),
+                                  onPressed: () => Navigator.of(context, rootNavigator: true).pushNamed('/notices')),
                               isVisible: notifications.newNotices > 0,
                               counter: notifications.newNotices)),
                       trailing: GestureDetector(
