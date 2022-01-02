@@ -58,20 +58,6 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
       await Future.delayed(Duration.zero);
       _controller = PrimaryScrollController.of(context);
 
-      if (widget._isInfinite) {
-        _controller!.addListener(() {
-          // TODO: Refactor, use ScrollNotification ?
-          // Display loading and load next page if we are at the end of the list
-          if (_controller!.position.userScrollDirection == ScrollDirection.reverse && _controller!.position.outOfRange) {
-            if (_slivers.last is! SliverPadding) {
-              setState(() => _slivers
-                  .add(SliverPadding(padding: EdgeInsets.symmetric(vertical: 16), sliver: SliverToBoxAdapter(child: CupertinoActivityIndicator()))));
-              this.loadData(append: true);
-            }
-          }
-        });
-      }
-
       // Add the refresh control on first position
       _slivers.add(CupertinoSliverRefreshControl(
         builder: Platform.isIOS ? CupertinoSliverRefreshControl.buildRefreshIndicator : buildAndroidRefreshIndicator,
@@ -90,7 +76,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
 
   @override
   void dispose() {
-    _controller!.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 
@@ -132,10 +118,24 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
             mainAxisSize: MainAxisSize.max,
             children: [
               Expanded(
-                child: CustomScrollView(
-                  physics: Platform.isIOS ? const AlwaysScrollableScrollPhysics() : const RefreshScrollPhysics(),
-                  slivers: _slivers,
-                  controller: _controller,
+                child: NotificationListener<ScrollNotification>(
+                  onNotification: (ScrollNotification scrollInfo) {
+                    if (widget._isInfinite) {
+                      if (scrollInfo.metrics.axisDirection == AxisDirection.down && scrollInfo.metrics.outOfRange) {
+                        if (_slivers.last is! SliverPadding) {
+                          setState(() => _slivers.add(SliverPadding(
+                              padding: EdgeInsets.symmetric(vertical: 16), sliver: SliverToBoxAdapter(child: CupertinoActivityIndicator()))));
+                          this.loadData(append: true);
+                        }
+                      }
+                    }
+                    return true;
+                  },
+                  child: CustomScrollView(
+                    physics: Platform.isIOS ? const AlwaysScrollableScrollPhysics() : const RefreshScrollPhysics(),
+                    slivers: _slivers,
+                    controller: _controller,
+                  ),
                 ),
               ),
             ],
