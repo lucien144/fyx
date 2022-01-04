@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:typed_data';
-import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -65,6 +64,18 @@ class _NewMessagePageState extends State<NewMessagePage> {
             ATTACHMENT.mime: mime,
             ATTACHMENT.extension: ext,
             ATTACHMENT.mediatype: MediaType(mime!.split('/')[0], mime.split('/')[1]),
+            ATTACHMENT.previewWidget: Image.memory(
+              Uint8List.fromList(list),
+              width: 35,
+              height: 35,
+              fit: BoxFit.cover,
+              frameBuilder: (BuildContext context, Widget child, int? frame, bool wasSynchronouslyLoaded) {
+                if (frame == null) {
+                  return CupertinoActivityIndicator();
+                }
+                return child;
+              },
+            ),
           }));
     }
     setState(() => _loadingImage = false);
@@ -208,7 +219,10 @@ class _NewMessagePageState extends State<NewMessagePage> {
                           CupertinoActivityIndicator()
                         else
                           Row(
-                            children: _images.map((Map<ATTACHMENT, dynamic> image) => _buildPreviewWidget(image[ATTACHMENT.bytes])).toList(),
+                            children: _images
+                                .map(
+                                    (Map<ATTACHMENT, dynamic> image) => _buildPreviewWidget(image[ATTACHMENT.bytes], image[ATTACHMENT.previewWidget]))
+                                .toList(),
                           ),
                       ],
                     ),
