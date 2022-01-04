@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -14,12 +13,9 @@ import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:http_parser/http_parser.dart';
-import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart';
-
-enum ISOLATE_ARG { images, width, quality }
 
 typedef F = Future<bool> Function(String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachment);
 
@@ -43,10 +39,6 @@ class _NewMessagePageState extends State<NewMessagePage> {
   TextEditingController _messageController = TextEditingController();
   List<Map<ATTACHMENT, dynamic>> _images = [];
   NewMessageSettings? _settings;
-  final List<int> widths = [640, 768, 1024, 1280];
-  int _widthIndex = 2;
-  final List<int> qualities = [60, 70, 80, 90, 100];
-  int _qualityIndex = 1;
   String _message = '';
   String _recipient = '';
   bool _loadingImage = false;
@@ -58,8 +50,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
   Future getImage(ImageSource source) async {
     final picker = ImagePicker();
     setState(() => _loadingImage = true);
-    final file = await picker.getImage(
-        source: source, maxHeight: widths[_widthIndex].toDouble(), maxWidth: widths[_widthIndex].toDouble(), imageQuality: qualities[_qualityIndex]);
+    final XFile? file = await picker.pickImage(source: source, maxWidth: 2048, imageQuality: 90);
     if (file != null) {
       String ext = 'jpg';
       try {
@@ -85,8 +76,6 @@ class _NewMessagePageState extends State<NewMessagePage> {
     _messageFocusNode.addListener(_focusCallback);
     _messageController.addListener(() => setState(() => _message = _messageController.text));
     _recipientController.addListener(() => setState(() => _recipient = _recipientController.text));
-    _widthIndex = widths.indexOf(MainRepository().settings.photoWidth);
-    _qualityIndex = qualities.indexOf(MainRepository().settings.photoQuality);
     AnalyticsProvider().setScreen('New Message', 'NewMessagePage');
     super.initState();
   }
@@ -120,21 +109,6 @@ class _NewMessagePageState extends State<NewMessagePage> {
     return ((_settings!.hasInputField == true ? _recipient.length : 1) * (_message.length + _images.length)) == 0;
   }
 
-  // Isolate -> encoding to JPG
-  static FutureOr<List<Map<ATTACHMENT, dynamic>>> handleImages(List<Map<ATTACHMENT, dynamic>> images) {
-    return images.map<Map<ATTACHMENT, dynamic>>((image) {
-      var decode = img.decodeImage(image[ATTACHMENT.bytes]);
-      var baked = decode == null ? image[ATTACHMENT.bytes] : img.bakeOrientation(decode);
-      return {
-        ATTACHMENT.bytes: img.encodeJpg(baked),
-        ATTACHMENT.filename: image[ATTACHMENT.filename],
-        ATTACHMENT.mime: 'image/jpeg',
-        ATTACHMENT.mediatype: MediaType('image', 'jpg'),
-        ATTACHMENT.extension: 'jpg',
-      };
-    }).toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     SkinColors colors = Skin.of(context).theme.colors;
@@ -163,9 +137,6 @@ class _NewMessagePageState extends State<NewMessagePage> {
                             ? null
                             : () async {
                                 setState(() => _sending = true);
-                                if (_images.length > 0) {
-                                  _images = await compute(handleImages, _images);
-                                }
                                 var response = await _settings!.onSubmit(_settings!.hasInputField == true ? _recipientController.text : null,
                                     _messageController.text, _images.length > 0 ? _images : []);
                                 if (response) {
@@ -239,87 +210,6 @@ class _NewMessagePageState extends State<NewMessagePage> {
                           Row(
                             children: _images.map((Map<ATTACHMENT, dynamic> image) => _buildPreviewWidget(image[ATTACHMENT.bytes])).toList(),
                           ),
-                        Expanded(child: Container()),
-                        CupertinoButton(
-                            padding: EdgeInsets.all(0),
-                            child: Text('${widths[_widthIndex]}px / ${qualities[_qualityIndex]}%', style: TextStyle(fontSize: 13)),
-                            onPressed: () => showCupertinoModalPopup(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  SkinColors colors = Skin.of(context).theme.colors;
-
-                                  return Container(
-                                    height: 250.0,
-                                    color: colors.background,
-                                    child: Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 16.0),
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                  child: Text('Šířka',
-                                                      textAlign: TextAlign.center, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
-                                              Expanded(
-                                                  child: Text('Kvalita',
-                                                      textAlign: TextAlign.center, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
-                                            ],
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text('Obrázek větší než 0.5M se zobrazí jako odkaz (příloha).',
-                                              style: TextStyle(fontSize: 13, fontStyle: FontStyle.italic, color: colors.text.withOpacity(.60))),
-                                        ),
-                                        Expanded(
-                                          child: Row(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: <Widget>[
-                                              Expanded(
-                                                child: CupertinoPicker(
-                                                    scrollController: new FixedExtentScrollController(
-                                                      initialItem: _widthIndex,
-                                                    ),
-                                                    itemExtent: 32.0,
-                                                    backgroundColor: colors.background,
-                                                    onSelectedItemChanged: (int index) {
-                                                      setState(() {
-                                                        _widthIndex = index;
-                                                        MainRepository().settings.photoWidth = widths[_widthIndex];
-                                                      });
-                                                    },
-                                                    children: widths
-                                                        .map((width) => Center(
-                                                              child: new Text('${width}px'),
-                                                            ))
-                                                        .toList()),
-                                              ),
-                                              Expanded(
-                                                child: CupertinoPicker(
-                                                    scrollController: new FixedExtentScrollController(
-                                                      initialItem: _qualityIndex,
-                                                    ),
-                                                    itemExtent: 32.0,
-                                                    backgroundColor: colors.background,
-                                                    onSelectedItemChanged: (int index) {
-                                                      setState(() {
-                                                        _qualityIndex = index;
-                                                        MainRepository().settings.photoQuality = qualities[_qualityIndex];
-                                                      });
-                                                    },
-                                                    children: qualities
-                                                        .map((quality) => Center(
-                                                              child: new Text('$quality%'),
-                                                            ))
-                                                        .toList()),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }))
                       ],
                     ),
                   ),
@@ -327,32 +217,21 @@ class _NewMessagePageState extends State<NewMessagePage> {
               ),
               SizedBox(height: 16),
               if (_settings!.replyWidget != null) _settings!.replyWidget!
-            ].where((Object o) => o != null).toList(),
+            ].toList(),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildPreviewWidget(List<int> bytes) {
+  Widget _buildPreviewWidget(List<int> bytes, previewWidget) {
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: GestureDetector(
         onTap: () => setState(() => _images.removeWhere((image) => image[ATTACHMENT.bytes] == bytes)),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8),
-          child: Image(
-            image: MemoryImage(Uint8List.fromList(bytes)),
-            width: 35,
-            height: 35,
-            fit: BoxFit.cover,
-            frameBuilder: (BuildContext context, Widget child, int? frame, bool wasSynchronouslyLoaded) {
-              if (frame == null) {
-                return CupertinoActivityIndicator();
-              }
-              return child;
-            },
-          ),
+          child: previewWidget,
         ),
       ),
     );
