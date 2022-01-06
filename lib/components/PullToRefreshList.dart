@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
-import 'package:fyx/theme/skin/SkinColors.dart';
-import 'package:fyx/theme/skin/Skin.dart';
-import 'package:sentry/sentry.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:sentry/sentry.dart';
 
 // ignore: must_be_immutable
 class PullToRefreshList extends StatefulWidget {
@@ -111,26 +111,27 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
       );
     }
 
-    return CupertinoScrollbar(
-      child: Stack(
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Expanded(
-                child: NotificationListener<ScrollNotification>(
-                  onNotification: (ScrollNotification scrollInfo) {
-                    if (widget._isInfinite) {
-                      if (scrollInfo.metrics.axisDirection == AxisDirection.down && scrollInfo.metrics.outOfRange) {
-                        if (_slivers.last is! SliverPadding) {
-                          setState(() => _slivers.add(SliverPadding(
-                              padding: EdgeInsets.symmetric(vertical: 16), sliver: SliverToBoxAdapter(child: CupertinoActivityIndicator()))));
-                          this.loadData(append: true);
-                        }
+    return Stack(
+      children: [
+        Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Expanded(
+              child: NotificationListener<ScrollNotification>(
+                onNotification: (ScrollNotification scrollInfo) {
+                  if (widget._isInfinite) {
+                    if (scrollInfo.metrics.axisDirection == AxisDirection.down && scrollInfo.metrics.outOfRange) {
+                      if (_slivers.last is! SliverPadding) {
+                        setState(() => _slivers.add(SliverPadding(
+                            padding: EdgeInsets.symmetric(vertical: 16), sliver: SliverToBoxAdapter(child: CupertinoActivityIndicator()))));
+                        this.loadData(append: true);
                       }
                     }
-                    return true;
-                  },
+                  }
+                  return true;
+                },
+                child: CupertinoScrollbar(
+                  controller: _controller,
                   child: CustomScrollView(
                     physics: Platform.isIOS ? const AlwaysScrollableScrollPhysics() : const RefreshScrollPhysics(),
                     slivers: _slivers,
@@ -138,25 +139,25 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
                   ),
                 ),
               ),
-            ],
-          ),
-          Visibility(
-            visible: _isLoading && !_hasPulledDown, // Show only when not pulling down the list
-            child: Positioned(
-              top: 0,
-              left: 0,
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: 1,
-                child: LinearProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(colors.light),
-                  backgroundColor: colors.primary,
-                ),
+            ),
+          ],
+        ),
+        Visibility(
+          visible: _isLoading && !_hasPulledDown, // Show only when not pulling down the list
+          child: Positioned(
+            top: 0,
+            left: 0,
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: 1,
+              child: LinearProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(colors.light),
+                backgroundColor: colors.primary,
               ),
             ),
-          )
-        ],
-      ),
+          ),
+        )
+      ],
     );
   }
 

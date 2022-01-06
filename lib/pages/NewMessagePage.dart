@@ -49,7 +49,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
   Future getImage(ImageSource source) async {
     final picker = ImagePicker();
     setState(() => _loadingImage = true);
-    final XFile? file = await picker.pickImage(source: source, maxWidth: 2048, imageQuality: 90);
+    final XFile? file = await picker.pickImage(source: source, maxWidth: 2048);
     if (file != null) {
       String ext = 'jpg';
       try {
@@ -131,107 +131,109 @@ class _NewMessagePageState extends State<NewMessagePage> {
 
     return CupertinoPageScaffold(
       child: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: <Widget>[
-              Column(
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      CupertinoButton(padding: EdgeInsets.all(0), child: Text('Zavřít'), onPressed: () => Navigator.of(context).pop()),
-                      CupertinoButton(
-                        padding: EdgeInsets.all(0),
-                        child: _sending ? CupertinoActivityIndicator() : Text('Odeslat'),
-                        onPressed: _isSendDisabled()
-                            ? null
-                            : () async {
-                                setState(() => _sending = true);
-                                var response = await _settings!.onSubmit(_settings!.hasInputField == true ? _recipientController.text : null,
-                                    _messageController.text, _images.length > 0 ? _images : []);
-                                if (response) {
-                                  if (_settings!.onClose != null) {
-                                    _settings!.onClose!();
-                                  }
-                                  Navigator.of(context).pop();
-                                }
-                                setState(() => _sending = false);
-                              },
-                      )
-                    ],
-                  ),
-                  Visibility(
-                      visible: _settings!.hasInputField == true,
-                      child: CupertinoTextField(
-                        controller: _recipientController,
-                        inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9_]'))],
-                        textCapitalization: TextCapitalization.characters,
-                        placeholder: 'Adresát',
-                        autofocus: _settings!.hasInputField == true && _settings!.inputFieldPlaceholder == null,
-                        autocorrect: MainRepository().settings.useAutocorrect,
-                        focusNode: _recipientFocusNode,
-                      )),
-                  SizedBox(
-                    height: 8,
-                  ),
-                  CupertinoTextField(
-                    controller: _messageController,
-                    maxLines: 10,
-                    autofocus: _settings!.hasInputField != true || _settings!.inputFieldPlaceholder != null,
-                    textCapitalization: TextCapitalization.sentences,
-                    autocorrect: MainRepository().settings.useAutocorrect,
-                    focusNode: _messageFocusNode,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
+        child: CupertinoScrollbar(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: <Widget>[
+                Column(
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
+                        CupertinoButton(padding: EdgeInsets.all(0), child: Text('Zavřít'), onPressed: () => Navigator.of(context).pop()),
                         CupertinoButton(
                           padding: EdgeInsets.all(0),
-                          child: Icon(Icons.camera_alt),
-                          onPressed: () async {
-                            FocusScope.of(context).unfocus();
-                            await getImage(ImageSource.camera);
-                            FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
-                          },
-                        ),
-                        CupertinoButton(
-                          padding: EdgeInsets.all(0),
-                          child: Icon(Icons.image),
-                          onPressed: () async {
-                            FocusScope.of(context).unfocus();
-                            await getImage(ImageSource.gallery);
-                            FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
-                          },
-                        ),
-                        Visibility(
-                          visible: _images.length > 0,
-                          child: Container(
-                            width: 16,
-                            height: 1,
-                            color: colors.grey,
-                          ),
-                        ),
-                        SizedBox(width: 12),
-                        if (_loadingImage)
-                          CupertinoActivityIndicator()
-                        else
-                          Row(
-                            children: _images
-                                .map(
-                                    (Map<ATTACHMENT, dynamic> image) => _buildPreviewWidget(image[ATTACHMENT.bytes], image[ATTACHMENT.previewWidget]))
-                                .toList(),
-                          ),
+                          child: _sending ? CupertinoActivityIndicator() : Text('Odeslat'),
+                          onPressed: _isSendDisabled()
+                              ? null
+                              : () async {
+                                  setState(() => _sending = true);
+                                  var response = await _settings!.onSubmit(_settings!.hasInputField == true ? _recipientController.text : null,
+                                      _messageController.text, _images.length > 0 ? _images : []);
+                                  if (response) {
+                                    if (_settings!.onClose != null) {
+                                      _settings!.onClose!();
+                                    }
+                                    Navigator.of(context).pop();
+                                  }
+                                  setState(() => _sending = false);
+                                },
+                        )
                       ],
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16),
-              if (_settings!.replyWidget != null) _settings!.replyWidget!
-            ].toList(),
+                    Visibility(
+                        visible: _settings!.hasInputField == true,
+                        child: CupertinoTextField(
+                          controller: _recipientController,
+                          inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9_]'))],
+                          textCapitalization: TextCapitalization.characters,
+                          placeholder: 'Adresát',
+                          autofocus: _settings!.hasInputField == true && _settings!.inputFieldPlaceholder == null,
+                          autocorrect: MainRepository().settings.useAutocorrect,
+                          focusNode: _recipientFocusNode,
+                        )),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    CupertinoTextField(
+                      controller: _messageController,
+                      maxLines: 10,
+                      autofocus: _settings!.hasInputField != true || _settings!.inputFieldPlaceholder != null,
+                      textCapitalization: TextCapitalization.sentences,
+                      autocorrect: MainRepository().settings.useAutocorrect,
+                      focusNode: _messageFocusNode,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          CupertinoButton(
+                            padding: EdgeInsets.all(0),
+                            child: Icon(Icons.camera_alt),
+                            onPressed: () async {
+                              FocusScope.of(context).unfocus();
+                              await getImage(ImageSource.camera);
+                              FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
+                            },
+                          ),
+                          CupertinoButton(
+                            padding: EdgeInsets.all(0),
+                            child: Icon(Icons.image),
+                            onPressed: () async {
+                              FocusScope.of(context).unfocus();
+                              await getImage(ImageSource.gallery);
+                              FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
+                            },
+                          ),
+                          Visibility(
+                            visible: _images.length > 0,
+                            child: Container(
+                              width: 16,
+                              height: 1,
+                              color: colors.grey,
+                            ),
+                          ),
+                          SizedBox(width: 12),
+                          if (_loadingImage)
+                            CupertinoActivityIndicator()
+                          else
+                            Row(
+                              children: _images
+                                  .map((Map<ATTACHMENT, dynamic> image) =>
+                                      _buildPreviewWidget(image[ATTACHMENT.bytes], image[ATTACHMENT.previewWidget]))
+                                  .toList(),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+                if (_settings!.replyWidget != null) _settings!.replyWidget!
+              ].toList(),
+            ),
           ),
         ),
       ),
