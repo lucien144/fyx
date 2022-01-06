@@ -131,7 +131,7 @@ class _PostListItemState extends State<PostListItem> {
                             try {
                               await ApiController().deleteDiscussionMessage(_post!.idKlub, _post!.id);
                               T.success('👍 Příspěvek byl smazán', bg: colors.success);
-                              Provider.of<DiscussionPageNotifier>(context, listen: false).deletedPostId = _post!.id;
+                              Provider.of<DiscussionPageNotifier>(context, listen: false).addPostToDelete(_post!.id);
                             } catch (error) {}
                           },
                     flagPostCallback: (postId) => MainRepository().settings.blockPost(postId)))),

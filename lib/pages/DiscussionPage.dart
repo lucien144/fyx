@@ -129,11 +129,9 @@ class _DiscussionPageState extends State<DiscussionPage> {
                       filtered = data
                           .where((item) => !MainRepository().settings.isPostBlocked((item as PostListItem).post.id))
                           .where((item) => !MainRepository().settings.isUserBlocked((item as PostListItem).post.nick))
-                          .where((item) => (item as PostListItem).post.id != Provider.of<DiscussionPageNotifier>(context).deletedPostId)
+                          .where((item) => !Provider.of<DiscussionPageNotifier>(context).deletedPostIds.contains((item as PostListItem).post.id))
                           .toList();
                     }
-                    // Do not keep the id of the deleted post.
-                    Provider.of<DiscussionPageNotifier>(context, listen: false).resetPostId();
                     return SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, i) => filtered[i],
@@ -144,6 +142,8 @@ class _DiscussionPageState extends State<DiscussionPage> {
                 );
               },
               dataProvider: (lastId) async {
+                Provider.of<DiscussionPageNotifier>(context, listen: false).clearPostsToDelete(); // Clean up a queue of deleted posts
+
                 var result;
                 if (lastId != null) {
                   // If we load next page(s)

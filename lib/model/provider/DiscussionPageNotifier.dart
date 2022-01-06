@@ -1,17 +1,17 @@
 import 'package:flutter/cupertino.dart';
 
 class DiscussionPageNotifier extends ChangeNotifier {
-  int _deletedPostId = 0;
+  List<int> _deletedPostIds = [];
 
-  int get deletedPostId => _deletedPostId;
+  List<int> get deletedPostIds => _deletedPostIds;
 
-  set deletedPostId(int val) {
-    _deletedPostId = val;
+  addPostToDelete(int val) {
+    _deletedPostIds.add(val);
     notifyListeners();
   }
 
-  resetPostId() {
-    _deletedPostId = 0;
+  clearPostsToDelete() {
+    _deletedPostIds = [];
     // Do not notify!
   }
 }
