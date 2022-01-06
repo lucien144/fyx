@@ -1,5 +1,4 @@
 // ignore_for_file: non_constant_identifier_names
-import 'package:fyx/model/enums/PostTypeEnum.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/content/Advertisement.dart';
 import 'package:fyx/model/post/content/Poll.dart';
@@ -14,7 +13,7 @@ class Post {
   int _id_wu = 0;
   String _nick = '';
   int _time = 0;
-  int _wu_rating = 0;
+  int? rating;
   String _wu_type = '';
   String myRating = '';
   bool _reminder = false;
@@ -27,7 +26,7 @@ class Post {
     this._id_wu = json['id'] ?? 0;
     this._nick = json['username'] ?? '';
     this._time = DateTime.parse(json['inserted_at'] ?? '0').millisecondsSinceEpoch;
-    this._wu_rating = json['rating'] ?? 0;
+    this.rating = json['rating'];
     this._wu_type = json['type'] ?? '';
     this._isNew = json['new'] ?? false;
     this.myRating = json['my_rating'] ?? 'none'; // positive / negative / negative_visible / none TODO: enums
@@ -46,8 +45,9 @@ class Post {
           this._content = ContentAdvertisement.fromPostJson(json);
           break;
         default:
-          this._content =
-              ContentRegular('${json['content']}<br><br><small><em>Chyba: neošetřený druh příspěvku: "${json['content_raw']['type']}"</em></small>', isCompact: this.isCompact);
+          this._content = ContentRegular(
+              '${json['content']}<br><br><small><em>Chyba: neošetřený druh příspěvku: "${json['content_raw']['type']}"</em></small>',
+              isCompact: this.isCompact);
           break;
       }
       //TODO handle other cases
@@ -56,13 +56,18 @@ class Post {
     }
   }
 
+  static String formatRating(int _rating) {
+    if (_rating == 0) {
+      return '±$_rating';
+    } else if (_rating < 0) {
+      return _rating.toString();
+    }
+    return '+$_rating';
+  }
+
   Content get content => _content;
 
   String get type => _wu_type;
-
-  int get rating => _wu_rating;
-
-  set rating(val) => _wu_rating = val;
 
   int get time => _time;
 

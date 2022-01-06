@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -59,11 +57,13 @@ class _PostListItemState extends State<PostListItem> {
 
         ApiController().giveRating(_post!.idKlub, _post!.id, remove: _post!.myRating != 'none').then((response) {
           if (_post!.myRating != 'none') {
-            T.success('Hodocení odebráno.', bg: colors.success);
+            T.success('👎', bg: colors.success);
           } else {
-            T.success('Hodocení uděleno.', bg: colors.success);
+            T.success('👍', bg: colors.success);
           }
-
+          print(response.currentRating);
+          print(response.myRating);
+          print(response.isGiven);
           setState(() {
             _post!.rating = response.currentRating;
             _post!.myRating = response.myRating;
@@ -88,19 +88,28 @@ class _PostListItemState extends State<PostListItem> {
             _post!.nick,
             descriptionWidget: Row(
               children: [
-                if (_post!.rating != 0) Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 1),
-                  decoration:
-                      BoxDecoration(
-                          color: _post!.rating > 0 ? colors.success.withOpacity(Helpers.ratingRange(_post!.rating)) : colors.danger.withOpacity(Helpers.ratingRange(_post!.rating.abs())),
-                        borderRadius: BorderRadius.circular(2)
-                      ),
-                  child: Text(_post!.rating > 0 ? '+${_post!.rating}' : _post!.rating.toString(), style: TextStyle(fontSize: 10)),
+                if (_post!.rating != null)
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+                    decoration: BoxDecoration(
+                        color: _post!.rating! > 0
+                            ? colors.success.withOpacity(Helpers.ratingRange(_post!.rating!))
+                            : (_post!.rating! < 0
+                                ? colors.danger.withOpacity(Helpers.ratingRange(_post!.rating!.abs()))
+                                : colors.text.withOpacity(0.2)),
+                        borderRadius: BorderRadius.circular(2)),
+                    child: Text(Post.formatRating(_post!.rating!), style: TextStyle(fontSize: 10)),
+                  ),
+                if (_post!.rating != null) SizedBox(width: 8),
+                Text(
+                  Helpers.absoluteTime(_post!.time),
+                  style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10),
                 ),
-                if (_post!.rating != 0) SizedBox(width: 8),
-                Text(Helpers.absoluteTime(_post!.time), style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10),),
                 SizedBox(width: 8),
-                Text('~${Helpers.relativeTime(_post!.time)}', style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10),)
+                Text(
+                  '~${Helpers.relativeTime(_post!.time)}',
+                  style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10),
+                )
               ],
             ),
           ),

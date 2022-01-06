@@ -7,7 +7,6 @@ import 'package:fyx/controllers/ApiProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/exceptions/AuthException.dart';
 import 'package:fyx/model/Credentials.dart';
-import 'package:sentry/sentry.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/ResponseContext.dart';
 import 'package:fyx/model/post/content/Poll.dart';
@@ -26,6 +25,7 @@ import 'package:fyx/model/reponses/WaitingFilesResponse.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:provider/provider.dart';
+import 'package:sentry/sentry.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum AUTH_STATES { AUTH_INVALID_USERNAME, AUTH_NEW, AUTH_EXISTING }
@@ -232,7 +232,7 @@ class ApiController {
     return RatingResponse(
         isGiven: data['error'] ?? true,
         needsConfirmation: data['code'] == 'NeedsConfirmation',
-        currentRating: data['rating'] ?? 0,
+        currentRating: data['rating'],
         myRating: data['my_rating'] ?? 'none');
   }
 
