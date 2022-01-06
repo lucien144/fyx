@@ -9,6 +9,7 @@ import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:holding_gesture/holding_gesture.dart';
 import 'package:share/share.dart';
 
 class ShareData {
@@ -43,6 +44,7 @@ class PostActionSheet extends StatefulWidget {
 
 class _PostActionSheetState extends State<PostActionSheet> {
   bool _reportIndicator = false;
+  int _deleteCounter = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -86,18 +88,40 @@ class _PostActionSheetState extends State<PostActionSheet> {
                 }),
           ),
           if (widget.deletePostCallback != null)
-            CupertinoActionSheetAction(
-                child: TextIcon(
-                  'Smazat příspěvek',
-                  icon: Icons.delete,
-                  iconColor: colors.danger,
-                ),
-                isDestructiveAction: true,
-                onPressed: () {
+            HoldDetector(
+              enableHapticFeedback: true,
+              onHold: () {
+                setState(() => _deleteCounter++);
+                if (_deleteCounter / 800 >= 1) {
                   widget.deletePostCallback!();
                   Navigator.pop(context);
                   AnalyticsProvider().logEvent('deletePost');
-                }),
+                }
+              },
+              onCancel: () => _deleteCounter = 0,
+              holdTimeout: Duration(milliseconds: 1),
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: FractionallySizedBox(
+                      alignment: Alignment.centerLeft,
+                      widthFactor: _deleteCounter / 800,
+                      child: Container(
+                        color: colors.primary,
+                      ),
+                    ),
+                  ),
+                  CupertinoActionSheetAction(
+                      child: TextIcon(
+                        'Smazat příspěvek',
+                        icon: Icons.delete,
+                        iconColor: colors.danger,
+                      ),
+                      isDestructiveAction: true,
+                      onPressed: () => null)
+                ],
+              ),
+            ),
           CupertinoActionSheetAction(
               child: TextIcon(
                 L.POST_SHEET_HIDE,
