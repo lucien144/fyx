@@ -128,7 +128,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
                       }
                     }
                   }
-                  return true;
+                  return false;
                 },
                 child: CupertinoScrollbar(
                   controller: _controller,

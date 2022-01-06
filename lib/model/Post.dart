@@ -6,6 +6,7 @@ import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/theme/Helpers.dart';
 
 class Post {
+  // TODO: Refactor all params to follow names from the new API like _id_wu -> id ...
   final bool isCompact;
   bool _canReply = true;
   bool _isNew = false;
