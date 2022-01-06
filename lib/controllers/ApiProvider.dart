@@ -128,8 +128,8 @@ class ApiProvider implements IApiProvider {
     return await dio.get('$URL/notifications');
   }
 
-  Future<Response> postDiscussionMessage(int postId, String message) async {
-    return await dio.post('$URL/discussion/$postId/send/text',
+  Future<Response> postDiscussionMessage(int discussionId, String message) async {
+    return await dio.post('$URL/discussion/$discussionId/send/text',
         data: {'content': message, 'format': 'html'}, options: Options(contentType: Headers.formUrlEncodedContentType));
   }
 
