@@ -120,7 +120,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
               child: NotificationListener<ScrollNotification>(
                 onNotification: (ScrollNotification scrollInfo) {
                   if (widget._isInfinite) {
-                    if (scrollInfo.metrics.axisDirection == AxisDirection.down && scrollInfo.metrics.outOfRange) {
+                    if (_controller?.position.userScrollDirection == ScrollDirection.reverse && scrollInfo.metrics.outOfRange) {
                       if (_slivers.last is! SliverPadding) {
                         setState(() => _slivers.add(SliverPadding(
                             padding: EdgeInsets.symmetric(vertical: 16), sliver: SliverToBoxAdapter(child: CupertinoActivityIndicator()))));
