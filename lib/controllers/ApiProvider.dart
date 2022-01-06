@@ -110,7 +110,7 @@ class ApiProvider implements IApiProvider {
   }
 
   Future<Response> fetchHistory() async {
-    return await dio.get('$URL/bookmarks/history', queryParameters: {'more_results': true, 'show_read': true, 'show_booked': true});
+    return await dio.get('$URL/bookmarks/history', queryParameters: {'more_results': true, 'show_read': true});
   }
 
   Future<Response> fetchDiscussion(int discussionId, {int? lastId, String? user, String? search}) async {
@@ -119,7 +119,8 @@ class ApiProvider implements IApiProvider {
   }
 
   Future<Response> fetchDiscussionHome(int id) async {
-    FormData formData = new FormData.fromMap({'auth_nick': _credentials?.nickname, 'auth_token': _credentials?.token, 'l': 'discussion', 'l2': 'home', 'id_klub': id});
+    FormData formData = new FormData.fromMap(
+        {'auth_nick': _credentials?.nickname, 'auth_token': _credentials?.token, 'l': 'discussion', 'l2': 'home', 'id_klub': id});
     return await dio.post(URL, data: formData);
   }
 
@@ -128,7 +129,8 @@ class ApiProvider implements IApiProvider {
   }
 
   Future<Response> postDiscussionMessage(int postId, String message) async {
-    return await dio.post('$URL/discussion/$postId/send/text', data: {'content': message, 'format': 'html'}, options: Options(contentType: Headers.formUrlEncodedContentType));
+    return await dio.post('$URL/discussion/$postId/send/text',
+        data: {'content': message, 'format': 'html'}, options: Options(contentType: Headers.formUrlEncodedContentType));
   }
 
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder) async {
@@ -152,7 +154,8 @@ class ApiProvider implements IApiProvider {
   }
 
   Future<Response> sendMail(String recipient, String message) async {
-    return await dio.post('$URL/mail/send', data: {'recipient': recipient, 'message': message, 'format': 'html'}, options: Options(contentType: Headers.formUrlEncodedContentType));
+    return await dio.post('$URL/mail/send',
+        data: {'recipient': recipient, 'message': message, 'format': 'html'}, options: Options(contentType: Headers.formUrlEncodedContentType));
   }
 
   Future<Response> deleteFile(int id) async {
@@ -171,7 +174,8 @@ class ApiProvider implements IApiProvider {
     List<Future> uploads = [];
     for (Map<ATTACHMENT, dynamic> attachment in attachments) {
       FormData fileData = new FormData.fromMap({
-        'file': MultipartFile.fromBytes(attachment[ATTACHMENT.bytes], filename: attachment[ATTACHMENT.filename], contentType: attachment[ATTACHMENT.mediatype]),
+        'file': MultipartFile.fromBytes(attachment[ATTACHMENT.bytes],
+            filename: attachment[ATTACHMENT.filename], contentType: attachment[ATTACHMENT.mediatype]),
         'file_type': id == 0 ? 'mail_attachment' : 'discussion_attachment',
         'id_specific': id
       });
