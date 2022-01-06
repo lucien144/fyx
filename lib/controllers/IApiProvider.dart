@@ -29,6 +29,7 @@ abstract class IApiProvider {
   Future<List> uploadFile(List<Map<ATTACHMENT, dynamic>> attachments, {int id});
   Future<Response> sendMail(String recipient, String message);
   Future<Response> postDiscussionMessage(int id, String message);
+  Future<Response> deleteDiscussionMessage(int discussionId, int postId);
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder);
   Future<Response> giveRating(int discussionId, int postId, bool add, bool confirm, bool remove);
   Future<Response> votePoll(int discussionId, int postId, List<int> votes);

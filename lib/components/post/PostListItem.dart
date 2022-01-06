@@ -13,6 +13,7 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
+import 'package:fyx/model/provider/DiscussionPageNotifier.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/IconReply.dart';
@@ -20,6 +21,7 @@ import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:provider/provider.dart';
 
 class PostListItem extends StatefulWidget {
   final Post post;
@@ -123,6 +125,15 @@ class _PostListItemState extends State<PostListItem> {
                     user: _post!.nick,
                     postId: _post!.id,
                     shareData: ShareData(subject: '@${_post!.nick}', body: _post!.content, link: _post!.link),
+                    deletePostCallback: !_post!.canBeDeleted
+                        ? null
+                        : () async {
+                            try {
+                              await ApiController().deleteDiscussionMessage(_post!.idKlub, _post!.id);
+                              T.success('👍 Příspěvek byl smazán', bg: colors.success);
+                              Provider.of<DiscussionPageNotifier>(context, listen: false).deletedPostId = _post!.id;
+                            } catch (error) {}
+                          },
                     flagPostCallback: (postId) => MainRepository().settings.blockPost(postId)))),
         bottomWidget: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

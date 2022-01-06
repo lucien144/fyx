@@ -222,6 +222,10 @@ class ApiController {
     return OkResponse.fromJson(result.data);
   }
 
+  Future<Response> deleteDiscussionMessage(int discussionId, int postId) {
+    return provider.deleteDiscussionMessage(discussionId, postId);
+  }
+
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder) {
     return provider.setPostReminder(discussionId, postId, setReminder);
   }

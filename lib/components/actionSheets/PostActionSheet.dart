@@ -24,9 +24,18 @@ class PostActionSheet extends StatefulWidget {
   final String user;
   final int postId;
   final Function flagPostCallback;
+  Function? deletePostCallback;
   final ShareData shareData;
 
-  PostActionSheet({Key? key, required this.user, required this.postId, required this.flagPostCallback, required this.parentContext, required this.shareData}) : super(key: key);
+  PostActionSheet(
+      {Key? key,
+      required this.user,
+      required this.postId,
+      required this.flagPostCallback,
+      required this.parentContext,
+      required this.shareData,
+      this.deletePostCallback})
+      : super(key: key);
 
   @override
   _PostActionSheetState createState() => _PostActionSheetState();
@@ -76,6 +85,19 @@ class _PostActionSheetState extends State<PostActionSheet> {
                   AnalyticsProvider().logEvent('shareSheet');
                 }),
           ),
+          if (widget.deletePostCallback != null)
+            CupertinoActionSheetAction(
+                child: TextIcon(
+                  'Smazat příspěvek',
+                  icon: Icons.delete,
+                  iconColor: colors.danger,
+                ),
+                isDestructiveAction: true,
+                onPressed: () {
+                  widget.deletePostCallback!();
+                  Navigator.pop(context);
+                  AnalyticsProvider().logEvent('deletePost');
+                }),
           CupertinoActionSheetAction(
               child: TextIcon(
                 L.POST_SHEET_HIDE,

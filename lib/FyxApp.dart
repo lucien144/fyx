@@ -13,6 +13,7 @@ import 'package:fyx/libs/DeviceInfo.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/ThemeEnum.dart';
+import 'package:fyx/model/provider/DiscussionPageNotifier.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/model/provider/ThemeModel.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
@@ -25,8 +26,8 @@ import 'package:fyx/pages/NoticesPage.dart';
 import 'package:fyx/pages/SettingsPage.dart';
 import 'package:fyx/pages/TutorialPage.dart';
 import 'package:fyx/theme/T.dart';
-import 'package:fyx/theme/skin/skins/FyxSkin.dart';
 import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/skins/FyxSkin.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry/sentry.dart';
@@ -193,20 +194,19 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
         providers: [
           ChangeNotifierProvider<NotificationsModel>(create: (context) => NotificationsModel()),
           ChangeNotifierProvider<ThemeModel>(create: (context) => ThemeModel(MainRepository().settings.theme)),
+          ChangeNotifierProvider<DiscussionPageNotifier>(create: (context) => DiscussionPageNotifier()),
         ],
         builder: (ctx, widget) => Directionality(
-          textDirection: TextDirection.ltr,
-          child: Skin(
-            skin: FyxSkin.create(),
-            brightness: (() {
-              if (ctx.watch<ThemeModel>().theme == ThemeEnum.system && _platformBrightness != null) {
-                return _platformBrightness!;
-              }
-              return ctx.watch<ThemeModel>().theme == ThemeEnum.light ? Brightness.light : Brightness.dark;
-            })(),
-            child: SkinnedApp()
-          )
-        ),
+            textDirection: TextDirection.ltr,
+            child: Skin(
+                skin: FyxSkin.create(),
+                brightness: (() {
+                  if (ctx.watch<ThemeModel>().theme == ThemeEnum.system && _platformBrightness != null) {
+                    return _platformBrightness!;
+                  }
+                  return ctx.watch<ThemeModel>().theme == ThemeEnum.light ? Brightness.light : Brightness.dark;
+                })(),
+                child: SkinnedApp())),
       ),
     );
   }

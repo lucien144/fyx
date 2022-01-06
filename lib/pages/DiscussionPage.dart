@@ -9,10 +9,10 @@ import 'package:fyx/components/post/SyntaxHighlighter.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
-import 'package:fyx/model/DiscussionOwner.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/post/content/Advertisement.dart';
+import 'package:fyx/model/provider/DiscussionPageNotifier.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/L.dart';
@@ -20,6 +20,7 @@ import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
 
 class DiscussionPageArguments {
   final int discussionId;
@@ -128,8 +129,11 @@ class _DiscussionPageState extends State<DiscussionPage> {
                       filtered = data
                           .where((item) => !MainRepository().settings.isPostBlocked((item as PostListItem).post.id))
                           .where((item) => !MainRepository().settings.isUserBlocked((item as PostListItem).post.nick))
+                          .where((item) => (item as PostListItem).post.id != Provider.of<DiscussionPageNotifier>(context).deletedPostId)
                           .toList();
                     }
+                    // Do not keep the id of the deleted post.
+                    Provider.of<DiscussionPageNotifier>(context, listen: false).resetPostId();
                     return SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, i) => filtered[i],

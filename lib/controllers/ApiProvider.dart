@@ -133,6 +133,10 @@ class ApiProvider implements IApiProvider {
         data: {'content': message, 'format': 'html'}, options: Options(contentType: Headers.formUrlEncodedContentType));
   }
 
+  Future<Response> deleteDiscussionMessage(int discussionId, int postId) async {
+    return await dio.delete('$URL/discussion/$discussionId/delete/$postId');
+  }
+
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder) async {
     return await dio.post('$URL/discussion/$discussionId/reminder/$postId/$setReminder');
   }
