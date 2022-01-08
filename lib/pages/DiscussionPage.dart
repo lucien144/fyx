@@ -12,7 +12,6 @@ import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/post/content/Advertisement.dart';
-import 'package:fyx/model/provider/DiscussionPageNotifier.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/L.dart';
@@ -20,7 +19,6 @@ import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:provider/provider.dart';
 
 class DiscussionPageArguments {
   final int discussionId;
@@ -116,66 +114,75 @@ class _DiscussionPageState extends State<DiscussionPage> {
         title: discussionResponse.discussion.name.replaceAll('', '\u{200B}'),
         body: Stack(
           children: [
-            PullToRefreshList(
-              rebuild: _refreshList,
-              isInfinite: true,
-              pinnedWidget: getPinnedWidget(discussionResponse),
-              sliverListBuilder: (List data) {
-                return ValueListenableBuilder(
-                  valueListenable: MainRepository().settings.box.listenable(keys: ['blockedPosts', 'blockedUsers']),
-                  builder: (BuildContext context, value, Widget? child) {
-                    var filtered = data;
-                    if (data[0] is PostListItem) {
-                      filtered = data
-                          .where((item) => !MainRepository().settings.isPostBlocked((item as PostListItem).post.id))
-                          .where((item) => !MainRepository().settings.isUserBlocked((item as PostListItem).post.nick))
-                          .where((item) => !Provider.of<DiscussionPageNotifier>(context).deletedPostIds.contains((item as PostListItem).post.id))
-                          .toList();
-                    }
-                    return SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, i) => filtered[i],
-                        childCount: filtered.length,
-                      ),
-                    );
-                  },
-                );
-              },
-              dataProvider: (lastId) async {
-                Provider.of<DiscussionPageNotifier>(context, listen: false).clearPostsToDelete(); // Clean up a queue of deleted posts
-
-                var result;
-                if (lastId != null) {
-                  // If we load next page(s)
-                  var response = await ApiController().loadDiscussion(pageArguments.discussionId, lastId: lastId, user: pageArguments.filterByUser);
-                  result = response.posts;
-                } else {
-                  // If we load init data or we refresh data on pull
-                  if (!this._hasInitData) {
-                    // If we load init data, use the data from FutureBuilder
-                    result = discussionResponse.posts;
-                    this._hasInitData = true;
-                  } else {
-                    // If we just pull to refresh, load a fresh data
-                    var response = await ApiController().loadDiscussion(pageArguments.discussionId, user: pageArguments.filterByUser);
-                    result = response.posts;
-                  }
+            NotificationListener<PostDeleteFailNotification>(
+              onNotification: (notification) {
+                void rebuild(Element el) {
+                  el.markNeedsBuild();
+                  el.visitChildren(rebuild);
                 }
-                List<Widget> data = (result as List)
-                    .map((post) {
-                      return Post.fromJson(post, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode);
-                    })
-                    .where((post) => !MainRepository().settings.isPostBlocked(post.id))
-                    .where((post) => !MainRepository().settings.isUserBlocked(post.nick))
-                    .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.isNew))
-                    .toList();
 
-                int? id;
-                try {
-                  id = Post.fromJson((result as List).last, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode).id;
-                } catch (error) {}
-                return DataProviderResult(data, lastId: id);
+                // Rebuild the widget tree if Dismissible didn't removed the item due to the server error.
+                (context as Element).visitChildren(rebuild);
+                return false;
               },
+              child: PullToRefreshList(
+                rebuild: _refreshList,
+                isInfinite: true,
+                pinnedWidget: getPinnedWidget(discussionResponse),
+                sliverListBuilder: (List data) {
+                  return ValueListenableBuilder(
+                    valueListenable: MainRepository().settings.box.listenable(keys: ['blockedPosts', 'blockedUsers']),
+                    builder: (BuildContext context, value, Widget? child) {
+                      var filtered = data;
+                      if (data[0] is PostListItem) {
+                        filtered = data
+                            .where((item) => !MainRepository().settings.isPostBlocked((item as PostListItem).post.id))
+                            .where((item) => !MainRepository().settings.isUserBlocked((item as PostListItem).post.nick))
+                            .toList();
+                      }
+                      return SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, i) => filtered[i],
+                          childCount: filtered.length,
+                        ),
+                      );
+                    },
+                  );
+                },
+                dataProvider: (lastId) async {
+                  var result;
+                  if (lastId != null) {
+                    // If we load next page(s)
+                    var response = await ApiController().loadDiscussion(pageArguments.discussionId, lastId: lastId, user: pageArguments.filterByUser);
+                    result = response.posts;
+                  } else {
+                    // If we load init data or we refresh data on pull
+                    if (!this._hasInitData) {
+                      // If we load init data, use the data from FutureBuilder
+                      result = discussionResponse.posts;
+                      this._hasInitData = true;
+                    } else {
+                      // If we just pull to refresh, load a fresh data
+                      var response = await ApiController().loadDiscussion(pageArguments.discussionId, user: pageArguments.filterByUser);
+                      result = response.posts;
+                    }
+                  }
+                  List<Widget> data = (result as List)
+                      .map((post) {
+                        return Post.fromJson(post, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode);
+                      })
+                      .where((post) => !MainRepository().settings.isPostBlocked(post.id))
+                      .where((post) => !MainRepository().settings.isUserBlocked(post.nick))
+                      .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.isNew))
+                      .toList();
+
+                  int? id;
+                  try {
+                    id = Post.fromJson((result as List).last, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode).id;
+                  } catch (error) {}
+                  return DataProviderResult(data, lastId: id);
+                },
+              ),
             ),
             Visibility(
               visible: discussionResponse.discussion.accessRights.canWrite != false || discussionResponse.discussion.rights.canWrite != false,

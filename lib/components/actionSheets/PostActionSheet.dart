@@ -9,7 +9,6 @@ import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
-import 'package:holding_gesture/holding_gesture.dart';
 import 'package:share/share.dart';
 
 class ShareData {
@@ -25,17 +24,10 @@ class PostActionSheet extends StatefulWidget {
   final String user;
   final int postId;
   final Function flagPostCallback;
-  Function? deletePostCallback;
   final ShareData shareData;
 
   PostActionSheet(
-      {Key? key,
-      required this.user,
-      required this.postId,
-      required this.flagPostCallback,
-      required this.parentContext,
-      required this.shareData,
-      this.deletePostCallback})
+      {Key? key, required this.user, required this.postId, required this.flagPostCallback, required this.parentContext, required this.shareData})
       : super(key: key);
 
   @override
@@ -87,41 +79,6 @@ class _PostActionSheetState extends State<PostActionSheet> {
                   AnalyticsProvider().logEvent('shareSheet');
                 }),
           ),
-          if (widget.deletePostCallback != null)
-            HoldDetector(
-              enableHapticFeedback: true,
-              onHold: () {
-                setState(() => _deleteCounter++);
-                if (_deleteCounter / 800 >= 1) {
-                  widget.deletePostCallback!();
-                  Navigator.pop(context);
-                  AnalyticsProvider().logEvent('deletePost');
-                }
-              },
-              onCancel: () => _deleteCounter = 0,
-              holdTimeout: Duration(milliseconds: 1),
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: FractionallySizedBox(
-                      alignment: Alignment.centerLeft,
-                      widthFactor: _deleteCounter / 800,
-                      child: Container(
-                        color: colors.primary,
-                      ),
-                    ),
-                  ),
-                  CupertinoActionSheetAction(
-                      child: TextIcon(
-                        'Smazat příspěvek',
-                        icon: Icons.delete,
-                        iconColor: colors.danger,
-                      ),
-                      isDestructiveAction: true,
-                      onPressed: () => null)
-                ],
-              ),
-            ),
           CupertinoActionSheetAction(
               child: TextIcon(
                 L.POST_SHEET_HIDE,
