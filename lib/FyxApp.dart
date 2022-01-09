@@ -13,7 +13,6 @@ import 'package:fyx/libs/DeviceInfo.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/ThemeEnum.dart';
-import 'package:fyx/model/provider/DiscussionPageNotifier.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/model/provider/ThemeModel.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
@@ -194,7 +193,6 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
         providers: [
           ChangeNotifierProvider<NotificationsModel>(create: (context) => NotificationsModel()),
           ChangeNotifierProvider<ThemeModel>(create: (context) => ThemeModel(MainRepository().settings.theme)),
-          ChangeNotifierProvider<DiscussionPageNotifier>(create: (context) => DiscussionPageNotifier()),
         ],
         builder: (ctx, widget) => Directionality(
             textDirection: TextDirection.ltr,
