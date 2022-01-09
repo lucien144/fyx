@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 
 class FyxSkin extends SkinData {
   FyxSkin({lightData, darkData}) : super(lightData: lightData, darkData: darkData);
@@ -9,7 +9,7 @@ class FyxSkin extends SkinData {
   factory FyxSkin.create() {
     final lightColors = SkinColors();
     final darkColors = SkinColors(
-        primary: const Color(0xff316775),
+        primary: const Color(0xff4898ad),
         background: const Color(0xFF1C2128),
         barBackground: const Color(0xff2d333b),
         text: const Color(0xFFadbac7),
