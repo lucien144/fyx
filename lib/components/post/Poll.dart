@@ -44,21 +44,21 @@ class _PollState extends State<Poll> {
             padding: const EdgeInsets.symmetric(vertical: 4.0),
             child: GestureDetector(
               onTap: !_poll!.canVote ? null : () => setState(() {
-                if (_votes.contains(index)) {
-                  _votes.remove(index);
+                if (_votes.contains(answer.id)) {
+                  _votes.remove(answer.id);
                 } else {
                   if (_votes.length >= _poll!.allowedVotes) {
                     _votes.removeLast();
-                    _votes.add(index);
+                    _votes.add(answer.id);
                   } else {
-                    _votes.add(index);
+                    _votes.add(answer.id);
                   }
                 }
               }),
               child: Container(
                 padding: const EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
-                    color: _votes.contains(index) ? colors.pollAnswerSelected : colors.pollAnswer, border: _poll!.canVote ? Border.all(color: colors.primary) : null),
+                    color: _votes.contains(answer.id) ? colors.pollAnswerSelected : colors.pollAnswer, border: _poll!.canVote ? Border.all(color: colors.primary) : null),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   PostHtml(ContentRegular(answer.answer)),
                   if (answer.result != null)
@@ -112,8 +112,7 @@ class _PollState extends State<Poll> {
                 onPressed: _votes.length == 0 || _loading ? null : () async {
                   setState(() => _loading = true);
                   try {
-                    var votes = _votes.map((index) => index + 1).toList(); // Votes starting from 1 and not from 0.
-                    var poll = await ApiController().votePoll(_poll!.discussionId, _poll!.postId, votes);
+                    var poll = await ApiController().votePoll(_poll!.discussionId, _poll!.postId, _votes);
                     setState(() => _poll = poll);
                   } catch (error) {
                     T.error(error.toString(), bg: colors.danger);
