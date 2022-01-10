@@ -100,7 +100,12 @@ class _DiscussionPageState extends State<DiscussionPage> {
           middle: Container(
               alignment: Alignment.center,
               width: MediaQuery.of(context).size.width - 120,
-              child: Text(title, style: TextStyle(color: colors.text), overflow: TextOverflow.ellipsis))),
+              child: Tooltip(
+                  message: title,
+                  child: Text(title.replaceAll('', '\u{200B}'), style: TextStyle(color: colors.text), overflow: TextOverflow.ellipsis),
+                  padding: EdgeInsets.all(8.0), // needed until https://github.com/flutter/flutter/issues/86170 is fixed
+                  margin: EdgeInsets.all(8.0),
+              ))),
       child: body,
     );
   }
@@ -111,7 +116,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
     SyntaxHighlighter.languageContext = discussionResponse.discussion.name;
 
     return _pageScaffold(
-        title: discussionResponse.discussion.name.replaceAll('', '\u{200B}'),
+        title: discussionResponse.discussion.name,
         body: Stack(
           children: [
             NotificationListener<PostDeleteFailNotification>(
