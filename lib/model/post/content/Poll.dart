@@ -50,8 +50,9 @@ class ContentPoll extends Content {
     if (json['answers'] != null) {
       _answers = <PollAnswer>[];
       (json['answers'] as Map<String, dynamic>).forEach((String key, dynamic answer) {
-        _answers.add(new PollAnswer.fromJson(answer as Map<String, dynamic>));
+        _answers.add(new PollAnswer.fromJson(int.parse(key), answer as Map<String, dynamic>));
       });
+      _answers.sort((a, b) => a.id.compareTo(b.id));
     }
     if (json['computed_values'] != null) {
       _pollComputedValues = PollComputedValues.fromJson(json['computed_values']);
