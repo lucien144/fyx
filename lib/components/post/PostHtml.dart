@@ -27,16 +27,13 @@ class PostHtml extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Html(
-      data:
-          MainRepository().settings.useCompactMode && content!.consecutiveImages
-              ? content!.body
-              : content!.rawBody,
+      data: MainRepository().settings.useCompactMode && content!.consecutiveImages ? content!.body : content!.rawBody,
       style: {
-        'html':
-            Style.fromTextStyle(CupertinoTheme.of(context).textTheme.textStyle),
+        'html': Style.fromTextStyle(CupertinoTheme.of(context).textTheme.textStyle),
         '.image-link': Style(textDecoration: TextDecoration.none),
         'span.r': Style(fontWeight: FontWeight.bold),
-        'body': Style(margin: EdgeInsets.all(0))
+        'body': Style(margin: EdgeInsets.all(0)),
+        'pre': Style(color: Colors.transparent),
       },
       customRender: {
         'img': (
@@ -79,10 +76,7 @@ class PostHtml extends StatelessWidget {
         ) {
           final element = renderContext.tree.element;
           var url = element!.attributes['src'];
-          var urls = element
-              .querySelectorAll('source')
-              .map((element) => element.attributes['src'])
-              .toList();
+          var urls = element.querySelectorAll('source').map((element) => element.attributes['src']).toList();
           if ([null, ''].contains(url) && urls.length > 0) {
             url = urls.firstWhere((url) => url!.endsWith('.mp4'));
             if (url!.isEmpty) {
@@ -118,12 +112,10 @@ class PostHtml extends StatelessWidget {
               child: PostHeroAttachment(
                 Video(
                     id: element.attributes['data-embed-value']!,
-                    type: Video.findVideoType(
-                        element.attributes['data-embed-type']!),
+                    type: Video.findVideoType(element.attributes['data-embed-type']!),
                     image: img.attributes['src']!,
                     thumb: img.attributes['src']!),
-                size: Size(
-                    double.infinity, MediaQuery.of(context).size.width * (0.5)),
+                size: Size(double.infinity, MediaQuery.of(context).size.width * (0.5)),
                 showStrip: false,
               ),
             );
@@ -158,14 +150,11 @@ class PostHtml extends StatelessWidget {
           }
         }
       },
-      onImageTap: (String? src, RenderContext context,
-          Map<String, String> attributes, dom.Element? element) {
+      onImageTap: (String? src, RenderContext context, Map<String, String> attributes, dom.Element? element) {
         _isImageTap = true;
-        Navigator.of(context.buildContext).pushNamed('/gallery',
-            arguments: GalleryArguments(src!, images: content!.images));
+        Navigator.of(context.buildContext).pushNamed('/gallery', arguments: GalleryArguments(src!, images: content!.images));
       },
-      onLinkTap: (String? link, RenderContext context,
-          Map<String, String> attributes, dom.Element? element) async {
+      onLinkTap: (String? link, RenderContext context, Map<String, String> attributes, dom.Element? element) async {
         // 👇 https://github.com/Sub6Resources/flutter_html/issues/121#issuecomment-581593467
         if (_isImageTap) {
           _isImageTap = false;
@@ -187,11 +176,9 @@ class PostHtml extends StatelessWidget {
         // Click through to another discussion with message deeplink
         parserResult = Helpers.parseDiscussionPostUri(link);
         if (parserResult.isNotEmpty) {
-          var arguments = DiscussionPageArguments(
-              parserResult[INTERNAL_URI_PARSER.discussionId]!,
-              postId: parserResult[INTERNAL_URI_PARSER.postId]! + 1);
-          Navigator.of(context.buildContext, rootNavigator: true)
-              .pushNamed('/discussion', arguments: arguments);
+          var arguments =
+              DiscussionPageArguments(parserResult[INTERNAL_URI_PARSER.discussionId]!, postId: parserResult[INTERNAL_URI_PARSER.postId]! + 1);
+          Navigator.of(context.buildContext, rootNavigator: true).pushNamed('/discussion', arguments: arguments);
           return;
         }
 
@@ -200,8 +187,7 @@ class PostHtml extends StatelessWidget {
         // TODO: New API
         // Other Nyx internal links that cannot be displayed within Fyx
         RegExp otherDeeplinkTest = new RegExp(r"^/(.*)");
-        Iterable<RegExpMatch> otherDeeplinkMatches =
-            otherDeeplinkTest.allMatches(link);
+        Iterable<RegExpMatch> otherDeeplinkMatches = otherDeeplinkTest.allMatches(link);
         if (otherDeeplinkMatches.length == 1) {
           link = 'https://nyx.cz$link';
         }
