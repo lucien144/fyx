@@ -105,6 +105,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
                   child: Text(title.replaceAll('', '\u{200B}'), style: TextStyle(color: colors.text), overflow: TextOverflow.ellipsis),
                   padding: EdgeInsets.all(8.0), // needed until https://github.com/flutter/flutter/issues/86170 is fixed
                   margin: EdgeInsets.all(8.0),
+                  showDuration: Duration(seconds: 3),
               ))),
       child: body,
     );
