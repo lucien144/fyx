@@ -3,6 +3,94 @@
 Tento soubor vychází z [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 verzování z [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2021/07/12
+### Nové
+- První hybridní verze pro Android a iOS
+- Tržiště #217 #201
+- Oprava anket a přidání hlasování #149
+
+### Změněno
+- Skrýt floating button když nemám práva čtení #218
+- Pod YT videem se zobrazují dva!! #180
+- Nahradit nekonečno číslem #198
+- Zredukovat zbytečný padding kolem příspěvku #215
+- Možnost posílat HTML a zobrazování invalidního HTML #229
+- LaunchIcons #178
+- Upgrade některých knihoven #207
+
+### Opraveno
+- Reload neoznačuje nepřečtené -> přečtené #186
+- Rozbitý syntax highlight #148
+- Přestaly fungovat spoilery #200
+- Chyba zobrazení příspěvku pokud v diskuzi žádné nejsou #212
+- Chyba zobrazení příspěvku #165
+- Chyba zobrazení příspěvku - jeden příspěvek zcela brání vyrenderovat diskuzi #214
+- Prazdne auditko #122
+- Zaporne hodnoty u neprectenych prispevku #194
+- Prokliky na jiné diskuze z odpovědí #206
+- Chybová hláška při vstupu do soukromé diskuze #208
+- Nezobrazují se badges #174
+- Pouze prispevky tohoto ID #211
+- Dvakrát zobrazený příspěvek #209
+- Cyklení zobrazení příspěvků #139
+- Nezobrazení diskuze s velmi dlouhým příspěvkem #224
+- Revize interních odkazů #226
+- Ztráta contextu při otevření notifikace #227
+- Chybý rebuild widget tree při pull 2 refresh #228
+- Zlobí zobrazování náhledu v kompakt modu #169
+
+## [0.6.1] - 2021/04/23
+
+### Nové
+- Nefungují prokliky notifikací #154
+
+### Opraveno
+- Nenačítají se avataři #155
+- Pošta nezobrazuje odeslaný příspěvek #170
+- Odeslaná pošta má prohozené odesiltele #171
+- Obnovení home resetuje notifikace pošty #161
+- Vykopnutí z diskuze při novém příspěvku, který se mi notifikuje #141
+- Opravit odkaz na podmínky užívání #157
+
+### Změněno
+- Po probuzení bez připojení k internetu se zobrazí chyba místo přednačtených příspěvků #160
+- Po uspání a probuzení aplikace může diskuze odskrolovat jinam #159
+- Přehodit api z alpha na www #156
+- Vrátit zpět BACKERS.md #158
+
+## [0.6.0] - 2021/04/02
+
+### Nové
+- Napojení na nové API
+- Možnost nahrání více obrázků najednou
+
+### Opraveno
+- Při kliku na zvoneček se vždy zobrazí chyba. #142
+- Nefungují obrázky v poště #147
+
+## [0.5.0] - 2021/02/02
+
+### Nové
+- Push notifikace #14
+- Upozornění / notifikační centrum #6
+- Syntax highlight - tag <code/> #8
+- Zobrazování anket #38
+- Možnost ukládat obrázky #127
+- Nastavení > výchozí obrazovka > Ukládat poslední stav #91
+- Kontextová nabídka uživatele (filtrovat v diskuzi, poslat zprávu, ...) #113
+- Vylepšená práce s nahráváním fotek (fix performance, přidána kvalita, rozlišení, ...) #69
+- UI feedback palečkování, uložení do připomínek... #118
+
+### Opraveno
+- Reload zanořené diskuze #97
+- Přeskakující kursor #124
+- Po nahrání obrázku se i při blikajícím kurzoru schová klávesnice #119
+- Další drobné bugy
+
+### Změněno
+- Nová kudlanka #112
+- Drobné UI fixy #116 #120
+
 ## [0.4.1] - 2020/11/09
 
 ### Nové

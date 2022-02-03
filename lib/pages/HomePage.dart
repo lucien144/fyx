@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/FyxApp.dart';
-import 'package:fyx/components/CircleAvatar.dart' as ca;
+import 'package:fyx/components/Avatar.dart' as ca;
 import 'package:fyx/components/DiscussionListItem.dart';
 import 'package:fyx/components/ListHeader.dart';
 import 'package:fyx/components/NotificationBadge.dart';
@@ -16,6 +16,8 @@ import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/pages/MailboxPage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:provider/provider.dart';
 
 enum ETabs { history, bookmarks }
@@ -36,20 +38,20 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObserver {
-  PageController _bookmarksController;
+  late PageController _bookmarksController;
 
-  ETabs activeTab;
-  int _pageIndex;
+  ETabs activeTab = ETabs.history;
+  int _pageIndex = 0;
   Map<String, int> _refreshData = {'bookmarks': 0, 'mail': 0};
   bool _filterUnread = false;
-  DefaultView _defaultView;
+  DefaultView _defaultView = DefaultView.history;
   List<int> _toggledCategories = [];
-  HomePageArguments _arguments;
+  HomePageArguments? _arguments;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance?.addObserver(this);
 
     _defaultView = MainRepository().settings.defaultView == DefaultView.latest ? MainRepository().settings.latestView : MainRepository().settings.defaultView;
     _filterUnread = [DefaultView.bookmarksUnread, DefaultView.historyUnread].indexOf(_defaultView) >= 0;
@@ -63,9 +65,9 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
     _bookmarksController.addListener(() {
       // If the CupertinoTabView is sliding and the animation is finished, change the active tab
-      if (_bookmarksController.page % 1 == 0 && activeTab != ETabs.values[_bookmarksController.page.toInt()]) {
+      if (_bookmarksController.page! % 1 == 0 && activeTab != ETabs.values[_bookmarksController.page!.toInt()]) {
         setState(() {
-          activeTab = ETabs.values[_bookmarksController.page.toInt()];
+          activeTab = ETabs.values[_bookmarksController.page!.toInt()];
         });
       }
     });
@@ -73,9 +75,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     // Request for push notifications
     MainRepository().notifications.request();
 
-    AnalyticsProvider().setUser(MainRepository().credentials.nickname);
-    AnalyticsProvider().setUserProperty('photoWidth', MainRepository().settings.photoWidth.toString());
-    AnalyticsProvider().setUserProperty('photoQuality', MainRepository().settings.photoQuality.toString());
+    AnalyticsProvider().setUser(MainRepository().credentials!.nickname);
     AnalyticsProvider().setUserProperty('autocorrect', MainRepository().settings.useAutocorrect.toString());
     AnalyticsProvider().setUserProperty('compactMode', MainRepository().settings.useCompactMode.toString());
     AnalyticsProvider().setUserProperty('defaultView', MainRepository().settings.defaultView.toString());
@@ -89,7 +89,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
   void dispose() {
     _bookmarksController.dispose();
     FyxApp.routeObserver.unsubscribe(this);
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance?.removeObserver(this);
     super.dispose();
   }
 
@@ -97,7 +97,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // If we omit the Route check, there's very rare issue during authorization
     // See: https://github.com/lucien144/fyx/issues/57
-    if (state == AppLifecycleState.resumed && ModalRoute.of(context).isCurrent) {
+    if (state == AppLifecycleState.resumed && ModalRoute.of(context)!.isCurrent) {
       this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? ERefreshData.mail : ERefreshData.bookmarks);
     }
   }
@@ -144,7 +144,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   Widget actionSheet(BuildContext context) {
     return CupertinoActionSheet(
-        title: Text('Přihlášen jako: ${MainRepository().credentials.nickname}'),
+        title: Text('Přihlášen jako: ${MainRepository().credentials!.nickname}'),
         actions: <Widget>[
           CupertinoActionSheetAction(
               child: Text(L.SETTINGS),
@@ -155,7 +155,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
           CupertinoActionSheetAction(
               child: Text('⚠️ ${L.SETTINGS_BUGREPORT}'),
               onPressed: () {
-                T.prefillGithubIssue(appContext: MainRepository(), user: MainRepository().credentials.nickname);
+                T.prefillGithubIssue(appContext: MainRepository(), user: MainRepository().credentials!.nickname);
                 AnalyticsProvider().logEvent('reportBug');
               }),
         ],
@@ -170,17 +170,16 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     if (ApiController().buildContext == null || ApiController().buildContext.hashCode != context.hashCode) {
       ApiController().buildContext = context;
     }
 
-    if (_pageIndex == null) {
-      if (_arguments == null) {
-        _arguments = ModalRoute.of(context).settings.arguments as HomePageArguments;
-        _pageIndex = _arguments?.pageIndex ?? HomePage.PAGE_BOOKMARK;
-      } else {
-        _pageIndex = _arguments.pageIndex;
-      }
+    final Object? _objArguments = ModalRoute.of(context)?.settings.arguments;
+    if (_objArguments != null) {
+      _arguments = _objArguments as HomePageArguments;
+      _pageIndex = _arguments?.pageIndex;
     }
 
     return WillPopScope(
@@ -200,7 +199,6 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
             setState(() => _pageIndex = index);
             this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? ERefreshData.mail : ERefreshData.bookmarks);
           },
-          backgroundColor: Colors.white,
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: Icon(_filterUnread ? Icons.bookmarks : Icons.bookmarks_outlined, size: 34),
@@ -224,22 +222,22 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
               return CupertinoTabView(builder: (context) {
                 return CupertinoPageScaffold(
                   navigationBar: CupertinoNavigationBar(
-                      backgroundColor: Colors.white,
                       leading: Consumer<NotificationsModel>(
                           builder: (context, notifications, child) => NotificationBadge(
-                              widget: GestureDetector(
+                              widget: CupertinoButton(
+                                  padding: EdgeInsets.zero,
+                                  minSize: kMinInteractiveDimensionCupertino - 10,
                                   child: Icon(
                                     Icons.notifications_none,
                                     size: 30,
                                   ),
-                                  onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/notices')),
+                                  onPressed: () => Navigator.of(context, rootNavigator: true).pushNamed('/notices')),
                               isVisible: notifications.newNotices > 0,
                               counter: notifications.newNotices)),
                       trailing: GestureDetector(
-                        child: ca.CircleAvatar(
-                          MainRepository().credentials.avatar,
-                          size: 30,
-                          isHighlighted: true,
+                        child: ca.Avatar(
+                          MainRepository().credentials!.avatar,
+                          size: 26
                         ),
                         onTap: () {
                           showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet(context));
@@ -248,7 +246,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                       middle: CupertinoSegmentedControl(
                         groupValue: activeTab,
                         onValueChanged: (value) {
-                          _bookmarksController.animateToPage(ETabs.values.indexOf(value), duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
+                          _bookmarksController.animateToPage(ETabs.values.indexOf(value as ETabs), duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
                         },
                         children: {
                           ETabs.history: Padding(
@@ -270,7 +268,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                       // HISTORY PULL TO REFRESH
                       // -----
                       PullToRefreshList(
-                          rebuild: _refreshData['bookmarks'],
+                          rebuild: _refreshData['bookmarks'] ?? 0,
                           dataProvider: (lastId) async {
                             List<DiscussionListItem> withReplies = [];
                             var result = await ApiController().loadHistory();
@@ -292,7 +290,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                       // BOOKMARKS PULL TO REFRESH
                       // -----
                       PullToRefreshList(
-                          rebuild: _refreshData['bookmarks'],
+                          rebuild: _refreshData['bookmarks'] ?? 0,
                           dataProvider: (lastId) async {
                             var categories = [];
                             var result = await ApiController().loadBookmarks();
@@ -354,19 +352,18 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
               return CupertinoTabView(builder: (context) {
                 return CupertinoPageScaffold(
                     navigationBar: CupertinoNavigationBar(
-                        backgroundColor: Colors.white,
                         trailing: GestureDetector(
-                          child: ca.CircleAvatar(
-                            MainRepository().credentials.avatar,
-                            size: 30,
+                          child: ca.Avatar(
+                            MainRepository().credentials!.avatar,
+                            size: 26,
                           ),
                           onTap: () {
                             showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet(context));
                           },
                         ),
-                        middle: Text('Pošta')),
+                        middle: Text('Pošta', style: TextStyle(color: colors.text),)),
                     child: MailboxPage(
-                      refreshData: _refreshData['mail'],
+                      refreshData: _refreshData['mail'] ?? 0,
                     ));
               });
             default:

@@ -7,6 +7,8 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:share/share.dart';
 
 class ShareData {
@@ -14,7 +16,7 @@ class ShareData {
   final Content body;
   final String link;
 
-  ShareData({this.subject, this.body, this.link});
+  ShareData({required this.subject, required this.body, required this.link});
 }
 
 class PostActionSheet extends StatefulWidget {
@@ -24,7 +26,9 @@ class PostActionSheet extends StatefulWidget {
   final Function flagPostCallback;
   final ShareData shareData;
 
-  PostActionSheet({Key key, this.user, this.postId, this.flagPostCallback, this.parentContext, this.shareData}) : super(key: key);
+  PostActionSheet(
+      {Key? key, required this.user, required this.postId, required this.flagPostCallback, required this.parentContext, required this.shareData})
+      : super(key: key);
 
   @override
   _PostActionSheetState createState() => _PostActionSheetState();
@@ -32,9 +36,12 @@ class PostActionSheet extends StatefulWidget {
 
 class _PostActionSheetState extends State<PostActionSheet> {
   bool _reportIndicator = false;
+  int _deleteCounter = 0;
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     return CupertinoActionSheet(
         actions: <Widget>[
           Visibility(
@@ -44,7 +51,7 @@ class _PostActionSheetState extends State<PostActionSheet> {
                 onPressed: () {
                   var data = ClipboardData(text: widget.shareData.link);
                   Clipboard.setData(data).then((_) {
-                    T.success(L.TOAST_COPIED);
+                    T.success(L.TOAST_COPIED, bg: colors.success);
                     Navigator.pop(context);
                   });
                   AnalyticsProvider().logEvent('copyLink');
@@ -66,7 +73,7 @@ class _PostActionSheetState extends State<PostActionSheet> {
                     body = widget.shareData.body.videos.fold('', (previousValue, element) => '$previousValue ${element.link}').trim();
                   }
 
-                  final RenderBox box = context.findRenderObject();
+                  final RenderBox box = context.findRenderObject() as RenderBox;
                   Share.share(body, subject: widget.shareData.subject, sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
                   Navigator.pop(context);
                   AnalyticsProvider().logEvent('shareSheet');
@@ -76,12 +83,12 @@ class _PostActionSheetState extends State<PostActionSheet> {
               child: TextIcon(
                 L.POST_SHEET_HIDE,
                 icon: Icons.visibility_off,
-                iconColor: Colors.redAccent,
+                iconColor: colors.danger,
               ),
               isDestructiveAction: true,
               onPressed: () {
                 widget.flagPostCallback(widget.postId);
-                T.success(L.TOAST_POST_HIDDEN);
+                T.success(L.TOAST_POST_HIDDEN, bg: colors.success);
                 Navigator.pop(context);
                 AnalyticsProvider().logEvent('hidePost');
               }),
@@ -89,16 +96,16 @@ class _PostActionSheetState extends State<PostActionSheet> {
               child: TextIcon(
                 _reportIndicator ? L.POST_SHEET_FLAG_SAVING : L.POST_SHEET_FLAG,
                 icon: Icons.warning,
-                iconColor: Colors.redAccent,
+                iconColor: colors.danger,
               ),
               isDestructiveAction: true,
               onPressed: () async {
                 try {
                   setState(() => _reportIndicator = true);
-                  await ApiController().sendMail('FYXBOT', 'Inappropriate post/mail report: ID $widget.postId by user @$widget.user.');
-                  T.success(L.TOAST_POST_FLAGGED);
+                  await ApiController().sendMail('FYXBOT', 'Inappropriate post/mail report: ID ${widget.postId} by user @${widget.user}.');
+                  T.success(L.TOAST_POST_FLAGGED, bg: colors.success);
                 } catch (error) {
-                  T.error(L.TOAST_POST_FLAG_ERROR);
+                  T.error(L.TOAST_POST_FLAG_ERROR, bg: colors.danger);
                 } finally {
                   setState(() => _reportIndicator = false);
                   Navigator.pop(context);

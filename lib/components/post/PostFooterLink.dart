@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/model/post/Link.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 
 class PostFooterLink extends StatelessWidget {
   final Link link;
@@ -11,6 +13,8 @@ class PostFooterLink extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     return GestureDetector(
       onTap: () => T.openLink(link.url),
       child: Padding(
@@ -19,10 +23,10 @@ class PostFooterLink extends StatelessWidget {
           children: <Widget>[
             Container(
                 padding: EdgeInsets.all(4),
-                decoration: BoxDecoration(color: CupertinoTheme.of(context).primaryColor, borderRadius: BorderRadius.circular(4)),
+                decoration: BoxDecoration(color: colors.primary, borderRadius: BorderRadius.circular(4)),
                 child: Icon(
                   Icons.link,
-                  color: Colors.white,
+                  color: colors.background,
                 )),
             SizedBox(
               width: 4,

@@ -10,20 +10,20 @@ class ApiProvider implements IApiProvider {
   // ignore: non_constant_identifier_names
   final URL = 'https://nyx.cz/api';
 
-  Credentials _credentials;
+  Credentials? _credentials;
 
-  TOnError onError;
-  TOnAuthError onAuthError;
-  TOnContextData onContextData;
+  TOnError? onError;
+  TOnAuthError? onAuthError;
+  TOnContextData? onContextData;
 
-  Credentials getCredentials() {
-    if (_credentials != null && _credentials.isValid) {
+  getCredentials() {
+    if (_credentials != null && _credentials!.isValid) {
       return _credentials;
     }
     return null;
   }
 
-  Credentials setCredentials(Credentials creds) {
+  setCredentials(Credentials? creds) {
     if (creds != null && creds.isValid) {
       _credentials = creds;
     }
@@ -31,7 +31,7 @@ class ApiProvider implements IApiProvider {
   }
 
   ApiProvider() {
-    dio.interceptors.add(InterceptorsWrapper(onRequest: (RequestOptions options) async {
+    dio.interceptors.add(InterceptorsWrapper(onRequest: (RequestOptions options, RequestInterceptorHandler handler) async {
       try {
         // TODO: Perhaps, solve Czech characters too...
         // TODO: Get rid of MainRepository()
@@ -46,43 +46,53 @@ class ApiProvider implements IApiProvider {
       print('[API] UA: ${options.headers['user-agent']}');
       print('[API] ${options.method.toUpperCase()}: ${options.uri}');
 
-      if (_credentials != null && _credentials.isValid) {
-        print('[API] -> Bearer: ${_credentials.token}');
-        options.headers['Authorization'] = 'Bearer ${_credentials.token}';
+      if (_credentials != null && _credentials!.isValid) {
+        print('[API] -> Bearer: ${_credentials!.token}');
+        options.headers['Authorization'] = 'Bearer ${_credentials!.token}';
       }
-      return options;
-    }, onResponse: (Response response) async {
+      return handler.next(options);
+    }, onResponse: (Response response, ResponseInterceptorHandler handler) async {
       if (response.data.containsKey('context')) {
-        onContextData(response.data['context']);
+        if (onContextData != null) {
+          onContextData!(response.data['context']);
+        }
       }
 
       // All seems ok.
       if (response.statusCode == 200) {
-        return response;
+        return handler.next(response);
+      }
+
+      // Negative rating confirmation
+      if (response.statusCode == 403 && ['NeedsConfirmation'].contains(response.data?['code'])) {
+        return handler.next(response);
       }
 
       // Malformed response
-      onError(L.API_ERROR);
-      return response;
-    }, onError: (DioError e) async {
+      if (onError != null) {
+        onError!(L.API_ERROR);
+      }
+      return handler.next(response);
+    }, onError: (DioError e, ErrorInterceptorHandler handler) async {
       // Not Authorized
       if (e.response?.statusCode == 401) {
-        onAuthError(e.response.data['message']);
-        return e.response;
+        if (onAuthError != null) {
+          onAuthError!(e.response!.data['message']);
+        }
+        return handler.next(e);
       }
 
       // Other problem
       if (e.response?.statusCode == 400) {
-        onError(e.response.data['message']);
-        return e.response;
+        if (onError != null) {
+          onError!(e.response!.data['message']);
+        }
+        return handler.next(e);
       }
 
-      // Negative rating confirmation
-      if (e.response?.statusCode == 403) {
-        return e.response;
+      if (onError != null) {
+        onError!(e.message);
       }
-
-      onError(e.message);
     }));
   }
 
@@ -92,7 +102,7 @@ class ApiProvider implements IApiProvider {
 
   Future<Response> registerFcmToken(String token) async {
     String client = 'fyx';
-    return await dio.post('$URL/register_for_notifications/${_credentials.token}/$client/$token');
+    return await dio.post('$URL/register_for_notifications/${_credentials?.token}/$client/$token');
   }
 
   Future<Response> fetchBookmarks() async {
@@ -100,16 +110,17 @@ class ApiProvider implements IApiProvider {
   }
 
   Future<Response> fetchHistory() async {
-    return await dio.get('$URL/bookmarks/history/more');
+    return await dio.get('$URL/bookmarks/history', queryParameters: {'more_results': true, 'show_read': true});
   }
 
-  Future<Response> fetchDiscussion(int discussionId, {int lastId, String user}) async {
-    Map<String, dynamic> params = {'order': lastId == null ? 'newest' : 'older_than', 'from_id': lastId, 'user': user};
+  Future<Response> fetchDiscussion(int discussionId, {int? lastId, String? user, String? search}) async {
+    Map<String, dynamic> params = {'order': lastId == null ? 'newest' : 'older_than', 'from_id': lastId, 'user': user, 'text': search};
     return await dio.get('$URL/discussion/$discussionId', queryParameters: params);
   }
 
   Future<Response> fetchDiscussionHome(int id) async {
-    FormData formData = new FormData.fromMap({'auth_nick': _credentials.nickname, 'auth_token': _credentials.token, 'l': 'discussion', 'l2': 'home', 'id_klub': id});
+    FormData formData = new FormData.fromMap(
+        {'auth_nick': _credentials?.nickname, 'auth_token': _credentials?.token, 'l': 'discussion', 'l2': 'home', 'id_klub': id});
     return await dio.post(URL, data: formData);
   }
 
@@ -117,8 +128,13 @@ class ApiProvider implements IApiProvider {
     return await dio.get('$URL/notifications');
   }
 
-  Future<Response> postDiscussionMessage(int postId, String message) async {
-    return await dio.post('$URL/discussion/$postId/send/text', data: {'content': message, 'format': 'html'}, options: Options(contentType: Headers.formUrlEncodedContentType));
+  Future<Response> postDiscussionMessage(int discussionId, String message) async {
+    return await dio.post('$URL/discussion/$discussionId/send/text',
+        data: {'content': message, 'format': 'html'}, options: Options(contentType: Headers.formUrlEncodedContentType));
+  }
+
+  Future<Response> deleteDiscussionMessage(int discussionId, int postId) async {
+    return await dio.delete('$URL/discussion/$discussionId/delete/$postId');
   }
 
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder) async {
@@ -129,20 +145,21 @@ class ApiProvider implements IApiProvider {
     String action = positive ? 'positive' : 'negative';
     action = remove ? 'remove' : action;
     action = confirm ? 'negative_visible' : action;
-    return await dio.post('$URL/discussion/$discussionId/rating/$postId/$action');
+    return await dio.post('$URL/discussion/$discussionId/rating/$postId/$action', options: Options(validateStatus: (status) => status! < 500));
   }
 
   Future<Response> logout() async {
-    return await dio.delete('$URL/profile/delete_token/${_credentials.token}');
+    return await dio.delete('$URL/profile/delete_token/${_credentials?.token}');
   }
 
-  Future<Response> fetchMail({int lastId, String username}) async {
+  Future<Response> fetchMail({int? lastId, String? username}) async {
     Map<String, dynamic> params = {'order': lastId == null ? 'newest' : 'older_than', 'from_id': lastId, 'user': username};
     return await dio.get('$URL/mail', queryParameters: params);
   }
 
   Future<Response> sendMail(String recipient, String message) async {
-    return await dio.post('$URL/mail/send', data: {'recipient': recipient, 'message': message, 'format': 'html'}, options: Options(contentType: Headers.formUrlEncodedContentType));
+    return await dio.post('$URL/mail/send',
+        data: {'recipient': recipient, 'message': message, 'format': 'html'}, options: Options(contentType: Headers.formUrlEncodedContentType));
   }
 
   Future<Response> deleteFile(int id) async {
@@ -161,7 +178,8 @@ class ApiProvider implements IApiProvider {
     List<Future> uploads = [];
     for (Map<ATTACHMENT, dynamic> attachment in attachments) {
       FormData fileData = new FormData.fromMap({
-        'file': MultipartFile.fromBytes(attachment[ATTACHMENT.bytes], filename: attachment[ATTACHMENT.filename], contentType: attachment[ATTACHMENT.mediatype]),
+        'file': MultipartFile.fromBytes(attachment[ATTACHMENT.bytes],
+            filename: attachment[ATTACHMENT.filename], contentType: attachment[ATTACHMENT.mediatype]),
         'file_type': id == 0 ? 'mail_attachment' : 'discussion_attachment',
         'id_specific': id
       });

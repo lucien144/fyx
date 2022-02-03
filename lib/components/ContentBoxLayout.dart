@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/shims/dart_ui.dart';
 import 'package:fyx/components/post/Advertisement.dart';
 import 'package:fyx/components/post/Poll.dart';
 import 'package:fyx/components/post/PostFooterLink.dart';
@@ -9,24 +10,28 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/PostTypeEnum.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/Image.dart' as model;
+import 'package:fyx/model/post/content/Advertisement.dart';
+import 'package:fyx/model/post/content/Poll.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/UnreadBadgeDecoration.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:fyx/theme/skin/Skin.dart';
 
 enum LAYOUT_TYPES { textOnly, oneImageOnly, attachmentsOnly, attachmentsAndText }
 
-typedef Widget TLayout();
+typedef Widget? TLayout();
 
 class ContentBoxLayout extends StatelessWidget {
   final Widget topLeftWidget;
   final Widget topRightWidget;
-  final Widget bottomWidget;
+  final Widget? bottomWidget;
   final Content content;
   final bool _isPreview;
   final bool _isHighlighted;
   final Map<LAYOUT_TYPES, TLayout> _layoutMap = {};
-  final Function onTap;
+  final VoidCallback? onTap;
 
-  ContentBoxLayout({this.topLeftWidget, this.topRightWidget, this.bottomWidget, this.content, isPreview = false, isHighlighted = false, this.onTap})
+  ContentBoxLayout({required this.topLeftWidget, required this.topRightWidget, this.bottomWidget, required this.content, isPreview = false, isHighlighted = false, this.onTap})
       : _isPreview = isPreview,
         _isHighlighted = isHighlighted {
     // The order here is important!
@@ -109,8 +114,10 @@ class ContentBoxLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     return Container(
-      decoration: _isPreview ? T.CARD_SHADOW_DECORATION : null,
+      decoration: _isPreview ? colors.shadow : null,
       child: Column(
         children: <Widget>[
           Visibility(
@@ -121,8 +128,8 @@ class ContentBoxLayout extends StatelessWidget {
             ),
           ),
           Container(
-            color: _isHighlighted ? T.COLOR_SECONDARY.withOpacity(0.1) : null,
-            foregroundDecoration: _isHighlighted ? UnreadBadgeDecoration(badgeColor: T.COLOR_PRIMARY, badgeSize: 16) : null,
+            color: _isHighlighted ? colors.primary.withOpacity(0.1) : null,
+            foregroundDecoration: _isHighlighted ? UnreadBadgeDecoration(badgeColor: colors.primary, badgeSize: 16) : null,
             child: Column(
               children: <Widget>[
                 SizedBox(
@@ -132,7 +139,7 @@ class ContentBoxLayout extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[topLeftWidget ?? Container(), SizedBox(), _isPreview ? Container() : (topRightWidget ?? Container())],
+                    children: <Widget>[topLeftWidget, SizedBox(), _isPreview ? Container() : (topRightWidget)],
                   ),
                 ),
                 if (this.onTap == null)
@@ -161,7 +168,7 @@ class ContentBoxLayout extends StatelessWidget {
                 SizedBox(
                   height: 8,
                 ),
-                this.bottomWidget != null ? Divider(color: Colors.black38) : Container(),
+                this.bottomWidget != null ? Divider(color: colors.grey) : Container(),
                 this.bottomWidget != null ? Container(child: this.bottomWidget, padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16)) : Container(),
                 SizedBox(
                   height: 8,
@@ -178,7 +185,7 @@ class ContentBoxLayout extends StatelessWidget {
     return MainRepository().settings.useCompactMode
         ? (() {
             for (final layout in LAYOUT_TYPES.values) {
-              var result = _layoutMap[layout]();
+              var result = _layoutMap[layout]!();
               if (result != null) {
                 return result;
               }
@@ -191,11 +198,11 @@ class ContentBoxLayout extends StatelessWidget {
   Widget getWidgetByContentType(Content content) {
     switch (this.content.contentType) {
       case PostTypeEnum.poll:
-        return Poll(content);
+        return Poll(content as ContentPoll);
       case PostTypeEnum.text:
         return PostHtml(content);
       case PostTypeEnum.advertisement:
-        return Advertisement(content);
+        return Advertisement(content as ContentAdvertisement);
       default:
         return T.somethingsWrongButton(content.rawBody);
     }

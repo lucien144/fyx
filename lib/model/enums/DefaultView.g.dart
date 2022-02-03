@@ -46,9 +46,6 @@ class DefaultViewAdapter extends TypeAdapter<DefaultView> {
       case DefaultView.latest:
         writer.writeByte(4);
         break;
-      default:
-        writer.writeByte(0);
-        break;
     }
   }
 

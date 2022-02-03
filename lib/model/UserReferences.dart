@@ -1,8 +1,8 @@
 class UserReferences {
-  int _positive;
-  int _negative;
+  late int _positive;
+  late int _negative;
 
-  UserReferences({int positive, int negative}) {
+  UserReferences({int positive = 0, int negative = 0}) {
     this._positive = positive;
     this._negative = negative;
   }

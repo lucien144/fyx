@@ -2,22 +2,24 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/FeedbackIndicator.dart';
 import 'package:fyx/controllers/ApiController.dart';
-import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 
 class PostRating extends StatefulWidget {
   final Post post;
+  Function? onRatingChange;
 
-  PostRating(this.post, {Key key}) : super(key: key);
+  PostRating(this.post, {Key? key, this.onRatingChange}) : super(key: key);
 
   @override
   _PostRatingState createState() => _PostRatingState();
 }
 
 class _PostRatingState extends State<PostRating> {
-  Post _post;
+  Post? _post;
   bool _givingRating = false;
 
   @override
@@ -36,29 +38,34 @@ class _PostRatingState extends State<PostRating> {
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     return FeedbackIndicator(
       isLoading: _givingRating,
       child: Row(
         children: <Widget>[
           Visibility(
-            visible: _post.canBeRated,
+            visible: _post!.canBeRated,
             child: GestureDetector(
               child: Icon(
                 Icons.thumb_up,
-                color: _post.myRating == 'positive' ? Colors.green : Colors.black38,
+                color: _post!.myRating == 'positive' ? colors.success : colors.text.withOpacity(0.38),
               ),
               onTap: _givingRating
                   ? null
                   : () {
                       setState(() => _givingRating = true);
-                      ApiController().giveRating(_post.idKlub, _post.id, remove: _post.myRating != 'none').then((response) {
+                      ApiController().giveRating(_post!.idKlub, _post!.id, remove: _post!.myRating != 'none').then((response) {
                         setState(() {
-                          _post.rating = response.currentRating;
-                          _post.myRating = response.myRating;
+                          _post!.rating = response.currentRating;
+                          _post!.myRating = response.myRating;
                         });
+                        if (widget.onRatingChange != null) {
+                          widget.onRatingChange!(_post);
+                        }
                       }).catchError((error) {
                         print(error);
-                        T.error(L.RATING_ERROR);
+                        T.error(L.RATING_ERROR, bg: colors.danger);
                       }).whenComplete(() => setState(() => _givingRating = false));
                     },
             ),
@@ -66,31 +73,30 @@ class _PostRatingState extends State<PostRating> {
           SizedBox(
             width: 4,
           ),
-          Visibility(
-            visible: _post.rating != 0 || MainRepository().credentials.nickname != _post.nick,
-            child: Opacity(
+          if (_post!.rating != null)
+            Opacity(
               opacity: _givingRating ? 0 : 1,
               child: Text(
-                _post.rating > 0 ? '+${_post.rating}' : _post.rating.toString(),
-                style: TextStyle(fontSize: 14, color: _post.rating > 0 ? Colors.green : (_post.rating < 0 ? Colors.redAccent : Colors.black38)),
+                Post.formatRating(_post!.rating!),
+                style: TextStyle(
+                    fontSize: 14, color: _post!.rating! > 0 ? colors.success : (_post!.rating! < 0 ? colors.danger : colors.text.withOpacity(0.38))),
               ),
             ),
-          ),
           SizedBox(
             width: 4,
           ),
           Visibility(
-            visible: _post.canBeRated,
+            visible: _post!.canBeRated,
             child: GestureDetector(
               child: Icon(
                 Icons.thumb_down,
-                color: ['negative', 'negative_visible'].contains(_post.myRating) ? Colors.redAccent : Colors.black38,
+                color: ['negative', 'negative_visible'].contains(_post!.myRating) ? colors.danger : colors.text.withOpacity(0.38),
               ),
               onTap: _givingRating
                   ? null
                   : () {
                       setState(() => _givingRating = true);
-                      ApiController().giveRating(_post.idKlub, _post.id, positive: false, remove: _post.myRating != 'none').then((response) {
+                      ApiController().giveRating(_post!.idKlub, _post!.id, positive: false, remove: _post!.myRating != 'none').then((response) {
                         if (response.needsConfirmation) {
                           showCupertinoDialog(
                             context: context,
@@ -110,14 +116,19 @@ class _PostRatingState extends State<PostRating> {
                                     isDestructiveAction: true,
                                     child: new Text('Hodnotit'),
                                     onPressed: () {
-                                      ApiController().giveRating(_post.idKlub, _post.id, positive: false, confirm: true, remove: _post.myRating != 'none').then((response) {
+                                      ApiController()
+                                          .giveRating(_post!.idKlub, _post!.id, positive: false, confirm: true, remove: _post!.myRating != 'none')
+                                          .then((response) {
                                         setState(() {
-                                          _post.rating = response.currentRating;
-                                          _post.myRating = response.myRating;
+                                          _post!.rating = response.currentRating;
+                                          _post!.myRating = response.myRating;
                                         });
+                                        if (widget.onRatingChange != null) {
+                                          widget.onRatingChange!(_post);
+                                        }
                                       }).catchError((error) {
                                         print(error);
-                                        T.error(L.RATING_ERROR);
+                                        T.error(L.RATING_ERROR, bg: colors.danger);
                                       }).whenComplete(() {
                                         setState(() => _givingRating = false);
                                         Navigator.of(context, rootNavigator: true).pop();
@@ -128,14 +139,17 @@ class _PostRatingState extends State<PostRating> {
                           );
                         } else {
                           setState(() {
-                            _post.rating = response.currentRating;
-                            _post.myRating = response.myRating;
+                            _post!.rating = response.currentRating;
+                            _post!.myRating = response.myRating;
                             _givingRating = false;
                           });
+                          if (widget.onRatingChange != null) {
+                            widget.onRatingChange!(_post);
+                          }
                         }
                       }).catchError((error) {
                         setState(() => _givingRating = false);
-                        T.error(L.RATING_ERROR);
+                        T.error(L.RATING_ERROR, bg: colors.danger);
                       });
                     },
             ),

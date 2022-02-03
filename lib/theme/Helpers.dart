@@ -2,18 +2,18 @@ import 'package:fyx/theme/L.dart';
 import 'package:html/parser.dart';
 import 'package:intl/intl.dart';
 
-enum INTERNAL_URI_PARSER { discussionId, postId }
+enum INTERNAL_URI_PARSER { discussionId, postId, search }
 
 class Helpers {
   static stripHtmlTags(String html) {
     final document = parse(html);
-    return parse(document.body.text).documentElement.text.trim();
+    return parse(document.body?.text).documentElement?.text.trim();
   }
 
   static String absoluteTime(int time) {
-    final DateTime now = DateTime.fromMillisecondsSinceEpoch(time);
-    final DateFormat formatter = DateFormat('d. M. y H:m');
-    return formatter.format(now);
+    final DateTime then = DateTime.fromMillisecondsSinceEpoch(time);
+    final DateFormat formatter = DateFormat(then.year == DateTime.now().year ? 'd. M. HH:mm' : 'd. M. y HH:mm');
+    return formatter.format(then);
   }
 
   static String relativeTime(int time) {
@@ -43,6 +43,24 @@ class Helpers {
     return '${years}Y';
   }
 
+  static double ratingRange(int rating) {
+    final opacity = {
+      0.2: [0, 20],
+      0.4: [20, 80],
+      0.6: [80, 150],
+      0.8: [150, 250],
+      0.9: [250, 350],
+    };
+
+    for (var entry in opacity.entries) {
+      if (rating == rating.clamp(entry.value[0], entry.value[1])) {
+        return entry.key;
+      }
+    }
+
+    return 1.0;
+  }
+
   static Map<INTERNAL_URI_PARSER, int> parseDiscussionPostUri(String uri) {
     RegExp test = new RegExp(r"(\?l=topic;id=([0-9]+);wu=([0-9]+))|(/discussion/([0-9]+)/id/([0-9]+))$");
     Iterable<RegExpMatch> matches = test.allMatches(uri);
@@ -58,20 +76,22 @@ class Helpers {
     return {};
   }
 
-  static Map<INTERNAL_URI_PARSER, int> parseDiscussionUri(String uri) {
-    RegExp test = new RegExp(r"(\?l=topic;id=([0-9]+))|(/discussion/([0-9]+))$");
+  static Map<INTERNAL_URI_PARSER, dynamic> parseDiscussionUri(String uri) {
+    RegExp test = new RegExp(r"(\?l=topic;id=([0-9]+))|(/discussion/([0-9]+)(\?(.*))?)$");
+    final parsed = Uri.parse(uri);
+
     Iterable<RegExpMatch> matches = test.allMatches(uri);
     if (matches.length == 1) {
       int discussionId = int.parse(matches.elementAt(0).group(2) ?? '0');
       if (discussionId == 0) {
         discussionId = int.parse(matches.elementAt(0).group(4) ?? '0');
       }
-      return {INTERNAL_URI_PARSER.discussionId: discussionId};
+      return {INTERNAL_URI_PARSER.discussionId: discussionId, INTERNAL_URI_PARSER.search: parsed.queryParameters['text']};
     }
     return {};
   }
 
-  static String fileExtension(String filePath) {
+  static String? fileExtension(String filePath) {
     final regexp = RegExp(r'\.(?<ext>[a-z]{3,})$', caseSensitive: false);
     final matches = regexp.allMatches(filePath);
 

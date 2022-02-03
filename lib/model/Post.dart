@@ -1,5 +1,4 @@
 // ignore_for_file: non_constant_identifier_names
-import 'package:fyx/model/enums/PostTypeEnum.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/content/Advertisement.dart';
 import 'package:fyx/model/post/content/Poll.dart';
@@ -7,28 +6,29 @@ import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/theme/Helpers.dart';
 
 class Post {
+  // TODO: Refactor all params to follow names from the new API like _id_wu -> id ...
   final bool isCompact;
   bool _canReply = true;
-  bool _isNew;
-  int idKlub;
-  int _id_wu;
-  String _nick;
-  int _time;
-  int _wu_rating;
-  String _wu_type;
-  String myRating;
-  bool _reminder;
-  bool _canBeRated;
-  bool _canBeDeleted;
-  bool _canBeReminded;
-  Content _content;
+  bool _isNew = false;
+  int idKlub = 0;
+  int _id_wu = 0;
+  String _nick = '';
+  int _time = 0;
+  int? rating;
+  String _wu_type = '';
+  String myRating = '';
+  bool _reminder = false;
+  bool _canBeRated = false;
+  bool _canBeDeleted = false;
+  bool _canBeReminded = false;
+  late Content _content;
 
-  Post.fromJson(Map<String, dynamic> json, this.idKlub, {this.isCompact}) {
-    this._id_wu = json['id'];
-    this._nick = json['username'];
+  Post.fromJson(Map<String, dynamic> json, this.idKlub, {this.isCompact = false}) {
+    this._id_wu = json['id'] ?? 0;
+    this._nick = json['username'] ?? '';
     this._time = DateTime.parse(json['inserted_at'] ?? '0').millisecondsSinceEpoch;
-    this._wu_rating = json['rating'] ?? 0;
-    this._wu_type = json['type'];
+    this.rating = json['rating'];
+    this._wu_type = json['type'] ?? '';
     this._isNew = json['new'] ?? false;
     this.myRating = json['my_rating'] ?? 'none'; // positive / negative / negative_visible / none TODO: enums
     this._reminder = json['reminder'] ?? false;
@@ -46,8 +46,9 @@ class Post {
           this._content = ContentAdvertisement.fromPostJson(json);
           break;
         default:
-          this._content =
-              ContentRegular('${json['content']}<br><br><small><em>Chyba: neošetřený druh příspěvku: "${json['content_raw']['type']}"</em></small>', isCompact: this.isCompact);
+          this._content = ContentRegular(
+              '${json['content']}<br><br><small><em>Chyba: neošetřený druh příspěvku: "${json['content_raw']['type']}"</em></small>',
+              isCompact: this.isCompact);
           break;
       }
       //TODO handle other cases
@@ -56,13 +57,18 @@ class Post {
     }
   }
 
+  static String formatRating(int _rating) {
+    if (_rating == 0) {
+      return '±$_rating';
+    } else if (_rating < 0) {
+      return _rating.toString();
+    }
+    return '+$_rating';
+  }
+
   Content get content => _content;
 
   String get type => _wu_type;
-
-  int get rating => _wu_rating;
-
-  set rating(val) => _wu_rating = val;
 
   int get time => _time;
 

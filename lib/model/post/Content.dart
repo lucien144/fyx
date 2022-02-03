@@ -8,7 +8,7 @@ abstract class Content {
   final bool isCompact;
   PostTypeEnum _contentType;
 
-  Content(this._contentType, { this.isCompact });
+  Content(this._contentType, { this.isCompact = false });
 
   bool get isNotEmpty => body.isNotEmpty;
 

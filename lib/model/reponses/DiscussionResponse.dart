@@ -2,18 +2,23 @@ import 'package:fyx/model/Discussion.dart';
 import 'package:fyx/model/ResponseContext.dart';
 
 class DiscussionResponse {
-  Discussion _discussion;
-  List _posts;
-  ResponseContext _context;
+  late Discussion _discussion;
+  List _posts = [];
+  late ResponseContext _context;
 
   DiscussionResponse.accessDenied() {
     this._discussion = Discussion.fromJson(null);
     this._posts = [];
   }
 
+  // TODO: Return something more relevant.
+  DiscussionResponse.error() {
+    DiscussionResponse.accessDenied();
+  }
+
   DiscussionResponse.fromJson(Map<String, dynamic> json) {
     this._discussion = Discussion.fromJson(json['discussion_common']);
-    this._posts = json['posts'];
+    this._posts = json['posts'] ?? [];
     this._context = ResponseContext.fromJson(json['context']);
   }
 

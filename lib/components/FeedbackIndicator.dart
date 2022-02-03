@@ -5,7 +5,7 @@ class FeedbackIndicator extends StatefulWidget {
   final Widget child;
   final bool isLoading;
 
-  FeedbackIndicator({Key key, this.child, this.isLoading}) : super(key: key);
+  FeedbackIndicator({Key? key, required this.child, required this.isLoading}) : super(key: key);
 
   @override
   _FeedbackIndicatorState createState() => _FeedbackIndicatorState();

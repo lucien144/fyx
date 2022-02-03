@@ -6,29 +6,29 @@ import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/content/Regular.dart';
 
 class ContentAdvertisement extends Content {
-  ContentRegular contentRegular;
+  ContentRegular? contentRegular;
 
-  int _discussion_id;
-  String _full_name;
-  List<int> _parent_categories;
-  List<String> _photo_ids;
-  String _ad_type;
-  int _price;
-  String _location;
-  String _currency;
-  String _state;
-  String _summary;
-  String _shipping;
-  String _description;
-  String _description_raw;
-  int _refreshed_at;
-  int _inserted_at;
-  int _posts_count;
-  List _parameters;
-  List<FileAttachment> fileAttachments;
-  UserReferences references;
+  int _discussion_id = 0;
+  String _full_name = '';
+  List<int> _parent_categories = <int>[];
+  List<String> _photo_ids = <String>[];
+  String _ad_type = '';
+  int _price = 0;
+  String _location = '';
+  String _currency = '';
+  String _state = '';
+  String _summary = '';
+  String _shipping = '';
+  String _description = '';
+  String _description_raw = '';
+  int _refreshed_at = 0;
+  int _inserted_at = 0;
+  int _posts_count = 0;
+  List _parameters = [];
+  List<FileAttachment> fileAttachments = <FileAttachment>[];
+  UserReferences? references;
 
-  ContentAdvertisement.fromJson(Map<String, dynamic> json, {bool isCompact}) : super(PostTypeEnum.advertisement, isCompact: isCompact) {
+  ContentAdvertisement.fromJson(Map<String, dynamic> json, {bool isCompact = false}) : super(PostTypeEnum.advertisement, isCompact: isCompact) {
     _discussion_id = json['discussion_id'];
     _full_name = json['full_name'] ?? '';
     _parent_categories = List.castFrom(json['parent_categories'] ?? []);
@@ -42,7 +42,7 @@ class ContentAdvertisement extends Content {
     _shipping = json['shipping'] ?? '';
     _description = json['description'] ?? '';
     _description_raw = json['description_raw'] ?? '';
-    _posts_count = json['posts_count'];
+    _posts_count = json['posts_count'] ?? 0;
     _parameters = List.castFrom(json['parameters'] ?? []);
 
     try {
@@ -58,7 +58,7 @@ class ContentAdvertisement extends Content {
     }
   }
 
-  factory ContentAdvertisement.fromDiscussionJson(Map<String, dynamic> json, {bool isCompact}) {
+  factory ContentAdvertisement.fromDiscussionJson(Map<String, dynamic> json, {bool isCompact = false}) {
     ContentAdvertisement ad = ContentAdvertisement.fromJson(json['advertisement'], isCompact: isCompact);
 
     if (json['attachments'] is List) {
@@ -73,7 +73,7 @@ class ContentAdvertisement extends Content {
     return ad;
   }
 
-  factory ContentAdvertisement.fromPostJson(Map<String, dynamic> json, {bool isCompact}) {
+  factory ContentAdvertisement.fromPostJson(Map<String, dynamic> json, {bool isCompact = false}) {
     ContentAdvertisement ad = ContentAdvertisement.fromJson(json['content_raw']['data'], isCompact: isCompact);
     ad.contentRegular = ContentRegular(json['content']);
     return ad;

@@ -9,20 +9,21 @@ import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/Mail.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
-import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 class MailboxPage extends StatefulWidget {
   final int refreshData;
 
-  MailboxPage({this.refreshData});
+  MailboxPage({this.refreshData = 0});
 
   @override
   _MailboxPageState createState() => _MailboxPageState();
 }
 
 class _MailboxPageState extends State<MailboxPage> {
-  int _refreshData;
+  int _refreshData = 0;
 
   @override
   void initState() {
@@ -48,6 +49,7 @@ class _MailboxPageState extends State<MailboxPage> {
     // Reset the language context.
     // TODO: Not ideal. Get rid of the static.
     SyntaxHighlighter.languageContext = '';
+    SkinColors colors = Skin.of(context).theme.colors;
 
     return Stack(children: [
       PullToRefreshList(
@@ -56,7 +58,7 @@ class _MailboxPageState extends State<MailboxPage> {
           sliverListBuilder: (List data) {
             return ValueListenableBuilder(
               valueListenable: MainRepository().settings.box.listenable(keys: ['blockedMails', 'blockedUsers']),
-              builder: (BuildContext context, value, Widget child) {
+              builder: (BuildContext context, value, Widget? child) {
                 var filtered = data;
                 if (data[0] is MailListItem) {
                   filtered = data
@@ -89,13 +91,18 @@ class _MailboxPageState extends State<MailboxPage> {
         bottom: 20,
         child: SafeArea(
           child: FloatingActionButton(
-            backgroundColor: T.COLOR_PRIMARY,
+            backgroundColor: colors.primary,
+            foregroundColor: colors.background,
             child: Icon(Icons.add),
             onPressed: () => Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
                 arguments: NewMessageSettings(
                     onClose: this.refreshData,
                     hasInputField: true,
-                    onSubmit: (String inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                    onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                      if (inputField == null) {
+                        return false;
+                      }
+
                       var response = await ApiController().sendMail(inputField, message, attachments: attachments);
                       return response.isOk;
                     })),

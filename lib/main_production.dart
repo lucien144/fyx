@@ -1,24 +1,30 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fyx/FyxApp.dart';
-import 'package:sentry/sentry.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await DotEnv().load('.env');
-  final sentry = SentryClient(dsn: DotEnv().env['SENTRY_KEY'], environmentAttributes: const Event(environment: 'production'));
+  ByteData data = await PlatformAssetBundle().load('assets/lets-encrypt-r3.cer');
+  SecurityContext.defaultContext.setTrustedCertificatesBytes(data.buffer.asUint8List());
+  await dotenv.load();
 
   runZonedGuarded(
     () async {
-      await FyxApp.init(sentry);
-      return runApp(FyxApp()..setEnv(Environment.production));
+      await FyxApp.init();
+      SentryFlutter.init((options) {
+        options.dsn = dotenv.env['SENTRY_KEY'];
+        options.environment = 'production';
+      }, appRunner: () => runApp(FyxApp()..setEnv(Environment.production)));
     },
     (error, stackTrace) async {
       try {
-        await sentry.captureException(
-          exception: error,
+        await Sentry.captureException(
+          error,
           stackTrace: stackTrace,
         );
         print('Error sent to sentry.io: $error');

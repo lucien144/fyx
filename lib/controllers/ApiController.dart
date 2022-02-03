@@ -7,7 +7,6 @@ import 'package:fyx/controllers/ApiProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/exceptions/AuthException.dart';
 import 'package:fyx/model/Credentials.dart';
-import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/ResponseContext.dart';
 import 'package:fyx/model/post/content/Poll.dart';
@@ -26,23 +25,22 @@ import 'package:fyx/model/reponses/WaitingFilesResponse.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:provider/provider.dart';
+import 'package:sentry/sentry.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum AUTH_STATES { AUTH_INVALID_USERNAME, AUTH_NEW, AUTH_EXISTING }
 
 class ApiController {
   static ApiController _instance = ApiController._init();
-  IApiProvider provider;
+  IApiProvider provider = ApiProvider();
   bool isLoggingIn = false;
-  BuildContext buildContext;
+  BuildContext? buildContext;
 
   factory ApiController() {
     return _instance;
   }
 
   ApiController._init() {
-    provider = ApiProvider();
-
     provider.onAuthError = (String message) {
       // API returns the same error on authorization as well as on normal data request. Therefore this "workaround".
       if (isLoggingIn) {
@@ -51,7 +49,9 @@ class ApiController {
 
       this.logout(removeAuthrorization: false);
       T.error(message == '' ? L.AUTH_ERROR : message);
-      FyxApp.navigatorKey.currentState.pushNamed('/login');
+      if (FyxApp.navigatorKey.currentState != null) {
+        FyxApp.navigatorKey.currentState!.pushNamed('/login');
+      }
     };
 
     provider.onError = (message) {
@@ -64,8 +64,8 @@ class ApiController {
       }
 
       ResponseContext responseContext = ResponseContext.fromJson(data);
-      Provider.of<NotificationsModel>(buildContext, listen: false).setNewMails(responseContext.user.mailUnread);
-      Provider.of<NotificationsModel>(buildContext, listen: false).setNewNotices(responseContext.user.notificationsUnread);
+      Provider.of<NotificationsModel>(buildContext!, listen: false).setNewMails(responseContext.user.mailUnread);
+      Provider.of<NotificationsModel>(buildContext!, listen: false).setNewNotices(responseContext.user.notificationsUnread);
     };
   }
 
@@ -82,7 +82,7 @@ class ApiController {
     return loginResponse;
   }
 
-  Future<Credentials> setCredentials(Credentials credentials) async {
+  Future<Credentials?> setCredentials(Credentials credentials) async {
     if (credentials.isValid) {
       provider.setCredentials(credentials);
       var storage = await SharedPreferences.getInstance();
@@ -93,21 +93,21 @@ class ApiController {
     return Future(() => null);
   }
 
-  Future<Credentials> getCredentials() async {
-    Credentials creds = provider.getCredentials();
+  Future<Credentials?> getCredentials() async {
+    Credentials? creds = provider.getCredentials();
 
-    if (creds is Credentials) {
+    if (creds != null) {
       return creds;
     }
 
     var prefs = await SharedPreferences.getInstance();
-    String identity = prefs.getString('identity');
+    String? identity = prefs.getString('identity');
 
     // Breaking change fix -> old identity storage
     // TODO: Delete in 3/2021 ?
     if (identity == null) {
       // Load identity from old storage
-      creds = Credentials(prefs.getString('nickname'), prefs.getString('token'));
+      creds = Credentials(prefs.getString('nickname') ?? '', prefs.getString('token') ?? '');
       // Save the identity into the new storage
       this.setCredentials(creds);
       // Remove the old fragments
@@ -134,7 +134,7 @@ class ApiController {
           this.setCredentials(creds.copyWith(fcmToken: token));
         } catch (error) {
           debugPrint(error.toString());
-          MainRepository().sentry.captureException(exception: error);
+          Sentry.captureException(error);
         }
       }
     });
@@ -152,7 +152,7 @@ class ApiController {
         this.setCredentials(creds.copyWith(fcmToken: token));
       } catch (error) {
         debugPrint(error.toString());
-        MainRepository().sentry.captureException(exception: error);
+        Sentry.captureException(error);
       }
     });
   }
@@ -167,12 +167,21 @@ class ApiController {
     return BookmarksAllResponse.fromJson(response.data);
   }
 
-  Future<DiscussionResponse> loadDiscussion(int id, {int lastId, String user}) async {
-    var response = await provider.fetchDiscussion(id, lastId: lastId == null ? null : lastId, user: user);
-    if (response.statusCode == 400) {
-      return DiscussionResponse.accessDenied();
+  Future<DiscussionResponse> loadDiscussion(int id, {int? lastId, String? user, String? search}) async {
+    try {
+      var response = await provider.fetchDiscussion(id, lastId: lastId, user: user, search: search);
+      if (response.statusCode == 400) {
+        return DiscussionResponse.accessDenied();
+      }
+      return DiscussionResponse.fromJson(response.data);
+    } catch (error) {
+      if (error is DioError) {
+        if (error.response?.statusCode == 400) {
+          return DiscussionResponse.accessDenied();
+        }
+      }
     }
-    return DiscussionResponse.fromJson(response.data);
+    return DiscussionResponse.error();
   }
 
   Future<DiscussionHomeResponse> getDiscussionHome(int id) async {
@@ -185,21 +194,23 @@ class ApiController {
     return FeedNoticesResponse.fromJson(response.data);
   }
 
-  Future<OkResponse> postDiscussionMessage(int id, String message, {List<Map<ATTACHMENT, dynamic>> attachments, Post replyPost}) async {
-    if (attachments is List) {
+  Future<OkResponse> postDiscussionMessage(int id, String message, {List<Map<ATTACHMENT, dynamic>>? attachments, Post? replyPost}) async {
+    if (attachments != null) {
       try {
         WaitingFilesResponse waitingFilesResponse = await this.fetchDiscussionWaitingFiles(id);
         await this.deleteAllWaitingFiles(waitingFilesResponse.files);
       } catch (error) {
         debugPrint(error.toString());
-        MainRepository().sentry.captureException(exception: error);
+        Sentry.captureException(error);
         // TODO: Notify user?
       }
 
       try {
         await provider.uploadFile(attachments, id: id);
       } catch (error) {
-        provider.onError('👎 Nějakteré z obrázků se nepodařilo nahrát.');
+        if (provider.onError != null) {
+          provider.onError!('👎 Nějakteré z obrázků se nepodařilo nahrát.');
+        }
       }
     }
 
@@ -211,6 +222,10 @@ class ApiController {
     return OkResponse.fromJson(result.data);
   }
 
+  Future<Response> deleteDiscussionMessage(int discussionId, int postId) {
+    return provider.deleteDiscussionMessage(discussionId, postId);
+  }
+
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder) {
     return provider.setPostReminder(discussionId, postId, setReminder);
   }
@@ -219,7 +234,10 @@ class ApiController {
     Response response = await provider.giveRating(discussionId, postId, positive, confirm, remove);
     var data = response.data;
     return RatingResponse(
-        isGiven: data['error'] ?? true, needsConfirmation: data['code'] == 'NeedsConfirmation', currentRating: data['rating'] ?? 0, myRating: data['my_rating'] ?? 'none');
+        isGiven: data['error'] ?? true,
+        needsConfirmation: data['code'] == 'NeedsConfirmation',
+        currentRating: data['rating'],
+        myRating: data['my_rating'] ?? 'none');
   }
 
   void logout({bool removeAuthrorization = true}) {
@@ -229,7 +247,7 @@ class ApiController {
     }
   }
 
-  Future<MailResponse> loadMail({int lastId}) async {
+  Future<MailResponse> loadMail({int? lastId}) async {
     var response = await provider.fetchMail(lastId: lastId);
     return MailResponse.fromJson(response.data);
   }
@@ -242,21 +260,23 @@ class ApiController {
     return await Future.wait(deletes);
   }
 
-  Future<OkResponse> sendMail(String recipient, String message, {List<Map<ATTACHMENT, dynamic>> attachments}) async {
+  Future<OkResponse> sendMail(String recipient, String message, {List<Map<ATTACHMENT, dynamic>>? attachments}) async {
     // Upload image
-    if (attachments is List) {
+    if (attachments != null) {
       try {
         WaitingFilesResponse waitingFilesResponse = await this.fetchMailWaitingFiles();
         await this.deleteAllWaitingFiles(waitingFilesResponse.files);
       } catch (error) {
         debugPrint(error.toString());
-        MainRepository().sentry.captureException(exception: error);
+        Sentry.captureException(error);
         // TODO: Notify user?
       }
       try {
         await provider.uploadFile(attachments);
       } catch (error) {
-        provider.onError('👎 Nějakteré z obrázků se nepodařilo nahrát.');
+        if (provider.onError != null) {
+          provider.onError!('👎 Nějakteré z obrázků se nepodařilo nahrát.');
+        }
       }
     }
 
@@ -277,7 +297,7 @@ class ApiController {
   Future<ContentPoll> votePoll(discussionId, postId, votes) async {
     Response response = await provider.votePoll(discussionId, postId, votes);
     Map<String, dynamic> json = response.data;
-    return ContentPoll.fromJson(json['content_raw']['data'], discussionId: json['discussion_id'], postId: json['post_id']);
+    return ContentPoll.fromJson(json['content_raw']['data'], discussionId: json['discussion_id'] ?? 0, postId: json['post_id'] ?? 0);
   }
 
   throwAuthException(LoginResponse loginResponse, {String message: ''}) {

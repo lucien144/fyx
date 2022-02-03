@@ -4,6 +4,8 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:http/http.dart';
 
 class InfoPageSettings {
@@ -20,7 +22,7 @@ class InfoPage extends StatefulWidget {
 
 class _InfoPageState extends State<InfoPage> {
   var _client = Client();
-  Future<Response> _response;
+  Future<Response>? _response;
 
   @override
   void initState() {
@@ -29,19 +31,19 @@ class _InfoPageState extends State<InfoPage> {
 
   @override
   Widget build(BuildContext context) {
-    InfoPageSettings settings = ModalRoute.of(context).settings.arguments;
+    SkinColors colors = Skin.of(context).theme.colors;
+    InfoPageSettings settings = ModalRoute.of(context)!.settings.arguments as InfoPageSettings;
 
     if (_response == null) {
-      _response = _client.get(settings.url);
+      _response = _client.get(Uri.parse(settings.url));
       AnalyticsProvider().setScreen(settings.title, 'InfoPage');
     }
 
     return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
-            backgroundColor: Colors.white,
-            middle: Text(settings.title),
+            middle: Text(settings.title, style: TextStyle(color: colors.text)),
             leading: CupertinoNavigationBarBackButton(
-              color: T.COLOR_PRIMARY,
+              color: colors.primary,
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -50,18 +52,19 @@ class _InfoPageState extends State<InfoPage> {
             future: _response,
             builder: (BuildContext context, AsyncSnapshot<Response> snapshot) {
               if (snapshot.hasData) {
-                return Markdown(data: snapshot.data.body, onTapLink: (String url) => T.openLink(url));
+                return Markdown(data: snapshot.data!.body, styleSheet: MarkdownStyleSheet.fromCupertinoTheme(CupertinoTheme.of(context)), onTapLink: (String text, String? url, String title) => url != null ? T.openLink(url) : null);
               }
               if (snapshot.hasError) {
                 return T.feedbackScreen(
+                    context,
                     label: L.GENERAL_REFRESH,
                     isWarning: true,
                     title: L.GENERAL_ERROR,
                     onPress: () async {
-                      setState(() => _response = _client.get(settings.url));
+                      setState(() => _response = _client.get(Uri.parse(settings.url)));
                     });
               }
-              return T.feedbackScreen(isLoading: true);
+              return T.feedbackScreen(context, isLoading: true);
             }));
   }
 }

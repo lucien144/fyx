@@ -1,13 +1,15 @@
 class PollResult {
-  int _respondentsCount;
-  bool _isMyVote;
-  List<String> _respondents;
+  int _respondentsCount = 0;
+  bool _isMyVote = false;
+  List<String> _respondents = [];
 
   int get respondentsCount => _respondentsCount;
 
   bool get isMyVote => _isMyVote;
 
   List<String> get respondents => _respondents;
+
+  PollResult();
 
   PollResult.fromJson(Map<String, dynamic> json) {
     _respondentsCount = json['respondents_count'] ?? 0;

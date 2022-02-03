@@ -1,12 +1,12 @@
 class DiscussionRights {
-  bool _arRead;
-  bool _arWrite;
-  bool _arDelete;
-  bool _arEdit;
-  bool _arRights;
-  bool _public;
+  bool _arRead = false;
+  bool _arWrite = false;
+  bool _arDelete = false;
+  bool _arEdit = false;
+  bool _arRights = false;
+  bool _public = false;
 
-  DiscussionRights({bool arRead, bool arWrite, bool arDelete, bool arEdit, bool arRights, bool public}) {
+  DiscussionRights({bool arRead = false, bool arWrite = false, bool arDelete = false, bool arEdit = false, bool arRights = false, bool public = false}) {
     this._arRead = arRead;
     this._arWrite = arWrite;
     this._arDelete = arDelete;

@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:device_info/device_info.dart';
 
 class DeviceInfo {
-  String systemName;
-  String systemVersion;
-  String localizedModel;
+  late String systemName;
+  late String systemVersion;
+  late String localizedModel;
 
   static Future<DeviceInfo> init() async {
     return Platform.isIOS

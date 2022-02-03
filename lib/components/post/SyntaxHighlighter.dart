@@ -9,7 +9,7 @@ class SyntaxHighlighter extends StatelessWidget {
   // TODO: Get rid of static.
   static String languageContext = '';
 
-  const SyntaxHighlighter(this.source, {Key key}) : super(key: key);
+  const SyntaxHighlighter(this.source, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,11 +19,7 @@ class SyntaxHighlighter extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         HighlightView(source,
-            language: lang,
-            theme: draculaTheme,
-            padding: EdgeInsets.all(12),
-            tabSize: 2,
-            textStyle: TextStyle(fontFamily: 'JetBrainsMono')),
+            language: lang, theme: draculaTheme, padding: EdgeInsets.all(12), tabSize: 2, textStyle: TextStyle(fontFamily: 'JetBrainsMono')),
         Container(
           alignment: Alignment.centerRight,
           child: Text(
@@ -44,8 +40,7 @@ class SyntaxHighlighter extends StatelessWidget {
 
     Map<String, String> langs = {
       'php': r"php|wordpress",
-      'javascript':
-          r"javascript|typescript|angular|\.js|ajax|angular|react|vue",
+      'javascript': r"javascript|typescript|angular|\.js|ajax|angular|react|vue",
       'java': r"java|android",
       'sql': r"sql",
       'css': r"css|scss|sass|less",
@@ -63,6 +58,7 @@ class SyntaxHighlighter extends StatelessWidget {
       'cs': r"csharp|c#|\.net|asp",
       'lisp': r"lisp",
       'ruby': r"ruby",
+      'rust': r"rust",
       'scala': r"scala|clojure",
       'bash': r"bash|shell|unix|linux",
       'swift': r"swift",
@@ -72,7 +68,7 @@ class SyntaxHighlighter extends StatelessWidget {
 
     String foundLang = 'plaintext';
     for (String key in langs.keys) {
-      final RegExp regexp = new RegExp(langs[key], caseSensitive: false);
+      final RegExp regexp = new RegExp(langs[key]!, caseSensitive: false);
       if (regexp.hasMatch(SyntaxHighlighter.languageContext)) {
         foundLang = key;
         break;

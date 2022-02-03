@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fyx/components/CircleAvatar.dart' as component;
+import 'package:fyx/components/Avatar.dart' as component;
 import 'package:fyx/components/ContentBoxLayout.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
@@ -11,9 +11,11 @@ import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:fyx/theme/skin/Skin.dart';
 
 class NoticesPage extends StatefulWidget {
-  NoticesPage({Key key}) : super(key: key);
+  NoticesPage({Key? key}) : super(key: key);
 
   @override
   _NoticesPageState createState() => _NoticesPageState();
@@ -29,31 +31,32 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance?.addObserver(this);
     AnalyticsProvider().setScreen('Notices', 'NoticesPage');
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    WidgetsBinding.instance?.removeObserver(this);
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed && ModalRoute.of(context).isCurrent) {
+    if (state == AppLifecycleState.resumed && ModalRoute.of(context)!.isCurrent) {
       this.refresh();
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
-            backgroundColor: Colors.white,
-            middle: Text(L.NOTICES),
+            middle: Text(L.NOTICES, style: TextStyle(color: colors.text)),
             leading: CupertinoNavigationBarBackButton(
-              color: T.COLOR_PRIMARY,
+              color: colors.primary,
               onPressed: () {
                 Navigator.of(context, rootNavigator: true).pop();
               },
@@ -73,7 +76,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
                   isHighlighted: highlight,
                   topRightWidget: Text(
                     item.wuRating > 0 ? '+${item.wuRating}' : item.wuRating.toString(),
-                    style: TextStyle(fontSize: 14, color: item.wuRating > 0 ? Colors.green : (item.wuRating < 0 ? Colors.redAccent : Colors.black38)),
+                    style: TextStyle(fontSize: 14, color: item.wuRating > 0 ? colors.success : (item.wuRating < 0 ? colors.danger : colors.grey)),
                   ),
                   topLeftWidget: Expanded(
                     child: GestureDetector(
@@ -108,7 +111,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
               waitDuration: Duration(milliseconds: 0),
               child: Padding(
                 padding: const EdgeInsets.only(left: 5, bottom: 5),
-                child: component.CircleAvatar(
+                child: component.Avatar(
                   Helpers.avatarUrl(thumbUp.nick),
                   size: 22,
                   isHighlighted: thumbUp.time > lastVisit,
@@ -146,7 +149,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
               SizedBox(
                 width: 5,
               ),
-              component.CircleAvatar(
+              component.Avatar(
                 Helpers.avatarUrl(reply.nick),
                 size: 22,
                 isHighlighted: reply.time > lastVisit,

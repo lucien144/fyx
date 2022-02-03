@@ -1,14 +1,21 @@
 import 'package:fyx/model/Settings.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
-import "package:hive/hive.dart";
-import "package:hive_flutter/hive_flutter.dart";
+import 'package:fyx/model/enums/ThemeEnum.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class SettingsProvider {
   static final SettingsProvider _singleton = SettingsProvider._internal();
-  Settings _settings;
-  Box<dynamic> _box;
+  late Settings _settings;
+  late Box<dynamic> _box;
 
   Box<dynamic> get box => _box;
+
+  ThemeEnum get theme => _settings.theme;
+  set theme(ThemeEnum theme) {
+    _box.put('theme', theme);
+    _settings.theme = theme;
+  }
 
   DefaultView get defaultView => _settings.defaultView;
   set defaultView(DefaultView view) {
@@ -40,18 +47,6 @@ class SettingsProvider {
 
   List get blockedUsers => _box.get('blockedUsers', defaultValue: Settings().blockedUsers);
 
-  int get photoQuality => _box.get('photoQuality', defaultValue: Settings().photoQuality);
-  set photoQuality(int quality) {
-    _box.put('photoQuality', quality);
-    _settings.photoQuality = quality;
-  }
-
-  int get photoWidth => _box.get('photoWidth', defaultValue: Settings().photoWidth);
-  set photoWidth(int width) {
-    _box.put('photoWidth', width);
-    _settings.photoWidth = width;
-  }
-
   factory SettingsProvider() {
     return _singleton;
   }
@@ -61,15 +56,15 @@ class SettingsProvider {
   Future<SettingsProvider> init() async {
     await Hive.initFlutter();
     Hive.registerAdapter(DefaultViewAdapter());
+    Hive.registerAdapter(ThemeEnumAdapter());
     _box = await Hive.openBox('settings');
 
     _settings = new Settings();
+    _settings.theme = _box.get('theme', defaultValue: Settings().theme);
     _settings.defaultView = _box.get('defaultView', defaultValue: Settings().defaultView);
     _settings.latestView = _box.get('latestView', defaultValue: Settings().latestView);
     _settings.useCompactMode = _box.get('useCompactMode', defaultValue: Settings().useCompactMode);
     _settings.useAutocorrect = _box.get('useAutocorrect', defaultValue: Settings().useAutocorrect);
-    _settings.photoQuality = _box.get('photoQuality', defaultValue: Settings().photoQuality);
-    _settings.photoWidth = _box.get('photoWidth', defaultValue: Settings().photoWidth);
 
     return _singleton;
   }

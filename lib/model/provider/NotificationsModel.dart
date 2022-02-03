@@ -8,12 +8,12 @@ class NotificationsModel extends ChangeNotifier {
   int get newNotices => _newNotices;
 
   void setNewMails(int val) {
-    _newMails = val ??= 0;
+    _newMails = val;
     notifyListeners();
   }
 
   void setNewNotices(int val) {
-    _newNotices = val ??= 0;
+    _newNotices = val;
     notifyListeners();
   }
 }

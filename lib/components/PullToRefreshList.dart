@@ -6,20 +6,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
-import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:sentry/sentry.dart';
 
 // ignore: must_be_immutable
 class PullToRefreshList extends StatefulWidget {
   final TDataProvider dataProvider;
-  Function sliverListBuilder;
+  final Function? sliverListBuilder;
   bool _disabled;
   bool _isInfinite;
   int _rebuild;
-  final Widget pinnedWidget;
+  final Widget? pinnedWidget;
 
-  PullToRefreshList({@required this.dataProvider, isInfinite = false, int rebuild = 0, this.sliverListBuilder, bool disabled = false, this.pinnedWidget})
+  PullToRefreshList(
+      {required this.dataProvider, isInfinite = false, int rebuild = 0, this.sliverListBuilder, bool disabled = false, this.pinnedWidget})
       : _isInfinite = isInfinite,
         _rebuild = rebuild,
         _disabled = disabled,
@@ -30,13 +33,13 @@ class PullToRefreshList extends StatefulWidget {
 }
 
 class _PullToRefreshListState extends State<PullToRefreshList> {
-  ScrollController _controller = ScrollController();
+  ScrollController? _controller;
   bool _isLoading = true;
   bool _hasPulledDown = false;
   bool _hasError = false;
-  DataProviderResult _result;
-  int _lastId;
-  int _prevLastId; // ID of last item loaded previously.
+  DataProviderResult? _result;
+  int? _lastId;
+  int? _prevLastId; // ID of last item loaded previously.
   var _slivers = <Widget>[];
   int _lastRebuild = 0;
 
@@ -51,49 +54,43 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
   void initState() {
     super.initState();
 
-    if (widget._isInfinite) {
-      _controller.addListener(() {
-        // TODO: Refactor, use ScrollNotification ?
-        // Display loading and load next page if we are at the end of the list
-        if (_controller.position.userScrollDirection == ScrollDirection.reverse && _controller.position.outOfRange) {
-          if (_slivers.last is! SliverPadding) {
-            setState(() => _slivers.add(SliverPadding(padding: EdgeInsets.symmetric(vertical: 16), sliver: SliverToBoxAdapter(child: CupertinoActivityIndicator()))));
-            this.loadData(append: true);
+    () async {
+      await Future.delayed(Duration.zero);
+      _controller = PrimaryScrollController.of(context);
+
+      // Add the refresh control on first position
+      _slivers.add(CupertinoSliverRefreshControl(
+        builder: Platform.isIOS ? CupertinoSliverRefreshControl.buildRefreshIndicator : buildAndroidRefreshIndicator,
+        onRefresh: () {
+          setState(() => _hasPulledDown = true);
+          if (!widget._disabled) {
+            return this.loadData();
           }
-        }
-      });
-    }
+          return Future.wait([]);
+        },
+      ));
 
-    // Add the refresh control on first position
-    _slivers.add(CupertinoSliverRefreshControl(
-      builder: Platform.isIOS ? CupertinoSliverRefreshControl.buildRefreshIndicator : buildAndroidRefreshIndicator,
-      onRefresh: () {
-        setState(() => _hasPulledDown = true);
-        if (!widget._disabled) {
-          return this.loadData();
-        }
-        return Future.wait([]);
-      },
-    ));
-
-    this.loadData();
+      this.loadData();
+    }();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     if (widget._rebuild > _lastRebuild && !_isLoading) {
       setState(() => _lastRebuild = widget._rebuild);
       this.loadData();
     }
 
     if (_hasError) {
-      return T.feedbackScreen(isLoading: _isLoading, onPress: loadData, label: L.GENERAL_REFRESH);
+      return T.feedbackScreen(context, isLoading: _isLoading, onPress: loadData, label: L.GENERAL_REFRESH);
     }
 
     if (_slivers.length == 1 && !_isLoading) {
@@ -114,38 +111,53 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
       );
     }
 
-    return CupertinoScrollbar(
-      child: Stack(
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Expanded(
-                child: CustomScrollView(
-                  physics: Platform.isIOS ? const AlwaysScrollableScrollPhysics() : const RefreshScrollPhysics(),
-                  slivers: _slivers,
+    return Stack(
+      children: [
+        Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Expanded(
+              child: NotificationListener<ScrollNotification>(
+                onNotification: (ScrollNotification scrollInfo) {
+                  if (widget._isInfinite) {
+                    if (_controller?.position.userScrollDirection == ScrollDirection.reverse && scrollInfo.metrics.outOfRange) {
+                      if (_slivers.last is! SliverPadding) {
+                        setState(() => _slivers.add(SliverPadding(
+                            padding: EdgeInsets.symmetric(vertical: 16), sliver: SliverToBoxAdapter(child: CupertinoActivityIndicator()))));
+                        this.loadData(append: true);
+                      }
+                    }
+                  }
+                  return false;
+                },
+                child: CupertinoScrollbar(
                   controller: _controller,
-                ),
-              ),
-            ],
-          ),
-          Visibility(
-            visible: _isLoading && !_hasPulledDown, // Show only when not pulling down the list
-            child: Positioned(
-              top: 0,
-              left: 0,
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: 1,
-                child: LinearProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                  backgroundColor: T.COLOR_PRIMARY,
+                  child: CustomScrollView(
+                    physics: Platform.isIOS ? const AlwaysScrollableScrollPhysics() : const RefreshScrollPhysics(),
+                    slivers: _slivers,
+                    controller: _controller,
+                  ),
                 ),
               ),
             ),
-          )
-        ],
-      ),
+          ],
+        ),
+        Visibility(
+          visible: _isLoading && !_hasPulledDown, // Show only when not pulling down the list
+          child: Positioned(
+            top: 0,
+            left: 0,
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: 1,
+              child: LinearProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(colors.light),
+                backgroundColor: colors.primary,
+              ),
+            ),
+          ),
+        )
+      ],
     );
   }
 
@@ -153,7 +165,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
     // If the list contains widgets
     if (_data.first is Widget) {
       if (widget.sliverListBuilder is Function) {
-        return <Widget>[widget.sliverListBuilder(_data)];
+        return <Widget>[widget.sliverListBuilder!(_data)];
       } else {
         return [
           SliverList(
@@ -171,8 +183,8 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
       List<Widget> _list = [];
 
       _data.cast<Map>().forEach((block) {
-        _list.add(SliverStickyHeaderBuilder(
-          builder: (context, state) => block['header'],
+        _list.add(SliverStickyHeader(
+          header: block['header'],
           sliver: SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, i) => block['items'][i],
@@ -216,7 +228,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
 
       // If the ID of the last ID is same as the ID of currently loaded last ID
       // Make the list inactive (makeInactive = true)
-      if (_lastId != null && _result.lastId == _lastId) {
+      if (_lastId != null && _result!.lastId == _lastId) {
         makeInactive = true;
         if (append) {
           // ... and if also appending, remove the loading indicator
@@ -225,15 +237,15 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
       }
 
       // Load the data only if there are any data AND should not be inactive.
-      if (_result.data.length > 0 && !makeInactive) {
+      if (_result!.data.length > 0 && !makeInactive) {
         if (append) {
           _slivers.removeLast(); // Remove the loading indicator
         } else {
           _slivers.removeRange(1, _slivers.length);
         }
-        _slivers.addAll(this.buildTheList(_result.data));
+        _slivers.addAll(this.buildTheList(_result!.data));
         setState(() => _hasError = false);
-        setState(() => _lastId = _result.lastId);
+        setState(() => _lastId = _result!.lastId);
       }
 
       // Add the pinned widget only if the list is active
@@ -245,7 +257,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
 
       print('[PullToRefresh error]: $error');
       print(StackTrace.current);
-      MainRepository().sentry.captureException(exception: error);
+      Sentry.captureException(error);
     } finally {
       setState(() {
         _hasPulledDown = false;
@@ -261,6 +273,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
     double refreshTriggerPullDistance,
     double refreshIndicatorExtent,
   ) {
+    SkinColors colors = Skin.of(context).theme.colors;
     const Curve opacityCurve = const Interval(0.4, 0.8, curve: Curves.easeInOut);
     return Align(
       alignment: Alignment.bottomCenter,
@@ -269,15 +282,15 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
         child: refreshState == RefreshIndicatorMode.drag
             ? Opacity(
                 opacity: opacityCurve.transform(min(pulledExtent / refreshTriggerPullDistance, 1.0)),
-                child: const Icon(
+                child: Icon(
                   Icons.arrow_downward,
-                  color: CupertinoColors.inactiveGray,
+                  color: colors.text.withOpacity(.35),
                   size: 24.0,
                 ),
               )
             : Opacity(
                 opacity: opacityCurve.transform(min(pulledExtent / refreshIndicatorExtent, 1.0)),
-                child: CircularProgressIndicator(strokeWidth: 2.0, valueColor: AlwaysStoppedAnimation<Color>(T.COLOR_PRIMARY)),
+                child: CircularProgressIndicator(strokeWidth: 2.0, valueColor: AlwaysStoppedAnimation<Color>(colors.primary)),
               ),
       ),
     );
@@ -285,10 +298,10 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
 }
 
 class RefreshScrollPhysics extends BouncingScrollPhysics {
-  const RefreshScrollPhysics({ScrollPhysics parent}) : super(parent: parent);
+  const RefreshScrollPhysics({ScrollPhysics? parent}) : super(parent: parent);
 
   @override
-  RefreshScrollPhysics applyTo(ScrollPhysics ancestor) {
+  RefreshScrollPhysics applyTo(ScrollPhysics? ancestor) {
     return RefreshScrollPhysics(parent: buildParent(ancestor));
   }
 
@@ -305,4 +318,4 @@ class DataProviderResult {
   DataProviderResult(this.data, {this.lastId});
 }
 
-typedef Future<DataProviderResult> TDataProvider(int id);
+typedef Future<DataProviderResult> TDataProvider(int? id);

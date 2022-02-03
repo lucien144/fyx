@@ -6,6 +6,8 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/post/content/Poll.dart';
 import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:fyx/theme/skin/Skin.dart';
 
 class Poll extends StatefulWidget {
   final ContentPoll content;
@@ -19,7 +21,8 @@ class Poll extends StatefulWidget {
 class _PollState extends State<Poll> {
   List<int> _votes = [];
   bool _loading = false;
-  ContentPoll _poll;
+  ContentPoll? _poll;
+  ScrollController controller = ScrollController();
 
 
   @override
@@ -29,31 +32,33 @@ class _PollState extends State<Poll> {
   }
 
   Widget buildAnswers(BuildContext context) {
-    var totalRespondents = _poll.pollComputedValues.totalRespondents;
+    SkinColors colors = Skin.of(context).theme.colors;
+    var totalRespondents = _poll!.pollComputedValues != null ? _poll!.pollComputedValues!.totalRespondents : 0;
 
     return ListView.builder(
       physics: NeverScrollableScrollPhysics(),
+        controller: controller,
         itemBuilder: (context, index) {
-          final answer = _poll.answers[index];
+          final answer = _poll!.answers[index];
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 4.0),
             child: GestureDetector(
-              onTap: !_poll.canVote ? null : () => setState(() {
-                if (_votes.contains(index)) {
-                  _votes.remove(index);
+              onTap: !_poll!.canVote ? null : () => setState(() {
+                if (_votes.contains(answer.id)) {
+                  _votes.remove(answer.id);
                 } else {
-                  if (_votes.length >= _poll.allowedVotes) {
+                  if (_votes.length >= _poll!.allowedVotes) {
                     _votes.removeLast();
-                    _votes.add(index);
+                    _votes.add(answer.id);
                   } else {
-                    _votes.add(index);
+                    _votes.add(answer.id);
                   }
                 }
               }),
               child: Container(
                 padding: const EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
-                    color: _votes.contains(index) ? Color(0xff76b9b9) : Color(0xffa9ccd3), border: _poll.canVote ? Border.all(color: T.COLOR_PRIMARY) : null),
+                    color: _votes.contains(answer.id) ? colors.pollAnswerSelected : colors.pollAnswer, border: _poll!.canVote ? Border.all(color: colors.primary) : null),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   PostHtml(ContentRegular(answer.answer)),
                   if (answer.result != null)
@@ -64,7 +69,7 @@ class _PollState extends State<Poll> {
                           child: FractionallySizedBox(
                             widthFactor: totalRespondents > 0 ? (answer.result.respondentsCount / totalRespondents) + 0.005 : .005,
                             child: Container(
-                              color: answer.result.isMyVote ? T.COLOR_ACCENT : T.COLOR_PRIMARY,
+                              color: answer.result.isMyVote ? colors.highlight : colors.primary,
                               height: 10,
                             ),
                           ),
@@ -79,49 +84,50 @@ class _PollState extends State<Poll> {
             ),
           );
         },
-        itemCount: _poll.answers.length,
+        itemCount: _poll!.answers.length,
         shrinkWrap: true,
         padding: const EdgeInsets.all(0));
   }
 
   @override
   Widget build(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     return Container(
         alignment: Alignment.centerLeft,
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          Text(_poll.question, style: DefaultTextStyle.of(context).style.copyWith(fontSize: 20, fontWeight: FontWeight.bold)),
-          if (_poll.instructions != null)
+          Text(_poll!.question, style: DefaultTextStyle.of(context).style.copyWith(fontSize: 20, fontWeight: FontWeight.bold)),
+          if (_poll!.instructions != null)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: PostHtml(ContentRegular(_poll.instructions)),
+              child: PostHtml(ContentRegular(_poll!.instructions)),
             ),
-          Text('Hlasů: ${_poll.pollComputedValues.totalVotes}\nHlasujících: ${_poll.pollComputedValues.totalRespondents}'),
+          if (_poll!.pollComputedValues != null) Text('Hlasů: ${_poll!.pollComputedValues!.totalVotes}\nHlasujících: ${_poll!.pollComputedValues!.totalRespondents}'),
           SizedBox(height: 8,),
           buildAnswers(context),
-          if (_poll.canVote)
+          if (_poll!.canVote)
             Padding(
               padding: const EdgeInsets.only(top: 16.0),
               child: CupertinoButton(
                 onPressed: _votes.length == 0 || _loading ? null : () async {
                   setState(() => _loading = true);
                   try {
-                    var votes = _votes.map((index) => index + 1).toList(); // Votes starting from 1 and not from 0.
-                    var poll = await ApiController().votePoll(_poll.discussionId, _poll.postId, votes);
+                    var poll = await ApiController().votePoll(_poll!.discussionId, _poll!.postId, _votes);
                     setState(() => _poll = poll);
                   } catch (error) {
-                    T.error(error.toString());
+                    T.error(error.toString(), bg: colors.danger);
                   } finally {
                     setState(() => _loading = false);
                   }
                 },
-                child: _loading ? CupertinoActivityIndicator() : Text('Hlasovat ${_votes.length}/${_poll.allowedVotes}'),
-                color: T.COLOR_PRIMARY,
+                child: _loading ? CupertinoActivityIndicator() : Text('Hlasovat ${_votes.length}/${_poll!.allowedVotes}'),
+                color: colors.primary,
                 padding: EdgeInsets.all(0),
-                disabledColor: Colors.black26,
+                disabledColor: colors.disabled,
               ),
             )
         ]),
-        color: Color(0xffcde5e9),
+        color: colors.pollBackground,
         padding: EdgeInsets.all(15));
   }
 }
