@@ -91,4 +91,4 @@ Pokud jste našli chybu, pak ji nahlaste ideálně přes aplikaci. Pokud to nejd
   Vzhledem k tomu, že [klub na Nyxu](https://www.nyx.cz/index.php?l=topic;id=24237;n=23dd) věnující se novému klientovi vznikl v češtině, rozhodl jsem se (Lucien) vést tento repozitář také v češtině. Naproti tomu kód a komentáře v kódu jsou v angličtině, protože to je pro mě přiřozené. Dále by měly [Issues](https://github.com/lucien144/fyx/issues) sloužit jako centrální hub pro vedení veškerých chyb a připomínek, což se mi zdá opět lepší vést v češtině pro běžné uživatele. Nicméně, změně na kompletně anglické repo se po diskuzi nebráním...
 
 ## Náhled
-![https://i.imgur.com/fY47YVH](https://i.imgur.com/fY47YVH.gif)
+![https://imgur.com/U00Oghi](https://imgur.com/U00Oghi.gif)
