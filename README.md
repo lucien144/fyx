@@ -35,7 +35,7 @@ Zde je přehled funkcí pro lepší představu.
 | Nástěnka / záhlaví klubu | ❌ | ✅ |
 | Ukládání do sledovaných | ❌ | ✅ |
 | Psaní příspěvků | ✅ | ✅ |
-| Mazání příspěvků | ❌ | ✅ |
+| Mazání příspěvků | ✅ | ✅ |
 | Kompaktní mód příspěvku | ✅ | ❌ |
 | Nahrávání obrázků | ✅ | ✅ |
 | Galerie více obrázků | ✅ | ❌ |
@@ -44,10 +44,10 @@ Zde je přehled funkcí pro lepší představu.
 | Uložení do upomínek | ✅ | ✅ |
 | Videa v příspěvku | ✅ | ❌ |
 | Spoilery | ✅ | ❌ |
-| Zobrazování anket | ✅ | ❌ |
+| Zobrazování anket | ✅ | ✅ |
 | Zobrazování zdrojáků | ✅ | ❌ |
 | Zobrazování videí | ✅ | ❌ |
-| Dark mode | ❌ | ✅ |
+| Dark mode | ✅ | ✅ |
 | Pošta | ✅ | ✅ |
 | Hledání | ❌ | ✅ |
 | Tržiště | ❌ | ✅ |
@@ -66,13 +66,14 @@ Pokud chcete vývoj Fyxu, který je nabízen zdarma, finančně podpořit, pak m
 
 - [Patreon](http://patreon.com/fyxapp)
 - [Bankovní spojení](https://www.nyx.cz/index.php?l=topic;l2=2;id=24237;n=6162)
+- Bitcoin: bc1q6m0ptsg3z4u6296m9kqfl4adylt9kxkafw94ul
 
 ### Vývoj
 
 Jakákoli pomoc - od každého - vítána! Nejrychleji se zapojíte přes [klub na Nyxu](https://www.nyx.cz/index.php?l=topic;id=24237;n=23dd), který se o vývojem nového klienta zabývá.
 Také si můžete projít [Issues](https://github.com/lucien144/fyx/issues) případně [Projects](https://github.com/lucien144/fyx/projects) a poslat pull request.
 
-Build produkce lze spustit zavoláním skpriput `$ ./ios/build.sh`, který zároveň zvýší build verzi o +1.
+Build produkce lze spustit zavoláním skpriput `$ ./build.sh`, který zároveň zvýší build verzi o +1.
 
 Tento repozitář používá [Gitflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow). Připravujte veškerou práci ve `feature` větvích nebo forku, pak pošlete PR do `develop` větve. PR jsou mergovány pouze adminy (a jako `squash commits`).
 
@@ -81,48 +82,13 @@ Pokud jste našli chybu, pak ji nahlaste ideálně přes aplikaci. Pokud to nejd
 
 ## FAQ
 
-- **Proč nelze k příspěvku nahrát víc obrázků najednou?**
+- **Chybí mi možnost odskoku na nejbližší nepřečtený příspěvěk. Bude?**
 
-  To bohužel nepodporuje Nyx.
-  
-- **Nikde nevidím možnost smazat příspěvek.**
-
-  Zatím není podporováno, ale bude - viz. [roadmapa](https://github.com/lucien144/fyx/projects/2).
+  Ano, bude.
 
 - **Proč je tento repozitář v češtině?**
 
   Vzhledem k tomu, že [klub na Nyxu](https://www.nyx.cz/index.php?l=topic;id=24237;n=23dd) věnující se novému klientovi vznikl v češtině, rozhodl jsem se (Lucien) vést tento repozitář také v češtině. Naproti tomu kód a komentáře v kódu jsou v angličtině, protože to je pro mě přiřozené. Dále by měly [Issues](https://github.com/lucien144/fyx/issues) sloužit jako centrální hub pro vedení veškerých chyb a připomínek, což se mi zdá opět lepší vést v češtině pro běžné uživatele. Nicméně, změně na kompletně anglické repo se po diskuzi nebráním...
 
-## Náhledy
-<table>
-	<tr>
-		<th width="33%">
-			<p><a title="history"></a> Výpis historie
-			<p><kbd><img src="https://user-images.githubusercontent.com/5161085/104580475-a1b6ef80-565d-11eb-8003-a412416e5d14.PNG">
-		<th width="33%">
-			<p><a title="bookmarks"></a> Výpis diskuzí
-			<p><kbd><img src="https://user-images.githubusercontent.com/5161085/104580503-a9769400-565d-11eb-90bf-8ff1865d8385.PNG">
-    <th width="33%">
-			<p><a title="detail"></a> Detail diskuze (v kompaktním módu)
-			<p><kbd><img src="https://user-images.githubusercontent.com/5161085/104580520-ad0a1b00-565d-11eb-9571-2326ee2dfad7.PNG">
-	<tr>
-		<th width="33%">
-			<p><a title="gallery"></a> Galerie (náhled obrázku v příspěvku)
-			<p><kbd><img src="https://user-images.githubusercontent.com/5161085/104580526-ae3b4800-565d-11eb-870e-acc8e764965f.PNG">
-		<th width="33%">
-			<p><a title="poll"></a> Anketa
-			<p><kbd><img src="https://user-images.githubusercontent.com/5161085/104580528-af6c7500-565d-11eb-9b2e-59852aa182b5.PNG">
-		<th width="33%">
-			<p><a title="syntax"></a> Zvýraznění syntaxe
-			<p><kbd><img src="https://user-images.githubusercontent.com/5161085/104580530-b0050b80-565d-11eb-9ec6-2ed9376814c0.PNG">
-  <tr>
-		<th width="33%">
-			<p><a title="spoiler"></a> Spoilery
-			<p><kbd><img src="https://user-images.githubusercontent.com/5161085/104580531-b0050b80-565d-11eb-9130-a44cfe19ab56.PNG">
-		<th width="33%">
-			<p><a title="reply"></a> Psaní odpovědi
-			<p><kbd><img src="https://user-images.githubusercontent.com/5161085/104581181-83052880-565e-11eb-8ff0-d1baa088886f.PNG">
-		<th width="33%">
-			<p><a title="settings"></a> Nastavení
-			<p><kbd><img src="https://user-images.githubusercontent.com/5161085/104581195-87314600-565e-11eb-9e2a-6cc20ebf743a.PNG">
-</table>
+## Náhled
+![https://i.imgur.com/fY47YVH](https://i.imgur.com/fY47YVH.gif)
