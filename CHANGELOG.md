@@ -3,7 +3,53 @@
 Tento soubor vychází z [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 verzování z [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2022/01/03
+
+### Nové
+
+- 🌓 Dark mode #48
+- 🆙 iOS - kliknuti na statusbar neroluje pull2refresh list #26
+- 🗑 Mazání příspěvků #24
+- Změnit/přidat čas zobrazený u příspěvku #199
+- Nefungují prokliky na hashtagy #253
+- Pokud se nenahraje video, zobrazí se alespoň zdrojové URL
+- UI tweaks #260
+    - square avatar
+    - unread stripe
+    - move likes
+    - like on doubletap
+    - Zobrazení celého názvu diskuze v detailu #tooltip
+- Syntax highlight: Rust 
+- Podpora pro starší Androidy
+
+### Změněno
+
+- Flutter 2.5 upgrade & safe null safety #242
+- Aktualizace knihovnen #78
+
+### Opraveno
+
+- Nefunguje ukládání/stahování obrázků na příspěvku #183
+- Animovaný gif se stáhne chybně #246
+- Sjednotit nastavení historie/sled. na webu vs. app #220
+- App padá při kliku na hashtag #238
+- Klavesnice překrývá příspěvek #261
+- Chyba zobrazení příspěvku #239
+- Prověřit vkládání negativních palečků #259
+- "trziste / vybaveni domova" zobrazuje prazdný screen #255
+- Neaktualizuje se typ úvodní obrazovky #249
+- Problikávání náhledu obrázku při psani #264
+- Zkontrolovat nahrávání HEIC obrazků #263
+- Nejde stáhnout jeden obrázek #262
+- Nezobrazuje se ± hodnocení #265
+- Fyx ignoruje nastaveni historie: vse / bez sledovanych #267
+- Nezobrazuje se scrollbar #266
+- Špatné pořadí možností v anketě #233
+
+**Kompletní changelog**: https://github.com/lucien144/fyx/compare/v0.7.0...v0.8.0
+
 ## [0.7.0] - 2021/07/12
+
 ### Nové
 - První hybridní verze pro Android a iOS
 - Tržiště #217 #201
