@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/theme/T.dart';
-import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:video_player/video_player.dart';
 
@@ -13,16 +13,7 @@ class VideoPlayer extends StatefulWidget {
   final dom.Element element;
   late final String? videoUrl;
 
-  VideoPlayer(this.element) {
-    videoUrl = element.attributes['src'];
-    var urls = element.querySelectorAll('source').map((element) => element.attributes['src']).toList();
-    if ([null, ''].contains(videoUrl) && urls.length > 0) {
-      videoUrl = urls.firstWhere((url) => url is String && url.endsWith('.mp4'));
-      if ((videoUrl as String).isEmpty) {
-        videoUrl = urls.first;
-      }
-    }
-  }
+  VideoPlayer(this.element);
 
   @override
   _VideoPlayerState createState() => _VideoPlayerState();
@@ -32,12 +23,23 @@ class _VideoPlayerState extends State<VideoPlayer> {
   VideoPlayerController? videoPlayerController;
   ChewieController? chewieController;
   late SkinColors colors;
+  late String? videoUrl;
 
   @override
   void initState() {
     super.initState();
-    if (widget.videoUrl != null && widget.videoUrl!.isNotEmpty) {
-      videoPlayerController = VideoPlayerController.network(widget.videoUrl!);
+    videoUrl = widget.element.attributes['src'];
+    var urls = widget.element.querySelectorAll('source').map((element) => element.attributes['src']).toList();
+
+    if ([null, ''].contains(videoUrl) && urls.length > 0) {
+      videoUrl = urls.firstWhere((url) => url is String && url.endsWith('.mp4'));
+      if ((videoUrl as String).isEmpty) {
+        videoUrl = urls.first;
+      }
+    }
+
+    if (videoUrl != null && videoUrl!.isNotEmpty) {
+      videoPlayerController = VideoPlayerController.network(videoUrl!);
     }
   }
 
@@ -84,7 +86,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
   @override
   Widget build(BuildContext context) {
     colors = Skin.of(context).theme.colors;
-    if (widget.videoUrl?.isEmpty ?? true) {
+    if (videoUrl?.isEmpty ?? true) {
       return T.somethingsWrongButton(widget.element.outerHtml);
     }
 
@@ -129,7 +131,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
   Widget _sourceButton() {
     return GestureDetector(
-      onTap: () => T.openLink(widget.videoUrl!),
+      onTap: () => T.openLink(videoUrl!),
       child: Padding(
         padding: const EdgeInsets.all(4),
         child: RichText(
@@ -137,7 +139,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
           text: TextSpan(children: [
             TextSpan(text: 'Zdroj: ', style: DefaultTextStyle.of(context).style.merge(TextStyle(fontSize: 12, color: colors.text))),
             TextSpan(
-              text: widget.videoUrl!.replaceAll('', '\u{200B}'),
+              text: videoUrl!.replaceAll('', '\u{200B}'),
               style: TextStyle(fontSize: 12, color: colors.primary, decoration: TextDecoration.underline),
             )
           ]),
