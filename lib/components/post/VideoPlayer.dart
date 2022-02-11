@@ -32,10 +32,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
     var urls = widget.element.querySelectorAll('source').map((element) => element.attributes['src']).toList();
 
     if ([null, ''].contains(videoUrl) && urls.length > 0) {
-      videoUrl = urls.firstWhere((url) => url is String && url.endsWith('.mp4'));
-      if ((videoUrl as String).isEmpty) {
-        videoUrl = urls.first;
-      }
+      videoUrl = urls.firstWhere((url) => url is String && url.isNotEmpty);
     }
 
     if (videoUrl != null && videoUrl!.isNotEmpty) {

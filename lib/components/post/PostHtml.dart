@@ -75,18 +75,9 @@ class PostHtml extends StatelessWidget {
           Widget parsedChild,
         ) {
           final element = renderContext.tree.element;
-          var url = element!.attributes['src'];
-          var urls = element.querySelectorAll('source').map((element) => element.attributes['src']).toList();
-          if ([null, ''].contains(url) && urls.length > 0) {
-            url = urls.firstWhere((url) => url!.endsWith('.mp4'));
-            if (url!.isEmpty) {
-              url = urls.first;
-            }
-          }
-          if (url?.isNotEmpty ?? false) {
+          if (element != null) {
             return VideoPlayer(element);
           }
-
           return T.somethingsWrongButton(content!.rawBody);
         },
         'div': (
