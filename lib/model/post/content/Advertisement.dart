@@ -62,7 +62,8 @@ class ContentAdvertisement extends Content {
     ContentAdvertisement ad = ContentAdvertisement.fromJson(json['advertisement'], isCompact: isCompact);
 
     if (json['attachments'] is List) {
-      ad.fileAttachments = List.castFrom<dynamic, Map<String, dynamic>>(json['attachments']).map((attachment) => FileAttachment.fromJson(attachment)).toList();
+      ad.fileAttachments =
+          List.castFrom<dynamic, Map<String, dynamic>>(json['attachments']).map((attachment) => FileAttachment.fromJson(attachment)).toList();
     }
 
     if (json['references'] is Map) {
@@ -75,7 +76,8 @@ class ContentAdvertisement extends Content {
 
   factory ContentAdvertisement.fromPostJson(Map<String, dynamic> json, {bool isCompact = false}) {
     ContentAdvertisement ad = ContentAdvertisement.fromJson(json['content_raw']['data'], isCompact: isCompact);
-    ad.contentRegular = ContentRegular(json['content']);
+    // We are not using 👇 anywhere + it causes the app to freeze
+    // ad.contentRegular = ContentRegular(json['content']);
     return ad;
   }
 
@@ -89,10 +91,14 @@ class ContentAdvertisement extends Content {
 
   AdStateEnum get state {
     switch (_state) {
-      case 'active': return AdStateEnum.active;
-      case 'old': return AdStateEnum.old;
-      case 'sold': return AdStateEnum.sold;
-      default: return AdStateEnum.unknown;
+      case 'active':
+        return AdStateEnum.active;
+      case 'old':
+        return AdStateEnum.old;
+      case 'sold':
+        return AdStateEnum.sold;
+      default:
+        return AdStateEnum.unknown;
     }
   }
 

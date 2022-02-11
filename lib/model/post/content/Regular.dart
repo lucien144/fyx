@@ -1,4 +1,3 @@
-import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/PostTypeEnum.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/Image.dart';
@@ -8,7 +7,6 @@ import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
-import 'package:html_unescape/html_unescape.dart';
 import 'package:sentry/sentry.dart';
 
 class ContentRegular extends Content {
@@ -28,7 +26,7 @@ class ContentRegular extends Content {
     _rawBody = _body;
     _rawBody = this._tagAllImageLinks(_rawBody); // This updates the raw body.
     _body = this._tagAllImageLinks(_body); // This updates the raw body.
-    
+
     this._cleanupBody();
     this._parseEmbeds();
     this._parseAttachedImages();
@@ -104,9 +102,11 @@ class ContentRegular extends Content {
       _body = _body.replaceAll(RegExp(r'<!--(.*?)-->'), '');
 
       // Remove trailing <br>
+      // TODO: This consumes a lot of memory. Is it really needed?
       var startBr = RegExp(r'^(((\s*)<\s*br\s*\/?\s*>(\s*))*)', caseSensitive: false);
       _body = _body.replaceAll(startBr, '');
 
+      // TODO: This consumes a lot of memory. Is it really needed?
       var trailingBr = RegExp(r'(((\s*)<\s*br\s*\/?\s*>(\s*))*)$', caseSensitive: false);
       _body = _body.replaceAll(trailingBr, '');
     } catch (error) {
@@ -128,7 +128,10 @@ class ContentRegular extends Content {
         }
 
         var video = Video(
-            id: el.attributes['data-embed-value'] ?? '', type: Video.findVideoType(el.attributes['data-embed-type'] ?? ''), image: img.attributes['src'] ?? '', thumb: img.attributes['data-thumb']);
+            id: el.attributes['data-embed-value'] ?? '',
+            type: Video.findVideoType(el.attributes['data-embed-type'] ?? ''),
+            image: img.attributes['src'] ?? '',
+            thumb: img.attributes['data-thumb']);
 
         // Remove the video element from the content.
         this._videos.add(video);
@@ -151,7 +154,8 @@ class ContentRegular extends Content {
     try {
       Document document = parse(_body);
 
-      RegExp reg = RegExp(r'^((?!<img).)*(((<a([^>]*?)>)?(\s*)<img([^>]*?)>(\s*)(<\/\s*a\s*>)?(\s*(\s*<\s*br\s*\/?\s*>\s*)*\s*))*)$', caseSensitive: false, dotAll: true);
+      RegExp reg = RegExp(r'^((?!<img).)*(((<a([^>]*?)>)?(\s*)<img([^>]*?)>(\s*)(<\/\s*a\s*>)?(\s*(\s*<\s*br\s*\/?\s*>\s*)*\s*))*)$',
+          caseSensitive: false, dotAll: true);
       _consecutiveImages = reg.hasMatch(_body);
 
       document.querySelectorAll('img[src]').forEach((Element el) {
