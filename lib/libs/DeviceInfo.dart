@@ -20,8 +20,8 @@ class DeviceInfo {
   }
 
   DeviceInfo.adroid(AndroidDeviceInfo info) {
-    systemName = info.device;
-    systemVersion = info.version.codename;
+    systemName = 'Android';
+    systemVersion = '${info.version.release} (SDK ${info.version.sdkInt})';
     localizedModel = info.model;
   }
 }
