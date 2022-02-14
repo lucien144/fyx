@@ -109,6 +109,10 @@ class ContentRegular extends Content {
       // TODO: This consumes a lot of memory. Is it really needed?
       var trailingBr = RegExp(r'(((\s*)<\s*br\s*\/?\s*>(\s*))*)$', caseSensitive: false);
       _body = _body.replaceAll(trailingBr, '');
+
+      var xmpTag = RegExp(r'<xmp>(.*?)</xmp>', caseSensitive: false, multiLine: true, dotAll: true);
+      _body = _body.replaceAllMapped(xmpTag, (match) => '<pre>${match.group(1)}</pre>');
+      _rawBody = _rawBody.replaceAllMapped(xmpTag, (match) => '<pre>${match.group(1)}</pre>');
     } catch (error) {
       Sentry.captureException(error, stackTrace: StackTrace.current);
     }
