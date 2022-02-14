@@ -52,7 +52,7 @@ class ApiProvider implements IApiProvider {
       }
       return handler.next(options);
     }, onResponse: (Response response, ResponseInterceptorHandler handler) async {
-      if (response.data.containsKey('context')) {
+      if (response.data is Map && response.data.containsKey('context')) {
         if (onContextData != null) {
           onContextData!(response.data['context']);
         }
@@ -139,6 +139,10 @@ class ApiProvider implements IApiProvider {
 
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder) async {
     return await dio.post('$URL/discussion/$discussionId/reminder/$postId/$setReminder');
+  }
+
+  Future<Response> getPostRatings(int discussionId, int postId) async {
+    return await dio.get('$URL/discussion/$discussionId/rating/$postId');
   }
 
   Future<Response> giveRating(int discussionId, int postId, bool positive, bool confirm, bool remove) async {

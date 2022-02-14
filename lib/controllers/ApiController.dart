@@ -20,6 +20,7 @@ import 'package:fyx/model/reponses/FileUploadResponse.dart';
 import 'package:fyx/model/reponses/LoginResponse.dart';
 import 'package:fyx/model/reponses/MailResponse.dart';
 import 'package:fyx/model/reponses/OkResponse.dart';
+import 'package:fyx/model/reponses/PostRatingsResponse.dart';
 import 'package:fyx/model/reponses/RatingResponse.dart';
 import 'package:fyx/model/reponses/WaitingFilesResponse.dart';
 import 'package:fyx/theme/L.dart';
@@ -238,6 +239,11 @@ class ApiController {
         needsConfirmation: data['code'] == 'NeedsConfirmation',
         currentRating: data['rating'],
         myRating: data['my_rating'] ?? 'none');
+  }
+
+  Future<PostRatingsResponse> getPostRatings(int discussionId, int postId) async {
+    Response response = await provider.getPostRatings(discussionId, postId);
+    return PostRatingsResponse.fromJson(response.data);
   }
 
   void logout({bool removeAuthrorization = true}) {

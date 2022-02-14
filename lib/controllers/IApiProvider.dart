@@ -32,5 +32,6 @@ abstract class IApiProvider {
   Future<Response> deleteDiscussionMessage(int discussionId, int postId);
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder);
   Future<Response> giveRating(int discussionId, int postId, bool add, bool confirm, bool remove);
+  Future<Response> getPostRatings(int discussionId, int postId);
   Future<Response> votePoll(int discussionId, int postId, List<int> votes);
 }
