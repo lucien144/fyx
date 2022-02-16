@@ -13,6 +13,9 @@
         android:label="fyx"
         android:requestLegacyExternalStorage="true"
         android:icon="@mipmap/ic_launcher">
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@mipmap/notification"/>
         <activity
             android:name="io.flutter.embedding.android.FlutterActivity"
             android:exported="true"
