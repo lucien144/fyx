@@ -46,9 +46,8 @@ class _PostRatingState extends State<PostRating> {
       isLoading: _givingRating,
       child: Row(
         children: <Widget>[
-          Visibility(
-            visible: _post!.canBeRated,
-            child: GestureDetector(
+          if (_post!.canBeRated)
+            GestureDetector(
               child: Icon(
                 Icons.thumb_up,
                 color: _post!.myRating == 'positive' ? colors.success : colors.text.withOpacity(0.38),
@@ -71,10 +70,10 @@ class _PostRatingState extends State<PostRating> {
                       }).whenComplete(() => setState(() => _givingRating = false));
                     },
             ),
-          ),
-          SizedBox(
-            width: 12,
-          ),
+          if (_post!.canBeRated)
+            SizedBox(
+              width: 12,
+            ),
           if (_post!.rating != null)
             Opacity(
               opacity: _givingRating ? 0 : 1,
@@ -83,12 +82,12 @@ class _PostRatingState extends State<PostRating> {
                 onTap: () => LoadRatingsNotification().dispatch(context),
               ),
             ),
-          SizedBox(
-            width: 12,
-          ),
-          Visibility(
-            visible: _post!.canBeRated,
-            child: GestureDetector(
+          if (_post!.rating != null)
+            SizedBox(
+              width: 12,
+            ),
+          if (_post!.canBeRated)
+            GestureDetector(
               child: Icon(
                 Icons.thumb_down,
                 color: ['negative', 'negative_visible'].contains(_post!.myRating) ? colors.danger : colors.text.withOpacity(0.38),
@@ -154,7 +153,6 @@ class _PostRatingState extends State<PostRating> {
                       });
                     },
             ),
-          ),
         ],
       ),
     );

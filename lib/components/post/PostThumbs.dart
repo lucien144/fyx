@@ -32,10 +32,10 @@ class PostThumbs extends StatelessWidget {
             ))
         .toList();
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 0),
+          padding: const EdgeInsets.only(top: 6),
           child: Icon(
             isNegative ? Icons.thumb_down : Icons.thumb_up,
             size: 18,
