@@ -17,9 +17,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiMock implements IApiProvider {
   final Map<String, dynamic> loginJsonResponse;
-  TOnError onError;
-  TOnAuthError onAuthError;
-  Credentials _credentials;
+  TOnError? onError;
+  TOnAuthError? onAuthError;
+  Credentials? _credentials;
   final bool emptyCredentials;
 
   ApiMock(this.loginJsonResponse, {this.emptyCredentials = false});
@@ -39,46 +39,46 @@ class ApiMock implements IApiProvider {
     // Wrong token
     // {"result":"error","code":"401","error":"Not Authorized","auth_state":"AUTH_EXISTING","auth_dev_comment":"There is already confirmed authorization for this App name, but you haven't provided correct token. If you you've lost your auth token, tell user to cancel existing authorization. It might be also caused by using the same App name by the same app on different devices or different apps."}
 
-    return Future(() => Response<Map<String, dynamic>>(data: this.loginJsonResponse));
+    return Future(() => Response<Map<String, dynamic>>(data: this.loginJsonResponse, requestOptions: RequestOptions(path: 'dummy')));
   }
 
   @override
   // TODO
   Future<Response> fetchBookmarks() {
-    return Future(() => Response<String>(data: ''));
+    throw UnimplementedError();
   }
 
   @override
   // TODO
   Future<Response> fetchHistory() {
-    return Future(() => Response<String>(data: ''));
+    throw UnimplementedError();
   }
 
   @override
   var onContextData;
 
   @override
-  Future<Response> fetchDiscussion(int id, {int lastId, String user}) {
+  Future<Response> fetchDiscussion(int id, {int? lastId, String? search, String? user}) {
     // TODO: implement fetchDiscussion
-    return null;
+    throw UnimplementedError();
   }
 
   @override
-  Future<Response> fetchMail({int lastId}) {
+  Future<Response> fetchMail({int? lastId}) {
     // TODO: implement fetchMail
-    return null;
+    throw UnimplementedError();
   }
 
   @override
-  Credentials getCredentials() {
-    if (_credentials != null && _credentials.isValid) {
+  Credentials? getCredentials() {
+    if (_credentials != null && _credentials!.isValid) {
       return _credentials;
     }
     return null;
   }
 
   @override
-  Credentials setCredentials(Credentials creds) {
+  Credentials? setCredentials(Credentials? creds) {
     if (creds != null && creds.isValid) {
       _credentials = creds;
     }
@@ -89,43 +89,43 @@ class ApiMock implements IApiProvider {
   @override
   Future<Response> giveRating(int discussionId, int postId, bool add, bool confirm, bool remove) {
     // TODO: implement giveRating
-    return null;
+    throw UnimplementedError();
   }
 
   @override
   Future<Response> logout() {
     // TODO: implement logout
-    return null;
+    throw UnimplementedError();
   }
 
   @override
-  Future<Response> postDiscussionMessage(int id, String message, {Map<ATTACHMENT, dynamic> attachment}) {
+  Future<Response> postDiscussionMessage(int id, String message, {Map<ATTACHMENT, dynamic>? attachment}) {
     // TODO: implement postDiscussionMessage
-    return null;
+    throw UnimplementedError();
   }
 
   @override
-  Future<Response> sendMail(String recipient, String message, {Map<ATTACHMENT, dynamic> attachment}) {
+  Future<Response> sendMail(String recipient, String message, {Map<ATTACHMENT, dynamic>? attachment}) {
     // TODO: implement sendMail
-    return null;
+    throw UnimplementedError();
   }
 
   @override
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder) {
     // TODO: implement setPostReminder
-    return null;
+    throw UnimplementedError();
   }
 
   @override
   Future<Response> testAuth() {
     // TODO: implement testAuth
-    return null;
+    throw UnimplementedError();
   }
 
   @override
   Future<Response> registerFcmToken(String token) {
     // TODO: implement registerFcmToken
-    return null;
+    throw UnimplementedError();
   }
 
   @override
@@ -159,7 +159,7 @@ class ApiMock implements IApiProvider {
   }
 
   @override
-  Future<List> uploadFile(List<Map<ATTACHMENT, dynamic>> attachments, {int id}) {
+  Future<List> uploadFile(List<Map<ATTACHMENT, dynamic>> attachments, {int? id}) {
     // TODO: implement uploadFile
     throw UnimplementedError();
   }
@@ -167,6 +167,18 @@ class ApiMock implements IApiProvider {
   @override
   Future<Response> votePoll(int discussionId, int postId, List<int> votes) {
     // TODO: implement votePoll
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> deleteDiscussionMessage(int discussionId, int postId) {
+    // TODO: implement deleteDiscussionMessage
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> getPostRatings(int discussionId, int postId) {
+    // TODO: implement getPostRatings
     throw UnimplementedError();
   }
 }
@@ -198,9 +210,9 @@ void main() {
     expect(loginResponse.isAuthorized, true);
 
     var creds = await api.getCredentials();
-    expect(creds.nickname, loginName);
-    expect(creds.token, '44a3d1241830ca61a592e28df783007d');
-    expect(creds.fcmToken, null);
+    expect(creds?.nickname, loginName);
+    expect(creds?.token, '44a3d1241830ca61a592e28df783007d');
+    expect(creds?.fcmToken, null);
   });
 
   test('User is logged in and uses old identity storage.', () async {
@@ -213,7 +225,7 @@ void main() {
     );
 
     var prefs = await SharedPreferences.getInstance();
-    String identity = prefs.getString('identity');
+    String? identity = prefs.getString('identity');
     expect(identity, null);
 
     // Set the old storage manually.
@@ -223,9 +235,9 @@ void main() {
     var creds = await api.getCredentials();
 
     // Check the identity object
-    expect(creds.nickname, loginName);
-    expect(creds.token, '44a3d1241830ca61a592e28df783007d');
-    expect(creds.fcmToken, null);
+    expect(creds?.nickname, loginName);
+    expect(creds?.token, '44a3d1241830ca61a592e28df783007d');
+    expect(creds?.fcmToken, null);
 
     // Reload the prefs
     prefs = await SharedPreferences.getInstance();
