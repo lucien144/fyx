@@ -223,7 +223,7 @@ class _PostListItemState extends State<PostListItem> {
                       builder: (BuildContext context, AsyncSnapshot<PostRatingsResponse> snapshot) {
                         if (snapshot.hasData && snapshot.data != null) {
                           final positive = snapshot.data!.positive.map((e) => PostThumbItem(e.username)).toList();
-                          final negative = snapshot.data!.negative.map((e) => PostThumbItem(e.username)).toList();
+                          final negative = snapshot.data!.negative_visible.map((e) => PostThumbItem(e.username)).toList();
                           final List<String> quotes = [
                             '“Affirmative, Dave. I read you.”',
                             '“I\'m sorry, Dave. I\'m afraid I can\'t do that.”',

@@ -35,12 +35,16 @@ class PostThumbs extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 6),
+          padding: const EdgeInsets.only(top: 0, right: 5),
           child: Icon(
             isNegative ? Icons.thumb_down : Icons.thumb_up,
             size: 18,
             color: isNegative ? colors.danger : colors.success,
           ),
+        ),
+        Text(
+          items.length.toString(),
+          style: TextStyle(fontSize: 14),
         ),
         Expanded(
           child: Wrap(children: avatars),
