@@ -24,14 +24,13 @@ class ResponseContext {
 class User {
   String _username = '';
   int _mailUnread = 0;
-  String _mailLastFrom = '';
+  String? mailLastFrom;
   int _notificationsUnread = 0;
   String _notificationsLastVisit = '';
 
-  User({String username = '', int mailUnread = 0, String mailLastFrom = '', int notificationsUnread = 0, String notificationsLastVisit = ''}) {
+  User({String username = '', int mailUnread = 0, String this.mailLastFrom = '', int notificationsUnread = 0, String notificationsLastVisit = ''}) {
     this._username = username;
     this._mailUnread = mailUnread;
-    this._mailLastFrom = mailLastFrom;
     this._notificationsUnread = notificationsUnread;
     this._notificationsLastVisit = notificationsLastVisit;
   }
@@ -40,8 +39,6 @@ class User {
 
   int get mailUnread => _mailUnread;
 
-  String get mailLastFrom => _mailLastFrom;
-
   int get notificationsUnread => _notificationsUnread;
 
   String get notificationsLastVisit => _notificationsLastVisit;
@@ -49,7 +46,7 @@ class User {
   User.fromJson(Map<String, dynamic> json) {
     _username = json['username'];
     _mailUnread = json['mail_unread'];
-    _mailLastFrom = json['mail_last_from'];
+    mailLastFrom = json['mail_last_from'];
     _notificationsUnread = json['notifications_unread'];
     _notificationsLastVisit = json['notifications_last_visit'];
   }
@@ -63,7 +60,13 @@ class ActiveFriends {
   String _location = '';
   String _locationUrl = '';
 
-  ActiveFriends({String username = '', String lastActivity = '', String lastAccessMethod = '', String statusDetails = '', String location = '', String locationUrl = ''}) {
+  ActiveFriends(
+      {String username = '',
+      String lastActivity = '',
+      String lastAccessMethod = '',
+      String statusDetails = '',
+      String location = '',
+      String locationUrl = ''}) {
     this._username = username;
     this._lastActivity = lastActivity;
     this._lastAccessMethod = lastAccessMethod;
