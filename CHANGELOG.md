@@ -3,6 +3,25 @@
 Tento soubor vychází z [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 verzování z [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.1] - 2022/02/19
+
+### Opraveno
+- Fyx nenačítá diskuze #295
+
+**Kompletní changelog**: https://github.com/lucien144/fyx/compare/v0.8.1...v0.8.2
+
+
+## [0.8.1] - 2022/02/16
+
+### Opraveno
+- Fyx padá v tržišti #280
+- Nezobrazuje se video #279
+
+### Změněno
+- Dělší zobrazení tooltipu dlouhého názvu diskuze #274 (poděkování ID KEJML)
+
+**Kompletní changelog**: https://github.com/lucien144/fyx/compare/v0.8.0...v0.8.1
+
 ## [0.8.0] - 2022/01/03
 
 ### Nové
