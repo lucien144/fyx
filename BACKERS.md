@@ -27,6 +27,7 @@ Takže milí podporovatelé, díky! ❤️
 - ID **DOMCIS**
 - ID **DUNICAN**
 - ID **EARL**
+- ID **FAITH** ☕️
 - ID **FRK_R23** ☕️
 - ID **GL_ST0RM** ☕️
 - ID **GRAETAR** ☕️
