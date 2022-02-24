@@ -48,6 +48,7 @@ android {
         applicationId "net.lucien144.fyx"
         minSdkVersion 19
         targetSdkVersion 31
+        multiDexEnabled true
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

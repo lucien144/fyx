@@ -9,8 +9,10 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  ByteData data = await PlatformAssetBundle().load('assets/lets-encrypt-r3.cer');
-  SecurityContext.defaultContext.setTrustedCertificatesBytes(data.buffer.asUint8List());
+  ByteData data =
+      await PlatformAssetBundle().load('assets/lets-encrypt-r3.cer');
+  SecurityContext.defaultContext
+      .setTrustedCertificatesBytes(data.buffer.asUint8List());
   await dotenv.load();
 
   runZonedGuarded(
