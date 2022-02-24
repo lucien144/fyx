@@ -36,7 +36,9 @@ class Post {
     this._canBeDeleted = json['can_be_deleted'] ?? false;
     this._canBeReminded = json['can_be_reminded'] ?? false;
 
-    if (json['content_raw'] != null) {
+    if (json['content_raw'] != null &&
+        json['content_raw']['data'] != null &&
+        !json['content_raw']['data'].containsKey('DiscussionWelcome')) {
       switch (json['content_raw']['type']) {
         case 'poll':
           this._content = ContentPoll.fromJson(json['content_raw']['data'], discussionId: json['discussion_id'], postId: json['id']);
