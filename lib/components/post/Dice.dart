@@ -86,6 +86,17 @@ class _DiceState extends State<Dice> {
         alignment: Alignment.centerLeft,
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Text(_dice!.reason, style: DefaultTextStyle.of(context).style.copyWith(fontSize: 20, fontWeight: FontWeight.bold)),
+          if (_dice!.showRollsAfter > 0 && _dice!.showRollsAfter > DateTime.now().millisecondsSinceEpoch)
+            Padding(
+                padding: EdgeInsets.only(top: 8),
+                child: Text('Výsledky se zobrazí po ${Helpers.absoluteTime(_dice!.showRollsAfter)}', style: TextStyle(fontStyle: FontStyle.italic),)
+            ),
+
+          if (_dice!.allowRollsUntil > 0 && _dice!.allowRollsUntil > DateTime.now().millisecondsSinceEpoch)
+            Padding(
+                padding: EdgeInsets.only(top: 8),
+                child: Text('Házet možné do ${Helpers.absoluteTime(_dice!.allowRollsUntil)}', style: TextStyle(fontStyle: FontStyle.italic),)
+            ),
           SizedBox(height: 8,),
            buildRolls(context),
           if (_dice!.canRoll)
