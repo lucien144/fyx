@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/post/content/Dice.dart';
 import 'package:fyx/theme/Helpers.dart';
+import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 
@@ -86,6 +88,27 @@ class _DiceState extends State<Dice> {
           Text(_dice!.reason, style: DefaultTextStyle.of(context).style.copyWith(fontSize: 20, fontWeight: FontWeight.bold)),
           SizedBox(height: 8,),
            buildRolls(context),
+          if (!_dice!.userDidRoll)
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: CupertinoButton(
+                onPressed:  _loading ? null : () async {
+                  setState(() => _loading = true);
+                  try {
+                    var poll = await ApiController().rollDice(_dice!.discussionId, _dice!.postId);
+                    setState(() => _dice = poll);
+                  } catch (error) {
+                    T.error(error.toString(), bg: colors.danger);
+                  } finally {
+                    setState(() => _loading = false);
+                  }
+                },
+                child: _loading ? CupertinoActivityIndicator() : Text('Hodit! ${_dice!.diceCount}d${_dice!.diceSides}'),
+                color: colors.primary,
+                padding: EdgeInsets.all(0),
+                disabledColor: colors.disabled,
+              ),
+            )
         ]),
         color: colors.pollBackground,
         padding: EdgeInsets.all(15)
