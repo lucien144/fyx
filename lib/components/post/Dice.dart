@@ -88,7 +88,7 @@ class _DiceState extends State<Dice> {
           Text(_dice!.reason, style: DefaultTextStyle.of(context).style.copyWith(fontSize: 20, fontWeight: FontWeight.bold)),
           SizedBox(height: 8,),
            buildRolls(context),
-          if (!_dice!.userDidRoll)
+          if (_dice!.canRoll)
             Padding(
               padding: const EdgeInsets.only(top: 16.0),
               child: CupertinoButton(

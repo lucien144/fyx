@@ -25,9 +25,15 @@ class ContentDice extends Content {
 
   int get showRollsAfter => _showRollsAfter;
 
-  bool get userDidRoll => _computedValues?.userDidRoll ?? true;
-
   List<DiceRoll> get rolls => _rolls;
+
+  bool get canRoll {
+    bool _canRoll = !(_computedValues?.userDidRoll ?? false);
+    if (_allowRollsUntil > 0) {
+      _canRoll = _canRoll && _allowRollsUntil > DateTime.now().millisecondsSinceEpoch;
+    }
+    return _canRoll;
+  }
 
   ContentDice.fromJson(Map<String, dynamic> json, {this.postId = 0, this.discussionId = 0}) : super(PostTypeEnum.dice, isCompact: false) {
     _reason = json['reason'] ?? '';
