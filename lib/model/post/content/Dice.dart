@@ -4,6 +4,9 @@ import 'package:fyx/model/post/dice/DiceComputedValues.dart';
 import 'package:fyx/model/post/dice/DiceRoll.dart';
 
 class ContentDice extends Content {
+  int postId = 0;
+  int discussionId = 0;
+
   String _reason = '';
   int _diceCount = 0;
   int _diceSides = 0;
@@ -26,7 +29,7 @@ class ContentDice extends Content {
 
   List<DiceRoll> get rolls => _rolls;
 
-  ContentDice.fromJson(Map<String, dynamic> json) : super(PostTypeEnum.dice, isCompact: false) {
+  ContentDice.fromJson(Map<String, dynamic> json, {this.postId = 0, this.discussionId = 0}) : super(PostTypeEnum.dice, isCompact: false) {
     _reason = json['reason'] ?? '';
     _diceCount = json['dice_count'] ?? 0;
     _diceSides = json['dice_sides'] ?? 0;

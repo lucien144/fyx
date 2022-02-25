@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/shims/dart_ui.dart';
 import 'package:fyx/components/post/Advertisement.dart';
+import 'package:fyx/components/post/Dice.dart';
 import 'package:fyx/components/post/Poll.dart';
 import 'package:fyx/components/post/PostFooterLink.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
@@ -11,11 +12,12 @@ import 'package:fyx/model/enums/PostTypeEnum.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/model/post/content/Advertisement.dart';
+import 'package:fyx/model/post/content/Dice.dart';
 import 'package:fyx/model/post/content/Poll.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/UnreadBadgeDecoration.dart';
-import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 
 enum LAYOUT_TYPES { textOnly, oneImageOnly, attachmentsOnly, attachmentsAndText }
 
@@ -199,6 +201,8 @@ class ContentBoxLayout extends StatelessWidget {
     switch (this.content.contentType) {
       case PostTypeEnum.poll:
         return Poll(content as ContentPoll);
+      case PostTypeEnum.dice:
+        return Dice(content as ContentDice);
       case PostTypeEnum.text:
         return PostHtml(content);
       case PostTypeEnum.advertisement:
