@@ -1,6 +1,7 @@
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:fyx/FyxApp.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
@@ -30,6 +31,14 @@ class SkinnedApp extends StatelessWidget {
               error,
             ))
       ],
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [
+        Locale('cs', ''),
+      ]
     );
   }
 }
