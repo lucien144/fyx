@@ -171,6 +171,12 @@ class ApiMock implements IApiProvider {
   }
 
   @override
+  Future<Response> rollDice(int discussionId, int postId) {
+    // TODO: implement rollDice
+    throw UnimplementedError();
+  }
+
+  @override
   Future<Response> deleteDiscussionMessage(int discussionId, int postId) {
     // TODO: implement deleteDiscussionMessage
     throw UnimplementedError();

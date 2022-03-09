@@ -1,6 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/content/Advertisement.dart';
+import 'package:fyx/model/post/content/Dice.dart';
 import 'package:fyx/model/post/content/Poll.dart';
 import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/theme/Helpers.dart';
@@ -40,6 +41,9 @@ class Post {
       switch (json['content_raw']['type']) {
         case 'poll':
           this._content = ContentPoll.fromJson(json['content_raw']['data'], discussionId: json['discussion_id'], postId: json['id']);
+          break;
+        case 'dice':
+          this._content = ContentDice.fromJson(json['content_raw']['data'], discussionId: json['discussion_id'], postId: json['id']);
           break;
         case 'advertisement':
           this._canReply = false;
