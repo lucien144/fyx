@@ -56,6 +56,8 @@ if [ $ios == true ]; then
   # shellcheck disable=SC2059
   printf "$GREEN Building iOS: ${version}$NC\n"
   flutter clean
+  flutter pub get
+  (cd ios && pod cache clean --all && pod update)
   flutter build ios -t lib/main_production.dart
   open ios/Runner.xcworkspace
   /usr/bin/osascript -e "display notification \"iOS built.\""
