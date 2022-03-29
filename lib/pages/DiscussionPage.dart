@@ -42,7 +42,8 @@ class _DiscussionPageState extends State<DiscussionPage> {
 
   Future<DiscussionResponse> _fetchData(discussionId, postId, user, {String? search}) {
     return this._memoizer.runOnce(() {
-      return ApiController().loadDiscussion(discussionId, lastId: postId, user: user, search: search);
+      return Future.delayed(
+          Duration(milliseconds: 300), () => ApiController().loadDiscussion(discussionId, lastId: postId, user: user, search: search));
     });
   }
 
