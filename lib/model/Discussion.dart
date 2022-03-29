@@ -1,6 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:fyx/model/AccessRights.dart';
+import 'package:fyx/model/DiscussionCommonBookmark.dart';
 import 'package:fyx/model/DiscussionOwner.dart';
 import 'package:fyx/model/DiscussionRights.dart';
 import 'package:fyx/model/enums/DiscussionTypeEnum.dart';
@@ -24,6 +25,7 @@ class Discussion {
   late AccessRights _access_rights;
   DiscussionOwner? _owner;
   ContentAdvertisement? _advertisement;
+  DiscussionCommonBookmark? _bookmark;
 
   Discussion.fromJson(Map<String, dynamic>? json) {
     if (json == null) {
@@ -63,13 +65,19 @@ class Discussion {
       this._owner = DiscussionOwner.fromJson(json['owner']);
     }
 
+    if (json['bookmark'] is Map) {
+      this._bookmark = DiscussionCommonBookmark.fromJson(json['bookmark']);
+    }
+
     try {
       this._last_visit = DateTime.parse(json['bookmark']['last_visited_at']).millisecondsSinceEpoch;
     } catch (error) {
       this._last_visit = 0;
     }
 
-    if (type == DiscussionTypeEnum.advertisement && json['advertisement_specific_data'] != null && json['advertisement_specific_data']['advertisement'] != null) {
+    if (type == DiscussionTypeEnum.advertisement &&
+        json['advertisement_specific_data'] != null &&
+        json['advertisement_specific_data']['advertisement'] != null) {
       _advertisement = ContentAdvertisement.fromDiscussionJson(json['advertisement_specific_data']);
     }
   }
@@ -95,6 +103,8 @@ class Discussion {
   bool get accessDenied => _accessDenied;
 
   ContentAdvertisement? get advertisement => _advertisement;
+
+  DiscussionCommonBookmark? get bookmark => _bookmark;
 
   DiscussionOwner? get owner => _owner;
 
