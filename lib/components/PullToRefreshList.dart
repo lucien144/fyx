@@ -10,6 +10,7 @@ import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:sentry/sentry.dart';
 
 // ignore: must_be_immutable
@@ -32,8 +33,8 @@ class PullToRefreshList extends StatefulWidget {
   _PullToRefreshListState createState() => _PullToRefreshListState();
 }
 
-class _PullToRefreshListState extends State<PullToRefreshList> {
-  ScrollController? _controller;
+class _PullToRefreshListState extends State<PullToRefreshList> with SingleTickerProviderStateMixin {
+  AutoScrollController _controller = AutoScrollController();
   bool _isLoading = true;
   bool _hasPulledDown = false;
   bool _hasError = false;
@@ -42,6 +43,8 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
   int? _prevLastId; // ID of last item loaded previously.
   var _slivers = <Widget>[];
   int _lastRebuild = 0;
+  late AnimationController slideController;
+  late Animation<Offset> slideOffset;
 
   @override
   void setState(fn) {
@@ -56,7 +59,10 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
 
     () async {
       await Future.delayed(Duration.zero);
-      _controller = PrimaryScrollController.of(context);
+      _controller.parentController = PrimaryScrollController.of(context)!;
+
+      slideController = AnimationController(vsync: this, duration: Duration(milliseconds: 600));
+      slideOffset = Tween<Offset>(begin: Offset(0.0, 1.0), end: Offset.zero).animate(slideController);
 
       // Add the refresh control on first position
       _slivers.add(CupertinoSliverRefreshControl(
@@ -76,8 +82,9 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
 
   @override
   void dispose() {
-    _controller?.dispose();
     super.dispose();
+    _controller.dispose();
+    slideController.dispose();
   }
 
   @override
@@ -119,8 +126,13 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
             Expanded(
               child: NotificationListener<ScrollNotification>(
                 onNotification: (ScrollNotification scrollInfo) {
+                  // Hide the jump to first unread button if user scrolls twice the height of the screen height
+                  if (scrollInfo.metrics.pixels > 2 * MediaQuery.of(context).size.height) {
+                    slideController.reverse();
+                  }
+
                   if (widget._isInfinite) {
-                    if (_controller?.position.userScrollDirection == ScrollDirection.reverse && scrollInfo.metrics.outOfRange) {
+                    if (_controller.position.userScrollDirection == ScrollDirection.reverse && scrollInfo.metrics.outOfRange) {
                       if (_slivers.last is! SliverPadding) {
                         setState(() => _slivers.add(SliverPadding(
                             padding: EdgeInsets.symmetric(vertical: 16), sliver: SliverToBoxAdapter(child: CupertinoActivityIndicator()))));
@@ -142,6 +154,29 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
             ),
           ],
         ),
+        if (_result != null && _result!.jumpIndex > 1)
+          Positioned(
+              width: MediaQuery.of(context).size.width,
+              bottom: 0,
+              left: 0,
+              child: SlideTransition(
+                position: slideOffset,
+                child: Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      if (_result != null && _result!.jumpIndex > 1) {
+                        _controller.scrollToIndex(_result!.jumpIndex - 1, preferPosition: AutoScrollPosition.begin);
+                        slideController.reverse();
+                      }
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(color: colors.highlight, borderRadius: BorderRadius.vertical(top: Radius.circular(6))),
+                      child: Text('↓ První nepřečtený'),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                    ),
+                  ),
+                ),
+              )),
         Visibility(
           visible: _isLoading && !_hasPulledDown, // Show only when not pulling down the list
           child: Positioned(
@@ -165,7 +200,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
     // If the list contains widgets
     if (_data.first is Widget) {
       if (widget.sliverListBuilder is Function) {
-        return <Widget>[widget.sliverListBuilder!(_data)];
+        return <Widget>[widget.sliverListBuilder!(_data, controller: _controller)];
       } else {
         return [
           SliverList(
@@ -225,6 +260,10 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
     try {
       _result = await widget.dataProvider(append ? _lastId : null);
       bool makeInactive = false;
+
+      if (_result!.jumpIndex > 1) {
+        slideController.forward();
+      }
 
       // If the ID of the last ID is same as the ID of currently loaded last ID
       // Make the list inactive (makeInactive = true)
@@ -317,8 +356,9 @@ class RefreshScrollPhysics extends BouncingScrollPhysics {
 class DataProviderResult {
   final List data;
   final dynamic lastId;
+  final int jumpIndex;
 
-  DataProviderResult(this.data, {this.lastId});
+  DataProviderResult(this.data, {this.lastId, this.jumpIndex = 0});
 }
 
 typedef Future<DataProviderResult> TDataProvider(int? id);

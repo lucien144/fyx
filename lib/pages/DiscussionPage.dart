@@ -19,6 +19,7 @@ import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
 class DiscussionPageArguments {
   final int discussionId;
@@ -102,11 +103,11 @@ class _DiscussionPageState extends State<DiscussionPage> {
               alignment: Alignment.center,
               width: MediaQuery.of(context).size.width - 120,
               child: Tooltip(
-                  message: title,
-                  child: Text(title.replaceAll('', '\u{200B}'), style: TextStyle(color: colors.text), overflow: TextOverflow.ellipsis),
-                  padding: EdgeInsets.all(8.0), // needed until https://github.com/flutter/flutter/issues/86170 is fixed
-                  margin: EdgeInsets.all(8.0),
-                  showDuration: Duration(seconds: 3),
+                message: title,
+                child: Text(title.replaceAll('', '\u{200B}'), style: TextStyle(color: colors.text), overflow: TextOverflow.ellipsis),
+                padding: EdgeInsets.all(8.0), // needed until https://github.com/flutter/flutter/issues/86170 is fixed
+                margin: EdgeInsets.all(8.0),
+                showDuration: Duration(seconds: 3),
               ))),
       child: body,
     );
@@ -136,7 +137,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
                 rebuild: _refreshList,
                 isInfinite: true,
                 pinnedWidget: getPinnedWidget(discussionResponse),
-                sliverListBuilder: (List data) {
+                sliverListBuilder: (List data, {controller}) {
                   return ValueListenableBuilder(
                     valueListenable: MainRepository().settings.box.listenable(keys: ['blockedPosts', 'blockedUsers']),
                     builder: (BuildContext context, value, Widget? child) {
@@ -149,7 +150,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
                       }
                       return SliverList(
                         delegate: SliverChildBuilderDelegate(
-                          (context, i) => filtered[i],
+                          (context, i) => AutoScrollTag(child: filtered[i], key: ValueKey(i), index: i, controller: controller),
                           childCount: filtered.length,
                         ),
                       );
@@ -174,7 +175,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
                       result = response.posts;
                     }
                   }
-                  List<Widget> data = (result as List)
+                  List<PostListItem> data = (result as List)
                       .map((post) {
                         return Post.fromJson(post, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode);
                       })
@@ -187,7 +188,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
                   try {
                     id = Post.fromJson((result as List).last, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode).id;
                   } catch (error) {}
-                  return DataProviderResult(data, lastId: id);
+                  return DataProviderResult(data, lastId: id, jumpIndex: data.where((listItem) => listItem.post.isNew).length);
                 },
               ),
             ),
