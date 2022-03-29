@@ -9,7 +9,6 @@ import 'package:fyx/components/actionSheets/PostAvatarActionSheet.dart';
 import 'package:fyx/components/post/PostAvatar.dart';
 import 'package:fyx/components/post/PostRating.dart';
 import 'package:fyx/components/post/PostThumbs.dart';
-import 'package:fyx/components/post/RatingValue.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
@@ -114,10 +113,9 @@ class _PostListItemState extends State<PostListItem> {
               descriptionWidget: Row(
                 children: [
                   if (_post!.rating != null)
-                    RatingValue(
-                      _post!.rating!,
-                      fontSize: 10,
-                    ),
+                    Text(Post.formatRating(_post!.rating!),
+                        style:
+                            TextStyle(fontSize: 10, color: _post!.rating! > 0 ? colors.success : (_post!.rating! < 0 ? colors.danger : colors.text))),
                   if (_post!.rating != null) SizedBox(width: 8),
                   Text(
                     Helpers.absoluteTime(_post!.time),
