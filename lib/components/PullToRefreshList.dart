@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'package:fyx/FyxApp.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -41,10 +42,12 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
   DataProviderResult? _result;
   int? _lastId;
   int? _prevLastId; // ID of last item loaded previously.
-  var _slivers = <Widget>[];
+  List<Widget> _slivers = <Widget>[];
   int _lastRebuild = 0;
   late AnimationController slideController;
   late Animation<Offset> slideOffset;
+
+  final int kJumpButtonTreshold = FyxApp.isDev ? 0 : 3;
 
   @override
   void setState(fn) {
@@ -154,7 +157,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
             ),
           ],
         ),
-        if (_result != null && _result!.jumpIndex > 1)
+        if (_result != null && _result!.jumpIndex >= kJumpButtonTreshold)
           Positioned(
               width: MediaQuery.of(context).size.width,
               bottom: 0,
@@ -164,15 +167,23 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
                 child: Center(
                   child: GestureDetector(
                     onTap: () {
-                      if (_result != null && _result!.jumpIndex > 1) {
+                      if (_result != null && _result!.jumpIndex >= kJumpButtonTreshold) {
                         _controller.scrollToIndex(_result!.jumpIndex - 1, preferPosition: AutoScrollPosition.begin);
                         slideController.reverse();
                       }
                     },
                     child: Container(
-                      decoration: BoxDecoration(color: colors.highlight, borderRadius: BorderRadius.vertical(top: Radius.circular(6))),
-                      child: Text('↓ První nepřečtený'),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                      decoration: BoxDecoration(boxShadow: [
+                        BoxShadow(
+                            color: colors.dark.withOpacity(.6), //New
+                            blurRadius: 20.0,
+                            offset: Offset(0, 0))
+                      ], color: colors.primary, borderRadius: BorderRadius.vertical(top: Radius.circular(6))),
+                      child: Text(
+                        '↓ První nepřečtený',
+                        style: TextStyle(color: colors.background),
+                      ),
+                      padding: const EdgeInsets.only(top: 16, left: 20, right: 20, bottom: 40),
                     ),
                   ),
                 ),
@@ -261,7 +272,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
       _result = await widget.dataProvider(append ? _lastId : null);
       bool makeInactive = false;
 
-      if (_result!.jumpIndex > 1) {
+      if (_result!.jumpIndex >= kJumpButtonTreshold) {
         slideController.forward();
       }
 
