@@ -2,6 +2,7 @@ import 'package:async/async.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/components/post/Advertisement.dart';
 import 'package:fyx/components/post/PostListItem.dart';
@@ -148,9 +149,16 @@ class _DiscussionPageState extends State<DiscussionPage> {
                             .where((item) => !MainRepository().settings.isUserBlocked((item as PostListItem).post.nick))
                             .toList();
                       }
+                      final kUnreadIndex = filtered.lastIndexWhere((item) => (item as PostListItem).post.isNew);
                       return SliverList(
                         delegate: SliverChildBuilderDelegate(
-                          (context, i) => AutoScrollTag(child: filtered[i], key: ValueKey(i), index: i, controller: controller),
+                          (context, i) {
+                            final postItem = AutoScrollTag(child: filtered[i], key: ValueKey(i), index: i, controller: controller);
+                            if (i == kUnreadIndex) {
+                              return unseenPill(postItem, kUnreadIndex + 1);
+                            }
+                            return postItem;
+                          },
                           childCount: filtered.length,
                         ),
                       );
@@ -231,5 +239,35 @@ class _DiscussionPageState extends State<DiscussionPage> {
       default:
         return null;
     }
+  }
+
+  Widget unseenPill(Widget postItem, unseenCount) {
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        postItem,
+        const Divider(
+          height: 8,
+          thickness: 8,
+        ),
+        Container(
+          color: colors.grey.withOpacity(.1),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Center(
+              child: Container(
+                child: Text(
+                  '↑ Nové příspěvky ($unseenCount})',
+                  style: TextStyle(color: colors.background, fontSize: FontSize.medium.size),
+                ),
+                decoration: BoxDecoration(color: colors.primary, borderRadius: BorderRadius.all(Radius.circular(12))),
+                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+              ),
+            ),
+          ),
+        )
+      ],
+    );
   }
 }
