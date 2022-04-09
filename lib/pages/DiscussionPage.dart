@@ -102,11 +102,15 @@ class _DiscussionPageState extends State<DiscussionPage> {
               alignment: Alignment.center,
               width: MediaQuery.of(context).size.width - 120,
               child: Tooltip(
-                  message: title,
-                  child: Text(title.replaceAll('', '\u{200B}'), style: TextStyle(color: colors.text), overflow: TextOverflow.ellipsis),
-                  padding: EdgeInsets.all(8.0), // needed until https://github.com/flutter/flutter/issues/86170 is fixed
-                  margin: EdgeInsets.all(8.0),
-                  showDuration: Duration(seconds: 3),
+                message: title,
+                child: Text(
+                    // https://github.com/flutter/flutter/issues/18761
+                    Characters(title).replaceAll(Characters(''), Characters('\u{200B}')).toString(),
+                    style: TextStyle(color: colors.text),
+                    overflow: TextOverflow.ellipsis),
+                padding: EdgeInsets.all(8.0), // needed until https://github.com/flutter/flutter/issues/86170 is fixed
+                margin: EdgeInsets.all(8.0),
+                showDuration: Duration(seconds: 3),
               ))),
       child: body,
     );
