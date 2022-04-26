@@ -55,7 +55,7 @@ class _MailboxPageState extends State<MailboxPage> {
       PullToRefreshList(
           rebuild: _refreshData,
           isInfinite: true,
-          sliverListBuilder: (List data) {
+          sliverListBuilder: (List data, {controller}) {
             return ValueListenableBuilder(
               valueListenable: MainRepository().settings.box.listenable(keys: ['blockedMails', 'blockedUsers']),
               builder: (BuildContext context, value, Widget? child) {
@@ -81,7 +81,10 @@ class _MailboxPageState extends State<MailboxPage> {
                 .map((_mail) => Mail.fromJson(_mail, isCompact: MainRepository().settings.useCompactMode))
                 .where((mail) => !MainRepository().settings.isMailBlocked(mail.id))
                 .where((mail) => !MainRepository().settings.isUserBlocked(mail.participant))
-                .map((mail) => MailListItem(mail, onUpdate: this.refreshData,))
+                .map((mail) => MailListItem(
+                      mail,
+                      onUpdate: this.refreshData,
+                    ))
                 .toList();
             var id = Mail.fromJson(result.mails.last, isCompact: MainRepository().settings.useCompactMode).id;
             return DataProviderResult(mails, lastId: id);

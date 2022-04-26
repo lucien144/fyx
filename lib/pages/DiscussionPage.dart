@@ -2,6 +2,7 @@ import 'package:async/async.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/components/post/Advertisement.dart';
 import 'package:fyx/components/post/PostListItem.dart';
@@ -19,6 +20,7 @@ import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
 class DiscussionPageArguments {
   final int discussionId;
@@ -140,7 +142,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
                 rebuild: _refreshList,
                 isInfinite: true,
                 pinnedWidget: getPinnedWidget(discussionResponse),
-                sliverListBuilder: (List data) {
+                sliverListBuilder: (List data, {controller}) {
                   return ValueListenableBuilder(
                     valueListenable: MainRepository().settings.box.listenable(keys: ['blockedPosts', 'blockedUsers']),
                     builder: (BuildContext context, value, Widget? child) {
@@ -151,9 +153,16 @@ class _DiscussionPageState extends State<DiscussionPage> {
                             .where((item) => !MainRepository().settings.isUserBlocked((item as PostListItem).post.nick))
                             .toList();
                       }
+                      final kUnreadIndex = filtered.lastIndexWhere((item) => (item as PostListItem).post.isNew);
                       return SliverList(
                         delegate: SliverChildBuilderDelegate(
-                          (context, i) => filtered[i],
+                          (context, i) {
+                            final postItem = AutoScrollTag(child: filtered[i], key: ValueKey(i), index: i, controller: controller);
+                            if (i == kUnreadIndex) {
+                              return unseenPill(postItem, kUnreadIndex + 1);
+                            }
+                            return postItem;
+                          },
                           childCount: filtered.length,
                         ),
                       );
@@ -178,7 +187,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
                       result = response.posts;
                     }
                   }
-                  List<Widget> data = (result as List)
+                  List<PostListItem> data = (result as List)
                       .map((post) {
                         return Post.fromJson(post, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode);
                       })
@@ -191,7 +200,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
                   try {
                     id = Post.fromJson((result as List).last, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode).id;
                   } catch (error) {}
-                  return DataProviderResult(data, lastId: id);
+                  return DataProviderResult(data, lastId: id, jumpIndex: data.where((listItem) => listItem.post.isNew).length);
                 },
               ),
             ),
@@ -234,5 +243,35 @@ class _DiscussionPageState extends State<DiscussionPage> {
       default:
         return null;
     }
+  }
+
+  Widget unseenPill(Widget postItem, unseenCount) {
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        postItem,
+        const Divider(
+          height: 8,
+          thickness: 8,
+        ),
+        Container(
+          color: colors.grey.withOpacity(.1),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Center(
+              child: Container(
+                child: Text(
+                  '↑ Nové příspěvky ($unseenCount)',
+                  style: TextStyle(color: colors.background, fontSize: FontSize.medium.size),
+                ),
+                decoration: BoxDecoration(color: colors.primary, borderRadius: BorderRadius.all(Radius.circular(12))),
+                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+              ),
+            ),
+          ),
+        )
+      ],
+    );
   }
 }
