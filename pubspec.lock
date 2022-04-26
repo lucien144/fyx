@@ -404,7 +404,7 @@ packages:
       name: flutter_html
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.1.5"
+    version: "2.2.1"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:
@@ -475,7 +475,7 @@ packages:
       name: fluttertoast
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "8.0.8"
+    version: "8.0.9"
   frontend_server_client:
     dependency: transitive
     description:
@@ -580,7 +580,14 @@ packages:
       name: image_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.8.4+4"
+    version: "0.8.5"
+  image_picker_android:
+    dependency: transitive
+    description:
+      name: image_picker_android
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.8.4+11"
   image_picker_for_web:
     dependency: transitive
     description:
@@ -588,6 +595,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0"
+  image_picker_ios:
+    dependency: transitive
+    description:
+      name: image_picker_ios
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.8.4+11"
   image_picker_platform_interface:
     dependency: transitive
     description:
@@ -825,7 +839,21 @@ packages:
       name: permission_handler
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "8.1.6"
+    version: "9.2.0"
+  permission_handler_android:
+    dependency: transitive
+    description:
+      name: permission_handler_android
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "9.0.2+1"
+  permission_handler_apple:
+    dependency: transitive
+    description:
+      name: permission_handler_apple
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "9.0.4"
   permission_handler_platform_interface:
     dependency: transitive
     description:
@@ -833,6 +861,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.7.0"
+  permission_handler_windows:
+    dependency: transitive
+    description:
+      name: permission_handler_windows
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.0"
   petitparser:
     dependency: transitive
     description:
@@ -923,7 +958,7 @@ packages:
       name: sentry_flutter
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.1.0"
+    version: "6.3.0"
   share:
     dependency: "direct main"
     description:
@@ -1201,7 +1236,7 @@ packages:
       name: video_player
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.2.18"
+    version: "2.2.19"
   video_player_android:
     dependency: transitive
     description:
@@ -1315,5 +1350,5 @@ packages:
     source: hosted
     version: "3.1.0"
 sdks:
-  dart: ">=2.14.0 <3.0.0"
+  dart: ">=2.15.0 <3.0.0"
   flutter: ">=2.10.2"
