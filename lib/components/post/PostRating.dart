@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/FeedbackIndicator.dart';
+import 'package:fyx/components/post/RatingValue.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Post.dart';
+import 'package:fyx/model/notifications/LoadRatingsNotification.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -44,9 +46,8 @@ class _PostRatingState extends State<PostRating> {
       isLoading: _givingRating,
       child: Row(
         children: <Widget>[
-          Visibility(
-            visible: _post!.canBeRated,
-            child: GestureDetector(
+          if (_post!.canBeRated)
+            GestureDetector(
               child: Icon(
                 Icons.thumb_up,
                 color: _post!.myRating == 'positive' ? colors.success : colors.text.withOpacity(0.38),
@@ -69,25 +70,24 @@ class _PostRatingState extends State<PostRating> {
                       }).whenComplete(() => setState(() => _givingRating = false));
                     },
             ),
-          ),
-          SizedBox(
-            width: 4,
-          ),
+          if (_post!.canBeRated)
+            SizedBox(
+              width: 12,
+            ),
           if (_post!.rating != null)
             Opacity(
               opacity: _givingRating ? 0 : 1,
-              child: Text(
-                Post.formatRating(_post!.rating!),
-                style: TextStyle(
-                    fontSize: 14, color: _post!.rating! > 0 ? colors.success : (_post!.rating! < 0 ? colors.danger : colors.text.withOpacity(0.38))),
+              child: GestureDetector(
+                child: RatingValue(_post!.rating!),
+                onTap: () => LoadRatingsNotification().dispatch(context),
               ),
             ),
-          SizedBox(
-            width: 4,
-          ),
-          Visibility(
-            visible: _post!.canBeRated,
-            child: GestureDetector(
+          if (_post!.rating != null)
+            SizedBox(
+              width: 12,
+            ),
+          if (_post!.canBeRated)
+            GestureDetector(
               child: Icon(
                 Icons.thumb_down,
                 color: ['negative', 'negative_visible'].contains(_post!.myRating) ? colors.danger : colors.text.withOpacity(0.38),
@@ -153,7 +153,6 @@ class _PostRatingState extends State<PostRating> {
                       });
                     },
             ),
-          ),
         ],
       ),
     );

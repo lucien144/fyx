@@ -9,6 +9,7 @@ import 'package:fyx/exceptions/AuthException.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/ResponseContext.dart';
+import 'package:fyx/model/post/content/Dice.dart';
 import 'package:fyx/model/post/content/Poll.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/model/reponses/BookmarksAllResponse.dart';
@@ -20,6 +21,7 @@ import 'package:fyx/model/reponses/FileUploadResponse.dart';
 import 'package:fyx/model/reponses/LoginResponse.dart';
 import 'package:fyx/model/reponses/MailResponse.dart';
 import 'package:fyx/model/reponses/OkResponse.dart';
+import 'package:fyx/model/reponses/PostRatingsResponse.dart';
 import 'package:fyx/model/reponses/RatingResponse.dart';
 import 'package:fyx/model/reponses/WaitingFilesResponse.dart';
 import 'package:fyx/theme/L.dart';
@@ -240,6 +242,11 @@ class ApiController {
         myRating: data['my_rating'] ?? 'none');
   }
 
+  Future<PostRatingsResponse> getPostRatings(int discussionId, int postId) async {
+    Response response = await provider.getPostRatings(discussionId, postId);
+    return PostRatingsResponse.fromJson(response.data);
+  }
+
   void logout({bool removeAuthrorization = true}) {
     SharedPreferences.getInstance().then((prefs) => prefs.clear());
     if (removeAuthrorization) {
@@ -298,6 +305,12 @@ class ApiController {
     Response response = await provider.votePoll(discussionId, postId, votes);
     Map<String, dynamic> json = response.data;
     return ContentPoll.fromJson(json['content_raw']['data'], discussionId: json['discussion_id'] ?? 0, postId: json['post_id'] ?? 0);
+  }
+
+  Future<ContentDice> rollDice(discussionId, postId) async {
+    Response response = await provider.rollDice(discussionId, postId);
+    Map<String, dynamic> json = response.data;
+    return ContentDice.fromJson(json['content_raw']['data'], discussionId: json['discussion_id'] ?? 0, postId: json['post_id'] ?? 0);
   }
 
   throwAuthException(LoginResponse loginResponse, {String message: ''}) {

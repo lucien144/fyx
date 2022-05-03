@@ -5,7 +5,7 @@ addons:
     packages:
       - lib32stdc++6
 install:
-  - git clone --depth 1 --branch 1.22.0 https://github.com/flutter/flutter.git
+  - git clone --depth 1 --branch 2.10.2 https://github.com/flutter/flutter.git
   - ./flutter/bin/flutter doctor
   - gem install coveralls-lcov
   - cp .env.example .env

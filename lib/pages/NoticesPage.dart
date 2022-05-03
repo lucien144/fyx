@@ -3,16 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:fyx/components/Avatar.dart' as component;
 import 'package:fyx/components/ContentBoxLayout.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
+import 'package:fyx/components/post/PostThumbs.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/model/post/PostThumbItem.dart';
 import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/model/reponses/FeedNoticesResponse.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/L.dart';
-import 'package:fyx/theme/T.dart';
-import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 
 class NoticesPage extends StatefulWidget {
   NoticesPage({Key? key}) : super(key: key);
@@ -91,10 +92,12 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
                   ),
                   bottomWidget: Column(
                     children: [
-                      if (item.thumbsUp.length > 0) buildLikes(context, item.thumbsUp, result.lastVisit),
-                      SizedBox(
-                        height: 8,
-                      ),
+                      if (item.thumbsUp.length > 0)
+                        PostThumbs(item.thumbsUp.map((thumb) => PostThumbItem.fromNoticeThumbsUp(thumb, result.lastVisit)).toList()),
+                      if (item.replies.length > 0)
+                        const SizedBox(
+                          height: 8,
+                        ),
                       if (item.replies.length > 0) buildReplies(context, item.replies, result.lastVisit),
                     ],
                   ),
@@ -102,38 +105,6 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
               }).toList();
               return DataProviderResult(feed);
             }));
-  }
-
-  Widget buildLikes(BuildContext context, List<NoticeThumbsUp> thumbsUp, int lastVisit) {
-    var avatars = thumbsUp
-        .map((thumbUp) => Tooltip(
-              message: thumbUp.nick,
-              waitDuration: Duration(milliseconds: 0),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 5, bottom: 5),
-                child: component.Avatar(
-                  Helpers.avatarUrl(thumbUp.nick),
-                  size: 22,
-                  isHighlighted: thumbUp.time > lastVisit,
-                ),
-              ),
-            ))
-        .toList();
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 4),
-          child: Icon(
-            Icons.thumb_up,
-            size: 22,
-          ),
-        ),
-        Expanded(
-          child: Wrap(children: avatars),
-        )
-      ],
-    );
   }
 
   Widget buildReplies(BuildContext context, List<NoticeReplies> replies, int lastVisit) {
@@ -160,7 +131,8 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
               Expanded(
                   child: Padding(
                 padding: const EdgeInsets.only(top: 6.0),
-                child: Text(Helpers.stripHtmlTags(reply.text), style: TextStyle(fontSize: 14, fontWeight: reply.time > lastVisit ? FontWeight.bold : FontWeight.normal)),
+                child: Text(Helpers.stripHtmlTags(reply.text),
+                    style: TextStyle(fontSize: 14, fontWeight: reply.time > lastVisit ? FontWeight.bold : FontWeight.normal)),
               ))
             ],
           ),

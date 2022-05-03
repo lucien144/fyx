@@ -236,14 +236,17 @@ class _PullToRefreshListState extends State<PullToRefreshList> {
         }
       }
 
-      // Load the data only if there are any data AND should not be inactive.
-      if (_result!.data.length > 0 && !makeInactive) {
+      // Load the data if should not be inactive.
+      if (!makeInactive) {
         if (append) {
           _slivers.removeLast(); // Remove the loading indicator
         } else {
           _slivers.removeRange(1, _slivers.length);
         }
-        _slivers.addAll(this.buildTheList(_result!.data));
+        // Render new data if anything actually arrived
+        if (_result!.data.length > 0) {
+          _slivers.addAll(this.buildTheList(_result!.data));
+        }
         setState(() => _hasError = false);
         setState(() => _lastId = _result!.lastId);
       }

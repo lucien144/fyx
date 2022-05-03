@@ -52,7 +52,7 @@ class ApiProvider implements IApiProvider {
       }
       return handler.next(options);
     }, onResponse: (Response response, ResponseInterceptorHandler handler) async {
-      if (response.data.containsKey('context')) {
+      if (response.data is Map && response.data.containsKey('context')) {
         if (onContextData != null) {
           onContextData!(response.data['context']);
         }
@@ -141,6 +141,10 @@ class ApiProvider implements IApiProvider {
     return await dio.post('$URL/discussion/$discussionId/reminder/$postId/$setReminder');
   }
 
+  Future<Response> getPostRatings(int discussionId, int postId) async {
+    return await dio.get('$URL/discussion/$discussionId/rating/$postId');
+  }
+
   Future<Response> giveRating(int discussionId, int postId, bool positive, bool confirm, bool remove) async {
     String action = positive ? 'positive' : 'negative';
     action = remove ? 'remove' : action;
@@ -190,5 +194,9 @@ class ApiProvider implements IApiProvider {
 
   Future<Response> votePoll(int discussionId, int postId, List<int> votes) async {
     return await dio.post('$URL/discussion/$discussionId/poll/$postId/vote/${votes.join(',')}');
+  }
+
+  Future<Response> rollDice(int discussionId, int postId) async {
+    return await dio.post('$URL/discussion/$discussionId/dice/$postId/roll');
   }
 }

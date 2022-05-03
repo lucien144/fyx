@@ -133,11 +133,15 @@ class PostHtml extends StatelessWidget {
         ) {
           final element = renderContext.tree.element;
 
-          if (element!.attributes['style'] == 'background-color:#272822') {
+          if (element == null) {
+            return parsedChild;
+          }
+
+          if (element.attributes['style'] == 'background-color:#272822') {
             final source = HtmlUnescape().convert(element.text);
             return SyntaxHighlighter(source);
           } else {
-            return parsedChild;
+            return Text(element.text, style: TextStyle(fontFamily: 'JetBrainsMono'));
           }
         }
       },

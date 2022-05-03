@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:fyx/theme/L.dart';
 import 'package:html/parser.dart';
 import 'package:intl/intl.dart';
@@ -104,5 +106,12 @@ class Helpers {
 
   static String avatarUrl(String username) {
     return 'https://nyx.cz/${username.substring(0, 1)}/$username.gif';
+  }
+
+  // https://stackoverflow.com/a/61929967/4026345
+  static String uuid(int length) {
+    const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    Random _rnd = Random();
+    return String.fromCharCodes(Iterable.generate(length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
   }
 }

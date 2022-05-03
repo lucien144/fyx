@@ -120,7 +120,7 @@ class _PollState extends State<Poll> {
                     setState(() => _loading = false);
                   }
                 },
-                child: _loading ? CupertinoActivityIndicator() : Text('Hlasovat ${_votes.length}/${_poll!.allowedVotes}'),
+                child: _loading ? CupertinoActivityIndicator() : Text('${_poll!.publicResults ? 'Veřejně hlasovat' : 'Hlasovat' } ${_votes.length}/${_poll!.allowedVotes}'),
                 color: colors.primary,
                 padding: EdgeInsets.all(0),
                 disabledColor: colors.disabled,
