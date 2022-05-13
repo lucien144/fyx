@@ -27,6 +27,8 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _compactMode = false;
   bool _underTheHood = false;
   bool _autocorrect = false;
+  bool _showFirstUnread = true;
+  bool _autoJumpFirstUnread = false;
   DefaultView _defaultView = DefaultView.latest;
   ThemeEnum _theme = ThemeEnum.light;
 
@@ -38,12 +40,16 @@ class _SettingsPageState extends State<SettingsPage> {
     _autocorrect = MainRepository().settings.useAutocorrect;
     _defaultView = MainRepository().settings.defaultView;
     _theme = MainRepository().settings.theme;
+    _showFirstUnread = MainRepository().settings.showFirstUnread;
+    _autoJumpFirstUnread = MainRepository().settings.autoJumpFirstUnread;
     AnalyticsProvider().setScreen('Settings', 'SettingsPage');
   }
 
   @override
   Widget build(BuildContext context) {
     SkinColors colors = Skin.of(context).theme.colors;
+    CSWidgetStyle firstUnreadStyle = CSWidgetStyle(icon: Icon(Icons.arrow_downward, color: colors.text.withOpacity(0.38)));
+    CSWidgetStyle autojumpStyle = CSWidgetStyle(icon: Icon(Icons.arrow_downward, color: colors.text.withOpacity(0.38)));
     CSWidgetStyle postsStyle = CSWidgetStyle(icon: Icon(Icons.view_compact, color: colors.text.withOpacity(0.38)));
     CSWidgetStyle autocorrectStyle = CSWidgetStyle(icon: Icon(Icons.spellcheck, color: colors.text.withOpacity(0.38)));
     CSWidgetStyle bugreportStyle = CSWidgetStyle(icon: Icon(Icons.bug_report, color: colors.text.withOpacity(0.38)));
@@ -69,6 +75,40 @@ class _SettingsPageState extends State<SettingsPage> {
         child: CupertinoScrollbar(
           child: CupertinoSettings(items: <Widget>[
             const CSHeader('Příspěvky'),
+            CSControl(
+              nameWidget: Text(
+                'Zobrazit "↓ První nepřečtený"',
+                style: TextStyle(color: colors.text),
+              ),
+              contentWidget: CupertinoSwitch(
+                  value: _showFirstUnread,
+                  onChanged: (bool value) {
+                    setState(() => _showFirstUnread = value);
+                    MainRepository().settings.showFirstUnread = value;
+                    if (value) {
+                      setState(() => _autoJumpFirstUnread = false);
+                      MainRepository().settings.autoJumpFirstUnread = false;
+                    }
+                  }),
+              style: firstUnreadStyle,
+            ),
+            CSControl(
+              nameWidget: Text(
+                'Vždy skočit na 1. nepřečtený',
+                style: TextStyle(color: colors.text),
+              ),
+              contentWidget: CupertinoSwitch(
+                  value: _autoJumpFirstUnread,
+                  onChanged: (bool value) {
+                    setState(() => _autoJumpFirstUnread = value);
+                    MainRepository().settings.autoJumpFirstUnread = value;
+                    if (value) {
+                      setState(() => _showFirstUnread = false);
+                      MainRepository().settings.showFirstUnread = false;
+                    }
+                  }),
+              style: autojumpStyle,
+            ),
             CSControl(
               nameWidget: Text(
                 'Autocorrect',

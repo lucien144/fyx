@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
-import 'package:fyx/FyxApp.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -47,7 +47,8 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
   late AnimationController slideController;
   late Animation<Offset> slideOffset;
 
-  final int kJumpButtonTreshold = FyxApp.isDev ? 0 : 3;
+  // Min. number of unreads to display the "Jump to first unread"
+  final int kJumpButtonThreshold = 3;
 
   @override
   void setState(fn) {
@@ -157,7 +158,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
             ),
           ],
         ),
-        if (_result != null && _result!.jumpIndex >= kJumpButtonTreshold)
+        if (_result != null && _result!.jumpIndex >= kJumpButtonThreshold && MainRepository().settings.showFirstUnread)
           Positioned(
               width: MediaQuery.of(context).size.width,
               bottom: 0,
@@ -167,7 +168,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
                 child: Center(
                   child: GestureDetector(
                     onTap: () {
-                      if (_result != null && _result!.jumpIndex >= kJumpButtonTreshold) {
+                      if (_result != null && _result!.jumpIndex >= kJumpButtonThreshold) {
                         _controller.scrollToIndex(_result!.jumpIndex - 1, preferPosition: AutoScrollPosition.begin);
                         slideController.reverse();
                       }
@@ -272,7 +273,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
       _result = await widget.dataProvider(append ? _lastId : null);
       bool makeInactive = false;
 
-      if (_result!.jumpIndex >= kJumpButtonTreshold) {
+      if (_result!.jumpIndex >= kJumpButtonThreshold && MainRepository().settings.showFirstUnread) {
         slideController.forward();
       }
 
@@ -304,6 +305,10 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
       // Add the pinned widget only if the list is active
       if (widget.pinnedWidget is Widget && !makeInactive) {
         _slivers.insert(0, SliverToBoxAdapter(child: widget.pinnedWidget));
+      }
+
+      if (MainRepository().settings.autoJumpFirstUnread && _result!.jumpIndex >= kJumpButtonThreshold) {
+        _controller.scrollToIndex(_result!.jumpIndex - 1, preferPosition: AutoScrollPosition.begin);
       }
     } catch (error) {
       setState(() => _hasError = true);

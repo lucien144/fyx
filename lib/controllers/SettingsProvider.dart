@@ -35,6 +35,18 @@ class SettingsProvider {
     _settings.useCompactMode = mode;
   }
 
+  bool get showFirstUnread => _settings.showFirstUnread;
+  set showFirstUnread(bool toggle) {
+    _box.put('showFirstUnread', toggle);
+    _settings.showFirstUnread = toggle;
+  }
+
+  bool get autoJumpFirstUnread => _settings.autoJumpFirstUnread;
+  set autoJumpFirstUnread(bool toggle) {
+    _box.put('autoJumpFirstUnread', toggle);
+    _settings.autoJumpFirstUnread = toggle;
+  }
+
   bool get useAutocorrect => _settings.useAutocorrect;
   set useAutocorrect(bool autocorrect) {
     _box.put('useAutocorrect', autocorrect);
@@ -65,6 +77,8 @@ class SettingsProvider {
     _settings.latestView = _box.get('latestView', defaultValue: Settings().latestView);
     _settings.useCompactMode = _box.get('useCompactMode', defaultValue: Settings().useCompactMode);
     _settings.useAutocorrect = _box.get('useAutocorrect', defaultValue: Settings().useAutocorrect);
+    _settings.showFirstUnread = _box.get('showFirstUnread', defaultValue: Settings().showFirstUnread);
+    _settings.autoJumpFirstUnread = _box.get('autoJumpFirstUnread', defaultValue: Settings().autoJumpFirstUnread);
 
     return _singleton;
   }

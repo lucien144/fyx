@@ -4,6 +4,8 @@ import 'package:fyx/model/enums/ThemeEnum.dart';
 class Settings {
   bool useCompactMode = false;
   bool useAutocorrect = true;
+  bool showFirstUnread = true;
+  bool autoJumpFirstUnread = false;
   // Settings -> what is the default view when app restart?
   DefaultView defaultView = DefaultView.history;
   // Save the last screen view
