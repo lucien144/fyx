@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_html/html_parser.dart';
-import 'package:flutter_html/style.dart';
 import 'package:fyx/components/post/PostHeroAttachment.dart';
 import 'package:fyx/components/post/Spoiler.dart';
 import 'package:fyx/components/post/SyntaxHighlighter.dart';
@@ -88,7 +86,7 @@ class PostHtml extends StatelessWidget {
 
           // Spoiler
           if (element!.classes.contains('spoiler')) {
-            return Spoiler(element.text);
+            return Spoiler(parsedChild);
           }
 
           // Youtube
@@ -122,7 +120,7 @@ class PostHtml extends StatelessWidget {
 
           // Spoiler
           if (element!.classes.contains('spoiler')) {
-            return Spoiler(element.text);
+            return Spoiler(parsedChild);
           }
 
           return parsedChild;

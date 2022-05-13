@@ -1,25 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 
 class Spoiler extends StatefulWidget {
-  final String text;
+  final Widget parsedChild;
 
-  Spoiler(this.text, {Key? key}) : super(key: key);
+  Spoiler(this.parsedChild, {Key? key}) : super(key: key);
 
   @override
   _SpoilerState createState() => _SpoilerState();
 }
 
 class _SpoilerState extends State<Spoiler> {
-  late final String _text;
+  late final Widget _parsedChild;
   bool _toggle = false;
 
   @override
   void initState() {
     super.initState();
-    _text = widget.text;
+    _parsedChild = widget.parsedChild;
   }
 
   @override
@@ -28,14 +27,19 @@ class _SpoilerState extends State<Spoiler> {
 
     return GestureDetector(
       onTap: () => setState(() => _toggle = !_toggle),
-      child: RichText(
-        text: TextSpan(children: <TextSpan>[
-          TextSpan(text: 'Spoiler ⮕ ', style: DefaultTextStyle.of(context).style),
-          TextSpan(
-            text: '$_text',
-            style: DefaultTextStyle.of(context).style.apply(backgroundColor: _toggle ? Colors.transparent : colors.text),
-          ),
-        ]),
+      child: Stack(
+        fit: StackFit.loose,
+        children: [
+          _parsedChild,
+          Positioned.fill(
+              child: Container(
+                  alignment: Alignment.center,
+                  child: Text(
+                    '* SPOILER! *',
+                    style: TextStyle(color: _toggle ? Colors.transparent : colors.light),
+                  ),
+                  color: _toggle ? Colors.transparent : colors.text)),
+        ],
       ),
     );
   }
