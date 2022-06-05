@@ -7,6 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/enums/FirstUnreadEnum.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -158,7 +159,10 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
             ),
           ],
         ),
-        if (_result != null && _result!.jumpIndex >= kJumpButtonThreshold && MainRepository().settings.showFirstUnread)
+        if (_result != null &&
+            _result!.postId == null &&
+            _result!.jumpIndex >= kJumpButtonThreshold &&
+            MainRepository().settings.firstUnread == FirstUnreadEnum.button)
           Positioned(
               width: MediaQuery.of(context).size.width,
               bottom: 0,
@@ -273,7 +277,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
       _result = await widget.dataProvider(append ? _lastId : null);
       bool makeInactive = false;
 
-      if (_result!.jumpIndex >= kJumpButtonThreshold && MainRepository().settings.showFirstUnread) {
+      if (_result!.jumpIndex >= kJumpButtonThreshold && MainRepository().settings.firstUnread == FirstUnreadEnum.button) {
         slideController.forward();
       }
 
@@ -307,7 +311,10 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
         _slivers.insert(0, SliverToBoxAdapter(child: widget.pinnedWidget));
       }
 
-      if (MainRepository().settings.autoJumpFirstUnread && _result!.jumpIndex >= kJumpButtonThreshold) {
+      if (MainRepository().settings.firstUnread == FirstUnreadEnum.autoscroll &&
+          _result!.jumpIndex >= kJumpButtonThreshold &&
+          _result!.postId == null) {
+        // Jump to a first unread only if we are on a first page
         _controller.scrollToIndex(_result!.jumpIndex - 1, preferPosition: AutoScrollPosition.begin);
       }
     } catch (error) {
@@ -373,8 +380,9 @@ class DataProviderResult {
   final List data;
   final dynamic lastId;
   final int jumpIndex;
+  int? postId;
 
-  DataProviderResult(this.data, {this.lastId, this.jumpIndex = 0});
+  DataProviderResult(this.data, {this.lastId, this.jumpIndex = 0, this.postId});
 }
 
 typedef Future<DataProviderResult> TDataProvider(int? id);

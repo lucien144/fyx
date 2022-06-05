@@ -200,7 +200,8 @@ class _DiscussionPageState extends State<DiscussionPage> {
                   try {
                     id = Post.fromJson((result as List).last, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode).id;
                   } catch (error) {}
-                  return DataProviderResult(data, lastId: id, jumpIndex: data.where((listItem) => listItem.post.isNew).length);
+                  return DataProviderResult(data,
+                      lastId: id, postId: pageArguments.postId, jumpIndex: data.where((listItem) => listItem.post.isNew).length);
                 },
               ),
             ),

@@ -8,6 +8,7 @@ import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
+import 'package:fyx/model/enums/FirstUnreadEnum.dart';
 import 'package:fyx/model/enums/ThemeEnum.dart';
 import 'package:fyx/model/provider/ThemeModel.dart';
 import 'package:fyx/pages/InfoPage.dart';
@@ -27,10 +28,9 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _compactMode = false;
   bool _underTheHood = false;
   bool _autocorrect = false;
-  bool _showFirstUnread = true;
-  bool _autoJumpFirstUnread = false;
   DefaultView _defaultView = DefaultView.latest;
   ThemeEnum _theme = ThemeEnum.light;
+  FirstUnreadEnum _firstUnread = FirstUnreadEnum.off;
 
   @override
   void initState() {
@@ -40,16 +40,13 @@ class _SettingsPageState extends State<SettingsPage> {
     _autocorrect = MainRepository().settings.useAutocorrect;
     _defaultView = MainRepository().settings.defaultView;
     _theme = MainRepository().settings.theme;
-    _showFirstUnread = MainRepository().settings.showFirstUnread;
-    _autoJumpFirstUnread = MainRepository().settings.autoJumpFirstUnread;
+    _firstUnread = MainRepository().settings.firstUnread;
     AnalyticsProvider().setScreen('Settings', 'SettingsPage');
   }
 
   @override
   Widget build(BuildContext context) {
     SkinColors colors = Skin.of(context).theme.colors;
-    CSWidgetStyle firstUnreadStyle = CSWidgetStyle(icon: Icon(Icons.arrow_downward, color: colors.text.withOpacity(0.38)));
-    CSWidgetStyle autojumpStyle = CSWidgetStyle(icon: Icon(Icons.arrow_downward, color: colors.text.withOpacity(0.38)));
     CSWidgetStyle postsStyle = CSWidgetStyle(icon: Icon(Icons.view_compact, color: colors.text.withOpacity(0.38)));
     CSWidgetStyle autocorrectStyle = CSWidgetStyle(icon: Icon(Icons.spellcheck, color: colors.text.withOpacity(0.38)));
     CSWidgetStyle bugreportStyle = CSWidgetStyle(icon: Icon(Icons.bug_report, color: colors.text.withOpacity(0.38)));
@@ -75,40 +72,6 @@ class _SettingsPageState extends State<SettingsPage> {
         child: CupertinoScrollbar(
           child: CupertinoSettings(items: <Widget>[
             const CSHeader('Příspěvky'),
-            CSControl(
-              nameWidget: Text(
-                'Zobrazit "↓ První nepřečtený"',
-                style: TextStyle(color: colors.text),
-              ),
-              contentWidget: CupertinoSwitch(
-                  value: _showFirstUnread,
-                  onChanged: (bool value) {
-                    setState(() => _showFirstUnread = value);
-                    MainRepository().settings.showFirstUnread = value;
-                    if (value) {
-                      setState(() => _autoJumpFirstUnread = false);
-                      MainRepository().settings.autoJumpFirstUnread = false;
-                    }
-                  }),
-              style: firstUnreadStyle,
-            ),
-            CSControl(
-              nameWidget: Text(
-                'Vždy skočit na 1. nepřečtený',
-                style: TextStyle(color: colors.text),
-              ),
-              contentWidget: CupertinoSwitch(
-                  value: _autoJumpFirstUnread,
-                  onChanged: (bool value) {
-                    setState(() => _autoJumpFirstUnread = value);
-                    MainRepository().settings.autoJumpFirstUnread = value;
-                    if (value) {
-                      setState(() => _showFirstUnread = false);
-                      MainRepository().settings.showFirstUnread = false;
-                    }
-                  }),
-              style: autojumpStyle,
-            ),
             CSControl(
               nameWidget: Text(
                 'Autocorrect',
@@ -137,6 +100,22 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             CSDescription(
               'Kompaktní zobrazení je zobrazení obrázků po stranách pokud to obsah příspěvku dovoluje (nedojde tak k narušení kontextu).',
+            ),
+            CSHeader('První nepřečtený'),
+            CSSelection<FirstUnreadEnum>(
+              items: const <CSSelectionItem<FirstUnreadEnum>>[
+                CSSelectionItem<FirstUnreadEnum>(text: 'Vypnuto', value: FirstUnreadEnum.off),
+                CSSelectionItem<FirstUnreadEnum>(text: 'Zobrazovat tlačítko', value: FirstUnreadEnum.button),
+                CSSelectionItem<FirstUnreadEnum>(text: 'Automaticky odskočit', value: FirstUnreadEnum.autoscroll),
+              ],
+              onSelected: (value) {
+                setState(() => _firstUnread = value);
+                MainRepository().settings.firstUnread = value;
+              },
+              currentSelection: _firstUnread,
+            ),
+            CSDescription(
+              'Pokud má diskuze více jak 100 nepřečtených, Fyx odskočí pouze na 100. příspěvek.',
             ),
             CSHeader('Úvodní obrazovka'),
             CSSelection<DefaultView>(
