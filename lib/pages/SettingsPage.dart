@@ -30,7 +30,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool _autocorrect = false;
   DefaultView _defaultView = DefaultView.latest;
   ThemeEnum _theme = ThemeEnum.light;
-  FirstUnreadEnum _firstUnread = FirstUnreadEnum.off;
+  FirstUnreadEnum _firstUnread = FirstUnreadEnum.button;
 
   @override
   void initState() {

@@ -13,5 +13,5 @@ class Settings {
   List<int> blockedMails = [];
   List<String> blockedUsers = [];
   ThemeEnum theme = ThemeEnum.system;
-  FirstUnreadEnum firstUnread = FirstUnreadEnum.off;
+  FirstUnreadEnum firstUnread = FirstUnreadEnum.button;
 }
