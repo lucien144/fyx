@@ -72,6 +72,7 @@ if [ $android == true ]; then
   fi
 
   flutter build appbundle -t lib/main_production.dart
+  mv build/app/outputs/bundle/release/app-release.aab "build/app/outputs/bundle/release/fyx-release-${version}.aab"
   open build/app/outputs/bundle/release/
   /usr/bin/osascript -e "display notification \"Android built.\""
 fi
