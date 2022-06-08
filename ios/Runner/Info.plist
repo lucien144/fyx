@@ -20,6 +20,8 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>K nahrání nebo uložení obrázku je potřeba povolit přístup k fotkám.</key>
+	<string>Light</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
@@ -28,8 +30,11 @@
 	<string>K nahrání videa se zvukem je potřeba povolit přístup k mikrofónu.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>K nahrání nebo uložení obrázku je potřeba povolit přístup k fotkám.</string>
-	<key>K nahrání nebo uložení obrázku je potřeba povolit přístup k fotkám.</key>
-    	<string>Light</string>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+	</dict>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
@@ -42,6 +47,8 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>

@@ -90,7 +90,7 @@ class FyxApp extends StatefulWidget {
     }
 
     SystemUiOverlayStyle(statusBarBrightness: Brightness.light);
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
 
     // TODO: Move to build using FutureBuilder.
     var results = await Future.wait([ApiController().getCredentials(), PackageInfo.fromPlatform(), DeviceInfo.init(), SettingsProvider().init()]);
