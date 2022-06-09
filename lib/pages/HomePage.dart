@@ -3,17 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/FyxApp.dart';
 import 'package:fyx/components/Avatar.dart' as ca;
-import 'package:fyx/components/DiscussionListItem.dart';
-import 'package:fyx/components/ListHeader.dart';
 import 'package:fyx/components/NotificationBadge.dart';
-import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
-import 'package:fyx/model/BookmarkedDiscussion.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/pages/MailboxPage.dart';
+import 'package:fyx/pages/tab_bar/BookmarksTab.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -53,7 +50,8 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     super.initState();
     WidgetsBinding.instance?.addObserver(this);
 
-    _defaultView = MainRepository().settings.defaultView == DefaultView.latest ? MainRepository().settings.latestView : MainRepository().settings.defaultView;
+    _defaultView =
+        MainRepository().settings.defaultView == DefaultView.latest ? MainRepository().settings.latestView : MainRepository().settings.defaultView;
     _filterUnread = [DefaultView.bookmarksUnread, DefaultView.historyUnread].indexOf(_defaultView) >= 0;
 
     activeTab = [DefaultView.history, DefaultView.historyUnread].indexOf(_defaultView) >= 0 ? ETabs.history : ETabs.bookmarks;
@@ -193,7 +191,6 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                 _filterUnread = !_filterUnread;
                 // Reset the category toggle
                 _toggledCategories = [];
-                this.updateLatestView();
               });
             }
             setState(() => _pageIndex = index);
@@ -219,135 +216,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
         tabBuilder: (context, index) {
           switch (index) {
             case HomePage.PAGE_BOOKMARK:
-              return CupertinoTabView(builder: (context) {
-                return CupertinoPageScaffold(
-                  navigationBar: CupertinoNavigationBar(
-                      leading: Consumer<NotificationsModel>(
-                          builder: (context, notifications, child) => NotificationBadge(
-                              widget: CupertinoButton(
-                                  padding: EdgeInsets.zero,
-                                  minSize: kMinInteractiveDimensionCupertino - 10,
-                                  child: Icon(
-                                    Icons.notifications_none,
-                                    size: 30,
-                                  ),
-                                  onPressed: () => Navigator.of(context, rootNavigator: true).pushNamed('/notices')),
-                              isVisible: notifications.newNotices > 0,
-                              counter: notifications.newNotices)),
-                      trailing: GestureDetector(
-                        child: ca.Avatar(
-                          MainRepository().credentials!.avatar,
-                          size: 26
-                        ),
-                        onTap: () {
-                          showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet(context));
-                        },
-                      ),
-                      middle: CupertinoSegmentedControl(
-                        groupValue: activeTab,
-                        onValueChanged: (value) {
-                          _bookmarksController.animateToPage(ETabs.values.indexOf(value as ETabs), duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
-                        },
-                        children: {
-                          ETabs.history: Padding(
-                            child: Text('Historie'),
-                            padding: EdgeInsets.symmetric(horizontal: 16),
-                          ),
-                          ETabs.bookmarks: Padding(
-                            child: Text('Sledované'),
-                            padding: EdgeInsets.symmetric(horizontal: 16),
-                          ),
-                        },
-                      )),
-                  child: PageView(
-                    controller: _bookmarksController,
-                    onPageChanged: (int index) => this.updateLatestView(isInverted: true),
-                    pageSnapping: true,
-                    children: <Widget>[
-                      // -----
-                      // HISTORY PULL TO REFRESH
-                      // -----
-                      PullToRefreshList(
-                          rebuild: _refreshData['bookmarks'] ?? 0,
-                          dataProvider: (lastId) async {
-                            List<DiscussionListItem> withReplies = [];
-                            var result = await ApiController().loadHistory();
-                            var data = result.discussions
-                                .map((discussion) => BookmarkedDiscussion.fromJson(discussion))
-                                .where((discussion) => this._filterUnread ? discussion.unread > 0 : true)
-                                .map((discussion) => DiscussionListItem(discussion))
-                                .where((discussionListItem) {
-                              if (discussionListItem.discussion.replies > 0) {
-                                withReplies.add(discussionListItem);
-                                return false;
-                              }
-                              return true;
-                            }).toList();
-                            data.insertAll(0, withReplies);
-                            return DataProviderResult(data);
-                          }),
-                      // -----
-                      // BOOKMARKS PULL TO REFRESH
-                      // -----
-                      PullToRefreshList(
-                          rebuild: _refreshData['bookmarks'] ?? 0,
-                          dataProvider: (lastId) async {
-                            var categories = [];
-                            var result = await ApiController().loadBookmarks();
-
-                            result.bookmarks.forEach((_bookmark) {
-                              List<DiscussionListItem> withReplies = [];
-                              var discussion = _bookmark.discussions
-                                  .where((discussion) {
-                                    // Filter by tapping on category headers
-                                    // If unread filter is ON
-                                    if (this._filterUnread) {
-                                      if (_toggledCategories.indexOf(_bookmark.categoryId) >= 0) {
-                                        // If unread filter is ON and category toggle is ON, display discussions
-                                        return true;
-                                      } else {
-                                        // If unread filter is ON and category toggle is OFF, display unread discussions only
-                                        return discussion.unread > 0;
-                                      }
-                                    } else {
-                                      if (_toggledCategories.indexOf(_bookmark.categoryId) >= 0) {
-                                        // If unread filter is OFF and category toggle is ON, hide discussions
-                                        return false;
-                                      }
-                                    }
-                                    // If unread filter is OFF and category toggle is OFF, show discussions
-                                    return true;
-                                  })
-                                  .map((discussion) => DiscussionListItem(discussion))
-                                  .where((discussionListItem) {
-                                    if (discussionListItem.discussion.replies > 0) {
-                                      withReplies.add(discussionListItem);
-                                      return false;
-                                    }
-                                    return true;
-                                  })
-                                  .toList();
-                              discussion.insertAll(0, withReplies);
-                              categories.add({
-                                'header': ListHeader(_bookmark.categoryName, onTap: () {
-                                  if (_toggledCategories.indexOf(_bookmark.categoryId) >= 0) {
-                                    // Hide discussions in the category
-                                    setState(() => _toggledCategories.remove(_bookmark.categoryId));
-                                  } else {
-                                    // Show discussions in the category
-                                    setState(() => _toggledCategories.add(_bookmark.categoryId));
-                                  }
-                                  this.refreshData(ERefreshData.bookmarks);
-                                }),
-                                'items': discussion
-                              });
-                            });
-                            return DataProviderResult(categories);
-                          }),
-                    ],
-                  ),
-                );
-              });
+              return BookmarksTab(filterUnread: _filterUnread, isActivated: _pageIndex == index);
             case HomePage.PAGE_MAIL:
               return CupertinoTabView(builder: (context) {
                 return CupertinoPageScaffold(
@@ -361,7 +230,10 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                             showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet(context));
                           },
                         ),
-                        middle: Text('Pošta', style: TextStyle(color: colors.text),)),
+                        middle: Text(
+                          'Pošta',
+                          style: TextStyle(color: colors.text),
+                        )),
                     child: MailboxPage(
                       refreshData: _refreshData['mail'] ?? 0,
                     ));
@@ -372,20 +244,5 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
         },
       ),
     );
-  }
-
-  // isInverted
-  // Sometimes the activeTab var is changed after the listener where we call updateLatestView() finishes.
-  // Therefore, the var activeTab needs to be handled as inverted.
-  void updateLatestView({bool isInverted: false}) {
-    DefaultView latestView = activeTab == ETabs.history ? DefaultView.history : DefaultView.bookmarks;
-    if (isInverted) {
-      latestView = activeTab == ETabs.history ? DefaultView.bookmarks : DefaultView.history;
-    }
-
-    if (_filterUnread) {
-      latestView = latestView == DefaultView.bookmarks ? DefaultView.bookmarksUnread : DefaultView.historyUnread;
-    }
-    MainRepository().settings.latestView = latestView;
   }
 }
