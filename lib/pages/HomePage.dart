@@ -7,14 +7,13 @@ import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
+import 'package:fyx/model/enums/RefreshDataEnum.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/pages/tab_bar/BookmarksTab.dart';
 import 'package:fyx/pages/tab_bar/MailboxTab.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:provider/provider.dart';
-
-enum ERefreshData { bookmarks, mail, all }
 
 class HomePageArguments {
   final pageIndex;
@@ -32,7 +31,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObserver {
   int _pageIndex = 0;
-  Map<String, int> _refreshData = {'bookmarks': 0, 'mail': 0};
+  Map<RefreshDataEnum, int> _refreshData = {RefreshDataEnum.bookmarks: 0, RefreshDataEnum.mail: 0};
   bool _filterUnread = false;
   HomePageArguments? _arguments;
 
@@ -70,7 +69,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     // If we omit the Route check, there's very rare issue during authorization
     // See: https://github.com/lucien144/fyx/issues/57
     if (state == AppLifecycleState.resumed && ModalRoute.of(context)!.isCurrent) {
-      this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? ERefreshData.mail : ERefreshData.bookmarks);
+      this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? RefreshDataEnum.mail : RefreshDataEnum.bookmarks);
     }
   }
 
@@ -82,7 +81,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   // Called when the current route has been pushed.
   void didPopNext() {
-    this.refreshData(ERefreshData.bookmarks);
+    this.refreshData(RefreshDataEnum.bookmarks);
   }
 
   void didPush() {
@@ -97,18 +96,18 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     // Called when a new route has been pushed, and the current route is no longer visible.
   }
 
-  void refreshData(ERefreshData type) {
+  void refreshData(RefreshDataEnum type) {
     setState(() {
       switch (type) {
-        case ERefreshData.bookmarks:
-          _refreshData['bookmarks'] = DateTime.now().millisecondsSinceEpoch;
+        case RefreshDataEnum.bookmarks:
+          _refreshData[RefreshDataEnum.bookmarks] = DateTime.now().millisecondsSinceEpoch;
           break;
-        case ERefreshData.mail:
-          _refreshData['mail'] = DateTime.now().millisecondsSinceEpoch;
+        case RefreshDataEnum.mail:
+          _refreshData[RefreshDataEnum.mail] = DateTime.now().millisecondsSinceEpoch;
           break;
         default:
-          _refreshData['bookmarks'] = DateTime.now().millisecondsSinceEpoch;
-          _refreshData['mail'] = DateTime.now().millisecondsSinceEpoch;
+          _refreshData[RefreshDataEnum.bookmarks] = DateTime.now().millisecondsSinceEpoch;
+          _refreshData[RefreshDataEnum.mail] = DateTime.now().millisecondsSinceEpoch;
           break;
       }
     });
@@ -162,7 +161,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
               setState(() => _filterUnread = !_filterUnread);
             }
             setState(() => _pageIndex = index);
-            this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? ERefreshData.mail : ERefreshData.bookmarks);
+            this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? RefreshDataEnum.mail : RefreshDataEnum.bookmarks);
           },
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
@@ -184,9 +183,9 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
         tabBuilder: (context, index) {
           switch (index) {
             case HomePage.PAGE_BOOKMARK:
-              return BookmarksTab(filterUnread: _filterUnread, refreshTimestamp: _refreshData['bookmarks'] ?? 0);
+              return BookmarksTab(filterUnread: _filterUnread, refreshTimestamp: _refreshData[RefreshDataEnum.bookmarks] ?? 0);
             case HomePage.PAGE_MAIL:
-              return MailboxTab(refreshTimestamp: _refreshData['mail'] ?? 0);
+              return MailboxTab(refreshTimestamp: _refreshData[RefreshDataEnum.mail] ?? 0);
             default:
               throw Exception('Selected undefined tab');
           }

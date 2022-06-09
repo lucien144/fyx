@@ -8,10 +8,9 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/BookmarkedDiscussion.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
+import 'package:fyx/model/enums/TabsEnum.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:provider/provider.dart';
-
-enum ETabs { history, bookmarks }
 
 class BookmarksTab extends StatefulWidget {
   // Unread filter toggle
@@ -29,7 +28,7 @@ class _BookmarksTabState extends State<BookmarksTab> {
   late PageController _bookmarksController;
   bool _filterUnread = false;
 
-  ETabs activeTab = ETabs.history;
+  TabsEnum activeTab = TabsEnum.history;
   List<int> _toggledCategories = [];
   int _refreshData = 0;
 
@@ -40,8 +39,8 @@ class _BookmarksTabState extends State<BookmarksTab> {
     final defaultView =
         MainRepository().settings.defaultView == DefaultView.latest ? MainRepository().settings.latestView : MainRepository().settings.defaultView;
 
-    activeTab = [DefaultView.history, DefaultView.historyUnread].indexOf(defaultView) >= 0 ? ETabs.history : ETabs.bookmarks;
-    if (activeTab == ETabs.bookmarks) {
+    activeTab = [DefaultView.history, DefaultView.historyUnread].indexOf(defaultView) >= 0 ? TabsEnum.history : TabsEnum.bookmarks;
+    if (activeTab == TabsEnum.bookmarks) {
       _bookmarksController = PageController(initialPage: 1);
     } else {
       _bookmarksController = PageController(initialPage: 0);
@@ -49,9 +48,9 @@ class _BookmarksTabState extends State<BookmarksTab> {
 
     _bookmarksController.addListener(() {
       // If the CupertinoTabView is sliding and the animation is finished, change the active tab
-      if (_bookmarksController.page! % 1 == 0 && activeTab != ETabs.values[_bookmarksController.page!.toInt()]) {
+      if (_bookmarksController.page! % 1 == 0 && activeTab != TabsEnum.values[_bookmarksController.page!.toInt()]) {
         setState(() {
-          activeTab = ETabs.values[_bookmarksController.page!.toInt()];
+          activeTab = TabsEnum.values[_bookmarksController.page!.toInt()];
         });
       }
     });
@@ -63,9 +62,9 @@ class _BookmarksTabState extends State<BookmarksTab> {
   // Sometimes the activeTab var is changed after the listener where we call updateLatestView() finishes.
   // Therefore, the var activeTab needs to be handled as inverted.
   void updateLatestView({bool isInverted: false}) {
-    DefaultView latestView = activeTab == ETabs.history ? DefaultView.history : DefaultView.bookmarks;
+    DefaultView latestView = activeTab == TabsEnum.history ? DefaultView.history : DefaultView.bookmarks;
     if (isInverted) {
-      latestView = activeTab == ETabs.history ? DefaultView.bookmarks : DefaultView.history;
+      latestView = activeTab == TabsEnum.history ? DefaultView.bookmarks : DefaultView.history;
     }
 
     if (_filterUnread) {
@@ -121,15 +120,15 @@ class _BookmarksTabState extends State<BookmarksTab> {
             middle: CupertinoSegmentedControl(
               groupValue: activeTab,
               onValueChanged: (value) {
-                _bookmarksController.animateToPage(ETabs.values.indexOf(value as ETabs),
+                _bookmarksController.animateToPage(TabsEnum.values.indexOf(value as TabsEnum),
                     duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
               },
               children: {
-                ETabs.history: Padding(
+                TabsEnum.history: Padding(
                   child: Text('Historie'),
                   padding: EdgeInsets.symmetric(horizontal: 16),
                 ),
-                ETabs.bookmarks: Padding(
+                TabsEnum.bookmarks: Padding(
                   child: Text('Sledované'),
                   padding: EdgeInsets.symmetric(horizontal: 16),
                 ),

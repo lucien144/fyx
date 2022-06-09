@@ -1,0 +1,1 @@
+enum TabsEnum { history, bookmarks }
