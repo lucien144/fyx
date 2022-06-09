@@ -83,8 +83,10 @@ class _BookmarksTabState extends State<BookmarksTab> {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.filterUnread != widget.filterUnread) {
-      setState(() => _filterUnread = widget.filterUnread);
-      setState(() => _refreshData = DateTime.now().millisecondsSinceEpoch);
+      setState(() {
+        _filterUnread = widget.filterUnread;
+        _refreshData = DateTime.now().millisecondsSinceEpoch;
+      });
     } else if (widget.isActivated && widget.isActivated != oldWidget.isActivated) {
       setState(() => _refreshData = DateTime.now().millisecondsSinceEpoch);
     }
