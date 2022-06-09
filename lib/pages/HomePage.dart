@@ -2,22 +2,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/FyxApp.dart';
-import 'package:fyx/components/Avatar.dart' as ca;
 import 'package:fyx/components/NotificationBadge.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
-import 'package:fyx/pages/MailboxPage.dart';
 import 'package:fyx/pages/tab_bar/BookmarksTab.dart';
+import 'package:fyx/pages/tab_bar/MailboxTab.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
-import 'package:fyx/theme/skin/Skin.dart';
-import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:provider/provider.dart';
 
-enum ETabs { history, bookmarks }
 enum ERefreshData { bookmarks, mail, all }
 
 class HomePageArguments {
@@ -35,14 +31,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObserver {
-  late PageController _bookmarksController;
-
-  ETabs activeTab = ETabs.history;
   int _pageIndex = 0;
   Map<String, int> _refreshData = {'bookmarks': 0, 'mail': 0};
   bool _filterUnread = false;
-  DefaultView _defaultView = DefaultView.history;
-  List<int> _toggledCategories = [];
   HomePageArguments? _arguments;
 
   @override
@@ -50,25 +41,9 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     super.initState();
     WidgetsBinding.instance?.addObserver(this);
 
-    _defaultView =
+    final defaultView =
         MainRepository().settings.defaultView == DefaultView.latest ? MainRepository().settings.latestView : MainRepository().settings.defaultView;
-    _filterUnread = [DefaultView.bookmarksUnread, DefaultView.historyUnread].indexOf(_defaultView) >= 0;
-
-    activeTab = [DefaultView.history, DefaultView.historyUnread].indexOf(_defaultView) >= 0 ? ETabs.history : ETabs.bookmarks;
-    if (activeTab == ETabs.bookmarks) {
-      _bookmarksController = PageController(initialPage: 1);
-    } else {
-      _bookmarksController = PageController(initialPage: 0);
-    }
-
-    _bookmarksController.addListener(() {
-      // If the CupertinoTabView is sliding and the animation is finished, change the active tab
-      if (_bookmarksController.page! % 1 == 0 && activeTab != ETabs.values[_bookmarksController.page!.toInt()]) {
-        setState(() {
-          activeTab = ETabs.values[_bookmarksController.page!.toInt()];
-        });
-      }
-    });
+    _filterUnread = [DefaultView.bookmarksUnread, DefaultView.historyUnread].indexOf(defaultView) >= 0;
 
     // Request for push notifications
     MainRepository().notifications.request();
@@ -85,7 +60,6 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   @override
   void dispose() {
-    _bookmarksController.dispose();
     FyxApp.routeObserver.unsubscribe(this);
     WidgetsBinding.instance?.removeObserver(this);
     super.dispose();
@@ -168,8 +142,6 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   @override
   Widget build(BuildContext context) {
-    SkinColors colors = Skin.of(context).theme.colors;
-
     if (ApiController().buildContext == null || ApiController().buildContext.hashCode != context.hashCode) {
       ApiController().buildContext = context;
     }
@@ -187,11 +159,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
           currentIndex: _pageIndex,
           onTap: (index) {
             if (_pageIndex == index && index == HomePage.PAGE_BOOKMARK) {
-              setState(() {
-                _filterUnread = !_filterUnread;
-                // Reset the category toggle
-                _toggledCategories = [];
-              });
+              setState(() => _filterUnread = !_filterUnread);
             }
             setState(() => _pageIndex = index);
             this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? ERefreshData.mail : ERefreshData.bookmarks);
@@ -216,28 +184,9 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
         tabBuilder: (context, index) {
           switch (index) {
             case HomePage.PAGE_BOOKMARK:
-              return BookmarksTab(filterUnread: _filterUnread, isActivated: _pageIndex == index);
+              return BookmarksTab(filterUnread: _filterUnread, refreshTimestamp: _refreshData['bookmarks'] ?? 0);
             case HomePage.PAGE_MAIL:
-              return CupertinoTabView(builder: (context) {
-                return CupertinoPageScaffold(
-                    navigationBar: CupertinoNavigationBar(
-                        trailing: GestureDetector(
-                          child: ca.Avatar(
-                            MainRepository().credentials!.avatar,
-                            size: 26,
-                          ),
-                          onTap: () {
-                            showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet(context));
-                          },
-                        ),
-                        middle: Text(
-                          'Pošta',
-                          style: TextStyle(color: colors.text),
-                        )),
-                    child: MailboxPage(
-                      refreshData: _refreshData['mail'] ?? 0,
-                    ));
-              });
+              return MailboxTab(refreshTimestamp: _refreshData['mail'] ?? 0);
             default:
               throw Exception('Selected undefined tab');
           }

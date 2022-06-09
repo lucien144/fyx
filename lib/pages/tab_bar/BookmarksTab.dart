@@ -9,17 +9,17 @@ import 'package:fyx/model/BookmarkedDiscussion.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
-import 'package:fyx/pages/HomePage.dart';
 import 'package:provider/provider.dart';
+
+enum ETabs { history, bookmarks }
 
 class BookmarksTab extends StatefulWidget {
   // Unread filter toggle
   final bool filterUnread;
 
-  // Boolean to refresh data only if the BookmarksTab is activated on the screen
-  final bool isActivated;
+  final int refreshTimestamp;
 
-  const BookmarksTab({Key? key, this.filterUnread = false, this.isActivated = false}) : super(key: key);
+  const BookmarksTab({Key? key, this.filterUnread = false, this.refreshTimestamp = 0}) : super(key: key);
 
   @override
   State<BookmarksTab> createState() => _BookmarksTabState();
@@ -28,23 +28,19 @@ class BookmarksTab extends StatefulWidget {
 class _BookmarksTabState extends State<BookmarksTab> {
   late PageController _bookmarksController;
   bool _filterUnread = false;
-  bool _isActivated = false;
 
   ETabs activeTab = ETabs.history;
-  DefaultView _defaultView = DefaultView.history;
   List<int> _toggledCategories = [];
   int _refreshData = 0;
 
   @override
   void initState() {
     _filterUnread = widget.filterUnread;
-    _isActivated = widget.isActivated;
 
-    _defaultView =
+    final defaultView =
         MainRepository().settings.defaultView == DefaultView.latest ? MainRepository().settings.latestView : MainRepository().settings.defaultView;
-    _filterUnread = widget.filterUnread;
 
-    activeTab = [DefaultView.history, DefaultView.historyUnread].indexOf(_defaultView) >= 0 ? ETabs.history : ETabs.bookmarks;
+    activeTab = [DefaultView.history, DefaultView.historyUnread].indexOf(defaultView) >= 0 ? ETabs.history : ETabs.bookmarks;
     if (activeTab == ETabs.bookmarks) {
       _bookmarksController = PageController(initialPage: 1);
     } else {
@@ -85,11 +81,19 @@ class _BookmarksTabState extends State<BookmarksTab> {
     if (oldWidget.filterUnread != widget.filterUnread) {
       setState(() {
         _filterUnread = widget.filterUnread;
+        _toggledCategories = [];
         _refreshData = DateTime.now().millisecondsSinceEpoch;
       });
-    } else if (widget.isActivated && widget.isActivated != oldWidget.isActivated) {
+      this.updateLatestView();
+    } else if (widget.refreshTimestamp > oldWidget.refreshTimestamp) {
       setState(() => _refreshData = DateTime.now().millisecondsSinceEpoch);
     }
+  }
+
+  @override
+  void dispose() {
+    _bookmarksController.dispose();
+    super.dispose();
   }
 
   @override
