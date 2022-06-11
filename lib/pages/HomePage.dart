@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:fyx/FyxApp.dart';
+import 'package:fyx/components/Avatar.dart';
 import 'package:fyx/components/NotificationBadge.dart';
+import 'package:fyx/components/bottom_tab_bar.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
@@ -11,8 +12,6 @@ import 'package:fyx/model/enums/RefreshDataEnum.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/pages/tab_bar/BookmarksTab.dart';
 import 'package:fyx/pages/tab_bar/MailboxTab.dart';
-import 'package:fyx/theme/L.dart';
-import 'package:fyx/theme/T.dart';
 import 'package:provider/provider.dart';
 
 class HomePageArguments {
@@ -33,6 +32,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
   int _pageIndex = 0;
   Map<RefreshDataEnum, int> _refreshData = {RefreshDataEnum.bookmarks: 0, RefreshDataEnum.mail: 0};
   bool _filterUnread = false;
+  bool _showSubmenu = false;
   HomePageArguments? _arguments;
 
   @override
@@ -66,6 +66,8 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    setState(() => _showSubmenu = false);
+
     // If we omit the Route check, there's very rare issue during authorization
     // See: https://github.com/lucien144/fyx/issues/57
     if (state == AppLifecycleState.resumed && ModalRoute.of(context)!.isCurrent) {
@@ -92,8 +94,9 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     // Called when the current route has been popped off.
   }
 
+  // Called when a new route has been pushed, and the current route is no longer visible.
   void didPushNext() {
-    // Called when a new route has been pushed, and the current route is no longer visible.
+    setState(() => _showSubmenu = false);
   }
 
   void refreshData(RefreshDataEnum type) {
@@ -113,32 +116,6 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     });
   }
 
-  Widget actionSheet(BuildContext context) {
-    return CupertinoActionSheet(
-        title: Text('Přihlášen jako: ${MainRepository().credentials!.nickname}'),
-        actions: <Widget>[
-          CupertinoActionSheetAction(
-              child: Text(L.SETTINGS),
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context, rootNavigator: true).pushNamed('/settings');
-              }),
-          CupertinoActionSheetAction(
-              child: Text('⚠️ ${L.SETTINGS_BUGREPORT}'),
-              onPressed: () {
-                T.prefillGithubIssue(appContext: MainRepository(), user: MainRepository().credentials!.nickname);
-                AnalyticsProvider().logEvent('reportBug');
-              }),
-        ],
-        cancelButton: CupertinoActionSheetAction(
-          isDefaultAction: true,
-          child: Text(L.GENERAL_CANCEL),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ));
-  }
-
   @override
   Widget build(BuildContext context) {
     if (ApiController().buildContext == null || ApiController().buildContext.hashCode != context.hashCode) {
@@ -151,46 +128,55 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
       _pageIndex = _arguments?.pageIndex;
     }
 
+    final tabs = [
+      BookmarksTab(filterUnread: _filterUnread, refreshTimestamp: _refreshData[RefreshDataEnum.bookmarks] ?? 0),
+      MailboxTab(refreshTimestamp: _refreshData[RefreshDataEnum.mail] ?? 0),
+    ];
+
+    final double bottomPadding = MediaQuery.of(context).padding.bottom;
+
     return WillPopScope(
       onWillPop: () async => false,
-      child: CupertinoTabScaffold(
-        tabBar: CupertinoTabBar(
-          currentIndex: _pageIndex,
-          onTap: (index) {
-            if (_pageIndex == index && index == HomePage.PAGE_BOOKMARK) {
-              setState(() => _filterUnread = !_filterUnread);
-            }
-            setState(() => _pageIndex = index);
-            this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? RefreshDataEnum.mail : RefreshDataEnum.bookmarks);
-          },
-          items: <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(_filterUnread ? Icons.bookmarks : Icons.bookmarks_outlined, size: 34),
-            ),
-            BottomNavigationBarItem(
-              icon: Consumer<NotificationsModel>(
+      child: Stack(children: [
+        Positioned.fill(
+          child: GestureDetector(
+            child: tabs[_pageIndex],
+            onVerticalDragDown: (_) => _showSubmenu ? setState(() => _showSubmenu = false) : null,
+          ),
+          bottom: 50 + bottomPadding,
+        ),
+        Positioned.fill(
+          child: BottomTabBar(
+            activeSubmenu: _showSubmenu,
+            onTap: (index) {
+              if (index == tabs.length) {
+                setState(() => _showSubmenu = !_showSubmenu);
+                return;
+              }
+
+              if (_pageIndex == index && index == HomePage.PAGE_BOOKMARK) {
+                setState(() => _filterUnread = !_filterUnread);
+              }
+              setState(() {
+                _pageIndex = index;
+                _showSubmenu = false;
+              });
+              this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? RefreshDataEnum.mail : RefreshDataEnum.bookmarks);
+            },
+            items: [
+              Icon(_filterUnread ? Icons.bookmarks : Icons.bookmarks_outlined,
+                  size: 34, color: _pageIndex == 0 ? null : CupertinoColors.inactiveGray),
+              Consumer<NotificationsModel>(
                 builder: (context, notifications, child) => NotificationBadge(
-                    widget: Icon(
-                      Icons.email_outlined,
-                      size: 42,
-                    ),
+                    widget: Icon(Icons.email_outlined, size: 42, color: _pageIndex == 1 ? null : CupertinoColors.inactiveGray),
                     counter: notifications.newMails,
                     isVisible: notifications.newMails > 0),
               ),
-            ),
-          ],
-        ),
-        tabBuilder: (context, index) {
-          switch (index) {
-            case HomePage.PAGE_BOOKMARK:
-              return BookmarksTab(filterUnread: _filterUnread, refreshTimestamp: _refreshData[RefreshDataEnum.bookmarks] ?? 0);
-            case HomePage.PAGE_MAIL:
-              return MailboxTab(refreshTimestamp: _refreshData[RefreshDataEnum.mail] ?? 0);
-            default:
-              throw Exception('Selected undefined tab');
-          }
-        },
-      ),
+              Center(child: Avatar(MainRepository().credentials!.avatar, size: 32))
+            ],
+          ),
+        )
+      ]),
     );
   }
 }

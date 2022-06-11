@@ -14,20 +14,27 @@ class Avatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SkinColors colors = Skin.of(context).theme.colors;
-    return Container(
-        padding: EdgeInsets.all(2),
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(3), color: isHighlighted ? colors.highlight : Colors.transparent),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(3),
-          child: CachedNetworkImage(
-            imageUrl: url,
-            fit: BoxFit.cover,
-            placeholder: (context, url) => CupertinoActivityIndicator(),
-            errorWidget: (context, url, error) => Icon(Icons.error),
-            width: size,
-            height: size * (50 / 40),
-          ),
-        ));
+    final SkinColors colors = Skin.of(context).theme.colors;
+    final width = size;
+    final height = width * (50 / 40);
+
+    return SizedBox(
+      width: width,
+      height: height,
+      child: Container(
+          padding: EdgeInsets.all(2),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(3), color: isHighlighted ? colors.highlight : Colors.transparent),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(3),
+            child: CachedNetworkImage(
+              imageUrl: url,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => CupertinoActivityIndicator(),
+              errorWidget: (context, url, error) => Icon(Icons.error),
+              width: width,
+              height: height,
+            ),
+          )),
+    );
   }
 }

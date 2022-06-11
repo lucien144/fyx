@@ -100,11 +100,6 @@ class _BookmarksTabState extends State<BookmarksTab> {
     return CupertinoTabView(builder: (context) {
       return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
-            trailing: GestureDetector(
-                child: Icon(Icons.settings),
-                onTap: () {
-                  Navigator.of(context, rootNavigator: true).pushNamed('/settings');
-                }),
             leading: Consumer<NotificationsModel>(
                 builder: (context, notifications, child) => NotificationBadge(
                     widget: CupertinoButton(
