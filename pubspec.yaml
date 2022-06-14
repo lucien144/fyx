@@ -55,6 +55,7 @@ dependencies:
   path_provider: 2.0.9
   permission_handler: 9.2.0
   scroll_to_index: any
+  flutter_riverpod: ^2.0.0-dev.4
 
   # Dart-lang core plugins 👇
   http_parser: ^4.0.0

@@ -5,7 +5,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'package:fyx/components/SearchBox.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/FirstUnreadEnum.dart';
 import 'package:fyx/theme/L.dart';
@@ -19,13 +21,24 @@ import 'package:sentry/sentry.dart';
 class PullToRefreshList extends StatefulWidget {
   final TDataProvider dataProvider;
   final Function? sliverListBuilder;
+  final ValueChanged? onSearch;
+  final VoidCallback? onSearchClear;
+  final StateProvider<String?>? searchProvider;
+  final Widget? pinnedWidget;
   bool _disabled;
   bool _isInfinite;
   int _rebuild;
-  final Widget? pinnedWidget;
 
   PullToRefreshList(
-      {required this.dataProvider, isInfinite = false, int rebuild = 0, this.sliverListBuilder, bool disabled = false, this.pinnedWidget})
+      {required this.dataProvider,
+      this.onSearch,
+      this.onSearchClear,
+      this.searchProvider,
+      isInfinite = false,
+      int rebuild = 0,
+      this.sliverListBuilder,
+      bool disabled = false,
+      this.pinnedWidget})
       : _isInfinite = isInfinite,
         _rebuild = rebuild,
         _disabled = disabled,
@@ -128,6 +141,12 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
         Column(
           mainAxisSize: MainAxisSize.max,
           children: [
+            if (widget.searchProvider != null)
+              SearchBox(
+                onSearch: widget.onSearch,
+                onClear: widget.onSearchClear,
+                provider: widget.searchProvider!,
+              ),
             Expanded(
               child: NotificationListener<ScrollNotification>(
                 onNotification: (ScrollNotification scrollInfo) {

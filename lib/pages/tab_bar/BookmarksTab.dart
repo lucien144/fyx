@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fyx/components/DiscussionListItem.dart';
 import 'package:fyx/components/ListHeader.dart';
 import 'package:fyx/components/NotificationBadge.dart';
@@ -10,9 +11,15 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
 import 'package:fyx/model/enums/TabsEnum.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
-import 'package:provider/provider.dart';
+import 'package:fyx/model/reponses/BookmarksHistoryResponse.dart';
+import 'package:provider/provider.dart' as provider;
 
-class BookmarksTab extends StatefulWidget {
+final searchHistoryProvider = StateProvider<String?>(
+  // We return the default sort type, here name.
+  (ref) => null,
+);
+
+class BookmarksTab extends ConsumerStatefulWidget {
   // Unread filter toggle
   final bool filterUnread;
 
@@ -21,10 +28,10 @@ class BookmarksTab extends StatefulWidget {
   const BookmarksTab({Key? key, this.filterUnread = false, this.refreshTimestamp = 0}) : super(key: key);
 
   @override
-  State<BookmarksTab> createState() => _BookmarksTabState();
+  _BookmarksTabState createState() => _BookmarksTabState();
 }
 
-class _BookmarksTabState extends State<BookmarksTab> {
+class _BookmarksTabState extends ConsumerState<BookmarksTab> {
   late PageController _bookmarksController;
   bool _filterUnread = false;
 
@@ -81,12 +88,16 @@ class _BookmarksTabState extends State<BookmarksTab> {
       setState(() {
         _filterUnread = widget.filterUnread;
         _toggledCategories = [];
-        _refreshData = DateTime.now().millisecondsSinceEpoch;
       });
+      this.refreshData();
       this.updateLatestView();
     } else if (widget.refreshTimestamp > oldWidget.refreshTimestamp) {
-      setState(() => _refreshData = DateTime.now().millisecondsSinceEpoch);
+      this.refreshData();
     }
+  }
+
+  refreshData() {
+    setState(() => _refreshData = DateTime.now().millisecondsSinceEpoch);
   }
 
   @override
@@ -100,7 +111,10 @@ class _BookmarksTabState extends State<BookmarksTab> {
     return CupertinoTabView(builder: (context) {
       return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
-            leading: Consumer<NotificationsModel>(
+            trailing: GestureDetector(
+                child: Icon(Icons.search),
+                onTap: () => ref.read(searchHistoryProvider.notifier).state = ref.read(searchHistoryProvider.notifier).state == null ? '' : null),
+            leading: provider.Consumer<NotificationsModel>(
                 builder: (context, notifications, child) => NotificationBadge(
                     widget: CupertinoButton(
                         padding: EdgeInsets.zero,
@@ -139,12 +153,18 @@ class _BookmarksTabState extends State<BookmarksTab> {
             // -----
             PullToRefreshList(
                 rebuild: _refreshData,
+                searchProvider: searchHistoryProvider,
+                onSearch: (term) => this.refreshData(),
+                onSearchClear: () => this.refreshData(),
                 dataProvider: (lastId) async {
                   List<DiscussionListItem> withReplies = [];
-                  var result = await ApiController().loadHistory();
+                  String? searchTerm = ref.read(searchHistoryProvider.notifier).state;
+                  BookmarksHistoryResponse result = await ApiController().loadHistory();
+
                   var data = result.discussions
                       .map((discussion) => BookmarkedDiscussion.fromJson(discussion))
                       .where((discussion) => this._filterUnread ? discussion.unread > 0 : true)
+                      .where((discussion) => searchTerm != null ? discussion.name.contains(RegExp(searchTerm, caseSensitive: false)) : true)
                       .map((discussion) => DiscussionListItem(discussion))
                       .where((discussionListItem) {
                     if (discussionListItem.discussion.replies > 0) {
@@ -207,7 +227,7 @@ class _BookmarksTabState extends State<BookmarksTab> {
                           // Show discussions in the category
                           setState(() => _toggledCategories.add(_bookmark.categoryId));
                         }
-                        setState(() => _refreshData = DateTime.now().millisecondsSinceEpoch);
+                        this.refreshData();
                       }),
                       'items': discussion
                     });
