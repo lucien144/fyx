@@ -21,6 +21,7 @@ import 'package:sentry/sentry.dart';
 class PullToRefreshList extends StatefulWidget {
   final TDataProvider dataProvider;
   final Function? sliverListBuilder;
+  final String? searchLabel;
   final ValueChanged? onSearch;
   final VoidCallback? onSearchClear;
   final StateProvider<String?>? searchProvider;
@@ -34,6 +35,7 @@ class PullToRefreshList extends StatefulWidget {
       this.onSearch,
       this.onSearchClear,
       this.searchProvider,
+      this.searchLabel,
       isInfinite = false,
       int rebuild = 0,
       this.sliverListBuilder,
@@ -143,6 +145,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
           children: [
             if (widget.searchProvider != null)
               SearchBox(
+                label: widget.searchLabel,
                 onSearch: widget.onSearch,
                 onClear: widget.onSearchClear,
                 provider: widget.searchProvider!,

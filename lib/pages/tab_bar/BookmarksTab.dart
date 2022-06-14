@@ -153,6 +153,7 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
             // -----
             PullToRefreshList(
                 rebuild: _refreshData,
+                searchLabel: 'Filtruj kluby v historii...',
                 searchProvider: searchHistoryProvider,
                 onSearch: (term) => this.refreshData(),
                 onSearchClear: () => this.refreshData(),

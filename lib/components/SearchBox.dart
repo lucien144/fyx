@@ -5,11 +5,12 @@ import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 
 class SearchBox extends ConsumerStatefulWidget {
+  final String? label;
   final ValueChanged? onSearch;
   final VoidCallback? onClear;
   final StateProvider<String?> provider;
 
-  SearchBox({Key? key, this.onSearch, this.onClear, required this.provider}) : super(key: key);
+  SearchBox({Key? key, this.onSearch, this.onClear, required this.provider, this.label = 'Hledej'}) : super(key: key);
 
   @override
   _SearchBoxState createState() => _SearchBoxState();
@@ -25,8 +26,7 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
     super.initState();
 
     searchController.text = ref.read(widget.provider.notifier).state ?? '';
-    searchAnimation = AnimationController(
-        duration: const Duration(milliseconds: 700), vsync: this, value: ref.read(widget.provider.notifier).state == null ? 0 : 1);
+    searchAnimation = AnimationController(vsync: this, value: ref.read(widget.provider.notifier).state == null ? 0 : 1);
   }
 
   @override
@@ -34,9 +34,17 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
     SkinColors colors = Skin.of(context).theme.colors;
     ref.listen<String?>(widget.provider, (_prev, _new) {
       if (_new == null) {
-        searchAnimation.reverse();
+        searchAnimation.animateTo(
+          0,
+          curve: Curves.easeOutExpo,
+          duration: const Duration(milliseconds: 600),
+        );
       } else {
-        searchAnimation.forward();
+        searchAnimation.animateTo(
+          1,
+          curve: Curves.easeOutExpo,
+          duration: const Duration(milliseconds: 600),
+        );
       }
     });
 
@@ -48,7 +56,7 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           child: CupertinoSearchTextField(
-            placeholder: 'Hledej',
+            placeholder: widget.label,
             controller: searchController,
             onSubmitted: (term) {
               ref.read(widget.provider.notifier).state = term;
