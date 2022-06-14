@@ -127,7 +127,13 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            SizedBox(),
+            if (widget.searchProvider != null)
+              SearchBox(
+                label: widget.searchLabel,
+                onSearch: widget.onSearch,
+                onClear: widget.onSearchClear,
+                provider: widget.searchProvider!,
+              ),
             Text(
               L.GENERAL_EMPTY,
               textAlign: TextAlign.center,
