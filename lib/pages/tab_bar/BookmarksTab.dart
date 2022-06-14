@@ -112,7 +112,7 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
       return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
             trailing: GestureDetector(
-                child: Icon(Icons.search),
+                child: ref.watch(searchHistoryProvider) == null ? Icon(Icons.search) : Icon(Icons.search_off),
                 onTap: () => ref.read(searchHistoryProvider.notifier).state = ref.read(searchHistoryProvider.notifier).state == null ? '' : null),
             leading: provider.Consumer<NotificationsModel>(
                 builder: (context, notifications, child) => NotificationBadge(
