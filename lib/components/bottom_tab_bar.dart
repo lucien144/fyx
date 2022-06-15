@@ -42,6 +42,18 @@ class _BottomTabBarState extends State<BottomTabBar> {
                       onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/settings'),
                       child: Column(
                         children: [
+                          Icon(Icons.search, size: 34, color: CupertinoColors.inactiveGray),
+                          Text(
+                            'Hledání příspěvků',
+                            style: TextStyle(fontSize: 12, color: CupertinoColors.inactiveGray),
+                          )
+                        ],
+                      ))),
+              Expanded(
+                  child: GestureDetector(
+                      onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/settings'),
+                      child: Column(
+                        children: [
                           Icon(Icons.settings, size: 34, color: CupertinoColors.inactiveGray),
                           Text(
                             'Nastavení',

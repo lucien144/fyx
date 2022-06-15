@@ -105,6 +105,10 @@ class ApiProvider implements IApiProvider {
     return await dio.post('$URL/register_for_notifications/${_credentials?.token}/$client/$token');
   }
 
+  Future<Response> searchDiscussions(String term) async {
+    return await dio.get('$URL/search/unified?search=$term&limit=100');
+  }
+
   Future<Response> fetchBookmarks() async {
     return await dio.get('$URL/bookmarks/all');
   }

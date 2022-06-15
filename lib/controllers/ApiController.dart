@@ -23,6 +23,7 @@ import 'package:fyx/model/reponses/MailResponse.dart';
 import 'package:fyx/model/reponses/OkResponse.dart';
 import 'package:fyx/model/reponses/PostRatingsResponse.dart';
 import 'package:fyx/model/reponses/RatingResponse.dart';
+import 'package:fyx/model/reponses/UnifiedSearchResponse.dart';
 import 'package:fyx/model/reponses/WaitingFilesResponse.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
@@ -167,6 +168,11 @@ class ApiController {
   Future<BookmarksAllResponse> loadBookmarks() async {
     var response = await provider.fetchBookmarks();
     return BookmarksAllResponse.fromJson(response.data);
+  }
+
+  Future<UnifiedSearchResponse> searchDiscussions(String term) async {
+    var response = await provider.searchDiscussions(term);
+    return UnifiedSearchResponse.fromJson(response.data);
   }
 
   Future<DiscussionResponse> loadDiscussion(int id, {int? lastId, String? user, String? search}) async {

@@ -5,6 +5,7 @@ import 'package:fyx/components/DiscussionListItem.dart';
 import 'package:fyx/components/ListHeader.dart';
 import 'package:fyx/components/NotificationBadge.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
+import 'package:fyx/components/discussion_search_list_item.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/BookmarkedDiscussion.dart';
 import 'package:fyx/model/MainRepository.dart';
@@ -12,9 +13,16 @@ import 'package:fyx/model/enums/DefaultView.dart';
 import 'package:fyx/model/enums/TabsEnum.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/model/reponses/BookmarksHistoryResponse.dart';
+import 'package:fyx/theme/L.dart';
+import 'package:fyx/theme/T.dart';
 import 'package:provider/provider.dart' as provider;
 
 final searchHistoryProvider = StateProvider<String?>(
+  // We return the default sort type, here name.
+  (ref) => null,
+);
+
+final searchBookmarksProvider = StateProvider<String?>(
   // We return the default sort type, here name.
   (ref) => null,
 );
@@ -111,9 +119,28 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
     return CupertinoTabView(builder: (context) {
       return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
-            trailing: GestureDetector(
-                child: ref.watch(searchHistoryProvider) == null ? Icon(Icons.search) : Icon(Icons.search_off),
-                onTap: () => ref.read(searchHistoryProvider.notifier).state = ref.read(searchHistoryProvider.notifier).state == null ? '' : null),
+            trailing: GestureDetector(child: (() {
+              if (activeTab == TabsEnum.history) {
+                return ref.watch(searchHistoryProvider) == null ? Icon(Icons.filter_alt_outlined) : Icon(Icons.filter_alt);
+              }
+              return ref.watch(searchBookmarksProvider) == null ? Icon(Icons.search) : Icon(Icons.search_off);
+            })(), onTap: () {
+              if (activeTab == TabsEnum.history) {
+                if (ref.read(searchHistoryProvider.notifier).state == null) {
+                  ref.read(searchHistoryProvider.notifier).state = ''; // Open the searchbox
+                } else {
+                  ref.read(searchHistoryProvider.notifier).state = null; // Close the searchbox
+                  this.refreshData(); // ... and reset the List
+                }
+              } else {
+                if (ref.read(searchBookmarksProvider.notifier).state == null) {
+                  ref.read(searchBookmarksProvider.notifier).state = ''; // Open the searchbox
+                } else {
+                  ref.read(searchBookmarksProvider.notifier).state = null; // Close the searchbox
+                  this.refreshData(); // ... and reset the List
+                }
+              }
+            }),
             leading: provider.Consumer<NotificationsModel>(
                 builder: (context, notifications, child) => NotificationBadge(
                     widget: CupertinoButton(
@@ -182,10 +209,32 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
             // -----
             PullToRefreshList(
                 rebuild: _refreshData,
+                searchLabel: 'Hledej diskuze, události a inzeráty...',
+                searchProvider: searchBookmarksProvider,
+                onSearch: (term) => this.refreshData(),
+                onSearchClear: () => this.refreshData(),
                 dataProvider: (lastId) async {
                   var categories = [];
-                  var result = await ApiController().loadBookmarks();
 
+                  try {
+                    if (ref.read(searchBookmarksProvider.notifier).state != null && ref.read(searchBookmarksProvider.notifier).state != '') {
+                      if (ref.read(searchBookmarksProvider.notifier).state!.length < 3) {
+                        T.warn('Zkus hledat víc jak 3 znaky...');
+                      } else {
+                        final term = ref.read(searchBookmarksProvider.notifier).state;
+                        final result = await ApiController().searchDiscussions(term!);
+                        result.discussion.forEach((type, list) {
+                          categories.add({
+                            'header': ListHeader(L.search[type] ?? ''),
+                            'items': list.map((model) => DiscussionSearchListItem(discussionId: model.id, child: Text(model.discussionName))).toList()
+                          });
+                        });
+                        return DataProviderResult(categories);
+                      }
+                    }
+                  } catch (error) {}
+
+                  var result = await ApiController().loadBookmarks();
                   result.bookmarks.forEach((_bookmark) {
                     List<DiscussionListItem> withReplies = [];
                     var discussion = _bookmark.discussions

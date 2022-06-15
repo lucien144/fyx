@@ -34,6 +34,7 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
     SkinColors colors = Skin.of(context).theme.colors;
     ref.listen<String?>(widget.provider, (_prev, _new) {
       if (_new == null) {
+        searchController.clear();
         searchAnimation.animateTo(
           0,
           curve: Curves.easeOutExpo,

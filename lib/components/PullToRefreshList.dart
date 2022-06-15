@@ -117,7 +117,19 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
     }
 
     if (_hasError) {
-      return T.feedbackScreen(context, isLoading: _isLoading, onPress: loadData, label: L.GENERAL_REFRESH);
+      return Container(
+          height: double.infinity,
+          width: double.infinity,
+          child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            if (widget.searchProvider != null)
+              SearchBox(
+                label: widget.searchLabel,
+                onSearch: widget.onSearch,
+                onClear: widget.onSearchClear,
+                provider: widget.searchProvider!,
+              ),
+            Expanded(child: T.feedbackScreen(context, isLoading: _isLoading, onPress: loadData, label: L.GENERAL_REFRESH)),
+          ]));
     }
 
     if (_slivers.length == 1 && !_isLoading) {

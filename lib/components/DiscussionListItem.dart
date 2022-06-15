@@ -2,8 +2,8 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fyx/components/discussion_list_item_base.dart';
 import 'package:fyx/model/BookmarkedDiscussion.dart';
-import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 
@@ -16,11 +16,8 @@ class DiscussionListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     SkinColors colors = Skin.of(context).theme.colors;
 
-    return GestureDetector(
-      onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/discussion', arguments: DiscussionPageArguments(discussion.idKlub)),
-      child: Container(
-        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.grey.withOpacity(.12)))),
-        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+    return DiscussionListItemBase(
+        discussionId: this.discussion.idKlub,
         child: Row(
           children: <Widget>[
             discussion.unread == 0
@@ -46,16 +43,10 @@ class DiscussionListItem extends StatelessWidget {
             SizedBox(
               width: 8,
             ),
-            Expanded(
-                child: Text(
-              discussion.name,
-              overflow: TextOverflow.ellipsis
-            )),
+            Expanded(child: Text(discussion.name, overflow: TextOverflow.ellipsis)),
             Visibility(visible: discussion.links > 0, child: Icon(Icons.link)),
             Visibility(visible: discussion.images > 0, child: Icon(Icons.image)),
           ],
-        ),
-      ),
-    );
+        ));
   }
 }
