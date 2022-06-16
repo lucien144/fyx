@@ -19,14 +19,22 @@ class SearchBox extends ConsumerStatefulWidget {
 class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateMixin {
   String searchTerm = '';
   late AnimationController searchAnimation;
+  late FocusNode focus;
   TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
 
+    focus = FocusNode();
     searchController.text = ref.read(widget.provider.notifier).state ?? '';
     searchAnimation = AnimationController(vsync: this, value: ref.read(widget.provider.notifier).state == null ? 0 : 1);
+  }
+
+  @override
+  void dispose() {
+    focus.dispose();
+    super.dispose();
   }
 
   @override
@@ -40,12 +48,14 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
           curve: Curves.easeOutExpo,
           duration: const Duration(milliseconds: 600),
         );
+        focus.unfocus();
       } else {
         searchAnimation.animateTo(
           1,
           curve: Curves.easeOutExpo,
           duration: const Duration(milliseconds: 600),
         );
+        focus.requestFocus();
       }
     });
 
@@ -57,6 +67,7 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           child: CupertinoSearchTextField(
+            focusNode: focus,
             placeholder: widget.label,
             controller: searchController,
             onSubmitted: (term) {
