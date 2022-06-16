@@ -1,3 +1,4 @@
+import 'package:diacritic/diacritic.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -192,15 +193,23 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
                   var data = result.discussions
                       .map((discussion) => BookmarkedDiscussion.fromJson(discussion))
                       .where((discussion) => this._filterUnread ? discussion.unread > 0 : true)
-                      .where((discussion) => searchTerm != null ? discussion.name.contains(RegExp(searchTerm, caseSensitive: false)) : true)
+                      .where((discussion) {
+                        if (searchTerm != null) {
+                          final slugNeedle = removeDiacritics(searchTerm);
+                          final slugHaystack = removeDiacritics(discussion.name);
+                          return slugHaystack.contains(RegExp(slugNeedle, caseSensitive: false));
+                        }
+                        return true;
+                      })
                       .map((discussion) => DiscussionListItem(discussion))
                       .where((discussionListItem) {
-                    if (discussionListItem.discussion.replies > 0) {
-                      withReplies.add(discussionListItem);
-                      return false;
-                    }
-                    return true;
-                  }).toList();
+                        if (discussionListItem.discussion.replies > 0) {
+                          withReplies.add(discussionListItem);
+                          return false;
+                        }
+                        return true;
+                      })
+                      .toList();
                   data.insertAll(0, withReplies);
                   return DataProviderResult(data);
                 }),
