@@ -183,31 +183,22 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return TapCanvas(
-      child: GestureDetector(
-        onTap: () {
-          // Hide the keyboard on tap
-          FocusScopeNode currentFocus = FocusScope.of(context);
-          if (!currentFocus.hasPrimaryFocus) {
-            currentFocus.unfocus();
-          }
-        },
-        child: MultiProvider(
-          providers: [
-            ChangeNotifierProvider<NotificationsModel>(create: (context) => NotificationsModel()),
-            ChangeNotifierProvider<ThemeModel>(create: (context) => ThemeModel(MainRepository().settings.theme)),
-          ],
-          builder: (ctx, widget) => Directionality(
-              textDirection: TextDirection.ltr,
-              child: Skin(
-                  skin: FyxSkin.create(),
-                  brightness: (() {
-                    if (ctx.watch<ThemeModel>().theme == ThemeEnum.system && _platformBrightness != null) {
-                      return _platformBrightness!;
-                    }
-                    return ctx.watch<ThemeModel>().theme == ThemeEnum.light ? Brightness.light : Brightness.dark;
-                  })(),
-                  child: SkinnedApp())),
-        ),
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider<NotificationsModel>(create: (context) => NotificationsModel()),
+          ChangeNotifierProvider<ThemeModel>(create: (context) => ThemeModel(MainRepository().settings.theme)),
+        ],
+        builder: (ctx, widget) => Directionality(
+            textDirection: TextDirection.ltr,
+            child: Skin(
+                skin: FyxSkin.create(),
+                brightness: (() {
+                  if (ctx.watch<ThemeModel>().theme == ThemeEnum.system && _platformBrightness != null) {
+                    return _platformBrightness!;
+                  }
+                  return ctx.watch<ThemeModel>().theme == ThemeEnum.light ? Brightness.light : Brightness.dark;
+                })(),
+                child: SkinnedApp())),
       ),
     );
   }
