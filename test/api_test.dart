@@ -192,6 +192,12 @@ class ApiMock implements IApiProvider {
     // TODO: implement getPostRatings
     throw UnimplementedError();
   }
+
+  @override
+  Future<Response> bookmarkDiscussion(int id, bool state) {
+    // TODO: implement getPostRatings
+    throw UnimplementedError();
+  }
 }
 
 void main() {

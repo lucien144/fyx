@@ -175,6 +175,10 @@ class ApiController {
     return UnifiedSearchResponse.fromJson(response.data);
   }
 
+  Future<Response> bookmarkDiscussion(int discussionId, bool state) async {
+    return await provider.bookmarkDiscussion(discussionId, state);
+  }
+
   Future<DiscussionResponse> loadDiscussion(int id, {int? lastId, String? user, String? search}) async {
     try {
       var response = await provider.fetchDiscussion(id, lastId: lastId, user: user, search: search);

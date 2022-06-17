@@ -122,6 +122,11 @@ class ApiProvider implements IApiProvider {
     return await dio.get('$URL/discussion/$discussionId', queryParameters: params);
   }
 
+  Future<Response> bookmarkDiscussion(int discussionId, bool state) async {
+    Map<String, dynamic> params = {'new_state': state};
+    return await dio.post('$URL/discussion/$discussionId/bookmark', queryParameters: params);
+  }
+
   Future<Response> fetchDiscussionHome(int id) async {
     FormData formData = new FormData.fromMap(
         {'auth_nick': _credentials?.nickname, 'auth_token': _credentials?.token, 'l': 'discussion', 'l2': 'home', 'id_klub': id});

@@ -169,19 +169,21 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
                 provider: widget.searchProvider!,
               ),
             Expanded(
-              child: NotificationListener<ScrollNotification>(
-                onNotification: (ScrollNotification scrollInfo) {
-                  // Hide the jump to first unread button if user scrolls twice the height of the screen height
-                  if (scrollInfo.metrics.pixels > 2 * MediaQuery.of(context).size.height) {
-                    slideController.reverse();
-                  }
+              child: NotificationListener(
+                onNotification: (scrollInfo) {
+                  if (scrollInfo is ScrollNotification) {
+                    // Hide the jump to first unread button if user scrolls twice the height of the screen height
+                    if (scrollInfo.metrics.pixels > 2 * MediaQuery.of(context).size.height) {
+                      slideController.reverse();
+                    }
 
-                  if (widget._isInfinite) {
-                    if (_controller.position.userScrollDirection == ScrollDirection.reverse && scrollInfo.metrics.outOfRange) {
-                      if (_slivers.last is! SliverPadding) {
-                        setState(() => _slivers.add(SliverPadding(
-                            padding: EdgeInsets.symmetric(vertical: 16), sliver: SliverToBoxAdapter(child: CupertinoActivityIndicator()))));
-                        this.loadData(append: true);
+                    if (widget._isInfinite) {
+                      if (_controller.position.userScrollDirection == ScrollDirection.reverse && scrollInfo.metrics.outOfRange) {
+                        if (_slivers.last is! SliverPadding) {
+                          setState(() => _slivers.add(SliverPadding(
+                              padding: EdgeInsets.symmetric(vertical: 16), sliver: SliverToBoxAdapter(child: CupertinoActivityIndicator()))));
+                          this.loadData(append: true);
+                        }
                       }
                     }
                   }

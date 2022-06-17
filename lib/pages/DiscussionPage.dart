@@ -21,6 +21,7 @@ import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
+import 'package:tap_canvas/tap_canvas.dart';
 
 class DiscussionPageArguments {
   final int discussionId;
@@ -41,6 +42,17 @@ class _DiscussionPageState extends State<DiscussionPage> {
   late SkinColors colors;
   int _refreshList = 0;
   bool _hasInitData = false;
+
+  // Did we close the context menu by tapping outside?
+  // Tapping on menu button is outside click. -> This toggle solves the issue of closing and immediate opening
+  // the menu when the menu is open and user clicks on three dots...
+  bool _closedByOutsideTap = false;
+
+  // Display the context menu?
+  bool _popupMenu = false;
+
+  // Is the discussion saved in bookmarks?
+  bool? _bookmark;
 
   Future<DiscussionResponse> _fetchData(discussionId, postId, user, {String? search}) {
     return this._memoizer.runOnce(() {
@@ -85,6 +97,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
               return T.feedbackScreen(context,
                   title: L.ACCESS_DENIED_ERROR, icon: Icons.do_not_disturb_alt, label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
             }
+            _bookmark ??= (snapshot.data!.discussion.bookmark?.bookmark ?? false);
             return this._createDiscussionPage(snapshot.data!, pageArguments);
           }
           return _pageScaffold(title: L.GENERAL_LOADING, body: T.feedbackScreen(context, isLoading: true));
@@ -113,7 +126,17 @@ class _DiscussionPageState extends State<DiscussionPage> {
                 padding: EdgeInsets.all(8.0), // needed until https://github.com/flutter/flutter/issues/86170 is fixed
                 margin: EdgeInsets.all(8.0),
                 showDuration: Duration(seconds: 3),
-              ))),
+              )),
+          trailing: GestureDetector(
+            onTap: () {
+              if (_closedByOutsideTap) {
+                setState(() => _closedByOutsideTap = false); // reset _closedByOutsideTap
+                return;
+              }
+              setState(() => _popupMenu = true);
+            },
+            child: Icon(Icons.more_horiz),
+          )),
       child: body,
     );
   }
@@ -127,15 +150,17 @@ class _DiscussionPageState extends State<DiscussionPage> {
         title: discussionResponse.discussion.name,
         body: Stack(
           children: [
-            NotificationListener<PostDeleteFailNotification>(
+            NotificationListener(
               onNotification: (notification) {
-                void rebuild(Element el) {
-                  el.markNeedsBuild();
-                  el.visitChildren(rebuild);
-                }
+                if (notification is PostDeleteFailNotification) {
+                  void rebuild(Element el) {
+                    el.markNeedsBuild();
+                    el.visitChildren(rebuild);
+                  }
 
-                // Rebuild the widget tree if Dismissible didn't removed the item due to the server error.
-                (context as Element).visitChildren(rebuild);
+                  // Rebuild the widget tree if Dismissible didn't removed the item due to the server error.
+                  (context as Element).visitChildren(rebuild);
+                }
                 return false;
               },
               child: PullToRefreshList(
@@ -226,6 +251,92 @@ class _DiscussionPageState extends State<DiscussionPage> {
                 ),
               ),
             ),
+            TapOutsideDetectorWidget(
+              onTappedOutside: () {
+                if (_popupMenu) {
+                  setState(() {
+                    _popupMenu = false;
+                    _closedByOutsideTap = true;
+                  });
+                  return;
+                }
+                setState(() => _closedByOutsideTap = false); // reset _closedByOutsideTap
+              },
+              child: Visibility(
+                visible: _popupMenu,
+                child: Positioned(
+                  top: 10,
+                  right: 12,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                      boxShadow: [
+                        BoxShadow(
+                            color: colors.grey.withOpacity(0.4), //New
+                            blurRadius: 15.0,
+                            offset: Offset(0, 0))
+                      ],
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(20)), color: colors.barBackground),
+                      child: IntrinsicWidth(
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.max, children: [
+                          Visibility(
+                            visible: _bookmark != null,
+                            child: GestureDetector(
+                              onTap: () {
+                                ApiController().bookmarkDiscussion(discussionResponse.discussion.idKlub, !_bookmark!);
+                                setState(() {
+                                  _bookmark = !_bookmark!;
+                                  _popupMenu = false;
+                                  T.success(_bookmark! ? 'Přidáno do sledovaných.' : 'Odebráno ze sledovaných', duration: 1);
+                                });
+                              },
+                              child: Row(
+                                children: [
+                                  _bookmark! ? Icon(Icons.bookmark) : Icon(Icons.bookmark_border),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  _bookmark! ? Text('Klub sleduješ') : Text('Klub nesleduješ'),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Divider(
+                            color: colors.grey,
+                            height: 26,
+                          ),
+                          Row(
+                            children: [
+                              Icon(Icons.home),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text('Nástěnka'),
+                            ],
+                          ),
+                          Divider(
+                            color: colors.grey,
+                            height: 26,
+                          ),
+                          Row(
+                            children: [
+                              Icon(Icons.search),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text('Hledat v diskuzi'),
+                            ],
+                          ),
+                        ]),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            )
           ],
         ));
   }
