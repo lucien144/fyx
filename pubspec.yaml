@@ -58,6 +58,7 @@ dependencies:
   flutter_riverpod: ^2.0.0-dev.4
   diacritic: ^0.1.3
   tap_canvas: ^0.9.4
+  webview_flutter: ^2.0.4
 
   # Dart-lang core plugins 👇
   http_parser: ^4.0.0

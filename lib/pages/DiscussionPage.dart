@@ -15,6 +15,7 @@ import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/post/content/Advertisement.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
+import 'package:fyx/pages/discussion_home_page.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -304,19 +305,44 @@ class _DiscussionPageState extends State<DiscussionPage> {
                               ),
                             ),
                           ),
-                          Divider(
-                            color: colors.grey,
-                            height: 26,
-                          ),
-                          Row(
-                            children: [
-                              Icon(Icons.home),
-                              SizedBox(
-                                width: 5,
+                          if (discussionResponse.discussion.hasHome)
+                            Divider(
+                              color: colors.grey,
+                              height: 26,
+                            ),
+                          if (discussionResponse.discussion.hasHome)
+                            GestureDetector(
+                              onTap: () =>
+                                  Navigator.of(context).pushNamed('/discussion/home', arguments: new DiscussionHomePageArguments(discussionResponse)),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.home_outlined),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text('Nástěnka'),
+                                ],
                               ),
-                              Text('Nástěnka'),
-                            ],
-                          ),
+                            ),
+                          if (discussionResponse.discussion.hasHeader)
+                            Divider(
+                              color: colors.grey,
+                              height: 26,
+                            ),
+                          if (discussionResponse.discussion.hasHeader)
+                            GestureDetector(
+                              onTap: () => Navigator.of(context)
+                                  .pushNamed('/discussion/header', arguments: new DiscussionHomePageArguments(discussionResponse)),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.push_pin_outlined),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text('Záhlaví'),
+                                ],
+                              ),
+                            ),
                           Divider(
                             color: colors.grey,
                             height: 26,

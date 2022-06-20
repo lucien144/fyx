@@ -201,6 +201,11 @@ class ApiController {
     return DiscussionHomeResponse.fromJson(response.data);
   }
 
+  Future<DiscussionHomeResponse> getDiscussionHeader(int id) async {
+    var response = await provider.fetchDiscussionHeader(id);
+    return DiscussionHomeResponse.fromJson(response.data);
+  }
+
   Future<FeedNoticesResponse> loadFeedNotices() async {
     var response = await provider.fetchNotices();
     return FeedNoticesResponse.fromJson(response.data);

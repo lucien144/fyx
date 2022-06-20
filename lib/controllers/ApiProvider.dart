@@ -128,9 +128,11 @@ class ApiProvider implements IApiProvider {
   }
 
   Future<Response> fetchDiscussionHome(int id) async {
-    FormData formData = new FormData.fromMap(
-        {'auth_nick': _credentials?.nickname, 'auth_token': _credentials?.token, 'l': 'discussion', 'l2': 'home', 'id_klub': id});
-    return await dio.post(URL, data: formData);
+    return await dio.get('$URL/discussion/$id/content/home');
+  }
+
+  Future<Response> fetchDiscussionHeader(int id) async {
+    return await dio.get('$URL/discussion/$id/content/header');
   }
 
   Future<Response> fetchNotices() async {
