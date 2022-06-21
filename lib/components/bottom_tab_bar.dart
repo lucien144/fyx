@@ -103,12 +103,18 @@ class _BottomTabBarState extends State<BottomTabBar> {
       alignment: Alignment.bottomCenter,
       children: [
         AnimatedPositioned(
-            curve: Curves.easeIn,
+          curve: Curves.linearToEaseOut,
+          duration: Duration(milliseconds: 200),
+          bottom: _activeSubmenu ? 50 + bottomPadding : -submenuHeight,
+          left: 0,
+          right: 0,
+          child: AnimatedOpacity(
+            opacity: _activeSubmenu ? 1 : 0,
+            curve: Curves.linearToEaseOut,
             duration: Duration(milliseconds: 200),
-            bottom: _activeSubmenu ? 50 + bottomPadding : -submenuHeight,
-            left: 0,
-            right: 0,
-            child: submenu()),
+            child: submenu(),
+          ),
+        ),
         DecoratedBox(
             decoration: BoxDecoration(color: CupertinoTheme.of(context).barBackgroundColor),
             child: SizedBox(
