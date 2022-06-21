@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
+import 'package:fyx/components/discussion_page_scaffold.dart';
 import 'package:fyx/components/post/Advertisement.dart';
 import 'package:fyx/components/post/PostListItem.dart';
 import 'package:fyx/components/post/SyntaxHighlighter.dart';
@@ -106,40 +107,19 @@ class _DiscussionPageState extends State<DiscussionPage> {
   }
 
   Widget _pageScaffold({required String title, required Widget body}) {
-    return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-          leading: CupertinoNavigationBarBackButton(
-            color: colors.primary,
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          middle: Container(
-              alignment: Alignment.center,
-              width: MediaQuery.of(context).size.width - 120,
-              child: Tooltip(
-                message: title,
-                child: Text(
-                    // https://github.com/flutter/flutter/issues/18761
-                    Characters(title).replaceAll(Characters(''), Characters('\u{200B}')).toString(),
-                    style: TextStyle(color: colors.text),
-                    overflow: TextOverflow.ellipsis),
-                padding: EdgeInsets.all(8.0), // needed until https://github.com/flutter/flutter/issues/86170 is fixed
-                margin: EdgeInsets.all(8.0),
-                showDuration: Duration(seconds: 3),
-              )),
-          trailing: GestureDetector(
-            onTap: () {
-              if (_closedByOutsideTap) {
-                setState(() => _closedByOutsideTap = false); // reset _closedByOutsideTap
-                return;
-              }
-              setState(() => _popupMenu = true);
-            },
-            child: Icon(Icons.more_horiz),
-          )),
-      child: body,
-    );
+    return DiscussionPageScaffold(
+        title: title,
+        child: body,
+        trailing: GestureDetector(
+          onTap: () {
+            if (_closedByOutsideTap) {
+              setState(() => _closedByOutsideTap = false); // reset _closedByOutsideTap
+              return;
+            }
+            setState(() => _popupMenu = true);
+          },
+          child: Icon(Icons.more_horiz),
+        ));
   }
 
   Widget _createDiscussionPage(DiscussionResponse discussionResponse, DiscussionPageArguments pageArguments) {
