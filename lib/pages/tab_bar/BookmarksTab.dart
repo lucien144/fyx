@@ -14,19 +14,10 @@ import 'package:fyx/model/enums/DefaultView.dart';
 import 'package:fyx/model/enums/TabsEnum.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/model/reponses/BookmarksHistoryResponse.dart';
+import 'package:fyx/state/search_providers.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:provider/provider.dart' as provider;
-
-final searchHistoryProvider = StateProvider<String?>(
-  // We return the default sort type, here name.
-  (ref) => null,
-);
-
-final searchBookmarksProvider = StateProvider<String?>(
-  // We return the default sort type, here name.
-  (ref) => null,
-);
 
 class BookmarksTab extends ConsumerStatefulWidget {
   // Unread filter toggle
