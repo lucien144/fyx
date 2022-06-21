@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fyx/components/PullToRefreshList.dart';
 import 'package:fyx/components/discussion_page_scaffold.dart';
 import 'package:fyx/components/post/Advertisement.dart';
@@ -13,10 +14,12 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
+import 'package:fyx/model/enums/DiscussionTypeEnum.dart';
 import 'package:fyx/model/post/content/Advertisement.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/pages/discussion_home_page.dart';
+import 'package:fyx/state/search_providers.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -34,12 +37,12 @@ class DiscussionPageArguments {
   DiscussionPageArguments(this.discussionId, {this.postId, this.filterByUser, this.search});
 }
 
-class DiscussionPage extends StatefulWidget {
+class DiscussionPage extends ConsumerStatefulWidget {
   @override
   _DiscussionPageState createState() => _DiscussionPageState();
 }
 
-class _DiscussionPageState extends State<DiscussionPage> {
+class _DiscussionPageState extends ConsumerState<DiscussionPage> {
   final AsyncMemoizer<DiscussionResponse> _memoizer = AsyncMemoizer<DiscussionResponse>();
   late SkinColors colors;
   int _refreshList = 0;
@@ -106,19 +109,22 @@ class _DiscussionPageState extends State<DiscussionPage> {
         });
   }
 
-  Widget _pageScaffold({required String title, required Widget body}) {
+  Widget _pageScaffold({required String title, required Widget body, DiscussionResponse? discussionResponse}) {
     return DiscussionPageScaffold(
         title: title,
         child: body,
-        trailing: GestureDetector(
-          onTap: () {
-            if (_closedByOutsideTap) {
-              setState(() => _closedByOutsideTap = false); // reset _closedByOutsideTap
-              return;
-            }
-            setState(() => _popupMenu = true);
-          },
-          child: Icon(Icons.more_horiz),
+        trailing: Visibility(
+          visible: discussionResponse != null && discussionResponse.discussion.type == DiscussionTypeEnum.discussion,
+          child: GestureDetector(
+            onTap: () {
+              if (_closedByOutsideTap) {
+                setState(() => _closedByOutsideTap = false); // reset _closedByOutsideTap
+                return;
+              }
+              setState(() => _popupMenu = true);
+            },
+            child: Icon(Icons.more_horiz),
+          ),
         ));
   }
 
@@ -128,6 +134,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
     SyntaxHighlighter.languageContext = discussionResponse.discussion.name;
 
     return _pageScaffold(
+        discussionResponse: discussionResponse,
         title: discussionResponse.discussion.name,
         body: Stack(
           children: [
@@ -144,7 +151,9 @@ class _DiscussionPageState extends State<DiscussionPage> {
                 }
                 return false;
               },
-              child: PullToRefreshList(
+              child: PullToRefreshList<AutoDisposeStateProvider<String?>>(
+                searchLabel: 'Hledej @nick a nebo text...',
+                searchProvider: searchDiscussionProvider,
                 rebuild: _refreshList,
                 isInfinite: true,
                 pinnedWidget: getPinnedWidget(discussionResponse),
@@ -326,14 +335,25 @@ class _DiscussionPageState extends State<DiscussionPage> {
                               color: colors.grey,
                               height: 26,
                             ),
-                            Row(
-                              children: [
-                                Text('Hledat v diskuzi'),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Expanded(child: Icon(Icons.search)),
-                              ],
+                            GestureDetector(
+                              onTap: () {
+                                if (ref.read(searchDiscussionProvider.notifier).state == null) {
+                                  ref.read(searchDiscussionProvider.notifier).state = ''; // Open the searchbox
+                                } else {
+                                  ref.read(searchDiscussionProvider.notifier).state = null; // Close the searchbox
+                                  //this.refreshData(); // ... and reset the List
+                                }
+                                setState(() => _popupMenu = false);
+                              },
+                              child: Row(
+                                children: [
+                                  Text(ref.read(searchDiscussionProvider.notifier).state == null ? 'Hledat v diskuzi' : 'Zavřít hledání'),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Expanded(child: Icon(ref.read(searchDiscussionProvider.notifier).state == null ? Icons.search : Icons.search_off)),
+                                ],
+                              ),
                             ),
                           ]),
                         ),

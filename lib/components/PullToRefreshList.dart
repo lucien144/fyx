@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:fyx/components/SearchBox.dart';
 import 'package:fyx/model/MainRepository.dart';
@@ -18,13 +17,13 @@ import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:sentry/sentry.dart';
 
 // ignore: must_be_immutable
-class PullToRefreshList extends StatefulWidget {
+class PullToRefreshList<TProvider> extends StatefulWidget {
   final TDataProvider dataProvider;
   final Function? sliverListBuilder;
   final String? searchLabel;
   final ValueChanged? onSearch;
   final VoidCallback? onSearchClear;
-  final StateProvider<String?>? searchProvider;
+  final TProvider? searchProvider;
   final Widget? pinnedWidget;
   bool _disabled;
   bool _isInfinite;
@@ -47,10 +46,10 @@ class PullToRefreshList extends StatefulWidget {
         assert(dataProvider != null);
 
   @override
-  _PullToRefreshListState createState() => _PullToRefreshListState();
+  _PullToRefreshListState createState() => _PullToRefreshListState<TProvider>();
 }
 
-class _PullToRefreshListState extends State<PullToRefreshList> with SingleTickerProviderStateMixin {
+class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with SingleTickerProviderStateMixin {
   AutoScrollController _controller = AutoScrollController();
   bool _isLoading = true;
   bool _hasPulledDown = false;
@@ -122,7 +121,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
           width: double.infinity,
           child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             if (widget.searchProvider != null)
-              SearchBox(
+              SearchBox<TProvider>(
                 label: widget.searchLabel,
                 onSearch: widget.onSearch,
                 onClear: widget.onSearchClear,
@@ -140,7 +139,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             if (widget.searchProvider != null)
-              SearchBox(
+              SearchBox<TProvider>(
                 label: widget.searchLabel,
                 onSearch: widget.onSearch,
                 onClear: widget.onSearchClear,
@@ -162,7 +161,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
           mainAxisSize: MainAxisSize.max,
           children: [
             if (widget.searchProvider != null)
-              SearchBox(
+              SearchBox<TProvider>(
                 label: widget.searchLabel,
                 onSearch: widget.onSearch,
                 onClear: widget.onSearchClear,

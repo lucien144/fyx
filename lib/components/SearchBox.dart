@@ -4,11 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 
-class SearchBox extends ConsumerStatefulWidget {
+class SearchBox<TProvider> extends ConsumerStatefulWidget {
   final String? label;
   final ValueChanged? onSearch;
   final VoidCallback? onClear;
-  final StateProvider<String?> provider;
+  final TProvider provider;
 
   SearchBox({Key? key, this.onSearch, this.onClear, required this.provider, this.label = 'Hledej'}) : super(key: key);
 

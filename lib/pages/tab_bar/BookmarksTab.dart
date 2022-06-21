@@ -170,7 +170,7 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
             // -----
             // HISTORY PULL TO REFRESH
             // -----
-            PullToRefreshList(
+            PullToRefreshList<StateProvider<String?>>(
                 rebuild: _refreshData,
                 searchLabel: 'Filtruj kluby v historii...',
                 searchProvider: searchHistoryProvider,
@@ -207,7 +207,7 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
             // -----
             // BOOKMARKS PULL TO REFRESH
             // -----
-            PullToRefreshList(
+            PullToRefreshList<StateProvider<String?>>(
                 rebuild: _refreshData,
                 searchLabel: 'Hledej diskuze, události a inzeráty...',
                 searchProvider: searchBookmarksProvider,

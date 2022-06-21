@@ -44,7 +44,7 @@ class _BottomTabBarState extends State<BottomTabBar> {
                         children: [
                           Icon(Icons.search, size: 34, color: CupertinoColors.inactiveGray),
                           Text(
-                            'Hledání příspěvků',
+                            'Upomínky',
                             style: TextStyle(fontSize: 12, color: CupertinoColors.inactiveGray),
                           )
                         ],
