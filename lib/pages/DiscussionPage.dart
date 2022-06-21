@@ -293,7 +293,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
-                                    _bookmark! ? Expanded(child: Text('Klub sleduješ')) : Text('Klub nesleduješ'),
+                                    Expanded(child: _bookmark! ? Text('Klub sleduješ') : Text('Klub nesleduješ')),
                                     _bookmark! ? Icon(Icons.bookmark) : Icon(Icons.bookmark_border),
                                   ],
                                 ),
