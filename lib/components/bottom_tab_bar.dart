@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 
 class BottomTabBar extends StatefulWidget {
   final List items;
@@ -17,6 +19,7 @@ class BottomTabBar extends StatefulWidget {
 
 class _BottomTabBarState extends State<BottomTabBar> {
   final submenuKey = GlobalKey();
+  late SkinColors colors;
   bool _activeSubmenu = false;
 
   @override
@@ -30,6 +33,12 @@ class _BottomTabBarState extends State<BottomTabBar> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
         color: CupertinoTheme.of(context).barBackgroundColor,
+        boxShadow: [
+          BoxShadow(
+              color: colors.grey.withOpacity(0.4), //New
+              blurRadius: 15.0,
+              offset: Offset(0, 0))
+        ],
       ),
       key: submenuKey,
       padding: EdgeInsets.all(40),
@@ -94,6 +103,7 @@ class _BottomTabBarState extends State<BottomTabBar> {
   @override
   Widget build(BuildContext context) {
     final double bottomPadding = MediaQuery.of(context).padding.bottom;
+    colors = Skin.of(context).theme.colors;
     double submenuHeight = 0;
 
     final box = submenuKey.currentContext?.findRenderObject();
@@ -104,7 +114,7 @@ class _BottomTabBarState extends State<BottomTabBar> {
       children: [
         AnimatedPositioned(
           curve: Curves.linearToEaseOut,
-          duration: Duration(milliseconds: 200),
+          duration: Duration(milliseconds: 300),
           bottom: _activeSubmenu ? 50 + bottomPadding : -submenuHeight,
           left: 0,
           right: 0,
