@@ -263,100 +263,100 @@ class _DiscussionPageState extends State<DiscussionPage> {
                 }
                 setState(() => _closedByOutsideTap = false); // reset _closedByOutsideTap
               },
-              child: Visibility(
-                visible: _popupMenu,
-                child: Positioned(
-                  top: 10,
-                  right: 12,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                      boxShadow: [
-                        BoxShadow(
-                            color: colors.grey.withOpacity(0.4), //New
-                            blurRadius: 15.0,
-                            offset: Offset(0, 0))
-                      ],
-                    ),
+              child: Positioned(
+                top: 10,
+                right: 12,
+                child: AnimatedOpacity(
+                  opacity: _popupMenu ? 1 : 0,
+                  duration: Duration(milliseconds: 280),
+                  curve: Curves.linearToEaseOut,
+                  child: AnimatedScale(
+                    curve: Curves.linearToEaseOut,
+                    scale: _popupMenu ? 1 : 0,
+                    alignment: Alignment.topRight,
+                    duration: Duration(milliseconds: 280),
                     child: Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(20)), color: colors.barBackground),
-                      child: IntrinsicWidth(
-                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.max, children: [
-                          Visibility(
-                            visible: _bookmark != null,
-                            child: GestureDetector(
-                              onTap: () {
-                                ApiController().bookmarkDiscussion(discussionResponse.discussion.idKlub, !_bookmark!);
-                                setState(() {
-                                  _bookmark = !_bookmark!;
-                                  _popupMenu = false;
-                                  T.success(_bookmark! ? 'Přidáno do sledovaných.' : 'Odebráno ze sledovaných', duration: 1);
-                                });
-                              },
-                              child: Row(
-                                children: [
-                                  _bookmark! ? Icon(Icons.bookmark) : Icon(Icons.bookmark_border),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  _bookmark! ? Text('Klub sleduješ') : Text('Klub nesleduješ'),
-                                ],
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                        boxShadow: [
+                          BoxShadow(
+                              color: colors.grey.withOpacity(0.4), //New
+                              blurRadius: 15.0,
+                              offset: Offset(0, 0))
+                        ],
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(20)), color: colors.barBackground),
+                        child: IntrinsicWidth(
+                          child: Column(children: [
+                            Visibility(
+                              visible: _bookmark != null,
+                              child: GestureDetector(
+                                onTap: () {
+                                  ApiController().bookmarkDiscussion(discussionResponse.discussion.idKlub, !_bookmark!);
+                                  setState(() {
+                                    _bookmark = !_bookmark!;
+                                    _popupMenu = false;
+                                    T.success(_bookmark! ? 'Přidáno do sledovaných.' : 'Odebráno ze sledovaných', duration: 1);
+                                  });
+                                },
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    _bookmark! ? Expanded(child: Text('Klub sleduješ')) : Text('Klub nesleduješ'),
+                                    _bookmark! ? Icon(Icons.bookmark) : Icon(Icons.bookmark_border),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                          if (discussionResponse.discussion.hasHome)
+                            if (discussionResponse.discussion.hasHeader)
+                              Divider(
+                                color: colors.grey,
+                                height: 26,
+                              ),
+                            if (discussionResponse.discussion.hasHeader)
+                              GestureDetector(
+                                onTap: () => Navigator.of(context)
+                                    .pushNamed('/discussion/header', arguments: new DiscussionHomePageArguments(discussionResponse)),
+                                child: Row(
+                                  children: [
+                                    Expanded(child: Text('Záhlaví')),
+                                    Icon(Icons.push_pin_outlined),
+                                  ],
+                                ),
+                              ),
+                            if (discussionResponse.discussion.hasHome)
+                              Divider(
+                                color: colors.grey,
+                                height: 26,
+                              ),
+                            if (discussionResponse.discussion.hasHome)
+                              GestureDetector(
+                                onTap: () => Navigator.of(context)
+                                    .pushNamed('/discussion/home', arguments: new DiscussionHomePageArguments(discussionResponse)),
+                                child: Row(
+                                  children: [
+                                    Expanded(child: Text('Nástěnka')),
+                                    Icon(Icons.home_outlined),
+                                  ],
+                                ),
+                              ),
                             Divider(
                               color: colors.grey,
                               height: 26,
                             ),
-                          if (discussionResponse.discussion.hasHome)
-                            GestureDetector(
-                              onTap: () =>
-                                  Navigator.of(context).pushNamed('/discussion/home', arguments: new DiscussionHomePageArguments(discussionResponse)),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.home_outlined),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text('Nástěnka'),
-                                ],
-                              ),
+                            Row(
+                              children: [
+                                Text('Hledat v diskuzi'),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Expanded(child: Icon(Icons.search)),
+                              ],
                             ),
-                          if (discussionResponse.discussion.hasHeader)
-                            Divider(
-                              color: colors.grey,
-                              height: 26,
-                            ),
-                          if (discussionResponse.discussion.hasHeader)
-                            GestureDetector(
-                              onTap: () => Navigator.of(context)
-                                  .pushNamed('/discussion/header', arguments: new DiscussionHomePageArguments(discussionResponse)),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.push_pin_outlined),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text('Záhlaví'),
-                                ],
-                              ),
-                            ),
-                          Divider(
-                            color: colors.grey,
-                            height: 26,
-                          ),
-                          Row(
-                            children: [
-                              Icon(Icons.search),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Text('Hledat v diskuzi'),
-                            ],
-                          ),
-                        ]),
+                          ]),
+                        ),
                       ),
                     ),
                   ),
