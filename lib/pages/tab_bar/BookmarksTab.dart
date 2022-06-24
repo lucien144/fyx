@@ -171,6 +171,7 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
             // -----
             PullToRefreshList<StateProvider<String?>>(
                 rebuild: _refreshData,
+                searchLimit: 1,
                 searchLabel: 'Filtruj kluby v historii...',
                 searchTerm: ref.read(searchHistoryProvider.notifier).state,
                 onSearch: (term) {

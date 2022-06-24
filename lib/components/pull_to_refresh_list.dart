@@ -22,6 +22,7 @@ class PullToRefreshList<TProvider> extends StatefulWidget {
   final Function? sliverListBuilder;
   final String? searchLabel;
   final String? searchTerm;
+  final int searchLimit;
   final ValueChanged? onSearch;
   final VoidCallback? onSearchClear;
   final Widget? pinnedWidget;
@@ -35,6 +36,7 @@ class PullToRefreshList<TProvider> extends StatefulWidget {
       this.onSearchClear, // TODO: move to SearchController
       this.searchLabel, // TODO: move to SearchController
       this.searchTerm, // TODO: move to SearchController
+      this.searchLimit = 3, // TODO: move to SearchController
       isInfinite = false,
       int rebuild = 0,
       this.sliverListBuilder,
@@ -133,6 +135,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
             if (widget.onSearch != null)
               SearchBox(
                 label: widget.searchLabel,
+                limit: widget.searchLimit,
                 searchTerm: widget.searchTerm,
                 onSearch: widget.onSearch!,
                 onClear: widget.onSearchClear,
@@ -151,6 +154,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
             if (widget.onSearch != null)
               SearchBox(
                 label: widget.searchLabel,
+                limit: widget.searchLimit,
                 searchTerm: widget.searchTerm,
                 onSearch: widget.onSearch!,
                 onClear: widget.onSearchClear,
@@ -173,6 +177,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
             if (widget.onSearch != null)
               SearchBox(
                 label: widget.searchLabel,
+                limit: widget.searchLimit,
                 searchTerm: widget.searchTerm,
                 onSearch: widget.onSearch!,
                 onClear: widget.onSearchClear,

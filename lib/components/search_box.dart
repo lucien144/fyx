@@ -10,8 +10,9 @@ class SearchBox extends ConsumerStatefulWidget {
   final ValueChanged onSearch;
   final VoidCallback? onClear;
   final String? searchTerm;
+  final int limit;
 
-  SearchBox({Key? key, required this.onSearch, this.onClear, this.searchTerm, this.label = 'Hledej'}) : super(key: key);
+  SearchBox({Key? key, required this.onSearch, this.onClear, this.searchTerm, this.limit = 3, this.label = 'Hledej'}) : super(key: key);
 
   @override
   _SearchBoxState createState() => _SearchBoxState();
@@ -73,8 +74,8 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
             placeholder: widget.label,
             controller: searchController,
             onSubmitted: (term) {
-              if (term.length < 3) {
-                T.warn('Zkus hledat víc jak 3 znaky...');
+              if (term.length < widget.limit) {
+                T.warn('Zkus hledat víc jak ${widget.limit} znaky...');
               } else {
                 widget.onSearch(term);
               }
