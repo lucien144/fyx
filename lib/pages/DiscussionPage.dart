@@ -19,6 +19,7 @@ import 'package:fyx/model/post/content/Advertisement.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/pages/discussion_home_page.dart';
+import 'package:fyx/state/batch_actions_provider.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -59,6 +60,9 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
   bool? _bookmark;
 
   String? _searchTerm;
+
+  // Progress indicator if some posts are being deleted...
+  bool _deleting = false;
 
   Future<DiscussionResponse> _fetchData(discussionId, postId, user, {String? search}) {
     return this._memoizer.runOnce(() {
@@ -139,115 +143,154 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
         title: discussionResponse.discussion.name,
         body: Stack(
           children: [
-            NotificationListener(
-              onNotification: (notification) {
-                if (notification is PostDeleteFailNotification) {
-                  void rebuild(Element el) {
-                    el.markNeedsBuild();
-                    el.visitChildren(rebuild);
-                  }
-
-                  // Rebuild the widget tree if Dismissible didn't removed the item due to the server error.
-                  (context as Element).visitChildren(rebuild);
-                }
-                return false;
+            PullToRefreshList<AutoDisposeStateProvider<String?>>(
+              searchLabel: 'Hledej @nick a nebo text...',
+              searchTerm: this._searchTerm,
+              onSearch: (term) {
+                setState(() => this._searchTerm = term);
+                this.refresh();
               },
-              child: PullToRefreshList<AutoDisposeStateProvider<String?>>(
-                searchLabel: 'Hledej @nick a nebo text...',
-                searchTerm: this._searchTerm,
-                onSearch: (term) {
-                  setState(() => this._searchTerm = term);
-                  this.refresh();
-                },
-                onSearchClear: () {
-                  setState(() => this._searchTerm = '');
-                  this.refresh();
-                },
-                rebuild: _refreshList,
-                isInfinite: true,
-                pinnedWidget: getPinnedWidget(discussionResponse),
-                sliverListBuilder: (List data, {controller}) {
-                  return ValueListenableBuilder(
-                    valueListenable: MainRepository().settings.box.listenable(keys: ['blockedPosts', 'blockedUsers']),
-                    builder: (BuildContext context, value, Widget? child) {
-                      var filtered = data;
-                      if (data[0] is PostListItem) {
-                        filtered = data
-                            .where((item) => !MainRepository().settings.isPostBlocked((item as PostListItem).post.id))
-                            .where((item) => !MainRepository().settings.isUserBlocked((item as PostListItem).post.nick))
-                            .toList();
-                      }
-                      final kUnreadIndex = filtered.lastIndexWhere((item) => (item as PostListItem).post.isNew);
-                      return SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, i) {
-                            final postItem = AutoScrollTag(child: filtered[i], key: ValueKey(i), index: i, controller: controller);
-                            if (i == kUnreadIndex) {
-                              return unseenPill(postItem, kUnreadIndex + 1);
-                            }
-                            return postItem;
-                          },
-                          childCount: filtered.length,
-                        ),
-                      );
-                    },
-                  );
-                },
-                dataProvider: (lastId) async {
-                  var result;
-                  if (lastId != null) {
-                    // If we load next page(s)
-                    var response = await ApiController()
-                        .loadDiscussion(pageArguments.discussionId, lastId: lastId, user: pageArguments.filterByUser, search: this._searchTerm);
-                    result = response.posts;
-                  } else {
-                    // If we load init data or we refresh data on pull
-                    if (!this._hasInitData) {
-                      // If we load init data, use the data from FutureBuilder
-                      result = discussionResponse.posts;
-                      this._hasInitData = true;
-                    } else {
-                      // If we just pull to refresh, load a fresh data
-                      var response = await ApiController()
-                          .loadDiscussion(pageArguments.discussionId, user: pageArguments.filterByUser, search: this._searchTerm);
-                      result = response.posts;
+              onSearchClear: () {
+                setState(() => this._searchTerm = '');
+                this.refresh();
+              },
+              rebuild: _refreshList,
+              isInfinite: true,
+              pinnedWidget: getPinnedWidget(discussionResponse),
+              sliverListBuilder: (List data, {controller}) {
+                return ValueListenableBuilder(
+                  valueListenable: MainRepository().settings.box.listenable(keys: ['blockedPosts', 'blockedUsers']),
+                  builder: (BuildContext context, value, Widget? child) {
+                    var filtered = data;
+                    if (data[0] is PostListItem) {
+                      filtered = data
+                          .where((item) => !MainRepository().settings.isPostBlocked((item as PostListItem).post.id))
+                          .where((item) => !MainRepository().settings.isUserBlocked((item as PostListItem).post.nick))
+                          .toList();
                     }
+                    final kUnreadIndex = filtered.lastIndexWhere((item) => (item as PostListItem).post.isNew);
+                    return SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, i) {
+                          final postItem = AutoScrollTag(child: filtered[i], key: ValueKey(i), index: i, controller: controller);
+                          if (i == kUnreadIndex) {
+                            return unseenPill(postItem, kUnreadIndex + 1);
+                          }
+                          return postItem;
+                        },
+                        childCount: filtered.length,
+                      ),
+                    );
+                  },
+                );
+              },
+              dataProvider: (lastId) async {
+                var result;
+                if (lastId != null) {
+                  // If we load next page(s)
+                  var response = await ApiController()
+                      .loadDiscussion(pageArguments.discussionId, lastId: lastId, user: pageArguments.filterByUser, search: this._searchTerm);
+                  result = response.posts;
+                } else {
+                  // If we load init data or we refresh data on pull
+                  if (!this._hasInitData) {
+                    // If we load init data, use the data from FutureBuilder
+                    result = discussionResponse.posts;
+                    this._hasInitData = true;
+                  } else {
+                    // If we just pull to refresh, load a fresh data
+                    var response =
+                        await ApiController().loadDiscussion(pageArguments.discussionId, user: pageArguments.filterByUser, search: this._searchTerm);
+                    result = response.posts;
                   }
-                  List<PostListItem> data = (result as List)
-                      .map((post) {
-                        return Post.fromJson(post, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode);
-                      })
-                      .where((post) => !MainRepository().settings.isPostBlocked(post.id))
-                      .where((post) => !MainRepository().settings.isUserBlocked(post.nick))
-                      .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.isNew))
-                      .toList();
+                }
+                List<PostListItem> data = (result as List)
+                    .map((post) {
+                      return Post.fromJson(post, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode);
+                    })
+                    .where((post) => !MainRepository().settings.isPostBlocked(post.id))
+                    .where((post) => !MainRepository().settings.isUserBlocked(post.nick))
+                    .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.isNew))
+                    .toList();
 
-                  int? id;
-                  try {
-                    id = Post.fromJson((result as List).last, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode).id;
-                  } catch (error) {}
-                  return DataProviderResult(data,
-                      lastId: id, postId: pageArguments.postId, jumpIndex: data.where((listItem) => listItem.post.isNew).length);
-                },
-              ),
+                int? id;
+                try {
+                  id = Post.fromJson((result as List).last, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode).id;
+                } catch (error) {}
+                return DataProviderResult(data,
+                    lastId: id, postId: pageArguments.postId, jumpIndex: data.where((listItem) => listItem.post.isNew).length);
+              },
             ),
             Visibility(
               visible: discussionResponse.discussion.accessRights.canWrite != false || discussionResponse.discussion.rights.canWrite != false,
               child: Positioned(
                 right: 20,
+                left: 20,
                 bottom: 20,
                 child: SafeArea(
-                  child: FloatingActionButton(
-                    backgroundColor: colors.primary,
-                    foregroundColor: colors.background,
-                    child: Icon(Icons.add),
-                    onPressed: () => Navigator.of(context).pushNamed('/new-message',
-                        arguments: NewMessageSettings(
-                            onClose: this.refresh,
-                            onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
-                              var result = await ApiController().postDiscussionMessage(pageArguments.discussionId, message, attachments: attachments);
-                              return result.isOk;
-                            })),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: ref.watch(PostsSelection.provider).isEmpty ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
+                    children: [
+                      if (ref.watch(PostsSelection.provider).isNotEmpty)
+                        FloatingActionButton(
+                          backgroundColor: _deleting ? colors.danger.withOpacity(.5) : colors.danger,
+                          foregroundColor: colors.background,
+                          child: Stack(alignment: Alignment.bottomCenter, children: [
+                            Opacity(opacity: _deleting ? 0.2 : 1, child: Icon(Icons.delete, size: 40)),
+                            Positioned(
+                              bottom: 5,
+                              child: Opacity(
+                                opacity: _deleting ? 0.2 : 1,
+                                child: Text(
+                                  ref.read(PostsSelection.provider).length.toString(),
+                                  style: TextStyle(color: colors.danger),
+                                ),
+                              ),
+                            ),
+                            if (_deleting) Positioned.fill(child: CupertinoActivityIndicator()),
+                          ]),
+                          onPressed: _deleting
+                              ? null
+                              : () async {
+                                  setState(() => _deleting = true);
+                                  try {
+                                    await Future.wait(ref
+                                        .read(PostsSelection.provider)
+                                        .map((id) => ApiController().deleteDiscussionMessage(discussionResponse.discussion.idKlub, id).then((_) {
+                                              ref.read(PostsToDelete.provider.notifier).add(id);
+                                              ref.read(PostsSelection.provider.notifier).remove(id);
+                                            })));
+                                    T.success('Smazáno.');
+                                  } catch (error) {
+                                    T.warn('Některé příspěvky se nepodařilo smazat.');
+                                  } finally {
+                                    setState(() => _deleting = false);
+                                  }
+                                },
+                        ),
+                      if (ref.watch(PostsSelection.provider).isNotEmpty)
+                        FloatingActionButton(
+                          backgroundColor: colors.text,
+                          foregroundColor: colors.background,
+                          child: Icon(Icons.cancel_rounded),
+                          onPressed: () => ref.read(PostsSelection.provider.notifier).reset(),
+                        ),
+                      if (ref.watch(PostsSelection.provider).isEmpty)
+                        FloatingActionButton(
+                          backgroundColor: colors.primary,
+                          foregroundColor: colors.background,
+                          child: Icon(Icons.add),
+                          onPressed: () => Navigator.of(context).pushNamed('/new-message',
+                              arguments: NewMessageSettings(
+                                  onClose: this.refresh,
+                                  onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                                    var result =
+                                        await ApiController().postDiscussionMessage(pageArguments.discussionId, message, attachments: attachments);
+                                    return result.isOk;
+                                  })),
+                        ),
+                    ],
                   ),
                 ),
               ),

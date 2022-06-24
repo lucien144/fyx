@@ -30,6 +30,7 @@ class ContentBoxLayout extends StatelessWidget {
   final Content content;
   final bool _isPreview;
   final bool _isHighlighted;
+  final bool isSelected;
   final Map<LAYOUT_TYPES, TLayout> _layoutMap = {};
   final VoidCallback? onTap;
 
@@ -37,6 +38,7 @@ class ContentBoxLayout extends StatelessWidget {
       {required this.topLeftWidget,
       required this.topRightWidget,
       this.bottomWidget,
+      this.isSelected = false,
       required this.content,
       isPreview = false,
       isHighlighted = false,
@@ -143,7 +145,12 @@ class ContentBoxLayout extends StatelessWidget {
             ),
           ),
           Container(
-            color: _isHighlighted ? colors.primary.withOpacity(0.1) : null,
+            color: (() {
+              if (this.isSelected) {
+                return colors.highlightedText.withOpacity(.3);
+              }
+              return _isHighlighted ? colors.primary.withOpacity(0.1) : null;
+            })(),
             foregroundDecoration: _isHighlighted ? UnreadBadgeDecoration(badgeColor: colors.primary, badgeSize: 16) : null,
             child: Column(
               children: <Widget>[
