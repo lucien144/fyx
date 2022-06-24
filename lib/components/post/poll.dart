@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fyx/components/post/PostHtml.dart';
+import 'package:fyx/components/post/post_html.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/post/content/Poll.dart';
 import 'package:fyx/model/post/content/Regular.dart';

@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:fyx/components/post/PostHeroAttachment.dart';
-import 'package:fyx/components/post/Spoiler.dart';
-import 'package:fyx/components/post/SyntaxHighlighter.dart';
-import 'package:fyx/components/post/VideoPlayer.dart';
+import 'package:fyx/components/post/post_hero_attachment.dart';
+import 'package:fyx/components/post/spoiler.dart';
+import 'package:fyx/components/post/syntax_highlighter.dart';
+import 'package:fyx/components/post/video_player.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/Image.dart' as post;

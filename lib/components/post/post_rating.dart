@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/feedback_indicator.dart';
-import 'package:fyx/components/post/RatingValue.dart';
+import 'package:fyx/components/post/rating_value.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/notifications/LoadRatingsNotification.dart';
