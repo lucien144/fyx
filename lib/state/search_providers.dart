@@ -9,8 +9,3 @@ final searchBookmarksProvider = StateProvider<String?>(
   // We return the default sort type, here name.
   (ref) => null,
 );
-
-final searchDiscussionProvider = StateProvider.autoDispose<String?>(
-  // We return the default sort type, here name.
-  (ref) => null,
-);

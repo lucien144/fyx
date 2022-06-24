@@ -16,7 +16,6 @@ import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/model/reponses/BookmarksHistoryResponse.dart';
 import 'package:fyx/state/search_providers.dart';
 import 'package:fyx/theme/L.dart';
-import 'package:fyx/theme/T.dart';
 import 'package:provider/provider.dart' as provider;
 
 class BookmarksTab extends ConsumerStatefulWidget {
@@ -173,9 +172,15 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
             PullToRefreshList<StateProvider<String?>>(
                 rebuild: _refreshData,
                 searchLabel: 'Filtruj kluby v historii...',
-                searchProvider: searchHistoryProvider,
-                onSearch: (term) => this.refreshData(),
-                onSearchClear: () => this.refreshData(),
+                searchTerm: ref.read(searchHistoryProvider.notifier).state,
+                onSearch: (term) {
+                  ref.read(searchHistoryProvider.notifier).state = term;
+                  this.refreshData();
+                },
+                onSearchClear: () {
+                  ref.read(searchHistoryProvider.notifier).state = '';
+                  this.refreshData();
+                },
                 dataProvider: (lastId) async {
                   List<DiscussionListItem> withReplies = [];
                   String? searchTerm = ref.read(searchHistoryProvider.notifier).state;
@@ -210,27 +215,29 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
             PullToRefreshList<StateProvider<String?>>(
                 rebuild: _refreshData,
                 searchLabel: 'Hledej diskuze, události a inzeráty...',
-                searchProvider: searchBookmarksProvider,
-                onSearch: (term) => this.refreshData(),
-                onSearchClear: () => this.refreshData(),
+                searchTerm: ref.read(searchBookmarksProvider.notifier).state,
+                onSearch: (term) {
+                  ref.read(searchBookmarksProvider.notifier).state = term;
+                  this.refreshData();
+                },
+                onSearchClear: () {
+                  ref.read(searchBookmarksProvider.notifier).state = '';
+                  this.refreshData();
+                },
                 dataProvider: (lastId) async {
                   var categories = [];
 
                   try {
                     if (ref.read(searchBookmarksProvider.notifier).state != null && ref.read(searchBookmarksProvider.notifier).state != '') {
-                      if (ref.read(searchBookmarksProvider.notifier).state!.length < 3) {
-                        T.warn('Zkus hledat víc jak 3 znaky...');
-                      } else {
-                        final term = ref.read(searchBookmarksProvider.notifier).state;
-                        final result = await ApiController().searchDiscussions(term!);
-                        result.discussion.forEach((type, list) {
-                          categories.add({
-                            'header': ListHeader(L.search[type] ?? ''),
-                            'items': list.map((model) => DiscussionSearchListItem(discussionId: model.id, child: Text(model.discussionName))).toList()
-                          });
+                      final term = ref.read(searchBookmarksProvider.notifier).state;
+                      final result = await ApiController().searchDiscussions(term!);
+                      result.discussion.forEach((type, list) {
+                        categories.add({
+                          'header': ListHeader(L.search[type] ?? ''),
+                          'items': list.map((model) => DiscussionSearchListItem(discussionId: model.id, child: Text(model.discussionName))).toList()
                         });
-                        return DataProviderResult(categories);
-                      }
+                      });
+                      return DataProviderResult(categories);
                     }
                   } catch (error) {}
 

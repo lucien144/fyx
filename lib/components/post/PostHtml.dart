@@ -12,6 +12,8 @@ import 'package:fyx/model/post/Video.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html_unescape/html_unescape.dart';
 
@@ -24,6 +26,8 @@ class PostHtml extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final SkinColors colors = Skin.of(context).theme.colors;
+
     return Html(
       data: MainRepository().settings.useCompactMode && content!.consecutiveImages ? content!.body : content!.rawBody,
       style: {
@@ -34,6 +38,34 @@ class PostHtml extends StatelessWidget {
         'pre': Style(color: Colors.transparent),
       },
       customRender: {
+        'em': (
+          RenderContext renderContext,
+          Widget parsedChild,
+        ) {
+          final element = renderContext.tree.element;
+          if (element!.classes.contains('search-match')) {
+            return RichText(
+                text: WidgetSpan(
+                    child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+              decoration: BoxDecoration(
+                  color: colors.highlightedText,
+                  border: Border.all(width: 1, color: colors.highlightedText),
+                  borderRadius: BorderRadius.circular(4),
+                  boxShadow: [
+                    BoxShadow(
+                        color: colors.grey.withOpacity(0.4), //New
+                        blurRadius: 2.0,
+                        offset: Offset(0, 0))
+                  ]),
+              child: Text(
+                element.text,
+                style: TextStyle(color: colors.dark, fontStyle: FontStyle.italic, fontSize: 15),
+              ),
+            )));
+          }
+          return parsedChild;
+        },
         'img': (
           RenderContext renderContext,
           Widget parsedChild,

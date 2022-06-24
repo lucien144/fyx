@@ -19,7 +19,6 @@ import 'package:fyx/model/post/content/Advertisement.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/pages/discussion_home_page.dart';
-import 'package:fyx/state/search_providers.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -58,6 +57,8 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
 
   // Is the discussion saved in bookmarks?
   bool? _bookmark;
+
+  String? _searchTerm;
 
   Future<DiscussionResponse> _fetchData(discussionId, postId, user, {String? search}) {
     return this._memoizer.runOnce(() {
@@ -153,7 +154,15 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
               },
               child: PullToRefreshList<AutoDisposeStateProvider<String?>>(
                 searchLabel: 'Hledej @nick a nebo text...',
-                searchProvider: searchDiscussionProvider,
+                searchTerm: this._searchTerm,
+                onSearch: (term) {
+                  setState(() => this._searchTerm = term);
+                  this.refresh();
+                },
+                onSearchClear: () {
+                  setState(() => this._searchTerm = '');
+                  this.refresh();
+                },
                 rebuild: _refreshList,
                 isInfinite: true,
                 pinnedWidget: getPinnedWidget(discussionResponse),
@@ -188,7 +197,8 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                   var result;
                   if (lastId != null) {
                     // If we load next page(s)
-                    var response = await ApiController().loadDiscussion(pageArguments.discussionId, lastId: lastId, user: pageArguments.filterByUser);
+                    var response = await ApiController()
+                        .loadDiscussion(pageArguments.discussionId, lastId: lastId, user: pageArguments.filterByUser, search: this._searchTerm);
                     result = response.posts;
                   } else {
                     // If we load init data or we refresh data on pull
@@ -198,7 +208,8 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                       this._hasInitData = true;
                     } else {
                       // If we just pull to refresh, load a fresh data
-                      var response = await ApiController().loadDiscussion(pageArguments.discussionId, user: pageArguments.filterByUser);
+                      var response = await ApiController()
+                          .loadDiscussion(pageArguments.discussionId, user: pageArguments.filterByUser, search: this._searchTerm);
                       result = response.posts;
                     }
                   }
@@ -337,21 +348,18 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                if (ref.read(searchDiscussionProvider.notifier).state == null) {
-                                  ref.read(searchDiscussionProvider.notifier).state = ''; // Open the searchbox
-                                } else {
-                                  ref.read(searchDiscussionProvider.notifier).state = null; // Close the searchbox
-                                  //this.refreshData(); // ... and reset the List
-                                }
-                                setState(() => _popupMenu = false);
+                                setState(() {
+                                  this._searchTerm = this._searchTerm == null ? '' : null;
+                                  this._popupMenu = false;
+                                });
                               },
                               child: Row(
                                 children: [
-                                  Text(ref.read(searchDiscussionProvider.notifier).state == null ? 'Hledat v diskuzi' : 'Zavřít hledání'),
+                                  Text(this._searchTerm == null ? 'Hledat v diskuzi' : 'Zavřít hledání'),
                                   SizedBox(
                                     width: 10,
                                   ),
-                                  Expanded(child: Icon(ref.read(searchDiscussionProvider.notifier).state == null ? Icons.search : Icons.search_off)),
+                                  Expanded(child: Icon(this._searchTerm == null ? Icons.search : Icons.search_off)),
                                 ],
                               ),
                             ),

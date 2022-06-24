@@ -21,9 +21,9 @@ class PullToRefreshList<TProvider> extends StatefulWidget {
   final TDataProvider dataProvider;
   final Function? sliverListBuilder;
   final String? searchLabel;
+  final String? searchTerm;
   final ValueChanged? onSearch;
   final VoidCallback? onSearchClear;
-  final TProvider? searchProvider;
   final Widget? pinnedWidget;
   bool _disabled;
   bool _isInfinite;
@@ -31,10 +31,10 @@ class PullToRefreshList<TProvider> extends StatefulWidget {
 
   PullToRefreshList(
       {required this.dataProvider,
-      this.onSearch,
-      this.onSearchClear,
-      this.searchProvider,
-      this.searchLabel,
+      this.onSearch, // TODO: move to SearchController
+      this.onSearchClear, // TODO: move to SearchController
+      this.searchLabel, // TODO: move to SearchController
+      this.searchTerm, // TODO: move to SearchController
       isInfinite = false,
       int rebuild = 0,
       this.sliverListBuilder,
@@ -59,6 +59,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
   int? _prevLastId; // ID of last item loaded previously.
   List<Widget> _slivers = <Widget>[];
   int _lastRebuild = 0;
+  String? _searchTerm;
   late AnimationController slideController;
   late Animation<Offset> slideOffset;
 
@@ -75,6 +76,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
   @override
   void initState() {
     super.initState();
+    _searchTerm = widget.searchTerm;
 
     () async {
       await Future.delayed(Duration.zero);
@@ -100,6 +102,14 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
   }
 
   @override
+  void didUpdateWidget(oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (this._searchTerm != widget.searchTerm) {
+      setState(() => this._searchTerm = widget.searchTerm);
+    }
+  }
+
+  @override
   void dispose() {
     super.dispose();
     _controller.dispose();
@@ -120,12 +130,12 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
           height: double.infinity,
           width: double.infinity,
           child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            if (widget.searchProvider != null)
-              SearchBox<TProvider>(
+            if (widget.onSearch != null)
+              SearchBox(
                 label: widget.searchLabel,
-                onSearch: widget.onSearch,
+                searchTerm: widget.searchTerm,
+                onSearch: widget.onSearch!,
                 onClear: widget.onSearchClear,
-                provider: widget.searchProvider!,
               ),
             Expanded(child: T.feedbackScreen(context, isLoading: _isLoading, onPress: loadData, label: L.GENERAL_REFRESH)),
           ]));
@@ -138,12 +148,12 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            if (widget.searchProvider != null)
-              SearchBox<TProvider>(
+            if (widget.onSearch != null)
+              SearchBox(
                 label: widget.searchLabel,
-                onSearch: widget.onSearch,
+                searchTerm: widget.searchTerm,
+                onSearch: widget.onSearch!,
                 onClear: widget.onSearchClear,
-                provider: widget.searchProvider!,
               ),
             Text(
               L.GENERAL_EMPTY,
@@ -160,12 +170,12 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
         Column(
           mainAxisSize: MainAxisSize.max,
           children: [
-            if (widget.searchProvider != null)
-              SearchBox<TProvider>(
+            if (widget.onSearch != null)
+              SearchBox(
                 label: widget.searchLabel,
-                onSearch: widget.onSearch,
+                searchTerm: widget.searchTerm,
+                onSearch: widget.onSearch!,
                 onClear: widget.onSearchClear,
-                provider: widget.searchProvider!,
               ),
             Expanded(
               child: NotificationListener(
