@@ -47,7 +47,7 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
     }
     if (widget.searchTerm == null) {
       focus.unfocus();
-    } else if (widget.searchTerm == '') {
+    } else if (widget.searchTerm == '' && oldWidget.searchTerm != '') {
       focus.requestFocus();
     }
   }
