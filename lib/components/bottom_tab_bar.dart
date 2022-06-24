@@ -47,17 +47,69 @@ class _BottomTabBarState extends State<BottomTabBar> {
           Row(
             children: [
               Expanded(
+                child: Opacity(
+                  opacity: .3,
                   child: GestureDetector(
-                      onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/settings'),
                       child: Column(
-                        children: [
-                          Icon(Icons.search, size: 34, color: CupertinoColors.inactiveGray),
-                          Text(
-                            'Upomínky',
-                            style: TextStyle(fontSize: 12, color: CupertinoColors.inactiveGray),
-                          )
-                        ],
-                      ))),
+                    children: [
+                      Icon(Icons.hourglass_top, size: 34, color: CupertinoColors.inactiveGray),
+                      Text(
+                        'Poslední',
+                        style: TextStyle(fontSize: 12, color: CupertinoColors.inactiveGray),
+                      )
+                    ],
+                  )),
+                ),
+              ),
+              Expanded(
+                  child: Opacity(
+                opacity: .3,
+                child: GestureDetector(
+                    child: Column(
+                  children: [
+                    Icon(Icons.shopping_cart, size: 34, color: CupertinoColors.inactiveGray),
+                    Text(
+                      'Tržiště',
+                      style: TextStyle(fontSize: 12, color: CupertinoColors.inactiveGray),
+                    )
+                  ],
+                )),
+              )),
+              Expanded(
+                  child: Opacity(
+                opacity: .3,
+                child: GestureDetector(
+                    child: Column(
+                  children: [
+                    Icon(Icons.search, size: 34, color: CupertinoColors.inactiveGray),
+                    Text(
+                      'Hledání',
+                      style: TextStyle(fontSize: 12, color: CupertinoColors.inactiveGray),
+                    )
+                  ],
+                )),
+              )),
+            ],
+          ),
+          SizedBox(
+            height: 30,
+          ),
+          Row(
+            children: [
+              Expanded(
+                  child: Opacity(
+                opacity: .3,
+                child: GestureDetector(
+                    child: Column(
+                  children: [
+                    Icon(Icons.bookmark, size: 34, color: CupertinoColors.inactiveGray),
+                    Text(
+                      'Uložené',
+                      style: TextStyle(fontSize: 12, color: CupertinoColors.inactiveGray),
+                    )
+                  ],
+                )),
+              )),
               Expanded(
                   child: GestureDetector(
                       onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/settings'),
