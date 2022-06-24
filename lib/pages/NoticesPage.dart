@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fyx/components/Avatar.dart' as component;
-import 'package:fyx/components/ContentBoxLayout.dart';
-import 'package:fyx/components/PullToRefreshList.dart';
+import 'package:fyx/components/avatar.dart' as component;
+import 'package:fyx/components/content_box_layout.dart';
 import 'package:fyx/components/post/PostThumbs.dart';
+import 'package:fyx/components/pull_to_refresh_list.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/post/PostThumbItem.dart';

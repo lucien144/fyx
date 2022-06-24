@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fyx/components/ContentBoxLayout.dart';
-import 'package:fyx/components/FeedbackIndicator.dart';
-import 'package:fyx/components/GestureFeedback.dart';
 import 'package:fyx/components/actionSheets/PostActionSheet.dart';
 import 'package:fyx/components/actionSheets/PostAvatarActionSheet.dart';
+import 'package:fyx/components/content_box_layout.dart';
+import 'package:fyx/components/feedback_indicator.dart';
+import 'package:fyx/components/gesture_feedback.dart';
 import 'package:fyx/components/post/PostAvatar.dart';
 import 'package:fyx/components/post/PostRating.dart';
 import 'package:fyx/components/post/PostThumbs.dart';

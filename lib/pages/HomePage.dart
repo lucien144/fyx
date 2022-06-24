@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/FyxApp.dart';
-import 'package:fyx/components/Avatar.dart';
-import 'package:fyx/components/NotificationBadge.dart';
+import 'package:fyx/components/avatar.dart';
 import 'package:fyx/components/bottom_tab_bar.dart';
+import 'package:fyx/components/notification_badge.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
