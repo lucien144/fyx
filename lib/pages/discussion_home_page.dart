@@ -9,8 +9,6 @@ import 'package:fyx/model/reponses/DiscussionHomeResponse.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
-import 'package:fyx/theme/skin/Skin.dart';
-import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class DiscussionHomePageArguments {
@@ -27,7 +25,6 @@ class DiscussionHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SkinColors colors = Skin.of(context).theme.colors;
     DiscussionHomePageArguments? pageArguments = ModalRoute.of(context)?.settings.arguments as DiscussionHomePageArguments?;
 
     return DiscussionPageScaffold(
