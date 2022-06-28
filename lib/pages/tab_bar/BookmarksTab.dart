@@ -109,6 +109,7 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
   Widget build(BuildContext context) {
     return CupertinoTabView(builder: (context) {
       return CupertinoPageScaffold(
+        resizeToAvoidBottomInset: false,
         navigationBar: CupertinoNavigationBar(
             trailing: GestureDetector(child: (() {
               if (activeTab == TabsEnum.history) {
