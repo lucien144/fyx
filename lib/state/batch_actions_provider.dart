@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class PostsSelection extends StateNotifier<List<int>> {
   PostsSelection() : super([]);
 
-  static final provider = StateNotifierProvider<PostsSelection, List<int>>((ref) {
+  static final provider = StateNotifierProvider.autoDispose<PostsSelection, List<int>>((ref) {
     return PostsSelection();
   });
 
@@ -33,7 +33,7 @@ class PostsSelection extends StateNotifier<List<int>> {
 class PostsToDelete extends StateNotifier<List<int>> {
   PostsToDelete() : super([]);
 
-  static final provider = StateNotifierProvider<PostsToDelete, List<int>>((ref) {
+  static final provider = StateNotifierProvider.autoDispose<PostsToDelete, List<int>>((ref) {
     return PostsToDelete();
   });
 
