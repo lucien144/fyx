@@ -156,7 +156,7 @@ class _BottomTabBarState extends State<BottomTabBar> {
   Widget build(BuildContext context) {
     final double bottomPadding = MediaQuery.of(context).padding.bottom;
     colors = Skin.of(context).theme.colors;
-    double submenuHeight = 0;
+    double submenuHeight = MediaQuery.of(context).size.height / 2;
 
     final box = submenuKey.currentContext?.findRenderObject();
     submenuHeight = box is RenderBox ? box.size.height : submenuHeight;
