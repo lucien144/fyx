@@ -134,6 +134,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
           child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             if (widget.onSearch != null)
               SearchBox(
+                loading: _isLoading,
                 label: widget.searchLabel,
                 limit: widget.searchLimit,
                 searchTerm: widget.searchTerm,
@@ -153,6 +154,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
           children: <Widget>[
             if (widget.onSearch != null)
               SearchBox(
+                loading: _isLoading,
                 label: widget.searchLabel,
                 limit: widget.searchLimit,
                 searchTerm: widget.searchTerm,
@@ -176,6 +178,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
           children: [
             if (widget.onSearch != null)
               SearchBox(
+                loading: _isLoading,
                 label: widget.searchLabel,
                 limit: widget.searchLimit,
                 searchTerm: widget.searchTerm,

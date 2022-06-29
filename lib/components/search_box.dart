@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,8 +13,10 @@ class SearchBox extends ConsumerStatefulWidget {
   final VoidCallback? onClear;
   final String? searchTerm;
   final int limit;
+  final bool loading;
 
-  SearchBox({Key? key, required this.onSearch, this.onClear, this.searchTerm, this.limit = 3, this.label = 'Hledej'}) : super(key: key);
+  SearchBox({Key? key, required this.onSearch, this.onClear, this.searchTerm, this.limit = 3, this.label = 'Hledej', this.loading = false})
+      : super(key: key);
 
   @override
   _SearchBoxState createState() => _SearchBoxState();
@@ -21,7 +25,9 @@ class SearchBox extends ConsumerStatefulWidget {
 class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateMixin {
   final FocusNode focus = FocusNode();
   late AnimationController searchAnimation;
+  Timer? _debounce;
   String searchTerm = '';
+  bool _loading = false;
 
   TextEditingController searchController = TextEditingController();
   @override
@@ -30,11 +36,13 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
 
     searchAnimation = AnimationController(vsync: this, value: widget.searchTerm == null ? 0 : 1);
     searchController.text = widget.searchTerm ?? '';
+    _loading = widget.loading;
   }
 
   @override
   void didUpdateWidget(oldWidget) {
     super.didUpdateWidget(oldWidget);
+
     if (oldWidget.searchTerm != widget.searchTerm) {
       if (widget.searchTerm == null) {
         searchController.clear();
@@ -45,17 +53,35 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
         duration: const Duration(milliseconds: 600),
       );
     }
+
     if (widget.searchTerm == null) {
       focus.unfocus();
     } else if (widget.searchTerm == '' && oldWidget.searchTerm != '') {
       focus.requestFocus();
+    }
+
+    // Update the loading only if has finished outside,
+    // otherwise this Widget handles the state itself.
+    if (oldWidget.loading != widget.loading && !widget.loading) {
+      setState(() => _loading = widget.loading);
     }
   }
 
   @override
   void dispose() {
     focus.dispose();
+    _debounce?.cancel();
     super.dispose();
+  }
+
+  void _submit(String term) {
+    if (term.length > 0 && term.length < widget.limit) {
+      T.warn('Zkus hledat víc jak ${widget.limit} znaky...');
+      setState(() => _loading = false);
+    } else {
+      widget.onSearch(term);
+      setState(() => _loading = true);
+    }
   }
 
   @override
@@ -73,13 +99,14 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
             focusNode: focus,
             placeholder: widget.label,
             controller: searchController,
-            onSubmitted: (term) {
-              if (term.length < widget.limit) {
-                T.warn('Zkus hledat víc jak ${widget.limit} znaky...');
-              } else {
-                widget.onSearch(term);
-              }
+            prefixIcon: _loading ? const CupertinoActivityIndicator(radius: 10) : const Icon(CupertinoIcons.search),
+            onChanged: (term) {
+              if (_debounce?.isActive ?? false) _debounce?.cancel();
+              _debounce = Timer(const Duration(milliseconds: 500), () {
+                _submit(term);
+              });
             },
+            onSubmitted: _submit,
             onSuffixTap: () {
               widget.onSearch('');
               searchController.clear();
