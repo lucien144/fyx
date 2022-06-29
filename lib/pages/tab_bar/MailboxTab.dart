@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fyx/components/MailListItem.dart';
-import 'package:fyx/components/PullToRefreshList.dart';
-import 'package:fyx/components/post/SyntaxHighlighter.dart';
+import 'package:fyx/components/mail_list_item.dart';
+import 'package:fyx/components/post/syntax_highlighter.dart';
+import 'package:fyx/components/pull_to_refresh_list.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';

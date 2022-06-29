@@ -7,8 +7,8 @@ import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
-import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:sentry/sentry.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -36,6 +36,17 @@ class T {
         timeInSecForIosWeb: duration,
         backgroundColor: bg,
         textColor: Colors.white,
+        fontSize: 14.0);
+  }
+
+  static warn(String message, {int duration: 7, Color bg: Colors.orangeAccent}) {
+    Fluttertoast.showToast(
+        msg: message,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: duration,
+        backgroundColor: bg,
+        textColor: Colors.black,
         fontSize: 14.0);
   }
 
@@ -73,14 +84,20 @@ class T {
     T.openLink(link);
   }
 
-  static Widget somethingsWrongButton(String content, {String url = '', IconData icon = Icons.warning, String title = 'Chyba zobrazení příspěvku.', String stack = ''}) {
+  static Widget somethingsWrongButton(String content,
+      {String url = '', IconData icon = Icons.warning, String title = 'Chyba zobrazení příspěvku.', String stack = ''}) {
     return GestureDetector(
       onTap: () => T.prefillGithubIssue(
-          title: title, body: '**Zdroj:**\n```$content```\n\n**Stack:**\n```$stack```', user: MainRepository().credentials!.nickname, url: url, appContext: MainRepository()),
-      child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-        Icon(icon, size: 48,),
+          title: title,
+          body: '**Zdroj:**\n```$content```\n\n**Stack:**\n```$stack```',
+          user: MainRepository().credentials!.nickname,
+          url: url,
+          appContext: MainRepository()),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
+        Icon(
+          icon,
+          size: 48,
+        ),
         Text(
           '$title\n Problém nahlásíte kliknutím zde.',
           textAlign: TextAlign.center,
@@ -89,7 +106,8 @@ class T {
     );
   }
 
-  static Widget feedbackScreen(BuildContext context, {bool isLoading = false, bool isWarning = false, String label = '', String title = '', VoidCallback? onPress, IconData icon = Icons.warning}) {
+  static Widget feedbackScreen(BuildContext context,
+      {bool isLoading = false, bool isWarning = false, String label = '', String title = '', VoidCallback? onPress, IconData icon = Icons.warning}) {
     return Container(
       width: double.infinity,
       color: (Skin.of(context).theme.colors as SkinColors).background,

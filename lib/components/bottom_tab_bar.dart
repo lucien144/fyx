@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 
 class BottomTabBar extends StatefulWidget {
   final List items;
@@ -17,6 +19,7 @@ class BottomTabBar extends StatefulWidget {
 
 class _BottomTabBarState extends State<BottomTabBar> {
   final submenuKey = GlobalKey();
+  late SkinColors colors;
   bool _activeSubmenu = false;
 
   @override
@@ -30,6 +33,12 @@ class _BottomTabBarState extends State<BottomTabBar> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
         color: CupertinoTheme.of(context).barBackgroundColor,
+        boxShadow: [
+          BoxShadow(
+              color: colors.grey.withOpacity(0.4), //New
+              blurRadius: 15.0,
+              offset: Offset(0, 0))
+        ],
       ),
       key: submenuKey,
       padding: EdgeInsets.all(40),
@@ -37,6 +46,70 @@ class _BottomTabBarState extends State<BottomTabBar> {
         children: [
           Row(
             children: [
+              Expanded(
+                child: Opacity(
+                  opacity: .3,
+                  child: GestureDetector(
+                      child: Column(
+                    children: [
+                      Icon(Icons.hourglass_top, size: 34, color: CupertinoColors.inactiveGray),
+                      Text(
+                        'Poslední',
+                        style: TextStyle(fontSize: 12, color: CupertinoColors.inactiveGray),
+                      )
+                    ],
+                  )),
+                ),
+              ),
+              Expanded(
+                  child: Opacity(
+                opacity: .3,
+                child: GestureDetector(
+                    child: Column(
+                  children: [
+                    Icon(Icons.shopping_cart, size: 34, color: CupertinoColors.inactiveGray),
+                    Text(
+                      'Tržiště',
+                      style: TextStyle(fontSize: 12, color: CupertinoColors.inactiveGray),
+                    )
+                  ],
+                )),
+              )),
+              Expanded(
+                  child: Opacity(
+                opacity: .3,
+                child: GestureDetector(
+                    child: Column(
+                  children: [
+                    Icon(Icons.search, size: 34, color: CupertinoColors.inactiveGray),
+                    Text(
+                      'Hledání',
+                      style: TextStyle(fontSize: 12, color: CupertinoColors.inactiveGray),
+                    )
+                  ],
+                )),
+              )),
+            ],
+          ),
+          SizedBox(
+            height: 30,
+          ),
+          Row(
+            children: [
+              Expanded(
+                  child: Opacity(
+                opacity: .3,
+                child: GestureDetector(
+                    child: Column(
+                  children: [
+                    Icon(Icons.bookmark, size: 34, color: CupertinoColors.inactiveGray),
+                    Text(
+                      'Uložené',
+                      style: TextStyle(fontSize: 12, color: CupertinoColors.inactiveGray),
+                    )
+                  ],
+                )),
+              )),
               Expanded(
                   child: GestureDetector(
                       onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/settings'),
@@ -82,7 +155,8 @@ class _BottomTabBarState extends State<BottomTabBar> {
   @override
   Widget build(BuildContext context) {
     final double bottomPadding = MediaQuery.of(context).padding.bottom;
-    double submenuHeight = 0;
+    colors = Skin.of(context).theme.colors;
+    double submenuHeight = MediaQuery.of(context).size.height / 2;
 
     final box = submenuKey.currentContext?.findRenderObject();
     submenuHeight = box is RenderBox ? box.size.height : submenuHeight;
@@ -91,12 +165,18 @@ class _BottomTabBarState extends State<BottomTabBar> {
       alignment: Alignment.bottomCenter,
       children: [
         AnimatedPositioned(
-            curve: Curves.easeIn,
+          curve: Curves.linearToEaseOut,
+          duration: Duration(milliseconds: 300),
+          bottom: _activeSubmenu ? 50 + bottomPadding : -submenuHeight,
+          left: 0,
+          right: 0,
+          child: AnimatedOpacity(
+            opacity: _activeSubmenu ? 1 : 0,
+            curve: Curves.linearToEaseOut,
             duration: Duration(milliseconds: 200),
-            bottom: _activeSubmenu ? 50 + bottomPadding : -submenuHeight,
-            left: 0,
-            right: 0,
-            child: submenu()),
+            child: submenu(),
+          ),
+        ),
         DecoratedBox(
             decoration: BoxDecoration(color: CupertinoTheme.of(context).barBackgroundColor),
             child: SizedBox(

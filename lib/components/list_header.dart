@@ -6,7 +6,7 @@ import 'package:fyx/theme/skin/SkinColors.dart';
 
 class ListHeader extends StatelessWidget {
   final String label;
-  final Function? onTap;
+  final GestureTapCallback? onTap;
 
   ListHeader(this.label, {this.onTap});
 
@@ -15,7 +15,7 @@ class ListHeader extends StatelessWidget {
     SkinColors colors = Skin.of(context).theme.colors;
 
     return GestureDetector(
-      onTap: () => this.onTap!(),
+      onTap: this.onTap,
       child: Container(
         decoration: BoxDecoration(color: colors.primary, border: Border(bottom: BorderSide(width: 1, color: colors.background.withOpacity(0.38)))),
         padding: EdgeInsets.all(8),

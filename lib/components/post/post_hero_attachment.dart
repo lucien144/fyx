@@ -2,8 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fyx/components/post/PostHeroAttachmentBox.dart';
-import 'package:fyx/model/post/Content.dart';
+import 'package:fyx/components/post/post_hero_attachment_box.dart';
 import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/model/post/Link.dart';
 import 'package:fyx/model/post/Video.dart';
@@ -25,7 +24,8 @@ class PostHeroAttachment extends StatelessWidget {
   Size size;
   bool showStrip;
 
-  PostHeroAttachment(this.attachment, {images = const <model.Image>[], crop = true, this.showStrip = true, this.size = const Size(100, 100), onTap, openGallery = true})
+  PostHeroAttachment(this.attachment,
+      {images = const <model.Image>[], crop = true, this.showStrip = true, this.size = const Size(100, 100), onTap, openGallery = true})
       : this._crop = crop,
         this._onTap = onTap,
         this._openGallery = openGallery,
@@ -40,7 +40,8 @@ class PostHeroAttachment extends StatelessWidget {
             _onTap!();
           }
           if (_openGallery) {
-            Navigator.of(context, rootNavigator: true).pushNamed('/gallery', arguments: GalleryArguments((attachment as model.Image).image, images: _images));
+            Navigator.of(context, rootNavigator: true)
+                .pushNamed('/gallery', arguments: GalleryArguments((attachment as model.Image).image, images: _images));
           }
         },
         child: ClipRRect(

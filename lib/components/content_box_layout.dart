@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/shims/dart_ui.dart';
-import 'package:fyx/components/post/Advertisement.dart';
-import 'package:fyx/components/post/Dice.dart';
-import 'package:fyx/components/post/Poll.dart';
-import 'package:fyx/components/post/PostFooterLink.dart';
-import 'package:fyx/components/post/PostHeroAttachment.dart';
-import 'package:fyx/components/post/PostHtml.dart';
+import 'package:fyx/components/post/advertisement.dart';
+import 'package:fyx/components/post/dice.dart';
+import 'package:fyx/components/post/poll.dart';
+import 'package:fyx/components/post/post_footer_link.dart';
+import 'package:fyx/components/post/post_hero_attachment.dart';
+import 'package:fyx/components/post/post_html.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/PostTypeEnum.dart';
 import 'package:fyx/model/post/Content.dart';
@@ -30,10 +30,19 @@ class ContentBoxLayout extends StatelessWidget {
   final Content content;
   final bool _isPreview;
   final bool _isHighlighted;
+  final bool isSelected;
   final Map<LAYOUT_TYPES, TLayout> _layoutMap = {};
   final VoidCallback? onTap;
 
-  ContentBoxLayout({required this.topLeftWidget, required this.topRightWidget, this.bottomWidget, required this.content, isPreview = false, isHighlighted = false, this.onTap})
+  ContentBoxLayout(
+      {required this.topLeftWidget,
+      required this.topRightWidget,
+      this.bottomWidget,
+      this.isSelected = false,
+      required this.content,
+      isPreview = false,
+      isHighlighted = false,
+      this.onTap})
       : _isPreview = isPreview,
         _isHighlighted = isHighlighted {
     // The order here is important!
@@ -90,7 +99,13 @@ class ContentBoxLayout extends StatelessWidget {
               var children = <Widget>[];
               children.add(Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[Expanded(child: PostHtml(content)), PostHeroAttachment(content.attachmentsWithFeatured['featured'], images: content.images,)],
+                children: <Widget>[
+                  Expanded(child: PostHtml(content)),
+                  PostHeroAttachment(
+                    content.attachmentsWithFeatured['featured'],
+                    images: content.images,
+                  )
+                ],
               ));
 
               if ((content.attachmentsWithFeatured['attachments'] as List).whereType<model.Image>().length > 0) {
@@ -130,7 +145,12 @@ class ContentBoxLayout extends StatelessWidget {
             ),
           ),
           Container(
-            color: _isHighlighted ? colors.primary.withOpacity(0.1) : null,
+            color: (() {
+              if (this.isSelected) {
+                return colors.highlightedText.withOpacity(.3);
+              }
+              return _isHighlighted ? colors.primary.withOpacity(0.1) : null;
+            })(),
             foregroundDecoration: _isHighlighted ? UnreadBadgeDecoration(badgeColor: colors.primary, badgeSize: 16) : null,
             child: Column(
               children: <Widget>[
@@ -171,7 +191,9 @@ class ContentBoxLayout extends StatelessWidget {
                   height: 8,
                 ),
                 this.bottomWidget != null ? Divider(color: colors.grey) : Container(),
-                this.bottomWidget != null ? Container(child: this.bottomWidget, padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16)) : Container(),
+                this.bottomWidget != null
+                    ? Container(child: this.bottomWidget, padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16))
+                    : Container(),
                 SizedBox(
                   height: 8,
                 )

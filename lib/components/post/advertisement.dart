@@ -1,16 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fyx/components/post/PostAvatar.dart';
-import 'package:fyx/components/post/PostHeroAttachment.dart';
-import 'package:fyx/components/post/PostHtml.dart';
+import 'package:fyx/components/post/post_avatar.dart';
+import 'package:fyx/components/post/post_hero_attachment.dart';
+import 'package:fyx/components/post/post_html.dart';
 import 'package:fyx/model/UserReferences.dart';
 import 'package:fyx/model/enums/AdEnums.dart';
 import 'package:fyx/model/post/Image.dart' as i;
 import 'package:fyx/model/post/content/Advertisement.dart';
 import 'package:fyx/theme/Helpers.dart';
-import 'package:fyx/theme/T.dart';
-import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 
 class Advertisement extends StatelessWidget {
   final ContentAdvertisement content;
@@ -30,18 +29,12 @@ class Advertisement extends StatelessWidget {
     return Container(
         padding: const EdgeInsets.all(6),
         child: Text('${content.price.toString()} ${content.currency}',
-            style: DefaultTextStyle
-                .of(context)
-                .style
-                .copyWith(fontSize: 16, fontWeight: FontWeight.bold, color: colors.background)),
+            style: DefaultTextStyle.of(context).style.copyWith(fontSize: 16, fontWeight: FontWeight.bold, color: colors.background)),
         decoration: BoxDecoration(color: colors.primary, borderRadius: BorderRadius.circular(6)));
   }
 
   Widget buildTitleWidget(BuildContext context) {
-    return Text(heading, style: DefaultTextStyle
-        .of(context)
-        .style
-        .copyWith(fontSize: 20, fontWeight: FontWeight.bold));
+    return Text(heading, style: DefaultTextStyle.of(context).style.copyWith(fontSize: 20, fontWeight: FontWeight.bold));
   }
 
   Widget buildRefrencesWidget(BuildContext context) {
@@ -51,9 +44,12 @@ class Advertisement extends StatelessWidget {
       return RichText(
         text: TextSpan(children: [
           TextSpan(text: 'Reference: ', style: TextStyle(color: colors.grey, fontSize: 10)),
-          if (content.references != null && content.references!.positive > 0) TextSpan(text: '+${content.references!.positive}', style: TextStyle(color: colors.primary, fontSize: 10)),
-          if (content.references != null && content.references!.positive > 0 && content.references!.negative < 0) TextSpan(text: ' / ', style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10)),
-          if (content.references != null && content.references!.negative < 0) TextSpan(text: '-${content.references!.negative}', style: TextStyle(color: colors.danger, fontSize: 10))
+          if (content.references != null && content.references!.positive > 0)
+            TextSpan(text: '+${content.references!.positive}', style: TextStyle(color: colors.primary, fontSize: 10)),
+          if (content.references != null && content.references!.positive > 0 && content.references!.negative < 0)
+            TextSpan(text: ' / ', style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10)),
+          if (content.references != null && content.references!.negative < 0)
+            TextSpan(text: '-${content.references!.negative}', style: TextStyle(color: colors.danger, fontSize: 10))
         ]),
       );
     }
@@ -72,10 +68,7 @@ class Advertisement extends StatelessWidget {
           SizedBox(width: 6),
           Text(
             label,
-            style: DefaultTextStyle
-                .of(context)
-                .style
-                .copyWith(fontSize: 12),
+            style: DefaultTextStyle.of(context).style.copyWith(fontSize: 12),
           ),
         ],
       ),
@@ -121,12 +114,12 @@ class Advertisement extends StatelessWidget {
               padding: const EdgeInsets.all(4),
               child: Text(
                 content.type == AdTypeEnum.offer ? 'Nabízím' : 'Hledám',
-                style: DefaultTextStyle
-                    .of(context)
+                style: DefaultTextStyle.of(context)
                     .style
                     .copyWith(fontSize: 12, color: content.type == AdTypeEnum.offer ? colors.background : colors.text),
               ),
-              decoration: BoxDecoration(color: content.type == AdTypeEnum.offer ? colors.primary : colors.highlight, borderRadius: BorderRadius.circular(6)),
+              decoration:
+                  BoxDecoration(color: content.type == AdTypeEnum.offer ? colors.primary : colors.highlight, borderRadius: BorderRadius.circular(6)),
             ),
             if (content.location.isNotEmpty)
               Padding(

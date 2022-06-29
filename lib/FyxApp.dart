@@ -24,12 +24,14 @@ import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/pages/NoticesPage.dart';
 import 'package:fyx/pages/SettingsPage.dart';
 import 'package:fyx/pages/TutorialPage.dart';
+import 'package:fyx/pages/discussion_home_page.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/skins/FyxSkin.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry/sentry.dart';
+import 'package:tap_canvas/tap_canvas.dart';
 
 import 'controllers/NotificationsService.dart';
 
@@ -139,6 +141,12 @@ class FyxApp extends StatefulWidget {
       case '/discussion':
         print('[Router] Discussion');
         return CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings);
+      case '/discussion/home':
+        print('[Router] Discussion home');
+        return CupertinoPageRoute(builder: (_) => DiscussionHomePage(), settings: settings);
+      case '/discussion/header':
+        print('[Router] Discussion home');
+        return CupertinoPageRoute(builder: (_) => DiscussionHomePage(header: true), settings: settings);
       case '/new-message':
         print('[Router] New Message');
         return CupertinoPageRoute(builder: (_) => NewMessagePage(), settings: settings, fullscreenDialog: true);
@@ -181,14 +189,7 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // Hide the keyboard on tap
-        FocusScopeNode currentFocus = FocusScope.of(context);
-        if (!currentFocus.hasPrimaryFocus) {
-          currentFocus.unfocus();
-        }
-      },
+    return TapCanvas(
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider<NotificationsModel>(create: (context) => NotificationsModel()),
