@@ -139,6 +139,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
       onWillPop: () async => false,
       child: Stack(children: [
         Positioned.fill(
+          // Do not prevent the scroll down if the submenu is up. Only hide the submenu and keep scrolling...
           child: GestureDetector(
             child: tabs[_pageIndex],
             onVerticalDragDown: (_) => _showSubmenu ? setState(() => _showSubmenu = false) : null,
@@ -146,34 +147,39 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
           bottom: 50 + bottomPadding,
         ),
         Positioned.fill(
-          child: BottomTabBar(
-            activeSubmenu: _showSubmenu,
-            onTap: (index) {
-              if (index == tabs.length) {
-                setState(() => _showSubmenu = !_showSubmenu);
-                return;
-              }
+          // Prevent the tap if submenu is up!
+          child: GestureDetector(
+            behavior: _showSubmenu ? HitTestBehavior.translucent : HitTestBehavior.deferToChild,
+            onTap: () => _showSubmenu ? setState(() => _showSubmenu = false) : null,
+            child: BottomTabBar(
+              activeSubmenu: _showSubmenu,
+              onTap: (index) {
+                if (index == tabs.length) {
+                  setState(() => _showSubmenu = !_showSubmenu);
+                  return;
+                }
 
-              if (_pageIndex == index && index == HomePage.PAGE_BOOKMARK) {
-                setState(() => _filterUnread = !_filterUnread);
-              }
-              setState(() {
-                _pageIndex = index;
-                _showSubmenu = false;
-              });
-              this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? RefreshDataEnum.mail : RefreshDataEnum.bookmarks);
-            },
-            items: [
-              Icon(_filterUnread ? Icons.bookmarks : Icons.bookmarks_outlined,
-                  size: 34, color: _pageIndex == 0 ? null : CupertinoColors.inactiveGray),
-              Consumer<NotificationsModel>(
-                builder: (context, notifications, child) => NotificationBadge(
-                    widget: Icon(Icons.email_outlined, size: 42, color: _pageIndex == 1 ? null : CupertinoColors.inactiveGray),
-                    counter: notifications.newMails,
-                    isVisible: notifications.newMails > 0),
-              ),
-              Center(child: Avatar(MainRepository().credentials!.avatar, size: 32))
-            ],
+                if (_pageIndex == index && index == HomePage.PAGE_BOOKMARK) {
+                  setState(() => _filterUnread = !_filterUnread);
+                }
+                setState(() {
+                  _pageIndex = index;
+                  _showSubmenu = false;
+                });
+                this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? RefreshDataEnum.mail : RefreshDataEnum.bookmarks);
+              },
+              items: [
+                Icon(_filterUnread ? Icons.bookmarks : Icons.bookmarks_outlined,
+                    size: 34, color: _pageIndex == 0 ? null : CupertinoColors.inactiveGray),
+                Consumer<NotificationsModel>(
+                  builder: (context, notifications, child) => NotificationBadge(
+                      widget: Icon(Icons.email_outlined, size: 42, color: _pageIndex == 1 ? null : CupertinoColors.inactiveGray),
+                      counter: notifications.newMails,
+                      isVisible: notifications.newMails > 0),
+                ),
+                Center(child: Avatar(MainRepository().credentials!.avatar, size: 32))
+              ],
+            ),
           ),
         )
       ]),
