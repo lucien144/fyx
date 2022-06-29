@@ -91,7 +91,11 @@ class ApiProvider implements IApiProvider {
       }
 
       if (onError != null) {
-        onError!(e.message);
+        if (e.message.contains('SocketException')) {
+          onError!(L.CONNECTION_ERROR);
+        } else {
+          onError!(e.message);
+        }
       }
     }));
   }
