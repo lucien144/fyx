@@ -1,27 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:fyx/FyxApp.dart';
-import 'package:fyx/components/Avatar.dart' as ca;
-import 'package:fyx/components/DiscussionListItem.dart';
-import 'package:fyx/components/ListHeader.dart';
-import 'package:fyx/components/NotificationBadge.dart';
-import 'package:fyx/components/PullToRefreshList.dart';
+import 'package:fyx/components/avatar.dart';
+import 'package:fyx/components/bottom_tab_bar.dart';
+import 'package:fyx/components/notification_badge.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
-import 'package:fyx/model/BookmarkedDiscussion.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
+import 'package:fyx/model/enums/RefreshDataEnum.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
-import 'package:fyx/pages/MailboxPage.dart';
-import 'package:fyx/theme/L.dart';
-import 'package:fyx/theme/T.dart';
-import 'package:fyx/theme/skin/Skin.dart';
-import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:fyx/pages/tab_bar/BookmarksTab.dart';
+import 'package:fyx/pages/tab_bar/MailboxTab.dart';
 import 'package:provider/provider.dart';
-
-enum ETabs { history, bookmarks }
-enum ERefreshData { bookmarks, mail, all }
 
 class HomePageArguments {
   final pageIndex;
@@ -38,14 +29,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObserver {
-  late PageController _bookmarksController;
-
-  ETabs activeTab = ETabs.history;
   int _pageIndex = 0;
-  Map<String, int> _refreshData = {'bookmarks': 0, 'mail': 0};
+  Map<RefreshDataEnum, int> _refreshData = {RefreshDataEnum.bookmarks: 0, RefreshDataEnum.mail: 0};
   bool _filterUnread = false;
-  DefaultView _defaultView = DefaultView.history;
-  List<int> _toggledCategories = [];
+  bool _showSubmenu = false;
   HomePageArguments? _arguments;
 
   @override
@@ -53,24 +40,9 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     super.initState();
     WidgetsBinding.instance?.addObserver(this);
 
-    _defaultView = MainRepository().settings.defaultView == DefaultView.latest ? MainRepository().settings.latestView : MainRepository().settings.defaultView;
-    _filterUnread = [DefaultView.bookmarksUnread, DefaultView.historyUnread].indexOf(_defaultView) >= 0;
-
-    activeTab = [DefaultView.history, DefaultView.historyUnread].indexOf(_defaultView) >= 0 ? ETabs.history : ETabs.bookmarks;
-    if (activeTab == ETabs.bookmarks) {
-      _bookmarksController = PageController(initialPage: 1);
-    } else {
-      _bookmarksController = PageController(initialPage: 0);
-    }
-
-    _bookmarksController.addListener(() {
-      // If the CupertinoTabView is sliding and the animation is finished, change the active tab
-      if (_bookmarksController.page! % 1 == 0 && activeTab != ETabs.values[_bookmarksController.page!.toInt()]) {
-        setState(() {
-          activeTab = ETabs.values[_bookmarksController.page!.toInt()];
-        });
-      }
-    });
+    final defaultView =
+        MainRepository().settings.defaultView == DefaultView.latest ? MainRepository().settings.latestView : MainRepository().settings.defaultView;
+    _filterUnread = [DefaultView.bookmarksUnread, DefaultView.historyUnread].indexOf(defaultView) >= 0;
 
     // Request for push notifications
     MainRepository().notifications.request();
@@ -87,7 +59,6 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   @override
   void dispose() {
-    _bookmarksController.dispose();
     FyxApp.routeObserver.unsubscribe(this);
     WidgetsBinding.instance?.removeObserver(this);
     super.dispose();
@@ -95,10 +66,12 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    setState(() => _showSubmenu = false);
+
     // If we omit the Route check, there's very rare issue during authorization
     // See: https://github.com/lucien144/fyx/issues/57
     if (state == AppLifecycleState.resumed && ModalRoute.of(context)!.isCurrent) {
-      this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? ERefreshData.mail : ERefreshData.bookmarks);
+      this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? RefreshDataEnum.mail : RefreshDataEnum.bookmarks);
     }
   }
 
@@ -110,7 +83,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   // Called when the current route has been pushed.
   void didPopNext() {
-    this.refreshData(ERefreshData.bookmarks);
+    this.refreshData(RefreshDataEnum.bookmarks);
   }
 
   void didPush() {
@@ -121,57 +94,30 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     // Called when the current route has been popped off.
   }
 
+  // Called when a new route has been pushed, and the current route is no longer visible.
   void didPushNext() {
-    // Called when a new route has been pushed, and the current route is no longer visible.
+    setState(() => _showSubmenu = false);
   }
 
-  void refreshData(ERefreshData type) {
+  void refreshData(RefreshDataEnum type) {
     setState(() {
       switch (type) {
-        case ERefreshData.bookmarks:
-          _refreshData['bookmarks'] = DateTime.now().millisecondsSinceEpoch;
+        case RefreshDataEnum.bookmarks:
+          _refreshData[RefreshDataEnum.bookmarks] = DateTime.now().millisecondsSinceEpoch;
           break;
-        case ERefreshData.mail:
-          _refreshData['mail'] = DateTime.now().millisecondsSinceEpoch;
+        case RefreshDataEnum.mail:
+          _refreshData[RefreshDataEnum.mail] = DateTime.now().millisecondsSinceEpoch;
           break;
         default:
-          _refreshData['bookmarks'] = DateTime.now().millisecondsSinceEpoch;
-          _refreshData['mail'] = DateTime.now().millisecondsSinceEpoch;
+          _refreshData[RefreshDataEnum.bookmarks] = DateTime.now().millisecondsSinceEpoch;
+          _refreshData[RefreshDataEnum.mail] = DateTime.now().millisecondsSinceEpoch;
           break;
       }
     });
   }
 
-  Widget actionSheet(BuildContext context) {
-    return CupertinoActionSheet(
-        title: Text('Přihlášen jako: ${MainRepository().credentials!.nickname}'),
-        actions: <Widget>[
-          CupertinoActionSheetAction(
-              child: Text(L.SETTINGS),
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context, rootNavigator: true).pushNamed('/settings');
-              }),
-          CupertinoActionSheetAction(
-              child: Text('⚠️ ${L.SETTINGS_BUGREPORT}'),
-              onPressed: () {
-                T.prefillGithubIssue(appContext: MainRepository(), user: MainRepository().credentials!.nickname);
-                AnalyticsProvider().logEvent('reportBug');
-              }),
-        ],
-        cancelButton: CupertinoActionSheetAction(
-          isDefaultAction: true,
-          child: Text(L.GENERAL_CANCEL),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ));
-  }
-
   @override
   Widget build(BuildContext context) {
-    SkinColors colors = Skin.of(context).theme.colors;
-
     if (ApiController().buildContext == null || ApiController().buildContext.hashCode != context.hashCode) {
       ApiController().buildContext = context;
     }
@@ -182,210 +128,61 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
       _pageIndex = _arguments?.pageIndex;
     }
 
+    final tabs = [
+      BookmarksTab(filterUnread: _filterUnread, refreshTimestamp: _refreshData[RefreshDataEnum.bookmarks] ?? 0),
+      MailboxTab(refreshTimestamp: _refreshData[RefreshDataEnum.mail] ?? 0),
+    ];
+
+    final double bottomPadding = MediaQuery.of(context).padding.bottom;
+
     return WillPopScope(
       onWillPop: () async => false,
-      child: CupertinoTabScaffold(
-        tabBar: CupertinoTabBar(
-          currentIndex: _pageIndex,
-          onTap: (index) {
-            if (_pageIndex == index && index == HomePage.PAGE_BOOKMARK) {
-              setState(() {
-                _filterUnread = !_filterUnread;
-                // Reset the category toggle
-                _toggledCategories = [];
-                this.updateLatestView();
-              });
-            }
-            setState(() => _pageIndex = index);
-            this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? ERefreshData.mail : ERefreshData.bookmarks);
-          },
-          items: <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(_filterUnread ? Icons.bookmarks : Icons.bookmarks_outlined, size: 34),
-            ),
-            BottomNavigationBarItem(
-              icon: Consumer<NotificationsModel>(
-                builder: (context, notifications, child) => NotificationBadge(
-                    widget: Icon(
-                      Icons.email_outlined,
-                      size: 42,
-                    ),
-                    counter: notifications.newMails,
-                    isVisible: notifications.newMails > 0),
-              ),
-            ),
-          ],
+      child: Stack(children: [
+        Positioned.fill(
+          // Do not prevent the scroll down if the submenu is up. Only hide the submenu and keep scrolling...
+          child: GestureDetector(
+            child: tabs[_pageIndex],
+            onVerticalDragDown: (_) => _showSubmenu ? setState(() => _showSubmenu = false) : null,
+          ),
+          bottom: 50 + bottomPadding,
         ),
-        tabBuilder: (context, index) {
-          switch (index) {
-            case HomePage.PAGE_BOOKMARK:
-              return CupertinoTabView(builder: (context) {
-                return CupertinoPageScaffold(
-                  navigationBar: CupertinoNavigationBar(
-                      leading: Consumer<NotificationsModel>(
-                          builder: (context, notifications, child) => NotificationBadge(
-                              widget: CupertinoButton(
-                                  padding: EdgeInsets.zero,
-                                  minSize: kMinInteractiveDimensionCupertino - 10,
-                                  child: Icon(
-                                    Icons.notifications_none,
-                                    size: 30,
-                                  ),
-                                  onPressed: () => Navigator.of(context, rootNavigator: true).pushNamed('/notices')),
-                              isVisible: notifications.newNotices > 0,
-                              counter: notifications.newNotices)),
-                      trailing: GestureDetector(
-                        child: ca.Avatar(
-                          MainRepository().credentials!.avatar,
-                          size: 26
-                        ),
-                        onTap: () {
-                          showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet(context));
-                        },
-                      ),
-                      middle: CupertinoSegmentedControl(
-                        groupValue: activeTab,
-                        onValueChanged: (value) {
-                          _bookmarksController.animateToPage(ETabs.values.indexOf(value as ETabs), duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
-                        },
-                        children: {
-                          ETabs.history: Padding(
-                            child: Text('Historie'),
-                            padding: EdgeInsets.symmetric(horizontal: 16),
-                          ),
-                          ETabs.bookmarks: Padding(
-                            child: Text('Sledované'),
-                            padding: EdgeInsets.symmetric(horizontal: 16),
-                          ),
-                        },
-                      )),
-                  child: PageView(
-                    controller: _bookmarksController,
-                    onPageChanged: (int index) => this.updateLatestView(isInverted: true),
-                    pageSnapping: true,
-                    children: <Widget>[
-                      // -----
-                      // HISTORY PULL TO REFRESH
-                      // -----
-                      PullToRefreshList(
-                          rebuild: _refreshData['bookmarks'] ?? 0,
-                          dataProvider: (lastId) async {
-                            List<DiscussionListItem> withReplies = [];
-                            var result = await ApiController().loadHistory();
-                            var data = result.discussions
-                                .map((discussion) => BookmarkedDiscussion.fromJson(discussion))
-                                .where((discussion) => this._filterUnread ? discussion.unread > 0 : true)
-                                .map((discussion) => DiscussionListItem(discussion))
-                                .where((discussionListItem) {
-                              if (discussionListItem.discussion.replies > 0) {
-                                withReplies.add(discussionListItem);
-                                return false;
-                              }
-                              return true;
-                            }).toList();
-                            data.insertAll(0, withReplies);
-                            return DataProviderResult(data);
-                          }),
-                      // -----
-                      // BOOKMARKS PULL TO REFRESH
-                      // -----
-                      PullToRefreshList(
-                          rebuild: _refreshData['bookmarks'] ?? 0,
-                          dataProvider: (lastId) async {
-                            var categories = [];
-                            var result = await ApiController().loadBookmarks();
+        Positioned.fill(
+          // Prevent the tap if submenu is up!
+          child: GestureDetector(
+            behavior: _showSubmenu ? HitTestBehavior.translucent : HitTestBehavior.deferToChild,
+            onTap: () => _showSubmenu ? setState(() => _showSubmenu = false) : null,
+            child: BottomTabBar(
+              activeSubmenu: _showSubmenu,
+              onTap: (index) {
+                if (index == tabs.length) {
+                  setState(() => _showSubmenu = !_showSubmenu);
+                  return;
+                }
 
-                            result.bookmarks.forEach((_bookmark) {
-                              List<DiscussionListItem> withReplies = [];
-                              var discussion = _bookmark.discussions
-                                  .where((discussion) {
-                                    // Filter by tapping on category headers
-                                    // If unread filter is ON
-                                    if (this._filterUnread) {
-                                      if (_toggledCategories.indexOf(_bookmark.categoryId) >= 0) {
-                                        // If unread filter is ON and category toggle is ON, display discussions
-                                        return true;
-                                      } else {
-                                        // If unread filter is ON and category toggle is OFF, display unread discussions only
-                                        return discussion.unread > 0;
-                                      }
-                                    } else {
-                                      if (_toggledCategories.indexOf(_bookmark.categoryId) >= 0) {
-                                        // If unread filter is OFF and category toggle is ON, hide discussions
-                                        return false;
-                                      }
-                                    }
-                                    // If unread filter is OFF and category toggle is OFF, show discussions
-                                    return true;
-                                  })
-                                  .map((discussion) => DiscussionListItem(discussion))
-                                  .where((discussionListItem) {
-                                    if (discussionListItem.discussion.replies > 0) {
-                                      withReplies.add(discussionListItem);
-                                      return false;
-                                    }
-                                    return true;
-                                  })
-                                  .toList();
-                              discussion.insertAll(0, withReplies);
-                              categories.add({
-                                'header': ListHeader(_bookmark.categoryName, onTap: () {
-                                  if (_toggledCategories.indexOf(_bookmark.categoryId) >= 0) {
-                                    // Hide discussions in the category
-                                    setState(() => _toggledCategories.remove(_bookmark.categoryId));
-                                  } else {
-                                    // Show discussions in the category
-                                    setState(() => _toggledCategories.add(_bookmark.categoryId));
-                                  }
-                                  this.refreshData(ERefreshData.bookmarks);
-                                }),
-                                'items': discussion
-                              });
-                            });
-                            return DataProviderResult(categories);
-                          }),
-                    ],
-                  ),
-                );
-              });
-            case HomePage.PAGE_MAIL:
-              return CupertinoTabView(builder: (context) {
-                return CupertinoPageScaffold(
-                    navigationBar: CupertinoNavigationBar(
-                        trailing: GestureDetector(
-                          child: ca.Avatar(
-                            MainRepository().credentials!.avatar,
-                            size: 26,
-                          ),
-                          onTap: () {
-                            showCupertinoModalPopup(context: context, builder: (BuildContext context) => actionSheet(context));
-                          },
-                        ),
-                        middle: Text('Pošta', style: TextStyle(color: colors.text),)),
-                    child: MailboxPage(
-                      refreshData: _refreshData['mail'] ?? 0,
-                    ));
-              });
-            default:
-              throw Exception('Selected undefined tab');
-          }
-        },
-      ),
+                if (_pageIndex == index && index == HomePage.PAGE_BOOKMARK) {
+                  setState(() => _filterUnread = !_filterUnread);
+                }
+                setState(() {
+                  _pageIndex = index;
+                  _showSubmenu = false;
+                });
+                this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? RefreshDataEnum.mail : RefreshDataEnum.bookmarks);
+              },
+              items: [
+                Icon(_filterUnread ? Icons.bookmarks : Icons.bookmarks_outlined,
+                    size: 34, color: _pageIndex == 0 ? null : CupertinoColors.inactiveGray),
+                Consumer<NotificationsModel>(
+                  builder: (context, notifications, child) => NotificationBadge(
+                      widget: Icon(Icons.email_outlined, size: 42, color: _pageIndex == 1 ? null : CupertinoColors.inactiveGray),
+                      counter: notifications.newMails,
+                      isVisible: notifications.newMails > 0),
+                ),
+                Center(child: Avatar(MainRepository().credentials!.avatar, size: 32))
+              ],
+            ),
+          ),
+        )
+      ]),
     );
-  }
-
-  // isInverted
-  // Sometimes the activeTab var is changed after the listener where we call updateLatestView() finishes.
-  // Therefore, the var activeTab needs to be handled as inverted.
-  void updateLatestView({bool isInverted: false}) {
-    DefaultView latestView = activeTab == ETabs.history ? DefaultView.history : DefaultView.bookmarks;
-    if (isInverted) {
-      latestView = activeTab == ETabs.history ? DefaultView.bookmarks : DefaultView.history;
-    }
-
-    if (_filterUnread) {
-      latestView = latestView == DefaultView.bookmarks ? DefaultView.bookmarksUnread : DefaultView.historyUnread;
-    }
-    MainRepository().settings.latestView = latestView;
   }
 }

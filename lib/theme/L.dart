@@ -1,6 +1,14 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'package:fyx/model/reponses/UnifiedSearchResponse.dart';
+
 class L {
+  static Map<UnifiedSearchType, String> search = {
+    UnifiedSearchType.discussions: 'Nalezené diskuze',
+    UnifiedSearchType.events: 'Nalezené události',
+    UnifiedSearchType.advertisements: 'Nalezené inzeráty',
+  };
+
   // Errors
   static String AUTH_ERROR = 'Problém s přihlášením, přihlašte se znovu.';
   static String API_ERROR = 'Pardon, nastal problém v komunikaci se serverem.';

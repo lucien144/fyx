@@ -23,6 +23,7 @@ import 'package:fyx/model/reponses/MailResponse.dart';
 import 'package:fyx/model/reponses/OkResponse.dart';
 import 'package:fyx/model/reponses/PostRatingsResponse.dart';
 import 'package:fyx/model/reponses/RatingResponse.dart';
+import 'package:fyx/model/reponses/UnifiedSearchResponse.dart';
 import 'package:fyx/model/reponses/WaitingFilesResponse.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
@@ -169,6 +170,15 @@ class ApiController {
     return BookmarksAllResponse.fromJson(response.data);
   }
 
+  Future<UnifiedSearchResponse> searchDiscussions(String term) async {
+    var response = await provider.searchDiscussions(term);
+    return UnifiedSearchResponse.fromJson(response.data);
+  }
+
+  Future<Response> bookmarkDiscussion(int discussionId, bool state) async {
+    return await provider.bookmarkDiscussion(discussionId, state);
+  }
+
   Future<DiscussionResponse> loadDiscussion(int id, {int? lastId, String? user, String? search}) async {
     try {
       var response = await provider.fetchDiscussion(id, lastId: lastId, user: user, search: search);
@@ -188,6 +198,11 @@ class ApiController {
 
   Future<DiscussionHomeResponse> getDiscussionHome(int id) async {
     var response = await provider.fetchDiscussionHome(id);
+    return DiscussionHomeResponse.fromJson(response.data);
+  }
+
+  Future<DiscussionHomeResponse> getDiscussionHeader(int id) async {
+    var response = await provider.fetchDiscussionHeader(id);
     return DiscussionHomeResponse.fromJson(response.data);
   }
 

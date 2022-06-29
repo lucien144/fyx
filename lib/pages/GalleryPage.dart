@@ -5,7 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fyx/components/post/PostHeroAttachment.dart';
+import 'package:fyx/components/post/post_hero_attachment.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/exceptions/UnsupportedDownloadFormatException.dart';
 import 'package:fyx/theme/Helpers.dart';

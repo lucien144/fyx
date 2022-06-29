@@ -1,9 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:flutter/widgets.dart';
-import 'package:fyx/components/Avatar.dart';
+import 'package:fyx/components/avatar.dart';
 import 'package:fyx/theme/Helpers.dart';
-import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 
@@ -51,7 +50,8 @@ class PostAvatar extends StatelessWidget {
                 style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10),
               ),
             )
-          else if (this.descriptionWidget != null) Padding(padding: const EdgeInsets.only(top: 4.0),child: this.descriptionWidget!)
+          else if (this.descriptionWidget != null)
+            Padding(padding: const EdgeInsets.only(top: 4.0), child: this.descriptionWidget!)
         ],
       )
     ]);

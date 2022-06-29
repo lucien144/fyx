@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'package:fyx/components/search_box.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/FirstUnreadEnum.dart';
 import 'package:fyx/theme/L.dart';
@@ -16,26 +17,41 @@ import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:sentry/sentry.dart';
 
 // ignore: must_be_immutable
-class PullToRefreshList extends StatefulWidget {
+class PullToRefreshList<TProvider> extends StatefulWidget {
   final TDataProvider dataProvider;
   final Function? sliverListBuilder;
+  final String? searchLabel;
+  final String? searchTerm;
+  final int searchLimit;
+  final ValueChanged? onSearch;
+  final VoidCallback? onSearchClear;
+  final Widget? pinnedWidget;
   bool _disabled;
   bool _isInfinite;
   int _rebuild;
-  final Widget? pinnedWidget;
 
   PullToRefreshList(
-      {required this.dataProvider, isInfinite = false, int rebuild = 0, this.sliverListBuilder, bool disabled = false, this.pinnedWidget})
+      {required this.dataProvider,
+      this.onSearch, // TODO: move to SearchController
+      this.onSearchClear, // TODO: move to SearchController
+      this.searchLabel, // TODO: move to SearchController
+      this.searchTerm, // TODO: move to SearchController
+      this.searchLimit = 3, // TODO: move to SearchController
+      isInfinite = false,
+      int rebuild = 0,
+      this.sliverListBuilder,
+      bool disabled = false,
+      this.pinnedWidget})
       : _isInfinite = isInfinite,
         _rebuild = rebuild,
         _disabled = disabled,
         assert(dataProvider != null);
 
   @override
-  _PullToRefreshListState createState() => _PullToRefreshListState();
+  _PullToRefreshListState createState() => _PullToRefreshListState<TProvider>();
 }
 
-class _PullToRefreshListState extends State<PullToRefreshList> with SingleTickerProviderStateMixin {
+class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with SingleTickerProviderStateMixin {
   AutoScrollController _controller = AutoScrollController();
   bool _isLoading = true;
   bool _hasPulledDown = false;
@@ -45,6 +61,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
   int? _prevLastId; // ID of last item loaded previously.
   List<Widget> _slivers = <Widget>[];
   int _lastRebuild = 0;
+  String? _searchTerm;
   late AnimationController slideController;
   late Animation<Offset> slideOffset;
 
@@ -61,6 +78,7 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
   @override
   void initState() {
     super.initState();
+    _searchTerm = widget.searchTerm;
 
     () async {
       await Future.delayed(Duration.zero);
@@ -86,6 +104,14 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
   }
 
   @override
+  void didUpdateWidget(oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (this._searchTerm != widget.searchTerm) {
+      setState(() => this._searchTerm = widget.searchTerm);
+    }
+  }
+
+  @override
   void dispose() {
     super.dispose();
     _controller.dispose();
@@ -102,7 +128,20 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
     }
 
     if (_hasError) {
-      return T.feedbackScreen(context, isLoading: _isLoading, onPress: loadData, label: L.GENERAL_REFRESH);
+      return Container(
+          height: double.infinity,
+          width: double.infinity,
+          child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            if (widget.onSearch != null)
+              SearchBox(
+                label: widget.searchLabel,
+                limit: widget.searchLimit,
+                searchTerm: widget.searchTerm,
+                onSearch: widget.onSearch!,
+                onClear: widget.onSearchClear,
+              ),
+            Expanded(child: T.feedbackScreen(context, isLoading: _isLoading, onPress: loadData, label: L.GENERAL_REFRESH)),
+          ]));
     }
 
     if (_slivers.length == 1 && !_isLoading) {
@@ -112,7 +151,14 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            SizedBox(),
+            if (widget.onSearch != null)
+              SearchBox(
+                label: widget.searchLabel,
+                limit: widget.searchLimit,
+                searchTerm: widget.searchTerm,
+                onSearch: widget.onSearch!,
+                onClear: widget.onSearchClear,
+              ),
             Text(
               L.GENERAL_EMPTY,
               textAlign: TextAlign.center,
@@ -128,20 +174,30 @@ class _PullToRefreshListState extends State<PullToRefreshList> with SingleTicker
         Column(
           mainAxisSize: MainAxisSize.max,
           children: [
+            if (widget.onSearch != null)
+              SearchBox(
+                label: widget.searchLabel,
+                limit: widget.searchLimit,
+                searchTerm: widget.searchTerm,
+                onSearch: widget.onSearch!,
+                onClear: widget.onSearchClear,
+              ),
             Expanded(
-              child: NotificationListener<ScrollNotification>(
-                onNotification: (ScrollNotification scrollInfo) {
-                  // Hide the jump to first unread button if user scrolls twice the height of the screen height
-                  if (scrollInfo.metrics.pixels > 2 * MediaQuery.of(context).size.height) {
-                    slideController.reverse();
-                  }
+              child: NotificationListener(
+                onNotification: (scrollInfo) {
+                  if (scrollInfo is ScrollNotification) {
+                    // Hide the jump to first unread button if user scrolls twice the height of the screen height
+                    if (scrollInfo.metrics.pixels > 2 * MediaQuery.of(context).size.height) {
+                      slideController.reverse();
+                    }
 
-                  if (widget._isInfinite) {
-                    if (_controller.position.userScrollDirection == ScrollDirection.reverse && scrollInfo.metrics.outOfRange) {
-                      if (_slivers.last is! SliverPadding) {
-                        setState(() => _slivers.add(SliverPadding(
-                            padding: EdgeInsets.symmetric(vertical: 16), sliver: SliverToBoxAdapter(child: CupertinoActivityIndicator()))));
-                        this.loadData(append: true);
+                    if (widget._isInfinite) {
+                      if (_controller.position.userScrollDirection == ScrollDirection.reverse && scrollInfo.metrics.outOfRange) {
+                        if (_slivers.last is! SliverPadding) {
+                          setState(() => _slivers.add(SliverPadding(
+                              padding: EdgeInsets.symmetric(vertical: 16), sliver: SliverToBoxAdapter(child: CupertinoActivityIndicator()))));
+                          this.loadData(append: true);
+                        }
                       }
                     }
                   }
