@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class FyxSkin extends SkinData {
   FyxSkin({lightData, darkData}) : super(lightData: lightData, darkData: darkData);
@@ -29,7 +29,7 @@ class FyxSkin extends SkinData {
                 primaryColor: lightColors.primary,
                 scaffoldBackgroundColor: lightColors.background,
                 brightness: Brightness.light,
-                textTheme: CupertinoTextThemeData(textStyle: TextStyle(color: lightColors.text, fontSize: 16))),
+                textTheme: CupertinoTextThemeData(textStyle: GoogleFonts.inter(color: lightColors.text, fontSize: 16))),
             colors: lightColors),
         darkData: SkinBrightnessData<SkinColors>(
             data: CupertinoThemeData(
@@ -38,7 +38,7 @@ class FyxSkin extends SkinData {
                 scaffoldBackgroundColor: darkColors.background,
                 primaryColor: darkColors.primary,
                 brightness: Brightness.dark,
-                textTheme: CupertinoTextThemeData(textStyle: TextStyle(color: darkColors.text, fontSize: 16))),
+                textTheme: CupertinoTextThemeData(textStyle: GoogleFonts.inter(color: darkColors.text, fontSize: 16))),
             colors: darkColors));
   }
 }
