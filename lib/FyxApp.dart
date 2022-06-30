@@ -22,9 +22,9 @@ import 'package:fyx/pages/InfoPage.dart';
 import 'package:fyx/pages/LoginPage.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/pages/NoticesPage.dart';
-import 'package:fyx/pages/SettingsPage.dart';
 import 'package:fyx/pages/TutorialPage.dart';
 import 'package:fyx/pages/discussion_home_page.dart';
+import 'package:fyx/pages/settings_screen.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/skins/FyxSkin.dart';
@@ -160,7 +160,7 @@ class FyxApp extends StatefulWidget {
             fullscreenDialog: true);
       case '/settings':
         print('[Router] Settings');
-        return CupertinoPageRoute(builder: (_) => SettingsPage(), settings: settings);
+        return CupertinoPageRoute(builder: (_) => SettingsScreen(), settings: settings);
       case '/settings/info':
         print('[Router] Settings / info');
         return CupertinoPageRoute(builder: (_) => InfoPage(), settings: settings);
