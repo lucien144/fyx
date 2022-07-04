@@ -103,7 +103,13 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                 isWarning: true, title: snapshot.error.toString(), label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
           }
           if (snapshot.hasData) {
-            if (snapshot.data!.discussion.accessDenied) {
+            if (snapshot.data!.error) {
+              return T.feedbackScreen(context,
+                  isWarning: true,
+                  title: 'Něco se pokazilo.\nChybu, prosím, nahlašte ID LUCIEN.',
+                  label: L.GENERAL_CLOSE,
+                  onPress: () => Navigator.of(context).pop());
+            } else if (snapshot.data!.discussion.accessDenied) {
               return T.feedbackScreen(context,
                   title: L.ACCESS_DENIED_ERROR, icon: Icons.do_not_disturb_alt, label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
             }

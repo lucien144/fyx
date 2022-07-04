@@ -10,6 +10,7 @@ class DiscussionResponse {
   Map<DiscussionSpecificDataEnum, List<DiscussionContent>>? discussionSpecificData;
   late final List posts;
   ResponseContext? context;
+  bool error = false;
 
   DiscussionResponse.accessDenied() {
     this.discussion = Discussion.fromJson(null);
@@ -18,7 +19,9 @@ class DiscussionResponse {
 
   // TODO: Return something more relevant.
   DiscussionResponse.error() {
-    DiscussionResponse.accessDenied();
+    this.error = true;
+    this.discussion = Discussion.fromJson(null);
+    this.posts = [];
   }
 
   DiscussionResponse.fromJson(Map<String, dynamic> json) {
