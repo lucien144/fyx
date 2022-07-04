@@ -76,7 +76,7 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
 
   void _submit(String term) {
     if (term.length > 0 && term.length < widget.limit) {
-      T.warn('Zkus hledat víc jak ${widget.limit} znaky...');
+      T.warn('Zadejte alespoň ${widget.limit} písmena...');
       setState(() => _loading = false);
     } else {
       widget.onSearch(term);
