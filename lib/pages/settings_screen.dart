@@ -26,7 +26,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _compactMode = false;
   bool _autocorrect = false;
   DefaultView _defaultView = DefaultView.latest;
-  ThemeEnum _theme = ThemeEnum.light;
   FirstUnreadEnum _firstUnread = FirstUnreadEnum.button;
 
   @override
@@ -35,7 +34,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _compactMode = MainRepository().settings.useCompactMode;
     _autocorrect = MainRepository().settings.useAutocorrect;
     _defaultView = MainRepository().settings.defaultView;
-    _theme = MainRepository().settings.theme;
     _firstUnread = MainRepository().settings.firstUnread;
     AnalyticsProvider().setScreen('Settings', 'SettingsPage');
   }
@@ -59,18 +57,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       onPressed: (_) {
         setState(() => _defaultView = value);
         MainRepository().settings.defaultView = value;
-      },
-    );
-  }
-
-  SettingsTile _themeFactory(String label, ThemeEnum theme) {
-    return SettingsTile(
-      title: Text(label),
-      trailing: _theme == theme ? Icon(CupertinoIcons.check_mark) : null,
-      onPressed: (_) {
-        setState(() => _theme = theme);
-        MainRepository().settings.theme = theme;
-        Provider.of<ThemeModel>(context, listen: false).setTheme(theme);
       },
     );
   }
@@ -100,7 +86,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 settingsSectionBackground: colors.barBackground,
                 settingsListBackground: colors.background,
                 settingsTileTextColor: colors.text,
-                tileHighlightColor: colors.pollAnswerSelected,
+                tileHighlightColor: colors.primary.withOpacity(0.1),
                 dividerColor: colors.background),
             sections: [
               SettingsSection(
@@ -149,11 +135,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ],
               ),
               SettingsSection(
-                title: Text('Barevný režim'),
+                title: Text('Vzhled'),
                 tiles: <SettingsTile>[
-                  _themeFactory('Světlý', ThemeEnum.light),
-                  _themeFactory('Tmavý', ThemeEnum.dark),
-                  _themeFactory('Podle systému', ThemeEnum.system),
+                  SettingsTile.navigation(
+                    title: Text('Barevný režim'),
+                    value: Text((() {
+                      switch (MainRepository().settings.theme) {
+                        case ThemeEnum.light:
+                          return 'Světlý';
+
+                        case ThemeEnum.dark:
+                          return 'Tmavý';
+
+                        case ThemeEnum.system:
+                          return 'Podle systému';
+                      }
+                    })()),
+                    onPressed: (context) => Navigator.of(context).pushNamed('/settings/design'),
+                  ),
                 ],
               ),
               SettingsSection(
@@ -202,32 +201,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ],
               ),
               SettingsSection(title: Text('Informace'), tiles: <SettingsTile>[
-                SettingsTile(
+                SettingsTile.navigation(
                   leading: Icon(Icons.volunteer_activism),
-                  trailing: Icon(Icons.arrow_forward_ios),
                   title: Text(L.BACKERS),
                   onPressed: (_) => Navigator.of(context).pushNamed('/settings/info',
                       arguments: InfoPageSettings(L.BACKERS, 'https://raw.githubusercontent.com/lucien144/fyx/develop/BACKERS.md')),
                 ),
-                SettingsTile(
+                SettingsTile.navigation(
                   leading: Icon(Icons.info),
-                  trailing: Icon(Icons.arrow_forward_ios),
                   title: Text(L.ABOUT),
                   onPressed: (_) => Navigator.of(context).pushNamed('/settings/info',
                       arguments: InfoPageSettings(L.ABOUT, 'https://raw.githubusercontent.com/lucien144/fyx/develop/ABOUT.md')),
                 ),
-                SettingsTile(
+                SettingsTile.navigation(
                   leading: Icon(Icons.bug_report),
-                  trailing: Icon(Icons.arrow_forward_ios),
                   title: Text(L.SETTINGS_BUGREPORT),
                   onPressed: (_) {
                     T.prefillGithubIssue(appContext: MainRepository(), user: MainRepository().credentials!.nickname);
                     AnalyticsProvider().logEvent('reportBug');
                   },
                 ),
-                SettingsTile(
+                SettingsTile.navigation(
                   leading: Icon(Icons.gavel),
-                  trailing: Icon(Icons.arrow_forward_ios),
                   title: Text(L.TERMS),
                   onPressed: (_) {
                     T.openLink('https://nyx.cz/terms');

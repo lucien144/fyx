@@ -24,6 +24,7 @@ import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/pages/NoticesPage.dart';
 import 'package:fyx/pages/TutorialPage.dart';
 import 'package:fyx/pages/discussion_home_page.dart';
+import 'package:fyx/pages/settings_design_screen.dart';
 import 'package:fyx/pages/settings_screen.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -161,6 +162,9 @@ class FyxApp extends StatefulWidget {
       case '/settings':
         print('[Router] Settings');
         return CupertinoPageRoute(builder: (_) => SettingsScreen(), settings: settings);
+      case '/settings/design':
+        print('[Router] Settings');
+        return CupertinoPageRoute(builder: (_) => SettingsDesignScreen(), settings: settings);
       case '/settings/info':
         print('[Router] Settings / info');
         return CupertinoPageRoute(builder: (_) => InfoPage(), settings: settings);
