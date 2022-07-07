@@ -44,6 +44,15 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
         MainRepository().settings.defaultView == DefaultView.latest ? MainRepository().settings.latestView : MainRepository().settings.defaultView;
     _filterUnread = [DefaultView.bookmarksUnread, DefaultView.historyUnread].indexOf(defaultView) >= 0;
 
+    () async {
+      await Future.delayed(Duration.zero);
+      final Object? _objArguments = ModalRoute.of(context)?.settings.arguments;
+      if (_objArguments != null) {
+        _arguments = _objArguments as HomePageArguments;
+        setState(() => _pageIndex = _arguments?.pageIndex);
+      }
+    }();
+
     // Request for push notifications
     MainRepository().notifications.request();
 
@@ -120,12 +129,6 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
   Widget build(BuildContext context) {
     if (ApiController().buildContext == null || ApiController().buildContext.hashCode != context.hashCode) {
       ApiController().buildContext = context;
-    }
-
-    final Object? _objArguments = ModalRoute.of(context)?.settings.arguments;
-    if (_objArguments != null) {
-      _arguments = _objArguments as HomePageArguments;
-      _pageIndex = _arguments?.pageIndex;
     }
 
     final tabs = [
