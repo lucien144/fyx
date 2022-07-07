@@ -144,6 +144,8 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
     // TODO: Not ideal, probably better to use Provider. Or not?
     SyntaxHighlighter.languageContext = discussionResponse.discussion.name;
 
+    final textStyleContext = TextStyle(fontSize: Skin.of(context).defaultFontSize);
+
     return _pageScaffold(
         discussionResponse: discussionResponse,
         title: discussionResponse.discussion.name,
@@ -353,7 +355,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
-                                    Expanded(child: _bookmark! ? Text('Klub sleduješ') : Text('Klub nesleduješ')),
+                                    Expanded(child: Text(_bookmark! ? 'Klub sleduješ' : 'Klub nesleduješ', style: textStyleContext)),
                                     _bookmark! ? Icon(Icons.bookmark) : Icon(Icons.bookmark_border),
                                   ],
                                 ),
@@ -370,7 +372,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                                     .pushNamed('/discussion/header', arguments: new DiscussionHomePageArguments(discussionResponse)),
                                 child: Row(
                                   children: [
-                                    Expanded(child: Text('Záhlaví')),
+                                    Expanded(child: Text('Záhlaví', style: textStyleContext)),
                                     Icon(Icons.push_pin_outlined),
                                   ],
                                 ),
@@ -386,7 +388,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                                     .pushNamed('/discussion/home', arguments: new DiscussionHomePageArguments(discussionResponse)),
                                 child: Row(
                                   children: [
-                                    Expanded(child: Text('Nástěnka')),
+                                    Expanded(child: Text('Nástěnka', style: textStyleContext)),
                                     Icon(Icons.home_outlined),
                                   ],
                                 ),
@@ -404,7 +406,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                               },
                               child: Row(
                                 children: [
-                                  Text(this._searchTerm == null ? 'Hledat v diskuzi' : 'Zavřít hledání'),
+                                  Text(this._searchTerm == null ? 'Hledat v diskuzi' : 'Zavřít hledání', style: textStyleContext),
                                   SizedBox(
                                     width: 10,
                                   ),

@@ -29,7 +29,7 @@ class FyxSkin extends SkinData {
                 primaryColor: lightColors.primary,
                 scaffoldBackgroundColor: lightColors.background,
                 brightness: Brightness.light,
-                textTheme: CupertinoTextThemeData(textStyle: GoogleFonts.inter(color: lightColors.text, fontSize: 16))),
+                textTheme: CupertinoTextThemeData(textStyle: GoogleFonts.inter(color: lightColors.text, fontSize: 26))),
             colors: lightColors),
         darkData: SkinBrightnessData<SkinColors>(
             data: CupertinoThemeData(
@@ -38,7 +38,7 @@ class FyxSkin extends SkinData {
                 scaffoldBackgroundColor: darkColors.background,
                 primaryColor: darkColors.primary,
                 brightness: Brightness.dark,
-                textTheme: CupertinoTextThemeData(textStyle: GoogleFonts.inter(color: darkColors.text, fontSize: 16))),
+                textTheme: CupertinoTextThemeData(textStyle: GoogleFonts.inter(color: darkColors.text, fontSize: 26))),
             colors: darkColors));
   }
 }

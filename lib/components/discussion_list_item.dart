@@ -36,7 +36,7 @@ class DiscussionListItem extends StatelessWidget {
                           maxFontSize: 12,
                           maxLines: 1,
                           minFontSize: 1,
-                          style: TextStyle(color: colors.background, fontSize: 12, fontWeight: FontWeight.w600),
+                          style: TextStyle(color: colors.background, fontWeight: FontWeight.w600),
                         ),
                       ),
                     )),

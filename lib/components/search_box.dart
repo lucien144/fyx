@@ -96,6 +96,7 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           child: CupertinoSearchTextField(
+            style: TextStyle(fontSize: Skin.of(context).defaultFontSize),
             focusNode: focus,
             placeholder: widget.label,
             controller: searchController,

@@ -77,7 +77,9 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
                   isHighlighted: highlight,
                   topRightWidget: Text(
                     item.wuRating > 0 ? '+${item.wuRating}' : item.wuRating.toString(),
-                    style: TextStyle(fontSize: 14, color: item.wuRating > 0 ? colors.success : (item.wuRating < 0 ? colors.danger : colors.grey)),
+                    style: TextStyle(
+                        fontSize: Skin.of(context).defaultFontSize * 0.9,
+                        color: item.wuRating > 0 ? colors.success : (item.wuRating < 0 ? colors.danger : colors.grey)),
                   ),
                   topLeftWidget: Expanded(
                     child: GestureDetector(
@@ -86,7 +88,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
                         item.discussionName,
                         overflow: TextOverflow.ellipsis,
                         softWrap: false,
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: Skin.of(context).defaultFontSize),
                       ),
                     ),
                   ),

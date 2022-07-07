@@ -32,7 +32,7 @@ class PostAvatar extends StatelessWidget {
             children: <material.Widget>[
               Text(
                 nick,
-                style: TextStyle(color: isHighlighted ? colors.primary : colors.text),
+                style: TextStyle(color: isHighlighted ? colors.primary : colors.text, fontSize: Skin.of(context).defaultFontSize),
               ),
               Visibility(
                 visible: isHighlighted,

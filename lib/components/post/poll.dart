@@ -99,7 +99,11 @@ class _PollState extends State<Poll> {
     return Container(
         alignment: Alignment.centerLeft,
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          Text(_poll!.question, style: DefaultTextStyle.of(context).style.copyWith(fontSize: 20, fontWeight: FontWeight.bold)),
+          Text(
+            _poll!.question,
+            textScaleFactor: 1.25,
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
           if (_poll!.instructions != null)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),

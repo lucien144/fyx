@@ -7,14 +7,12 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
 import 'package:fyx/model/enums/FirstUnreadEnum.dart';
 import 'package:fyx/model/enums/ThemeEnum.dart';
-import 'package:fyx/model/provider/ThemeModel.dart';
 import 'package:fyx/pages/InfoPage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:provider/provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -165,7 +163,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         builder: (BuildContext context, value, Widget? child) {
                           return Text(
                             MainRepository().settings.blockedUsers.length.toString(),
-                            style: TextStyle(color: colors.text),
+                            style: TextStyle(color: colors.text, fontSize: Skin.of(context).defaultFontSize),
                           );
                         }),
                   ),
@@ -176,7 +174,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         builder: (BuildContext context, value, Widget? child) {
                           return Text(
                             MainRepository().settings.blockedPosts.length.toString(),
-                            style: TextStyle(color: colors.text),
+                            style: TextStyle(color: colors.text, fontSize: Skin.of(context).defaultFontSize),
                           );
                         }),
                   ),
@@ -187,7 +185,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         builder: (BuildContext context, value, Widget? child) {
                           return Text(
                             MainRepository().settings.blockedMails.length.toString(),
-                            style: TextStyle(color: colors.text),
+                            style: TextStyle(color: colors.text, fontSize: Skin.of(context).defaultFontSize),
                           );
                         }),
                   ),

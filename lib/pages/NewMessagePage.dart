@@ -141,10 +141,14 @@ class _NewMessagePageState extends State<NewMessagePage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        CupertinoButton(padding: EdgeInsets.all(0), child: Text('Zavřít'), onPressed: () => Navigator.of(context).pop()),
+                        CupertinoButton(
+                            padding: EdgeInsets.all(0),
+                            child: Text('Zavřít', style: TextStyle(fontSize: Skin.of(context).defaultFontSize)),
+                            onPressed: () => Navigator.of(context).pop()),
                         CupertinoButton(
                           padding: EdgeInsets.all(0),
-                          child: _sending ? CupertinoActivityIndicator() : Text('Odeslat'),
+                          child:
+                              _sending ? CupertinoActivityIndicator() : Text('Odeslat', style: TextStyle(fontSize: Skin.of(context).defaultFontSize)),
                           onPressed: _isSendDisabled()
                               ? null
                               : () async {
