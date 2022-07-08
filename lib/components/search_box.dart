@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fyx/model/Settings.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
@@ -96,7 +97,7 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           child: CupertinoSearchTextField(
-            style: TextStyle(fontSize: Skin.of(context).defaultFontSize),
+            style: TextStyle(fontSize: Settings().fontSize),
             focusNode: focus,
             placeholder: widget.label,
             controller: searchController,

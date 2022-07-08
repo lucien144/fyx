@@ -18,6 +18,12 @@ class SettingsProvider {
     _settings.theme = theme;
   }
 
+  double get fontSize => _settings.fontSize;
+  set fontSize(double fontSize) {
+    _box.put('fontSize', fontSize);
+    _settings.fontSize = fontSize;
+  }
+
   DefaultView get defaultView => _settings.defaultView;
   set defaultView(DefaultView view) {
     _box.put('defaultView', view);
@@ -69,6 +75,7 @@ class SettingsProvider {
 
     _settings = new Settings();
     _settings.theme = _box.get('theme', defaultValue: Settings().theme);
+    _settings.fontSize = _box.get('fontSize', defaultValue: Settings().fontSize);
     _settings.defaultView = _box.get('defaultView', defaultValue: Settings().defaultView);
     _settings.latestView = _box.get('latestView', defaultValue: Settings().latestView);
     _settings.useCompactMode = _box.get('useCompactMode', defaultValue: Settings().useCompactMode);

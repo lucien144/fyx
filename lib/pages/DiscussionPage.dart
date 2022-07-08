@@ -14,6 +14,7 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
+import 'package:fyx/model/Settings.dart';
 import 'package:fyx/model/enums/DiscussionTypeEnum.dart';
 import 'package:fyx/model/post/content/Advertisement.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
@@ -144,7 +145,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
     // TODO: Not ideal, probably better to use Provider. Or not?
     SyntaxHighlighter.languageContext = discussionResponse.discussion.name;
 
-    final textStyleContext = TextStyle(fontSize: Skin.of(context).defaultFontSize);
+    final textStyleContext = TextStyle(fontSize: Settings().fontSize);
 
     return _pageScaffold(
         discussionResponse: discussionResponse,

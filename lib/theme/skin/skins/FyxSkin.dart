@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 class FyxSkin extends SkinData {
   FyxSkin({lightData, darkData}) : super(lightData: lightData, darkData: darkData);
 
-  factory FyxSkin.create() {
+  factory FyxSkin.create({required double fontSize}) {
     final lightColors = SkinColors();
     final darkColors = SkinColors(
         primary: const Color(0xff4898ad),
@@ -29,7 +29,7 @@ class FyxSkin extends SkinData {
                 primaryColor: lightColors.primary,
                 scaffoldBackgroundColor: lightColors.background,
                 brightness: Brightness.light,
-                textTheme: CupertinoTextThemeData(textStyle: GoogleFonts.inter(color: lightColors.text, fontSize: 26))),
+                textTheme: CupertinoTextThemeData(textStyle: GoogleFonts.inter(color: lightColors.text, fontSize: fontSize))),
             colors: lightColors),
         darkData: SkinBrightnessData<SkinColors>(
             data: CupertinoThemeData(
@@ -38,7 +38,7 @@ class FyxSkin extends SkinData {
                 scaffoldBackgroundColor: darkColors.background,
                 primaryColor: darkColors.primary,
                 brightness: Brightness.dark,
-                textTheme: CupertinoTextThemeData(textStyle: GoogleFonts.inter(color: darkColors.text, fontSize: 26))),
+                textTheme: CupertinoTextThemeData(textStyle: GoogleFonts.inter(color: darkColors.text, fontSize: fontSize))),
             colors: darkColors));
   }
 }

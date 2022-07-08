@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:flutter/widgets.dart';
 import 'package:fyx/components/avatar.dart';
+import 'package:fyx/model/Settings.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
@@ -32,7 +33,7 @@ class PostAvatar extends StatelessWidget {
             children: <material.Widget>[
               Text(
                 nick,
-                style: TextStyle(color: isHighlighted ? colors.primary : colors.text, fontSize: Skin.of(context).defaultFontSize),
+                style: TextStyle(color: isHighlighted ? colors.primary : colors.text, fontSize: Settings().fontSize),
               ),
               Visibility(
                 visible: isHighlighted,

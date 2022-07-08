@@ -13,5 +13,6 @@ class Settings {
   List<int> blockedMails = [];
   List<String> blockedUsers = [];
   ThemeEnum theme = ThemeEnum.system;
+  double fontSize = 16;
   FirstUnreadEnum firstUnread = FirstUnreadEnum.button;
 }

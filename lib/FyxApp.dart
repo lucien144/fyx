@@ -197,12 +197,12 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider<NotificationsModel>(create: (context) => NotificationsModel()),
-          ChangeNotifierProvider<ThemeModel>(create: (context) => ThemeModel(MainRepository().settings.theme)),
+          ChangeNotifierProvider<ThemeModel>(create: (context) => ThemeModel(MainRepository().settings.theme, MainRepository().settings.fontSize)),
         ],
         builder: (ctx, widget) => Directionality(
             textDirection: TextDirection.ltr,
             child: Skin(
-                skin: FyxSkin.create(),
+                skin: FyxSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
                 brightness: (() {
                   if (ctx.watch<ThemeModel>().theme == ThemeEnum.system && _platformBrightness != null) {
                     return _platformBrightness!;

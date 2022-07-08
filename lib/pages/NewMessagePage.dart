@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/Settings.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
@@ -143,12 +144,11 @@ class _NewMessagePageState extends State<NewMessagePage> {
                       children: <Widget>[
                         CupertinoButton(
                             padding: EdgeInsets.all(0),
-                            child: Text('Zavřít', style: TextStyle(fontSize: Skin.of(context).defaultFontSize)),
+                            child: Text('Zavřít', style: TextStyle(fontSize: Settings().fontSize)),
                             onPressed: () => Navigator.of(context).pop()),
                         CupertinoButton(
                           padding: EdgeInsets.all(0),
-                          child:
-                              _sending ? CupertinoActivityIndicator() : Text('Odeslat', style: TextStyle(fontSize: Skin.of(context).defaultFontSize)),
+                          child: _sending ? CupertinoActivityIndicator() : Text('Odeslat', style: TextStyle(fontSize: Settings().fontSize)),
                           onPressed: _isSendDisabled()
                               ? null
                               : () async {

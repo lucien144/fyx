@@ -6,6 +6,7 @@ import 'package:fyx/components/post/post_thumbs.dart';
 import 'package:fyx/components/pull_to_refresh_list.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/model/Settings.dart';
 import 'package:fyx/model/post/PostThumbItem.dart';
 import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/model/reponses/FeedNoticesResponse.dart';
@@ -78,7 +79,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
                   topRightWidget: Text(
                     item.wuRating > 0 ? '+${item.wuRating}' : item.wuRating.toString(),
                     style: TextStyle(
-                        fontSize: Skin.of(context).defaultFontSize * 0.9,
+                        fontSize: Settings().fontSize * 0.9,
                         color: item.wuRating > 0 ? colors.success : (item.wuRating < 0 ? colors.danger : colors.grey)),
                   ),
                   topLeftWidget: Expanded(
@@ -88,7 +89,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
                         item.discussionName,
                         overflow: TextOverflow.ellipsis,
                         softWrap: false,
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: Skin.of(context).defaultFontSize),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: Settings().fontSize),
                       ),
                     ),
                   ),

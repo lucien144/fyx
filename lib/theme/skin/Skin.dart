@@ -27,8 +27,6 @@ class Skin extends InheritedWidget {
 
   SkinBrightnessData get theme => this.brightness == Brightness.light ? skin.lightData : skin.darkData;
 
-  double get defaultFontSize => 16;
-
   static Skin of(BuildContext context) {
     final Skin? result = context.dependOnInheritedWidgetOfExactType<Skin>();
     assert(result != null, 'No Skin found in context');

@@ -4,6 +4,7 @@ import 'package:fyx/FyxApp.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/Settings.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
 import 'package:fyx/model/enums/FirstUnreadEnum.dart';
 import 'package:fyx/model/enums/ThemeEnum.dart';
@@ -151,6 +152,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     })()),
                     onPressed: (context) => Navigator.of(context).pushNamed('/settings/design'),
                   ),
+                  SettingsTile.navigation(
+                    title: Text('Velikost písma'),
+                    value: Text('${MainRepository().settings.fontSize.toInt().toString()}pt'),
+                    onPressed: (context) => Navigator.of(context).pushNamed('/settings/design'),
+                  ),
                 ],
               ),
               SettingsSection(
@@ -163,7 +169,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         builder: (BuildContext context, value, Widget? child) {
                           return Text(
                             MainRepository().settings.blockedUsers.length.toString(),
-                            style: TextStyle(color: colors.text, fontSize: Skin.of(context).defaultFontSize),
+                            style: TextStyle(color: colors.text, fontSize: Settings().fontSize),
                           );
                         }),
                   ),
@@ -174,7 +180,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         builder: (BuildContext context, value, Widget? child) {
                           return Text(
                             MainRepository().settings.blockedPosts.length.toString(),
-                            style: TextStyle(color: colors.text, fontSize: Skin.of(context).defaultFontSize),
+                            style: TextStyle(color: colors.text, fontSize: Settings().fontSize),
                           );
                         }),
                   ),
@@ -185,7 +191,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         builder: (BuildContext context, value, Widget? child) {
                           return Text(
                             MainRepository().settings.blockedMails.length.toString(),
-                            style: TextStyle(color: colors.text, fontSize: Skin.of(context).defaultFontSize),
+                            style: TextStyle(color: colors.text, fontSize: Settings().fontSize),
                           );
                         }),
                   ),
