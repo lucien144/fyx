@@ -52,10 +52,18 @@ class T {
 
   static Future<bool> openLink(String link) async {
     try {
-      var status = await launch(link);
-      if (status == false) {
+      var encodedUri = Uri.parse(link);
+
+      var canLaunch = await canLaunchUrl(encodedUri);
+      if (!canLaunch) {
+        throw ('Cannot launch url: $link');
+      }
+
+      var status = await launchUrl(encodedUri);
+      if (!status) {
         throw ('Cannot open webview. URL: $link');
       }
+
       return true;
     } catch (e) {
       T.error(L.INAPPBROWSER_ERROR);
