@@ -7,6 +7,7 @@ import 'package:fyx/model/UserReferences.dart';
 import 'package:fyx/model/enums/AdEnums.dart';
 import 'package:fyx/model/post/Image.dart' as i;
 import 'package:fyx/model/post/content/Advertisement.dart';
+import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
@@ -80,79 +81,88 @@ class Advertisement extends StatelessWidget {
   Widget build(BuildContext context) {
     SkinColors colors = Skin.of(context).theme.colors;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (this.isStandaloneWidget)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [PostAvatar(this.username, descriptionWidget: buildRefrencesWidget(context)), buildPriceWidget(context)],
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        if (!this.isStandaloneWidget) {
+          var arguments = DiscussionPageArguments(content.discussionId);
+          Navigator.of(context, rootNavigator: true).pushNamed('/discussion', arguments: arguments);
+        }
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (this.isStandaloneWidget)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [PostAvatar(this.username, descriptionWidget: buildRefrencesWidget(context)), buildPriceWidget(context)],
+              ),
             ),
+          if (this.isStandaloneWidget)
+            buildTitleWidget(context)
+          else
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (heading.isNotEmpty) Flexible(child: buildTitleWidget(context)),
+                if (content.price > 0) buildPriceWidget(context),
+              ],
+            ),
+          SizedBox(
+            height: 8,
           ),
-        if (this.isStandaloneWidget)
-          buildTitleWidget(context)
-        else
           Row(
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              if (heading.isNotEmpty) Flexible(child: buildTitleWidget(context)),
-              if (content.price > 0) buildPriceWidget(context),
+              Container(
+                padding: const EdgeInsets.all(4),
+                child: Text(
+                  content.type == AdTypeEnum.offer ? 'Nabízím' : 'Hledám',
+                  style: DefaultTextStyle.of(context)
+                      .style
+                      .copyWith(fontSize: 12, color: content.type == AdTypeEnum.offer ? colors.background : colors.text),
+                ),
+                decoration: BoxDecoration(
+                    color: content.type == AdTypeEnum.offer ? colors.primary : colors.highlight, borderRadius: BorderRadius.circular(6)),
+              ),
+              if (content.location.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: buildIconLabelWidget(Icons.location_on_outlined, content.location, context),
+                ),
             ],
           ),
-        SizedBox(
-          height: 8,
-        ),
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(4),
-              child: Text(
-                content.type == AdTypeEnum.offer ? 'Nabízím' : 'Hledám',
-                style: DefaultTextStyle.of(context)
-                    .style
-                    .copyWith(fontSize: 12, color: content.type == AdTypeEnum.offer ? colors.background : colors.text),
-              ),
-              decoration:
-                  BoxDecoration(color: content.type == AdTypeEnum.offer ? colors.primary : colors.highlight, borderRadius: BorderRadius.circular(6)),
+          SizedBox(
+            height: 8,
+          ),
+          if (content.insertedAt > 0)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: buildIconLabelWidget(Icons.calendar_today, Helpers.absoluteTime(content.insertedAt), context),
             ),
-            if (content.location.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: buildIconLabelWidget(Icons.location_on_outlined, content.location, context),
-              ),
-          ],
-        ),
-        SizedBox(
-          height: 8,
-        ),
-        if (content.insertedAt > 0)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: buildIconLabelWidget(Icons.calendar_today, Helpers.absoluteTime(content.insertedAt), context),
-          ),
-        if (content.shipping.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: buildIconLabelWidget(Icons.local_shipping_outlined, content.shipping, context),
-          ),
-        if (content.summary.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: Text(content.summary),
-          ),
-        if (content.description.isNotEmpty) PostHtml(content.description),
-        if (content.photoIds.length > 0)
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: galleryWidget(context),
-          )
-      ],
+          if (content.shipping.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: buildIconLabelWidget(Icons.local_shipping_outlined, content.shipping, context),
+            ),
+          if (content.summary.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Text(content.summary),
+            ),
+          if (content.description.isNotEmpty) PostHtml(content.description),
+          if (content.photoIds.length > 0)
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: galleryWidget(context),
+            )
+        ],
+      ),
     );
   }
 
