@@ -52,10 +52,10 @@ class _BottomTabBarState extends State<BottomTabBar> {
                   child: GestureDetector(
                       child: Column(
                     children: [
-                      Icon(Icons.hourglass_top, size: 34, color: CupertinoColors.inactiveGray),
+                      Icon(Icons.hourglass_top, size: 34, color: colors.grey),
                       Text(
                         'Poslední',
-                        style: TextStyle(fontSize: 12, color: CupertinoColors.inactiveGray),
+                        style: TextStyle(fontSize: 12, color: colors.grey),
                       )
                     ],
                   )),
@@ -67,10 +67,10 @@ class _BottomTabBarState extends State<BottomTabBar> {
                 child: GestureDetector(
                     child: Column(
                   children: [
-                    Icon(Icons.shopping_cart, size: 34, color: CupertinoColors.inactiveGray),
+                    Icon(Icons.shopping_cart, size: 34, color: colors.grey),
                     Text(
                       'Tržiště',
-                      style: TextStyle(fontSize: 12, color: CupertinoColors.inactiveGray),
+                      style: TextStyle(fontSize: 12, color: colors.grey),
                     )
                   ],
                 )),
@@ -81,10 +81,10 @@ class _BottomTabBarState extends State<BottomTabBar> {
                 child: GestureDetector(
                     child: Column(
                   children: [
-                    Icon(Icons.search, size: 34, color: CupertinoColors.inactiveGray),
+                    Icon(Icons.search, size: 34, color: colors.grey),
                     Text(
                       'Hledání',
-                      style: TextStyle(fontSize: 12, color: CupertinoColors.inactiveGray),
+                      style: TextStyle(fontSize: 12, color: colors.grey),
                     )
                   ],
                 )),
@@ -102,10 +102,10 @@ class _BottomTabBarState extends State<BottomTabBar> {
                 child: GestureDetector(
                     child: Column(
                   children: [
-                    Icon(Icons.bookmark, size: 34, color: CupertinoColors.inactiveGray),
+                    Icon(Icons.bookmark, size: 34, color: colors.grey),
                     Text(
                       'Uložené',
-                      style: TextStyle(fontSize: 12, color: CupertinoColors.inactiveGray),
+                      style: TextStyle(fontSize: 12, color: colors.grey),
                     )
                   ],
                 )),
@@ -115,10 +115,10 @@ class _BottomTabBarState extends State<BottomTabBar> {
                       onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/settings'),
                       child: Column(
                         children: [
-                          Icon(Icons.settings, size: 34, color: CupertinoColors.inactiveGray),
+                          Icon(Icons.settings, size: 34, color: colors.grey),
                           Text(
                             'Nastavení',
-                            style: TextStyle(fontSize: 12, color: CupertinoColors.inactiveGray),
+                            style: TextStyle(fontSize: 12, color: colors.disabled),
                           )
                         ],
                       ))),
@@ -130,10 +130,10 @@ class _BottomTabBarState extends State<BottomTabBar> {
                       },
                       child: Column(
                         children: [
-                          Icon(Icons.report, size: 34, color: CupertinoColors.inactiveGray),
+                          Icon(Icons.report, size: 34, color: colors.grey),
                           Text(
                             'Nahlásit chybu',
-                            style: TextStyle(fontSize: 12, color: CupertinoColors.inactiveGray),
+                            style: TextStyle(fontSize: 12, color: colors.grey),
                           )
                         ],
                       ))),

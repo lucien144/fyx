@@ -16,6 +16,8 @@ import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/model/reponses/BookmarksHistoryResponse.dart';
 import 'package:fyx/state/search_providers.dart';
 import 'package:fyx/theme/L.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:provider/provider.dart' as provider;
 
 class BookmarksTab extends ConsumerStatefulWidget {
@@ -107,6 +109,8 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
 
   @override
   Widget build(BuildContext context) {
+    final SkinColors colors = Skin.of(context).theme.colors;
+
     return CupertinoTabView(builder: (context) {
       return CupertinoPageScaffold(
         resizeToAvoidBottomInset: false,
@@ -146,6 +150,7 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
                     isVisible: notifications.newNotices > 0,
                     counter: notifications.newNotices)),
             middle: CupertinoSegmentedControl(
+              unselectedColor: colors.barBackground,
               groupValue: activeTab,
               onValueChanged: (value) {
                 _bookmarksController.animateToPage(TabsEnum.values.indexOf(value as TabsEnum),

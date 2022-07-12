@@ -11,6 +11,7 @@ import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/libs/DeviceInfo.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/enums/SkinEnum.dart';
 import 'package:fyx/model/enums/ThemeEnum.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/model/provider/ThemeModel.dart';
@@ -27,6 +28,7 @@ import 'package:fyx/pages/settings_design_screen.dart';
 import 'package:fyx/pages/settings_screen.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/skins/ForestSkin.dart';
 import 'package:fyx/theme/skin/skins/FyxSkin.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
@@ -196,12 +198,23 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider<NotificationsModel>(create: (context) => NotificationsModel()),
-          ChangeNotifierProvider<ThemeModel>(create: (context) => ThemeModel(MainRepository().settings.theme, MainRepository().settings.fontSize)),
+          ChangeNotifierProvider<ThemeModel>(
+              create: (context) =>
+                  ThemeModel(MainRepository().settings.theme, MainRepository().settings.fontSize, initialSkin: MainRepository().settings.skin)),
         ],
         builder: (ctx, widget) => Directionality(
             textDirection: TextDirection.ltr,
             child: Skin(
-                skin: FyxSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
+                skin: (() {
+                  switch (ctx.watch<ThemeModel>().skin) {
+                    case SkinEnum.fyx:
+                      return FyxSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize);
+                    case SkinEnum.forest:
+                      return ForestSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize);
+                    default:
+                      return FyxSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize);
+                  }
+                })(),
                 brightness: (() {
                   if (ctx.watch<ThemeModel>().theme == ThemeEnum.system && _platformBrightness != null) {
                     return _platformBrightness!;

@@ -1,5 +1,6 @@
 import 'package:fyx/model/enums/DefaultView.dart';
 import 'package:fyx/model/enums/FirstUnreadEnum.dart';
+import 'package:fyx/model/enums/SkinEnum.dart';
 import 'package:fyx/model/enums/ThemeEnum.dart';
 
 class Settings {
@@ -13,6 +14,7 @@ class Settings {
   List<int> blockedMails = [];
   List<String> blockedUsers = [];
   ThemeEnum theme = ThemeEnum.system;
+  SkinEnum skin = SkinEnum.fyx;
   double fontSize = 16;
   FirstUnreadEnum firstUnread = FirstUnreadEnum.button;
 }
