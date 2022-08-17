@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
@@ -48,7 +49,7 @@ class _BottomTabBarState extends State<BottomTabBar> {
             children: [
               Expanded(
                 child: Opacity(
-                  opacity: .3,
+                  opacity: .35,
                   child: GestureDetector(
                       child: Column(
                     children: [
@@ -63,7 +64,7 @@ class _BottomTabBarState extends State<BottomTabBar> {
               ),
               Expanded(
                   child: Opacity(
-                opacity: .3,
+                opacity: .35,
                 child: GestureDetector(
                     child: Column(
                   children: [
@@ -77,7 +78,7 @@ class _BottomTabBarState extends State<BottomTabBar> {
               )),
               Expanded(
                   child: Opacity(
-                opacity: .3,
+                opacity: .35,
                 child: GestureDetector(
                     child: Column(
                   children: [
@@ -98,7 +99,7 @@ class _BottomTabBarState extends State<BottomTabBar> {
             children: [
               Expanded(
                   child: Opacity(
-                opacity: .3,
+                opacity: .35,
                 child: GestureDetector(
                     child: Column(
                   children: [
@@ -117,8 +118,8 @@ class _BottomTabBarState extends State<BottomTabBar> {
                         children: [
                           Icon(Icons.settings, size: 34, color: colors.grey),
                           Text(
-                            'Nastavení',
-                            style: TextStyle(fontSize: 12, color: colors.disabled),
+                            L.SETTINGS,
+                            style: TextStyle(fontSize: 12, color: colors.grey),
                           )
                         ],
                       ))),
