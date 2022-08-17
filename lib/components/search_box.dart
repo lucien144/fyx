@@ -97,12 +97,13 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           child: CupertinoSearchTextField(
-            style: TextStyle(fontSize: Settings().fontSize),
-            backgroundColor: colors.primaryContrasting,
+            style: TextStyle(fontSize: Settings().fontSize, color: colors.barBackground),
+            placeholderStyle: TextStyle(fontSize: Settings().fontSize, color: colors.text.withOpacity(.5)),
+            backgroundColor: colors.text.withOpacity(.1),
             focusNode: focus,
             placeholder: widget.label,
             controller: searchController,
-            prefixIcon: _loading ? const CupertinoActivityIndicator(radius: 10) : const Icon(CupertinoIcons.search),
+            prefixIcon: _loading ? const CupertinoActivityIndicator(radius: 10) : Icon(CupertinoIcons.search, color: colors.text.withOpacity(.5)),
             onChanged: (term) {
               if (_debounce?.isActive ?? false) _debounce?.cancel();
               _debounce = Timer(const Duration(milliseconds: 500), () {

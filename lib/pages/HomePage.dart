@@ -173,11 +173,10 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                 this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? RefreshDataEnum.mail : RefreshDataEnum.bookmarks);
               },
               items: [
-                Icon(_filterUnread ? Icons.bookmarks : Icons.bookmarks_outlined,
-                    size: 34, color: _pageIndex == 0 ? colors.primaryContrasting : colors.grey),
+                Icon(_filterUnread ? Icons.bookmarks : Icons.bookmarks_outlined, size: 34, color: _pageIndex == 0 ? colors.primary : colors.grey),
                 Consumer<NotificationsModel>(
                   builder: (context, notifications, child) => NotificationBadge(
-                      widget: Icon(Icons.email_outlined, size: 42, color: _pageIndex == 1 ? colors.primaryContrasting : colors.grey),
+                      widget: Icon(Icons.email_outlined, size: 42, color: _pageIndex == 1 ? colors.primary : colors.grey),
                       counter: notifications.newMails,
                       isVisible: notifications.newMails > 0),
                 ),
