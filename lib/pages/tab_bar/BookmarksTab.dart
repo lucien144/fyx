@@ -109,9 +109,9 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
 
   @override
   Widget build(BuildContext context) {
-    final SkinColors colors = Skin.of(context).theme.colors;
-
     return CupertinoTabView(builder: (context) {
+      final SkinColors colors = Skin.of(context).theme.colors;
+
       return CupertinoPageScaffold(
         resizeToAvoidBottomInset: false,
         navigationBar: CupertinoNavigationBar(
