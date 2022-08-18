@@ -11,7 +11,6 @@ import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/libs/DeviceInfo.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
-import 'package:fyx/model/enums/SkinEnum.dart';
 import 'package:fyx/model/enums/ThemeEnum.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/model/provider/ThemeModel.dart';
@@ -205,16 +204,8 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
         builder: (ctx, widget) => Directionality(
             textDirection: TextDirection.ltr,
             child: Skin(
-                skin: (() {
-                  switch (ctx.watch<ThemeModel>().skin) {
-                    case SkinEnum.fyx:
-                      return FyxSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize);
-                    case SkinEnum.forest:
-                      return ForestSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize);
-                    default:
-                      return FyxSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize);
-                  }
-                })(),
+                skins: [FyxSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize), ForestSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize)],
+                skin: ctx.watch<ThemeModel>().skin,
                 brightness: (() {
                   if (ctx.watch<ThemeModel>().theme == ThemeEnum.system && _platformBrightness != null) {
                     return _platformBrightness!;

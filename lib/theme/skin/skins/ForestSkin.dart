@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fyx/model/enums/SkinEnum.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ForestSkin extends SkinData {
-  static final name = 'Forest4';
+  final id = SkinEnum.forest;
+  final name = 'Forest4';
 
   ForestSkin({lightData, darkData}) : super(lightData: lightData, darkData: darkData);
 

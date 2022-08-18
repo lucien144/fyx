@@ -9,8 +9,6 @@ import 'package:fyx/model/provider/ThemeModel.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
-import 'package:fyx/theme/skin/skins/ForestSkin.dart';
-import 'package:fyx/theme/skin/skins/FyxSkin.dart';
 import 'package:provider/provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 
@@ -44,10 +42,11 @@ class _SettingsDesignScreenState extends State<SettingsDesignScreen> {
     );
   }
 
-  SettingsTile _skinFactory(String label, SkinEnum skin) {
+  SettingsTile _skinFactory(String label, SkinEnum skin, {String? description}) {
     return SettingsTile(
       title: Text(label),
       trailing: MainRepository().settings.skin == skin ? Icon(CupertinoIcons.check_mark) : null,
+      description: description != null ? Text(description) : null,
       onPressed: (_) {
         MainRepository().settings.skin = skin;
         Provider.of<ThemeModel>(context, listen: false).setSkin(skin);
@@ -90,10 +89,7 @@ class _SettingsDesignScreenState extends State<SettingsDesignScreen> {
             ),
             SettingsSection(
               title: Text('Skin'),
-              tiles: <SettingsTile>[
-                _skinFactory(FyxSkin.name, SkinEnum.fyx),
-                _skinFactory(ForestSkin.name, SkinEnum.forest),
-              ],
+              tiles: Skin.of(context).skins.map((skin) => _skinFactory(skin.name, skin.id)).toList(),
             ),
             SettingsSection(
               title: Text('Velikost písma'),

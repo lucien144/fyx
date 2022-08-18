@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
+import 'package:fyx/model/enums/SkinEnum.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class FyxSkin extends SkinData {
-  static final name = 'Fyx';
+  final id = SkinEnum.fyx;
+  final name = 'Fyx';
 
   FyxSkin({lightData, darkData}) : super(lightData: lightData, darkData: darkData);
 

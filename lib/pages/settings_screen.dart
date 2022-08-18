@@ -7,15 +7,12 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Settings.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
 import 'package:fyx/model/enums/FirstUnreadEnum.dart';
-import 'package:fyx/model/enums/SkinEnum.dart';
 import 'package:fyx/model/enums/ThemeEnum.dart';
 import 'package:fyx/pages/InfoPage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
-import 'package:fyx/theme/skin/skins/ForestSkin.dart';
-import 'package:fyx/theme/skin/skins/FyxSkin.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:settings_ui/settings_ui.dart';
 
@@ -164,14 +161,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   SettingsTile.navigation(
                     title: Text('Skin'),
-                    value: (() {
-                      switch (MainRepository().settings.skin) {
-                        case SkinEnum.fyx:
-                          return Text(FyxSkin.name);
-                        case SkinEnum.forest:
-                          return Text(ForestSkin.name);
-                      }
-                    })(),
+                    value: Text(Skin.of(context).skins.firstWhere((skin) => skin.id == MainRepository().settings.skin).name),
                     onPressed: (context) => Navigator.of(context).pushNamed('/settings/design'),
                   ),
                 ],
