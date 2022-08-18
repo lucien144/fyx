@@ -1,33 +1,39 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:fyx/model/enums/SkinEnum.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class FyxSkin extends SkinData {
-  final id = SkinEnum.fyx;
-  final name = 'Fyx';
+class ForestSkin extends SkinData {
+  final id = SkinEnum.forest;
+  final name = 'Forest4';
 
-  FyxSkin({lightData, darkData}) : super(lightData: lightData, darkData: darkData);
+  ForestSkin({lightData, darkData}) : super(lightData: lightData, darkData: darkData);
 
-  factory FyxSkin.create({required double fontSize}) {
-    final lightColors = SkinColors();
-    final darkColors = SkinColors(
-        primary: const Color(0xff4898ad),
-        background: const Color(0xFF1C2128),
-        barBackground: const Color(0xff2d333b),
-        text: const Color(0xFFadbac7),
-        grey: CupertinoColors.inactiveGray,
-        danger: const Color(0xffe5534b),
-        highlight: const Color(0xff33BB9A),
-        disabled: const Color(0xFFadbac7),
-        pollBackground: const Color(0xff2d333b),
-        pollAnswer: const Color(0xff677578),
-        pollAnswerSelected: const Color(0xff316775),
-        primaryContrasting: const Color(0xff4898ad),
-        gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xff316775), Color(0xff00242e)]));
+  factory ForestSkin.create({required double fontSize}) {
+    final lightColors = SkinColors(
+      primary: const Color(0xFF3B4F41),
+      primaryContrasting: const Color(0xffcccdb1),
+      background: const Color(0xffb8b992), // #B8B992
+      barBackground: const Color(0xff87937b), // #617E69
+      text: const Color(0xFF282828),
+      success: Color(0xff617e6a),
+      danger: const Color(0xffb60f0f),
+      highlight: const Color(0xffDBD68B),
+      highlightedText: Colors.amber,
+      light: Colors.white,
+      dark: const Color(0xFF282828),
+      grey: Color(0xFF3B4F41).withOpacity(.7),
+      disabled: Colors.black26,
+      pollBackground: const Color(0xffcde5e9),
+      pollAnswer: const Color(0xffa9ccd3),
+      pollAnswerSelected: const Color(0xff76b9b9),
+      gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xff1AD592), Color(0xFF196378)]),
+    );
+    final darkColors = lightColors;
 
-    return FyxSkin(
+    return ForestSkin(
         lightData: SkinBrightnessData<SkinColors>(
             data: CupertinoThemeData(
                 barBackgroundColor: lightColors.barBackground,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Settings.dart';
+import 'package:fyx/model/enums/SkinEnum.dart';
 import 'package:fyx/model/enums/ThemeEnum.dart';
 import 'package:fyx/model/provider/ThemeModel.dart';
 import 'package:fyx/theme/L.dart';
@@ -41,6 +42,18 @@ class _SettingsDesignScreenState extends State<SettingsDesignScreen> {
     );
   }
 
+  SettingsTile _skinFactory(String label, SkinEnum skin, {String? description}) {
+    return SettingsTile(
+      title: Text(label),
+      trailing: MainRepository().settings.skin == skin ? Icon(CupertinoIcons.check_mark) : null,
+      description: description != null ? Text(description) : null,
+      onPressed: (_) {
+        MainRepository().settings.skin = skin;
+        Provider.of<ThemeModel>(context, listen: false).setSkin(skin);
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final SkinColors colors = Skin.of(context).theme.colors;
@@ -73,6 +86,10 @@ class _SettingsDesignScreenState extends State<SettingsDesignScreen> {
                 _themeFactory('Tmavý', ThemeEnum.dark),
                 _themeFactory('Podle systému', ThemeEnum.system),
               ],
+            ),
+            SettingsSection(
+              title: Text('Skin'),
+              tiles: Skin.of(context).skins.map((skin) => _skinFactory(skin.name, skin.id)).toList(),
             ),
             SettingsSection(
               title: Text('Velikost písma'),

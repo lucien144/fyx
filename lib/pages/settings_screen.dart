@@ -86,6 +86,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 settingsListBackground: colors.background,
                 settingsTileTextColor: colors.text,
                 tileHighlightColor: colors.primary.withOpacity(0.1),
+                trailingTextColor: colors.grey,
+                leadingIconsColor: colors.grey,
                 dividerColor: colors.background),
             sections: [
               SettingsSection(
@@ -97,7 +99,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       MainRepository().settings.useAutocorrect = value;
                     },
                     initialValue: _autocorrect,
-                    leading: Icon(Icons.spellcheck),
+                    leading: Icon(Icons.spellcheck, color: colors.grey),
                     title: Text('Autocorrect'),
                   ),
                   SettingsTile.switchTile(
@@ -106,7 +108,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       MainRepository().settings.useCompactMode = value;
                     },
                     initialValue: _compactMode,
-                    leading: Icon(Icons.view_compact),
+                    leading: Icon(Icons.view_compact, color: colors.grey),
                     title: Text('Kompaktní zobrazení'),
                     description: Text(
                       'Kompaktní zobrazení je zobrazení obrázků po stranách pokud to obsah příspěvku dovoluje (nedojde tak k narušení kontextu).',
@@ -155,6 +157,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   SettingsTile.navigation(
                     title: Text('Velikost písma'),
                     value: Text('${MainRepository().settings.fontSize.toInt().toString()}pt'),
+                    onPressed: (context) => Navigator.of(context).pushNamed('/settings/design'),
+                  ),
+                  SettingsTile.navigation(
+                    title: Text('Skin'),
+                    value: Text(Skin.of(context).skins.firstWhere((skin) => skin.id == MainRepository().settings.skin).name),
                     onPressed: (context) => Navigator.of(context).pushNamed('/settings/design'),
                   ),
                 ],
@@ -206,19 +213,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               SettingsSection(title: Text('Informace'), tiles: <SettingsTile>[
                 SettingsTile.navigation(
-                  leading: Icon(Icons.volunteer_activism),
+                  leading: Icon(Icons.volunteer_activism, color: colors.grey),
                   title: Text(L.BACKERS),
                   onPressed: (_) => Navigator.of(context).pushNamed('/settings/info',
                       arguments: InfoPageSettings(L.BACKERS, 'https://raw.githubusercontent.com/lucien144/fyx/develop/BACKERS.md')),
                 ),
                 SettingsTile.navigation(
-                  leading: Icon(Icons.info),
+                  leading: Icon(Icons.info, color: colors.grey),
                   title: Text(L.ABOUT),
                   onPressed: (_) => Navigator.of(context).pushNamed('/settings/info',
                       arguments: InfoPageSettings(L.ABOUT, 'https://raw.githubusercontent.com/lucien144/fyx/develop/ABOUT.md')),
                 ),
                 SettingsTile.navigation(
-                  leading: Icon(Icons.bug_report),
+                  leading: Icon(Icons.bug_report, color: colors.grey),
                   title: Text(L.SETTINGS_BUGREPORT),
                   onPressed: (_) {
                     T.prefillGithubIssue(appContext: MainRepository(), user: MainRepository().credentials!.nickname);
@@ -226,7 +233,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   },
                 ),
                 SettingsTile.navigation(
-                  leading: Icon(Icons.gavel),
+                  leading: Icon(Icons.gavel, color: colors.grey),
                   title: Text(L.TERMS),
                   onPressed: (_) {
                     T.openLink('https://nyx.cz/terms');

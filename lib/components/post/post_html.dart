@@ -36,6 +36,7 @@ class PostHtml extends StatelessWidget {
         'span.r': Style(fontWeight: FontWeight.bold),
         'body': Style(margin: EdgeInsets.all(0)),
         'pre': Style(color: Colors.transparent),
+        'a': Style(color: colors.primary),
       },
       customRender: {
         'em': (

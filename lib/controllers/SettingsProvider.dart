@@ -1,6 +1,7 @@
 import 'package:fyx/model/Settings.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
 import 'package:fyx/model/enums/FirstUnreadEnum.dart';
+import 'package:fyx/model/enums/SkinEnum.dart';
 import 'package:fyx/model/enums/ThemeEnum.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -16,6 +17,12 @@ class SettingsProvider {
   set theme(ThemeEnum theme) {
     _box.put('theme', theme);
     _settings.theme = theme;
+  }
+
+  SkinEnum get skin => _settings.skin;
+  set skin(SkinEnum skin) {
+    _box.put('skin', skin);
+    _settings.skin = skin;
   }
 
   double get fontSize => _settings.fontSize;
@@ -71,6 +78,7 @@ class SettingsProvider {
     Hive.registerAdapter(DefaultViewAdapter());
     Hive.registerAdapter(ThemeEnumAdapter());
     Hive.registerAdapter(FirstUnreadEnumAdapter());
+    Hive.registerAdapter(SkinEnumAdapter());
     _box = await Hive.openBox('settings');
 
     _settings = new Settings();
@@ -81,6 +89,7 @@ class SettingsProvider {
     _settings.useCompactMode = _box.get('useCompactMode', defaultValue: Settings().useCompactMode);
     _settings.useAutocorrect = _box.get('useAutocorrect', defaultValue: Settings().useAutocorrect);
     _settings.firstUnread = _box.get('firstUnread', defaultValue: Settings().firstUnread);
+    _settings.skin = _box.get('skin', defaultValue: Settings().skin);
 
     return _singleton;
   }

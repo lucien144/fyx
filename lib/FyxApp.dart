@@ -27,6 +27,7 @@ import 'package:fyx/pages/settings_design_screen.dart';
 import 'package:fyx/pages/settings_screen.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/skins/ForestSkin.dart';
 import 'package:fyx/theme/skin/skins/FyxSkin.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
@@ -196,12 +197,15 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider<NotificationsModel>(create: (context) => NotificationsModel()),
-          ChangeNotifierProvider<ThemeModel>(create: (context) => ThemeModel(MainRepository().settings.theme, MainRepository().settings.fontSize)),
+          ChangeNotifierProvider<ThemeModel>(
+              create: (context) =>
+                  ThemeModel(MainRepository().settings.theme, MainRepository().settings.fontSize, initialSkin: MainRepository().settings.skin)),
         ],
         builder: (ctx, widget) => Directionality(
             textDirection: TextDirection.ltr,
             child: Skin(
-                skin: FyxSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
+                skins: [FyxSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize), ForestSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize)],
+                skin: ctx.watch<ThemeModel>().skin,
                 brightness: (() {
                   if (ctx.watch<ThemeModel>().theme == ThemeEnum.system && _platformBrightness != null) {
                     return _platformBrightness!;

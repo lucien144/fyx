@@ -12,6 +12,7 @@ import 'package:fyx/model/enums/RefreshDataEnum.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/pages/tab_bar/BookmarksTab.dart';
 import 'package:fyx/pages/tab_bar/MailboxTab.dart';
+import 'package:fyx/theme/skin/Skin.dart';
 import 'package:provider/provider.dart';
 
 class HomePageArguments {
@@ -131,12 +132,12 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
       ApiController().buildContext = context;
     }
 
+    final double bottomPadding = MediaQuery.of(context).padding.bottom;
+    final colors = Skin.of(context).theme.colors;
     final tabs = [
       BookmarksTab(filterUnread: _filterUnread, refreshTimestamp: _refreshData[RefreshDataEnum.bookmarks] ?? 0),
       MailboxTab(refreshTimestamp: _refreshData[RefreshDataEnum.mail] ?? 0),
     ];
-
-    final double bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return WillPopScope(
       onWillPop: () async => false,
@@ -172,11 +173,10 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                 this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? RefreshDataEnum.mail : RefreshDataEnum.bookmarks);
               },
               items: [
-                Icon(_filterUnread ? Icons.bookmarks : Icons.bookmarks_outlined,
-                    size: 34, color: _pageIndex == 0 ? null : CupertinoColors.inactiveGray),
+                Icon(_filterUnread ? Icons.bookmarks : Icons.bookmarks_outlined, size: 34, color: _pageIndex == 0 ? colors.primary : colors.grey),
                 Consumer<NotificationsModel>(
                   builder: (context, notifications, child) => NotificationBadge(
-                      widget: Icon(Icons.email_outlined, size: 42, color: _pageIndex == 1 ? null : CupertinoColors.inactiveGray),
+                      widget: Icon(Icons.email_outlined, size: 42, color: _pageIndex == 1 ? colors.primary : colors.grey),
                       counter: notifications.newMails,
                       isVisible: notifications.newMails > 0),
                 ),
