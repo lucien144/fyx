@@ -11,6 +11,7 @@ import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class PostAvatarActionSheet extends StatelessWidget {
   final String user;
@@ -43,7 +44,7 @@ class PostAvatarActionSheet extends StatelessWidget {
           },
         ),
         CupertinoActionSheetAction(
-          child: TextIcon('Pouze příspěvky tohoto ID', icon: Icons.search),
+          child: TextIcon('Pouze příspěvky tohoto ID', icon: MdiIcons.magnify),
           onPressed: () {
             Navigator.of(context).pop();
             Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(idKlub, filterByUser: this.user));

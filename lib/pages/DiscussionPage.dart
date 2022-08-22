@@ -26,6 +26,7 @@ import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:tap_canvas/tap_canvas.dart';
 
@@ -357,7 +358,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                                   mainAxisSize: MainAxisSize.max,
                                   children: [
                                     Expanded(child: Text(_bookmark! ? 'Klub sleduješ' : 'Klub nesleduješ', style: textStyleContext)),
-                                    _bookmark! ? Icon(Icons.bookmark) : Icon(Icons.bookmark_border),
+                                    _bookmark! ? Icon(MdiIcons.pin) : Icon(MdiIcons.pinOutline),
                                   ],
                                 ),
                               ),
@@ -374,7 +375,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                                 child: Row(
                                   children: [
                                     Expanded(child: Text('Záhlaví', style: textStyleContext)),
-                                    Icon(Icons.push_pin_outlined),
+                                    Icon(MdiIcons.pageLayoutHeader),
                                   ],
                                 ),
                               ),
@@ -390,7 +391,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                                 child: Row(
                                   children: [
                                     Expanded(child: Text('Nástěnka', style: textStyleContext)),
-                                    Icon(Icons.home_outlined),
+                                    Icon(MdiIcons.viewDashboardOutline),
                                   ],
                                 ),
                               ),
@@ -411,7 +412,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                                   SizedBox(
                                     width: 10,
                                   ),
-                                  Expanded(child: Icon(this._searchTerm == null ? Icons.search : Icons.search_off)),
+                                  Expanded(child: Icon(this._searchTerm == null ? MdiIcons.magnify : MdiIcons.magnifyRemoveOutline)),
                                 ],
                               ),
                             ),

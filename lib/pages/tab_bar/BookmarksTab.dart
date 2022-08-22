@@ -18,6 +18,7 @@ import 'package:fyx/state/search_providers.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart' as provider;
 
 class BookmarksTab extends ConsumerStatefulWidget {
@@ -119,7 +120,7 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
               if (activeTab == TabsEnum.history) {
                 return ref.watch(searchHistoryProvider) == null ? Icon(Icons.filter_alt_outlined) : Icon(Icons.filter_alt);
               }
-              return ref.watch(searchBookmarksProvider) == null ? Icon(Icons.search) : Icon(Icons.search_off);
+              return ref.watch(searchBookmarksProvider) == null ? Icon(MdiIcons.magnify) : Icon(MdiIcons.magnifyRemoveOutline);
             })(), onTap: () {
               if (activeTab == TabsEnum.history) {
                 if (ref.read(searchHistoryProvider.notifier).state == null) {

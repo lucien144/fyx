@@ -1,11 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fyx/components/avatar.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class BottomTabBar extends StatefulWidget {
   final List items;
@@ -45,7 +48,45 @@ class _BottomTabBarState extends State<BottomTabBar> {
       padding: EdgeInsets.all(40),
       child: Column(
         children: [
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Row(
+              children: [
+                Avatar(MainRepository().credentials!.avatar, size: 24),
+                const SizedBox(width: 4),
+                Text(
+                  'Fyxbot'.toUpperCase(),
+                  style: TextStyle(fontSize: 14),
+                )
+              ],
+            ),
+            GestureDetector(
+              onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(24237)),
+              behavior: HitTestBehavior.translucent,
+              child: Container(
+                padding: EdgeInsets.all(2),
+                child: Row(
+                  children: [
+                    Icon(
+                      MdiIcons.bullhornOutline,
+                      color: colors.text,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Sleduj vývoj Fyxu',
+                      style: TextStyle(fontSize: 12),
+                    )
+                  ],
+                ),
+              ),
+            )
+          ]),
+          const SizedBox(height: 8),
+          Divider(
+            color: colors.grey,
+          ),
+          const SizedBox(height: 16),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
                 child: Opacity(
@@ -53,10 +94,10 @@ class _BottomTabBarState extends State<BottomTabBar> {
                   child: GestureDetector(
                       child: Column(
                     children: [
-                      Icon(Icons.hourglass_top, size: 34, color: colors.grey),
+                      Icon(MdiIcons.flashOutline, size: 34, color: colors.grey),
                       Text(
                         'Poslední',
-                        style: TextStyle(fontSize: 12, color: colors.grey),
+                        style: TextStyle(fontSize: 11, color: colors.grey),
                       )
                     ],
                   )),
@@ -68,10 +109,10 @@ class _BottomTabBarState extends State<BottomTabBar> {
                 child: GestureDetector(
                     child: Column(
                   children: [
-                    Icon(Icons.shopping_cart, size: 34, color: colors.grey),
+                    Icon(MdiIcons.pinOutline, size: 34, color: colors.grey),
                     Text(
-                      'Tržiště',
-                      style: TextStyle(fontSize: 12, color: colors.grey),
+                      'Uložené',
+                      style: TextStyle(fontSize: 11, color: colors.grey),
                     )
                   ],
                 )),
@@ -82,44 +123,40 @@ class _BottomTabBarState extends State<BottomTabBar> {
                 child: GestureDetector(
                     child: Column(
                   children: [
-                    Icon(Icons.search, size: 34, color: colors.grey),
+                    Icon(MdiIcons.magnify, size: 34, color: colors.grey),
                     Text(
                       'Hledání',
-                      style: TextStyle(fontSize: 12, color: colors.grey),
+                      style: TextStyle(fontSize: 11, color: colors.grey),
                     )
                   ],
                 )),
               )),
             ],
           ),
-          SizedBox(
-            height: 30,
-          ),
+          const SizedBox(height: 30),
           Row(
             children: [
               Expanded(
-                  child: Opacity(
-                opacity: .35,
-                child: GestureDetector(
-                    child: Column(
-                  children: [
-                    Icon(Icons.bookmark, size: 34, color: colors.grey),
-                    Text(
-                      'Uložené',
-                      style: TextStyle(fontSize: 12, color: colors.grey),
-                    )
-                  ],
-                )),
-              )),
+                  child: GestureDetector(
+                      onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(17067)),
+                      child: Column(
+                        children: [
+                          Icon(MdiIcons.shoppingOutline, size: 34, color: colors.grey),
+                          Text(
+                            'Tržiště',
+                            style: TextStyle(fontSize: 11, color: colors.grey),
+                          )
+                        ],
+                      ))),
               Expanded(
                   child: GestureDetector(
                       onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/settings'),
                       child: Column(
                         children: [
-                          Icon(Icons.settings, size: 34, color: colors.grey),
+                          Icon(MdiIcons.cogOutline, size: 34, color: colors.grey),
                           Text(
                             L.SETTINGS,
-                            style: TextStyle(fontSize: 12, color: colors.grey),
+                            style: TextStyle(fontSize: 11, color: colors.grey),
                           )
                         ],
                       ))),
@@ -131,10 +168,10 @@ class _BottomTabBarState extends State<BottomTabBar> {
                       },
                       child: Column(
                         children: [
-                          Icon(Icons.report, size: 34, color: colors.grey),
+                          Icon(MdiIcons.bugOutline, size: 34, color: colors.grey),
                           Text(
                             'Nahlásit chybu',
-                            style: TextStyle(fontSize: 12, color: colors.grey),
+                            style: TextStyle(fontSize: 11, color: colors.grey),
                           )
                         ],
                       ))),

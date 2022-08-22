@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/FyxApp.dart';
-import 'package:fyx/components/avatar.dart';
 import 'package:fyx/components/bottom_tab_bar.dart';
 import 'package:fyx/components/notification_badge.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
@@ -13,6 +12,7 @@ import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/pages/tab_bar/BookmarksTab.dart';
 import 'package:fyx/pages/tab_bar/MailboxTab.dart';
 import 'package:fyx/theme/skin/Skin.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 
 class HomePageArguments {
@@ -180,7 +180,11 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                       counter: notifications.newMails,
                       isVisible: notifications.newMails > 0),
                 ),
-                Center(child: Avatar(MainRepository().credentials!.avatar, size: 32))
+                Center(
+                    child: Icon(
+                  MdiIcons.menu,
+                  size: 34,
+                ))
               ],
             ),
           ),

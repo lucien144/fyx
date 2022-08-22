@@ -26,6 +26,7 @@ import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class PostListItem extends ConsumerStatefulWidget {
   final Post post;
@@ -72,7 +73,7 @@ class _PostListItemState extends ConsumerState<PostListItem> {
           color: colors.highlightedText,
           padding: const EdgeInsets.all(32),
           child: Icon(
-            isSelected ? Icons.remove_done_outlined : Icons.done_all,
+            isSelected ? MdiIcons.checkboxMarkedOutline : MdiIcons.checkboxBlankOutline,
             size: 32,
             color: colors.background,
           ),
