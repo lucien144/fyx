@@ -183,20 +183,20 @@ class _BottomTabBarState extends State<BottomTabBar> {
             child: SizedBox(
                 height: 50 + bottomPadding, // Standard iOS 10 tab bar height.
                 child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: List.generate(
                         widget.items.length,
-                        (i) => Expanded(
-                            child: GestureDetector(
-                                behavior: HitTestBehavior.opaque,
-                                onTap: widget.onTap == null
-                                    ? null
-                                    : () {
-                                        widget.onTap!(i);
-                                      },
-                                child: Padding(
-                                  padding: EdgeInsets.only(bottom: bottomPadding),
-                                  child: widget.items[i],
-                                )))))))
+                        (i) => GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: widget.onTap == null
+                                ? null
+                                : () {
+                                    widget.onTap!(i);
+                                  },
+                            child: Padding(
+                              padding: EdgeInsets.only(bottom: bottomPadding),
+                              child: widget.items[i],
+                            ))))))
       ],
     );
   }
