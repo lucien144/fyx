@@ -45,7 +45,7 @@ class _BottomTabBarState extends State<BottomTabBar> {
         ],
       ),
       key: submenuKey,
-      padding: EdgeInsets.all(40),
+      padding: EdgeInsets.all(MediaQuery.of(context).size.width < 375 ? 20 : 40),
       child: Column(
         children: [
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [

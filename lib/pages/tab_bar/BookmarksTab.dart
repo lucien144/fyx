@@ -159,12 +159,12 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
               },
               children: {
                 TabsEnum.history: Padding(
-                  child: Text('Historie'),
-                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Text('Historie', softWrap: false),
+                  padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width < 375 ? 2 : 16),
                 ),
                 TabsEnum.bookmarks: Padding(
-                  child: Text('Sledované'),
-                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Text('Sledované', softWrap: false),
+                  padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width < 375 ? 2 : 16),
                 ),
               },
             )),
