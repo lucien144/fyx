@@ -195,25 +195,26 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                 );
               },
               dataProvider: (lastId) async {
+                var response;
                 var result;
                 if (lastId != null) {
                   // If we load next page(s)
-                  var response = await ApiController()
+                  response = await ApiController()
                       .loadDiscussion(pageArguments.discussionId, lastId: lastId, user: pageArguments.filterByUser, search: this._searchTerm);
-                  result = response.posts;
                 } else {
                   // If we load init data or we refresh data on pull
                   if (!this._hasInitData) {
                     // If we load init data, use the data from FutureBuilder
-                    result = discussionResponse.posts;
+                    response = discussionResponse;
                     this._hasInitData = true;
                   } else {
                     // If we just pull to refresh, load a fresh data
-                    var response =
+                    response =
                         await ApiController().loadDiscussion(pageArguments.discussionId, user: pageArguments.filterByUser, search: this._searchTerm);
-                    result = response.posts;
                   }
                 }
+
+                result = response.posts;
                 List<PostListItem> data = (result as List)
                     .map((post) {
                       return Post.fromJson(post, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode);
@@ -228,7 +229,9 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                   id = Post.fromJson((result as List).last, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode).id;
                 } catch (error) {}
                 return DataProviderResult(data,
-                    lastId: id, postId: pageArguments.postId, jumpIndex: data.where((listItem) => listItem.post.isNew).length);
+                    lastId: id,
+                    postId: pageArguments.postId,
+                    jumpIndex: response.discussion.lastVisit > 0 ? data.where((listItem) => listItem.post.isNew).length : 0);
               },
             ),
             Visibility(
