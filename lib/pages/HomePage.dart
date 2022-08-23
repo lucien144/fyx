@@ -39,7 +39,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
 
     final defaultView =
         MainRepository().settings.defaultView == DefaultView.latest ? MainRepository().settings.latestView : MainRepository().settings.defaultView;
@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
   @override
   void dispose() {
     FyxApp.routeObserver.unsubscribe(this);
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 

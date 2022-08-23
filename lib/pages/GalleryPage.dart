@@ -40,7 +40,7 @@ class _GalleryPageState extends State<GalleryPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_arguments != null && _arguments!.images.length > 1) {
         _arguments!.images.asMap().forEach((key, image) {
           if (image.image == _arguments!.imageUrl) {

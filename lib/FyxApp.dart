@@ -187,8 +187,8 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addObserver(this);
-    _platformBrightness ??= WidgetsBinding.instance?.window.platformBrightness;
+    WidgetsBinding.instance.addObserver(this);
+    _platformBrightness ??= WidgetsBinding.instance.window.platformBrightness;
   }
 
   @override
@@ -221,12 +221,12 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
   void dispose() {
     super.dispose();
     FyxApp._notificationsService.dispose();
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
   }
 
   @override
   void didChangePlatformBrightness() {
-    setState(() => _platformBrightness = WidgetsBinding.instance?.window.platformBrightness);
+    setState(() => _platformBrightness = WidgetsBinding.instance.window.platformBrightness);
     super.didChangePlatformBrightness(); // make sure you call this
   }
 }
