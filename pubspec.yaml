@@ -27,7 +27,7 @@ dependencies:
   shared_preferences: ^2.0.13
   fluttertoast: ^8.0.9
   html_unescape: ^2.0.0
-  cached_network_image: ^3.2.0
+  cached_network_image: ^3.2.1
   carousel_slider: ^4.0.0
   device_info: ^2.0.3
   package_info: ^2.0.2
