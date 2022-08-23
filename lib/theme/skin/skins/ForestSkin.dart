@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/model/enums/SkinEnum.dart';
@@ -40,7 +42,7 @@ class ForestSkin extends SkinData {
                 primaryColor: lightColors.primary,
                 scaffoldBackgroundColor: lightColors.background,
                 brightness: Brightness.light,
-                textTheme: CupertinoTextThemeData(textStyle: GoogleFonts.inter(color: lightColors.text, fontSize: fontSize))),
+                textTheme: CupertinoTextThemeData(textStyle: Platform.isIOS ? GoogleFonts.inter(color: lightColors.text, fontSize: fontSize) : TextStyle(color: lightColors.text, fontSize: fontSize))),
             colors: lightColors),
         darkData: SkinBrightnessData<SkinColors>(
             data: CupertinoThemeData(
@@ -49,7 +51,7 @@ class ForestSkin extends SkinData {
                 scaffoldBackgroundColor: darkColors.background,
                 primaryColor: darkColors.primary,
                 brightness: Brightness.dark,
-                textTheme: CupertinoTextThemeData(textStyle: GoogleFonts.inter(color: darkColors.text, fontSize: fontSize))),
+                textTheme: CupertinoTextThemeData(textStyle: Platform.isIOS ? GoogleFonts.inter(color: darkColors.text, fontSize: fontSize) : TextStyle(color: darkColors.text, fontSize: fontSize))),
             colors: darkColors));
   }
 }
