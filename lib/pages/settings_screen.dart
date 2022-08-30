@@ -7,6 +7,7 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Settings.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
 import 'package:fyx/model/enums/FirstUnreadEnum.dart';
+import 'package:fyx/model/enums/LaunchModeEnum.dart';
 import 'package:fyx/model/enums/ThemeEnum.dart';
 import 'package:fyx/pages/InfoPage.dart';
 import 'package:fyx/theme/L.dart';
@@ -14,7 +15,9 @@ import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:settings_ui/settings_ui.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -26,6 +29,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _autocorrect = false;
   DefaultView _defaultView = DefaultView.latest;
   FirstUnreadEnum _firstUnread = FirstUnreadEnum.button;
+  LaunchModeEnum _linksMode = LaunchModeEnum.platformDefault;
 
   @override
   void initState() {
@@ -34,6 +38,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _autocorrect = MainRepository().settings.useAutocorrect;
     _defaultView = MainRepository().settings.defaultView;
     _firstUnread = MainRepository().settings.firstUnread;
+    _linksMode = MainRepository().settings.linksMode;
     AnalyticsProvider().setScreen('Settings', 'SettingsPage');
   }
 
@@ -56,6 +61,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
       onPressed: (_) {
         setState(() => _defaultView = value);
         MainRepository().settings.defaultView = value;
+      },
+    );
+  }
+
+  SettingsTile _linksModeFactory(String label, LaunchModeEnum value) {
+    return SettingsTile(
+      title: Text(label),
+      trailing: _linksMode == value ? Icon(CupertinoIcons.check_mark) : null,
+      onPressed: (_) {
+        setState(() => _linksMode = value);
+        MainRepository().settings.linksMode = value;
       },
     );
   }
@@ -91,7 +107,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 dividerColor: colors.background),
             sections: [
               SettingsSection(
-                title: Text('Příspěvky'),
+                title: Text('Obecné'),
                 tiles: <SettingsTile>[
                   SettingsTile.switchTile(
                     onToggle: (bool value) {
@@ -112,6 +128,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     title: Text('Kompaktní zobrazení'),
                     description: Text(
                       'Kompaktní zobrazení je zobrazení obrázků po stranách pokud to obsah příspěvku dovoluje (nedojde tak k narušení kontextu).',
+                    ),
+                  ),
+                  SettingsTile.switchTile(
+                    onToggle: (bool value) {
+                      setState(() => _compactMode = value);
+                      MainRepository().settings.useCompactMode = value;
+                    },
+                    initialValue: _compactMode,
+                    leading: Icon(MdiIcons.thumbsUpDown, color: colors.grey),
+                    title: Text('Rychlé hodnocení'),
+                    description: Text(
+                      'Umožňit hodnocení příspěvku double-tapem?',
                     ),
                   ),
                 ],
@@ -164,6 +192,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     value: Text(Skin.of(context).skins.firstWhere((skin) => skin.id == MainRepository().settings.skin).name),
                     onPressed: (context) => Navigator.of(context).pushNamed('/settings/design'),
                   ),
+                ],
+              ),
+              SettingsSection(
+                title: Text('Otevírání odkazů'),
+                tiles: <SettingsTile>[
+                  _linksModeFactory('Podle nastavení systému', LaunchModeEnum.platformDefault),
+                  _linksModeFactory('Otevírat v externí aplikaci', LaunchModeEnum.externalApplication),
+                  _linksModeFactory('Otevírat ve Fyxu', LaunchModeEnum.inAppWebView),
                 ],
               ),
               SettingsSection(
@@ -236,7 +272,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   leading: Icon(Icons.gavel, color: colors.grey),
                   title: Text(L.TERMS),
                   onPressed: (_) {
-                    T.openLink('https://nyx.cz/terms');
+                    T.openLink('https://nyx.cz/terms', mode: _linksMode);
                     AnalyticsProvider().logEvent('openTerms');
                   },
                 )

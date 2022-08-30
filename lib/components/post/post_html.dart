@@ -5,6 +5,7 @@ import 'package:fyx/components/post/post_hero_attachment.dart';
 import 'package:fyx/components/post/spoiler.dart';
 import 'package:fyx/components/post/syntax_highlighter.dart';
 import 'package:fyx/components/post/video_player.dart';
+import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/Image.dart' as post;
@@ -221,7 +222,7 @@ class PostHtml extends StatelessWidget {
             link = 'https://nyx.cz$link';
           }
 
-          T.openLink(link);
+          T.openLink(link, mode: SettingsProvider().linksMode);
         },
       ),
     );

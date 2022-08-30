@@ -12,7 +12,7 @@ class L {
   // Errors
   static String AUTH_ERROR = 'Problém s přihlášením, přihlašte se znovu.';
   static String API_ERROR = 'Pardon, nastal problém v komunikaci se serverem.';
-  static String INAPPBROWSER_ERROR = 'Nepodařilo se otevřít prohlížeč.';
+  static String INAPPBROWSER_ERROR = 'Nepodařilo se otevřít prohlížeč. Zkus si v nastavení změnit otevírání odkazů.';
   static String REMINDER_ERROR = 'Příspěvek se nepodařilo uložit do upomínek.';
   static String RATING_ERROR = 'Příspěvek se nepodařilo lajknout.';
   static String ACCESS_DENIED_ERROR = 'Sem nemáš přístup.';

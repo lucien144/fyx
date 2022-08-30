@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/model/post/Link.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -16,7 +17,7 @@ class PostFooterLink extends StatelessWidget {
     SkinColors colors = Skin.of(context).theme.colors;
 
     return GestureDetector(
-      onTap: () => T.openLink(link.url),
+      onTap: () => T.openLink(link.url, mode: SettingsProvider().linksMode),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Row(

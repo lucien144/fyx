@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
@@ -128,7 +129,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
   Widget _sourceButton() {
     return GestureDetector(
-      onTap: () => T.openLink(videoUrl!),
+      onTap: () => T.openLink(videoUrl!, mode: SettingsProvider().linksMode),
       child: Padding(
         padding: const EdgeInsets.all(4),
         child: RichText(

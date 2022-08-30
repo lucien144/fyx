@@ -1,10 +1,12 @@
 import 'package:fyx/model/Settings.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
 import 'package:fyx/model/enums/FirstUnreadEnum.dart';
+import 'package:fyx/model/enums/LaunchModeEnum.dart';
 import 'package:fyx/model/enums/SkinEnum.dart';
 import 'package:fyx/model/enums/ThemeEnum.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsProvider {
   static final SettingsProvider _singleton = SettingsProvider._internal();
@@ -61,6 +63,12 @@ class SettingsProvider {
     _settings.useAutocorrect = autocorrect;
   }
 
+  LaunchModeEnum get linksMode => _settings.linksMode;
+  set linksMode(LaunchModeEnum mode) {
+    _box.put('linksMode', mode);
+    _settings.linksMode = mode;
+  }
+
   List get blockedMails => _box.get('blockedMails', defaultValue: Settings().blockedMails);
 
   List get blockedPosts => _box.get('blockedPosts', defaultValue: Settings().blockedPosts);
@@ -79,6 +87,7 @@ class SettingsProvider {
     Hive.registerAdapter(ThemeEnumAdapter());
     Hive.registerAdapter(FirstUnreadEnumAdapter());
     Hive.registerAdapter(SkinEnumAdapter());
+    Hive.registerAdapter(LaunchModeEnumAdapter());
     _box = await Hive.openBox('settings');
 
     _settings = new Settings();
@@ -90,6 +99,7 @@ class SettingsProvider {
     _settings.useAutocorrect = _box.get('useAutocorrect', defaultValue: Settings().useAutocorrect);
     _settings.firstUnread = _box.get('firstUnread', defaultValue: Settings().firstUnread);
     _settings.skin = _box.get('skin', defaultValue: Settings().skin);
+    _settings.linksMode = _box.get('linksMode', defaultValue: Settings().linksMode);
 
     return _singleton;
   }

@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/components/post/post_hero_attachment_box.dart';
+import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/model/post/Link.dart';
 import 'package:fyx/model/post/Video.dart';
@@ -65,7 +66,7 @@ class PostHeroAttachment extends StatelessWidget {
         title: (attachment as Link).title,
         icon: Icons.link,
         size: size,
-        onTap: () => T.openLink((attachment as Link).url),
+        onTap: () => T.openLink((attachment as Link).url, mode: SettingsProvider().linksMode),
       );
     }
 
@@ -77,7 +78,7 @@ class PostHeroAttachment extends StatelessWidget {
         icon: Icons.play_circle_filled,
         image: (attachment as Video).thumb,
         size: size,
-        onTap: link == null ? null : () => T.openLink(link.url),
+        onTap: link == null ? null : () => T.openLink(link.url, mode: SettingsProvider().linksMode),
       );
     }
 

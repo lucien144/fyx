@@ -6,6 +6,7 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/enums/LaunchModeEnum.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
@@ -50,7 +51,7 @@ class T {
         fontSize: 14.0);
   }
 
-  static Future<bool> openLink(String link) async {
+  static Future<bool> openLink(String link, {mode: LaunchModeEnum.platformDefault}) async {
     try {
       var encodedUri = Uri.parse(link);
 
@@ -59,7 +60,7 @@ class T {
         throw ('Cannot launch url: $link');
       }
 
-      var status = await launchUrl(encodedUri);
+      var status = await launchUrl(encodedUri, mode: mode.original);
       if (!status) {
         throw ('Cannot open webview. URL: $link');
       }
@@ -72,24 +73,22 @@ class T {
     }
   }
 
-  static prefillGithubIssue({MainRepository? appContext, String title = '', String body = '', String user = '-', String url = ''}) async {
+  static prefillGithubIssue({required MainRepository appContext, String title = '', String body = '', String user = '-', String url = ''}) async {
     var version = '-';
     var system = '-';
     var phone = '-';
-    if (appContext != null) {
-      var pkg = appContext.packageInfo;
-      var device = appContext.deviceInfo;
-      version = Uri.encodeComponent('${pkg.version} (${pkg.buildNumber})');
-      system = Uri.encodeComponent('${device.systemName} ${device.systemVersion}');
-      phone = Uri.encodeComponent(device.localizedModel);
-    }
+    var pkg = appContext.packageInfo;
+    var device = appContext.deviceInfo;
+    version = Uri.encodeComponent('${pkg.version} (${pkg.buildNumber})');
+    system = Uri.encodeComponent('${device.systemName} ${device.systemVersion}');
+    phone = Uri.encodeComponent(device.localizedModel);
 
     var _body = Uri.encodeComponent(body);
     var _title = Uri.encodeComponent(title);
     var _url = Uri.encodeComponent(url);
     var link =
         'https://docs.google.com/forms/d/e/1FAIpQLSdbUIaF8IFd-ybZVXARRmtdgIGbSuYg7Vs1HDCYUJrJFInV8w/viewform?entry.76077276=$_title&entry.1416760014=$_body&entry.1520830537=$version&entry.931510077=$user&entry.594008397=$system&entry.1758179395=$phone&entry.17618653=$_url';
-    T.openLink(link);
+    T.openLink(link, mode: appContext.settings.linksMode);
   }
 
   static Widget somethingsWrongButton(String content,
