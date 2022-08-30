@@ -54,7 +54,7 @@ class _BottomTabBarState extends State<BottomTabBar> {
                 Avatar(MainRepository().credentials!.avatar, size: 24),
                 const SizedBox(width: 4),
                 Text(
-                  'Fyxbot'.toUpperCase(),
+                  MainRepository().credentials!.nickname.toUpperCase(),
                   style: TextStyle(fontSize: 14),
                 )
               ],
