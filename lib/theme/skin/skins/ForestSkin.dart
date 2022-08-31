@@ -28,9 +28,9 @@ class ForestSkin extends SkinData {
       dark: const Color(0xFF282828),
       grey: Color(0xFF3B4F41).withOpacity(.7),
       disabled: Colors.black26,
-      pollBackground: const Color(0xffcde5e9),
-      pollAnswer: const Color(0xffa9ccd3),
-      pollAnswerSelected: const Color(0xff76b9b9),
+      pollBackground: const Color(0xffcccdb1),
+      pollAnswer: const Color(0xffb8b992),
+      pollAnswerSelected: const Color(0xffDBD68B),
       gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xff1AD592), Color(0xFF196378)]),
     );
     final darkColors = lightColors;
