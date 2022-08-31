@@ -80,7 +80,7 @@ class _PostListItemState extends ConsumerState<PostListItem> {
         ),
         child: GestureDetector(
           onDoubleTap: () {
-            if (!_post!.canBeRated) {
+            if (!_post!.canBeRated || !MainRepository().settings.quickRating) {
               return null;
             }
 

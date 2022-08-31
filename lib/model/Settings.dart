@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 class Settings {
   bool useCompactMode = false;
   bool useAutocorrect = true;
+  bool quickRating = true;
   // Settings -> what is the default view when app restart?
   DefaultView defaultView = DefaultView.history;
   // Save the last screen view

@@ -57,6 +57,12 @@ class SettingsProvider {
     _settings.useCompactMode = mode;
   }
 
+  bool get quickRating => _settings.quickRating;
+  set quickRating(bool mode) {
+    _box.put('quickRating', mode);
+    _settings.quickRating = mode;
+  }
+
   bool get useAutocorrect => _settings.useAutocorrect;
   set useAutocorrect(bool autocorrect) {
     _box.put('useAutocorrect', autocorrect);
@@ -95,6 +101,7 @@ class SettingsProvider {
     _settings.fontSize = _box.get('fontSize', defaultValue: Settings().fontSize);
     _settings.defaultView = _box.get('defaultView', defaultValue: Settings().defaultView);
     _settings.latestView = _box.get('latestView', defaultValue: Settings().latestView);
+    _settings.quickRating = _box.get('quickRating', defaultValue: Settings().quickRating);
     _settings.useCompactMode = _box.get('useCompactMode', defaultValue: Settings().useCompactMode);
     _settings.useAutocorrect = _box.get('useAutocorrect', defaultValue: Settings().useAutocorrect);
     _settings.firstUnread = _box.get('firstUnread', defaultValue: Settings().firstUnread);

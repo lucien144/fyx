@@ -27,6 +27,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _compactMode = false;
   bool _autocorrect = false;
+  bool _quickRating = true;
   DefaultView _defaultView = DefaultView.latest;
   FirstUnreadEnum _firstUnread = FirstUnreadEnum.button;
   LaunchModeEnum _linksMode = LaunchModeEnum.platformDefault;
@@ -39,6 +40,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _defaultView = MainRepository().settings.defaultView;
     _firstUnread = MainRepository().settings.firstUnread;
     _linksMode = MainRepository().settings.linksMode;
+    _quickRating = MainRepository().settings.quickRating;
     AnalyticsProvider().setScreen('Settings', 'SettingsPage');
   }
 
@@ -119,6 +121,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     title: Text('Autocorrect'),
                   ),
                   SettingsTile.switchTile(
+                      onToggle: (bool value) {
+                        setState(() => _quickRating = value);
+                        MainRepository().settings.quickRating = value;
+                      },
+                      initialValue: _quickRating,
+                      leading: Icon(MdiIcons.thumbsUpDown, color: colors.grey),
+                      title: Text('Rychlé hodnocení')
+                  ),
+                  SettingsTile.switchTile(
                     onToggle: (bool value) {
                       setState(() => _compactMode = value);
                       MainRepository().settings.useCompactMode = value;
@@ -127,19 +138,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     leading: Icon(Icons.view_compact, color: colors.grey),
                     title: Text('Kompaktní zobrazení'),
                     description: Text(
-                      'Kompaktní zobrazení je zobrazení obrázků po stranách pokud to obsah příspěvku dovoluje (nedojde tak k narušení kontextu).',
-                    ),
-                  ),
-                  SettingsTile.switchTile(
-                    onToggle: (bool value) {
-                      setState(() => _compactMode = value);
-                      MainRepository().settings.useCompactMode = value;
-                    },
-                    initialValue: _compactMode,
-                    leading: Icon(MdiIcons.thumbsUpDown, color: colors.grey),
-                    title: Text('Rychlé hodnocení'),
-                    description: Text(
-                      'Umožňit hodnocení příspěvku double-tapem?',
+                      'Kompaktní zobrazení: zobrazuje obrázky po stranách pokud to obsah příspěvku dovoluje (nedojde tak k narušení kontextu).'
+                          '\n'
+                          'Rychlé hodnocení: možnost hodnotit příspěvek na dvojklik (double-tap).',
                     ),
                   ),
                 ],
