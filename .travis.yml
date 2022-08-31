@@ -1,11 +1,13 @@
 language: dart
+dart:
+  - 2.18.0
 dist: xenial
 addons:
   apt:
     packages:
       - lib32stdc++6
 install:
-  - git clone --depth 1 --branch 2.10.2 https://github.com/flutter/flutter.git
+  - git clone --depth 1 --branch 3.0.5 https://github.com/flutter/flutter.git
   - ./flutter/bin/flutter doctor
   - gem install coveralls-lcov
   - cp .env.example .env
