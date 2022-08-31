@@ -134,7 +134,7 @@ class _PollState extends State<Poll> {
                       },
                 child: _loading
                     ? CupertinoActivityIndicator()
-                    : Text('${_poll!.publicResults ? 'Veřejně hlasovat' : 'Hlasovat'} ${_votes.length}/${_poll!.allowedVotes}'),
+                    : Text('${_poll!.publicResults ? 'Veřejně hlasovat' : 'Hlasovat'} ${_votes.length}/${_poll!.allowedVotes}', style: TextStyle(color: colors.pollBackground),),
                 color: colors.primary,
                 padding: EdgeInsets.all(0),
                 disabledColor: colors.disabled,
