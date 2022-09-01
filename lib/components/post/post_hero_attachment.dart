@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:fyx/components/post/post_hero_attachment_box.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/model/post/Image.dart' as model;
@@ -45,6 +46,45 @@ class PostHeroAttachment extends StatelessWidget {
                 .pushNamed('/gallery', arguments: GalleryArguments((attachment as model.Image).image, images: _images));
           }
         },
+        onLongPress: () {
+          showCupertinoModalPopup<void>(
+            context: context,
+            builder: (BuildContext context) => CupertinoActionSheet(
+              title: Text(attachment.thumb),
+              actions: <CupertinoActionSheetAction>[
+                CupertinoActionSheetAction(
+                  isDestructiveAction: true,
+                  onPressed: () async {
+                    try {
+                      await DefaultCacheManager().removeFile(attachment.thumb);
+                      T.success('Cache smazána.');
+                    } catch (error) {
+                      T.warn('Cache se nepodařilo smazat.');
+                    } finally {
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: const Text('Reset cache obrázku?'),
+                ),
+                if (_openGallery)
+                  CupertinoActionSheetAction(
+                    isDestructiveAction: true,
+                    onPressed: () async {
+                      try {
+                        await Future.forEach(_images, (image) => DefaultCacheManager().removeFile((image as model.Image).image));
+                        T.success('Cache galerie smazána.');
+                      } catch (error) {
+                        T.warn('Cache se nepodařilo smazat.');
+                      } finally {
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: const Text('Reset cache celé galerie?'),
+                  ),
+              ],
+            ),
+          );
+        },
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: CachedNetworkImage(
@@ -55,6 +95,7 @@ class PostHeroAttachment extends StatelessWidget {
             fit: BoxFit.cover,
             width: _crop ? size.width : null,
             height: _crop ? size.height : null,
+            cacheManager: CacheManager(Config(attachment.thumb, stalePeriod: const Duration(days: 7))),
           ),
         ),
       );
