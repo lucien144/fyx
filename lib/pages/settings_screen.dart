@@ -30,7 +30,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _quickRating = true;
   DefaultView _defaultView = DefaultView.latest;
   FirstUnreadEnum _firstUnread = FirstUnreadEnum.button;
-  LaunchModeEnum _linksMode = LaunchModeEnum.platformDefault;
+  LaunchModeEnum _linksMode = LaunchModeEnum.externalApplication;
 
   @override
   void initState() {
@@ -198,7 +198,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SettingsSection(
                 title: Text('Otevírání odkazů'),
                 tiles: <SettingsTile>[
-                  _linksModeFactory('Podle nastavení systému', LaunchModeEnum.platformDefault),
+                  //_linksModeFactory('Podle nastavení systému', LaunchModeEnum.platformDefault),
                   _linksModeFactory('Otevírat v externí aplikaci', LaunchModeEnum.externalApplication),
                   _linksModeFactory('Otevírat ve Fyxu', LaunchModeEnum.inAppWebView),
                 ],

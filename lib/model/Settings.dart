@@ -20,5 +20,5 @@ class Settings {
   SkinEnum skin = SkinEnum.fyx;
   double fontSize = 16;
   FirstUnreadEnum firstUnread = FirstUnreadEnum.button;
-  LaunchModeEnum linksMode = LaunchModeEnum.platformDefault;
+  LaunchModeEnum linksMode = LaunchModeEnum.externalApplication;
 }

@@ -33,7 +33,7 @@ enum LaunchModeEnum {
       case LaunchModeEnum.externalNonBrowserApplication:
         return LaunchMode.externalNonBrowserApplication;
       default:
-        return LaunchMode.platformDefault;
+        return LaunchMode.externalApplication;
     }
   }
 }

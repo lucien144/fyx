@@ -51,7 +51,7 @@ class T {
         fontSize: 14.0);
   }
 
-  static Future<bool> openLink(String link, {mode: LaunchModeEnum.platformDefault}) async {
+  static Future<bool> openLink(String link, {mode: LaunchModeEnum.externalApplication}) async {
     try {
       var encodedUri = Uri.parse(link);
 
