@@ -189,6 +189,10 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
               child: NotificationListener(
                 onNotification: (scrollInfo) {
                   if (scrollInfo is ScrollNotification) {
+
+                    // Hide keyboard -> https://github.com/lucien144/fyx/issues/343
+                    FocusManager.instance.primaryFocus?.unfocus();
+
                     // Hide the jump to first unread button if user scrolls twice the height of the screen height
                     if (scrollInfo.metrics.pixels > 2 * MediaQuery.of(context).size.height) {
                       slideController.reverse();
