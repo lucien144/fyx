@@ -106,7 +106,7 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
             prefixIcon: _loading ? const CupertinoActivityIndicator(radius: 10) : Icon(CupertinoIcons.search, color: colors.text.withOpacity(.5)),
             onChanged: (term) {
               if (_debounce?.isActive ?? false) _debounce?.cancel();
-              _debounce = Timer(const Duration(milliseconds: 500), () {
+              _debounce = Timer(const Duration(milliseconds: 650), () {
                 _submit(term);
               });
             },

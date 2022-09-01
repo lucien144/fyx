@@ -145,22 +145,13 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
           ]));
     }
 
-    if (_slivers.length == 1 && !_isLoading) {
+    if (_slivers.length == 1 && !_isLoading && widget.searchTerm == null) {
       return Container(
         height: double.infinity,
         width: double.infinity,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            if (widget.onSearch != null)
-              SearchBox(
-                loading: _isLoading,
-                label: widget.searchLabel,
-                limit: widget.searchLimit,
-                searchTerm: widget.searchTerm,
-                onSearch: widget.onSearch!,
-                onClear: widget.onSearchClear,
-              ),
             Text(
               L.GENERAL_EMPTY,
               textAlign: TextAlign.center,
