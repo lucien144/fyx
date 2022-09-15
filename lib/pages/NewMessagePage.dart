@@ -169,6 +169,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                     Visibility(
                         visible: _settings!.hasInputField == true,
                         child: CupertinoTextField(
+                          decoration: colors.textFieldDecoration,
                           controller: _recipientController,
                           inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9_]'))],
                           textCapitalization: TextCapitalization.characters,
@@ -181,6 +182,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                       height: 8,
                     ),
                     CupertinoTextField(
+                      decoration: colors.textFieldDecoration,
                       controller: _messageController,
                       maxLines: 10,
                       autofocus: _settings!.hasInputField != true || _settings!.inputFieldPlaceholder != null,

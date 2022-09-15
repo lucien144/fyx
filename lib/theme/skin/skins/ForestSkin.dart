@@ -32,6 +32,20 @@ class ForestSkin extends SkinData {
       pollAnswer: const Color(0xffb8b992),
       pollAnswerSelected: const Color(0xffDBD68B),
       gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xff1AD592), Color(0xFF196378)]),
+      textFieldDecoration: const BoxDecoration(
+        color: CupertinoDynamicColor.withBrightness(
+          color: Color(0xffCCCCB1),
+          darkColor: Color(0xffCCCCB1),
+        ),
+        border: Border.fromBorderSide(BorderSide(
+          color: CupertinoDynamicColor.withBrightness(
+            color: Color(0xff858B62),
+            darkColor: Color(0xff858B62),
+          ),
+          width: 0.0,
+        )),
+        borderRadius: BorderRadius.all(Radius.circular(5.0)),
+      )
     );
     final darkColors = lightColors;
 
