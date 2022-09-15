@@ -256,7 +256,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
               width: MediaQuery.of(context).size.width,
               height: 1,
               child: LinearProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(colors.light),
+                valueColor: AlwaysStoppedAnimation<Color>(colors.background),
                 backgroundColor: colors.primary,
               ),
             ),
