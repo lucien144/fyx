@@ -243,44 +243,63 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                 child: SafeArea(
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     mainAxisAlignment: ref.watch(PostsSelection.provider).isEmpty ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
                     children: [
                       if (ref.watch(PostsSelection.provider).isNotEmpty)
-                        FloatingActionButton(
-                          backgroundColor: _deleting ? colors.danger.withOpacity(.5) : colors.danger,
-                          foregroundColor: colors.background,
-                          child: Stack(alignment: Alignment.bottomCenter, children: [
-                            Opacity(opacity: _deleting ? 0.2 : 1, child: Icon(Icons.delete, size: 40)),
-                            Positioned(
-                              bottom: 5,
-                              child: Opacity(
-                                opacity: _deleting ? 0.2 : 1,
-                                child: Text(
-                                  ref.read(PostsSelection.provider).length.toString(),
-                                  style: TextStyle(color: colors.danger),
-                                ),
-                              ),
-                            ),
-                            if (_deleting) Positioned.fill(child: CupertinoActivityIndicator()),
-                          ]),
-                          onPressed: _deleting
-                              ? null
-                              : () async {
-                                  setState(() => _deleting = true);
-                                  try {
-                                    await Future.wait(ref
-                                        .read(PostsSelection.provider)
-                                        .map((id) => ApiController().deleteDiscussionMessage(discussionResponse.discussion.idKlub, id).then((_) {
-                                              ref.read(PostsToDelete.provider.notifier).add(id);
-                                              ref.read(PostsSelection.provider.notifier).remove(id);
-                                            })));
-                                    T.success('Smazáno.');
-                                  } catch (error) {
-                                    T.warn('Některé příspěvky se nepodařilo smazat.');
-                                  } finally {
-                                    setState(() => _deleting = false);
-                                  }
-                                },
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // if (discussionResponse.discussion.accessRights.canRights)
+                            //   Padding(
+                            //     padding: const EdgeInsets.only(bottom: 32.0),
+                            //     child: FloatingActionButton.extended(
+                            //       backgroundColor: _deleting ? colors.primary.withOpacity(.5) : colors.primary,
+                            //       foregroundColor: colors.background,
+                            //       label: Text('RO 7 dní'),
+                            //       icon: Icon(MdiIcons.messageLock, size: 30),
+                            //       onPressed: _deleting
+                            //           ? null
+                            //           : () async {
+                            //         setState(() => _deleting = true);
+                            //         try {
+                            //           // await Future.wait(ref.read(PostsSelection.provider).map((post) => ApiController().setWriteRights(discussionResponse.discussion.idKlub, post, false).then((_) {
+                            //           //   ref.read(PostsSelection.provider.notifier).remove(post);
+                            //           // })));
+                            //           T.success('RO uděleno.');
+                            //         } catch (error) {
+                            //           T.warn('Některé příspěvky se nepodařilo smazat.');
+                            //         } finally {
+                            //           setState(() => _deleting = false);
+                            //         }
+                            //       },
+                            //     ),
+                            //   ),
+                            FloatingActionButton.extended(
+                              backgroundColor: _deleting ? colors.danger.withOpacity(.5) : colors.danger,
+                              foregroundColor: colors.background,
+                              label: _deleting ? CupertinoActivityIndicator() : Text('${ref.read(PostsSelection.provider).length.toString()}×'),
+                              icon: Icon(Icons.delete, size: 30),
+                              onPressed: _deleting
+                                  ? null
+                                  : () async {
+                                setState(() => _deleting = true);
+                                try {
+                                  await Future.wait(ref
+                                      .read(PostsSelection.provider)
+                                      .map((post) => ApiController().deleteDiscussionMessage(discussionResponse.discussion.idKlub, post.id).then((_) {
+                                    ref.read(PostsToDelete.provider.notifier).add(post);
+                                    ref.read(PostsSelection.provider.notifier).remove(post);
+                                  })));
+                                  T.success('Smazáno.');
+                                } catch (error) {
+                                  T.warn('Některé příspěvky se nepodařilo smazat.');
+                                } finally {
+                                  setState(() => _deleting = false);
+                                }
+                              },
+                            )
+                          ],
                         ),
                       if (ref.watch(PostsSelection.provider).isNotEmpty)
                         FloatingActionButton(

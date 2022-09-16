@@ -56,8 +56,8 @@ class _PostListItemState extends ConsumerState<PostListItem> {
   @override
   Widget build(BuildContext context) {
     SkinColors colors = Skin.of(context).theme.colors;
-    final isSelected = ref.watch(PostsSelection.provider).contains(this._post!.id);
-    final isDeleted = ref.watch(PostsToDelete.provider).contains(this._post!.id);
+    final isSelected = ref.watch(PostsSelection.provider).contains(this._post!);
+    final isDeleted = ref.watch(PostsToDelete.provider).contains(this._post!);
 
     return Visibility(
       visible: !isDeleted,
@@ -65,7 +65,7 @@ class _PostListItemState extends ConsumerState<PostListItem> {
         key: UniqueKey(),
         direction: _post!.canBeDeleted ? DismissDirection.endToStart : DismissDirection.none,
         confirmDismiss: (_) {
-          ref.read(PostsSelection.provider.notifier).toggle(this._post!.id);
+          ref.read(PostsSelection.provider.notifier).toggle(this._post!);
           return Future.value(false);
         },
         background: Container(

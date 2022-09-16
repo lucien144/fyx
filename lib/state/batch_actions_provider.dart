@@ -1,28 +1,29 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fyx/model/Post.dart';
 
-class PostsSelection extends StateNotifier<List<int>> {
+class PostsSelection extends StateNotifier<List<Post>> {
   PostsSelection() : super([]);
 
-  static final provider = StateNotifierProvider.autoDispose<PostsSelection, List<int>>((ref) {
+  static final provider = StateNotifierProvider.autoDispose<PostsSelection, List<Post>>((ref) {
     return PostsSelection();
   });
 
-  void add(int id) {
-    state = [...state, id];
+  void add(Post post) {
+    state = [...state, post];
   }
 
-  void remove(int id) {
+  void remove(Post post) {
     state = [
-      for (final postItemId in state)
-        if (postItemId != id) postItemId,
+      for (final _post in state)
+        if (_post.id != post.id) _post,
     ];
   }
 
-  void toggle(int id) {
-    if (state.contains(id))
-      this.remove(id);
+  void toggle(Post post) {
+    if (state.contains(post))
+      this.remove(post);
     else
-      this.add(id);
+      this.add(post);
   }
 
   void reset() {
@@ -30,25 +31,25 @@ class PostsSelection extends StateNotifier<List<int>> {
   }
 }
 
-class PostsToDelete extends StateNotifier<List<int>> {
+class PostsToDelete extends StateNotifier<List<Post>> {
   PostsToDelete() : super([]);
 
-  static final provider = StateNotifierProvider.autoDispose<PostsToDelete, List<int>>((ref) {
+  static final provider = StateNotifierProvider.autoDispose<PostsToDelete, List<Post>>((ref) {
     return PostsToDelete();
   });
 
-  void copy(List<int> list) {
+  void copy(List<Post> list) {
     state = list;
   }
 
-  void add(int id) {
-    state = [...state, id];
+  void add(Post post) {
+    state = [...state, post];
   }
 
-  void remove(int id) {
+  void remove(Post post) {
     state = [
-      for (final postItemId in state)
-        if (postItemId != id) postItemId,
+      for (final _post in state)
+        if (_post.id != post.id) _post,
     ];
   }
 
