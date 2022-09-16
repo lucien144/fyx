@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:fyx/model/enums/PostTypeEnum.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/Image.dart';
@@ -111,8 +113,8 @@ class ContentRegular extends Content {
       _body = _body.replaceAll(trailingBr, '');
 
       var xmpTag = RegExp(r'<xmp>(.*?)</xmp>', caseSensitive: false, multiLine: true, dotAll: true);
-      _body = _body.replaceAllMapped(xmpTag, (match) => '<pre>${match.group(1)}</pre>');
-      _rawBody = _rawBody.replaceAllMapped(xmpTag, (match) => '<pre>${match.group(1)}</pre>');
+      _body = _body.replaceAllMapped(xmpTag, (match) => '<pre>${HtmlEscape().convert(match.group(1) ?? '')}</pre>');
+      _rawBody = _rawBody.replaceAllMapped(xmpTag, (match) => '<pre>${HtmlEscape().convert(match.group(1) ?? '')}</pre>');
     } catch (error) {
       Sentry.captureException(error, stackTrace: StackTrace.current);
     }
