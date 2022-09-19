@@ -73,6 +73,7 @@ Takže milí podporovatelé, díky! ❤️
 - ID **WOJTISHEK** 🍦
 - ID **WOTAR** ☕️
 - ID **XLACHTAN** ☕️
+- - ID **KEVIN00** ☕️
 
 Dárci pod $1 jsou uvedeni na nástěnce klubu na Nyxu.
 

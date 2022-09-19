@@ -3,7 +3,31 @@
 Tento soubor vychází z [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 verzování z [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.8.1] - 2022/02/19
+## [0.8.3] - 2022/05/03
+
+### Nové
+- Zobrazování palečků #284
+- Podpora házení kostkou #301 [KEJML]
+- Podpora PRE a XMP tagu #275 #281
+
+### Změněno
+- Upgrade Flutteru a knihoven #303 [TRAGIKOMIX]
+- Psaní příspěvků nabízí anglické popisky pro práci s textem #205 #299 [KEJML]
+- Historie zobrazuje poslední klub jako nepřečtený #231 #298 [KEJML]
+- Odlišení, jestli je anketa veřejná, nebo ne #288 [KEJML]
+- U vypisu hlasu by bylo uzitecne videt kolik je pozitivnich hlasu #292 [KEJML]
+- Google Play issue #310
+
+### Opraveno
+- Nepodporovaný typ příspěvku "log_message" #300 [TRAGIKOMIX]
+- Android notifikace nemají správnou ikonu #203 [KEJML]
+- Otazník místo názvu jedné diskuze #312
+- Nelze stáhnout obrázek #304
+- První načtení diskuze je občas trhané #311
+
+**Kompletní changelog**: https://github.com/lucien144/fyx/compare/v0.8.2...v0.8.3
+
+## [0.8.2] - 2022/02/19
 
 ### Opraveno
 - Fyx nenačítá diskuze #295
