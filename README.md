@@ -21,8 +21,7 @@ Fyx je neoficiální mobilní klient (Android a iOS) pro diskuzní server [Nyx.c
 
 ## Funkce
 
-Fyx nabízí oproti [oficiálnímu klientovi](https://apps.apple.com/cz/app/nyx/id920743962) několik výhod, ale v něčem také ztrácí. 
-Zde je přehled funkcí pro lepší představu.
+Fyx nabízí oproti [oficiálnímu klientovi](https://apps.apple.com/cz/app/nyx/id920743962) několik výhod:
 
 | Funkce | Fyx | Nyx |
 |-|:-:|:-:|
