@@ -53,12 +53,10 @@ class _LoginPageState extends State<LoginPage> {
                   minWidth: MediaQuery.of(context).size.width,
                   minHeight: MediaQuery.of(context).size.height,
                 ),
-                child: IntrinsicHeight(
-                  child: Container(
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(gradient: colors.gradient),
-                    child: formFactory(),
-                  ),
+                child: Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(gradient: colors.gradient),
+                  child: formFactory(),
                 ))));
   }
 
@@ -73,7 +71,9 @@ class _LoginPageState extends State<LoginPage> {
     final textfieldDecoration =
         BoxDecoration(borderRadius: BorderRadius.circular(4), color: colors.background, border: Border.all(color: colors.background));
 
-    var offset = (MediaQuery.of(context).viewInsets.bottom / 3);
+    var offset = 128 - (MediaQuery.of(context).viewInsets.bottom / 3);
+    offset = offset > 0 ? offset : 20;
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.max,
@@ -91,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
               boxShadow: [BoxShadow(color: colors.dark, offset: Offset(0, 0), blurRadius: 16)]),
         ),
         AnimatedPadding(
-          padding: EdgeInsets.only(top: 128 - offset),
+          padding: EdgeInsets.only(top: offset),
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeInOut,
           child: Column(
