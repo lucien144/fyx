@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fyx/SkinnedApp.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
@@ -22,14 +21,18 @@ import 'package:fyx/pages/InfoPage.dart';
 import 'package:fyx/pages/LoginPage.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/pages/NoticesPage.dart';
-import 'package:fyx/pages/SettingsPage.dart';
 import 'package:fyx/pages/TutorialPage.dart';
+import 'package:fyx/pages/discussion_home_page.dart';
+import 'package:fyx/pages/settings_design_screen.dart';
+import 'package:fyx/pages/settings_screen.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/skins/ForestSkin.dart';
 import 'package:fyx/theme/skin/skins/FyxSkin.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry/sentry.dart';
+import 'package:tap_canvas/tap_canvas.dart';
 
 import 'controllers/NotificationsService.dart';
 
@@ -90,7 +93,7 @@ class FyxApp extends StatefulWidget {
     }
 
     SystemUiOverlayStyle(statusBarBrightness: Brightness.light);
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
 
     // TODO: Move to build using FutureBuilder.
     var results = await Future.wait([ApiController().getCredentials(), PackageInfo.fromPlatform(), DeviceInfo.init(), SettingsProvider().init()]);
@@ -139,6 +142,12 @@ class FyxApp extends StatefulWidget {
       case '/discussion':
         print('[Router] Discussion');
         return CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings);
+      case '/discussion/home':
+        print('[Router] Discussion home');
+        return CupertinoPageRoute(builder: (_) => DiscussionHomePage(), settings: settings);
+      case '/discussion/header':
+        print('[Router] Discussion home');
+        return CupertinoPageRoute(builder: (_) => DiscussionHomePage(header: true), settings: settings);
       case '/new-message':
         print('[Router] New Message');
         return CupertinoPageRoute(builder: (_) => NewMessagePage(), settings: settings, fullscreenDialog: true);
@@ -152,7 +161,10 @@ class FyxApp extends StatefulWidget {
             fullscreenDialog: true);
       case '/settings':
         print('[Router] Settings');
-        return CupertinoPageRoute(builder: (_) => SettingsPage(), settings: settings);
+        return CupertinoPageRoute(builder: (_) => SettingsScreen(), settings: settings);
+      case '/settings/design':
+        print('[Router] Settings');
+        return CupertinoPageRoute(builder: (_) => SettingsDesignScreen(), settings: settings);
       case '/settings/info':
         print('[Router] Settings / info');
         return CupertinoPageRoute(builder: (_) => InfoPage(), settings: settings);
@@ -175,29 +187,25 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addObserver(this);
-    _platformBrightness ??= WidgetsBinding.instance?.window.platformBrightness;
+    WidgetsBinding.instance.addObserver(this);
+    _platformBrightness ??= WidgetsBinding.instance.window.platformBrightness;
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // Hide the keyboard on tap
-        FocusScopeNode currentFocus = FocusScope.of(context);
-        if (!currentFocus.hasPrimaryFocus) {
-          currentFocus.unfocus();
-        }
-      },
+    return TapCanvas(
       child: MultiProvider(
         providers: [
           ChangeNotifierProvider<NotificationsModel>(create: (context) => NotificationsModel()),
-          ChangeNotifierProvider<ThemeModel>(create: (context) => ThemeModel(MainRepository().settings.theme)),
+          ChangeNotifierProvider<ThemeModel>(
+              create: (context) =>
+                  ThemeModel(MainRepository().settings.theme, MainRepository().settings.fontSize, initialSkin: MainRepository().settings.skin)),
         ],
         builder: (ctx, widget) => Directionality(
             textDirection: TextDirection.ltr,
             child: Skin(
-                skin: FyxSkin.create(),
+                skins: [FyxSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize), ForestSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize)],
+                skin: ctx.watch<ThemeModel>().skin,
                 brightness: (() {
                   if (ctx.watch<ThemeModel>().theme == ThemeEnum.system && _platformBrightness != null) {
                     return _platformBrightness!;
@@ -213,12 +221,12 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
   void dispose() {
     super.dispose();
     FyxApp._notificationsService.dispose();
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
   }
 
   @override
   void didChangePlatformBrightness() {
-    setState(() => _platformBrightness = WidgetsBinding.instance?.window.platformBrightness);
+    setState(() => _platformBrightness = WidgetsBinding.instance.window.platformBrightness);
     super.didChangePlatformBrightness(); // make sure you call this
   }
 }

@@ -91,7 +91,11 @@ class ApiProvider implements IApiProvider {
       }
 
       if (onError != null) {
-        onError!(e.message);
+        if (e.message.contains('SocketException')) {
+          onError!(L.CONNECTION_ERROR);
+        } else {
+          onError!(e.message);
+        }
       }
     }));
   }
@@ -103,6 +107,10 @@ class ApiProvider implements IApiProvider {
   Future<Response> registerFcmToken(String token) async {
     String client = 'fyx';
     return await dio.post('$URL/register_for_notifications/${_credentials?.token}/$client/$token');
+  }
+
+  Future<Response> searchDiscussions(String term) async {
+    return await dio.get('$URL/search/unified?search=$term&limit=100');
   }
 
   Future<Response> fetchBookmarks() async {
@@ -118,10 +126,17 @@ class ApiProvider implements IApiProvider {
     return await dio.get('$URL/discussion/$discussionId', queryParameters: params);
   }
 
+  Future<Response> bookmarkDiscussion(int discussionId, bool state) async {
+    Map<String, dynamic> params = {'new_state': state};
+    return await dio.post('$URL/discussion/$discussionId/bookmark', queryParameters: params);
+  }
+
   Future<Response> fetchDiscussionHome(int id) async {
-    FormData formData = new FormData.fromMap(
-        {'auth_nick': _credentials?.nickname, 'auth_token': _credentials?.token, 'l': 'discussion', 'l2': 'home', 'id_klub': id});
-    return await dio.post(URL, data: formData);
+    return await dio.get('$URL/discussion/$id/content/home');
+  }
+
+  Future<Response> fetchDiscussionHeader(int id) async {
+    return await dio.get('$URL/discussion/$id/content/header');
   }
 
   Future<Response> fetchNotices() async {

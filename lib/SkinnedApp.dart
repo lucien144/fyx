@@ -1,6 +1,5 @@
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:fyx/FyxApp.dart';
 import 'package:fyx/model/MainRepository.dart';

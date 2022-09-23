@@ -1,8 +1,12 @@
 import 'package:fyx/model/Settings.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
+import 'package:fyx/model/enums/FirstUnreadEnum.dart';
+import 'package:fyx/model/enums/LaunchModeEnum.dart';
+import 'package:fyx/model/enums/SkinEnum.dart';
 import 'package:fyx/model/enums/ThemeEnum.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsProvider {
   static final SettingsProvider _singleton = SettingsProvider._internal();
@@ -17,6 +21,18 @@ class SettingsProvider {
     _settings.theme = theme;
   }
 
+  SkinEnum get skin => _settings.skin;
+  set skin(SkinEnum skin) {
+    _box.put('skin', skin);
+    _settings.skin = skin;
+  }
+
+  double get fontSize => _settings.fontSize;
+  set fontSize(double fontSize) {
+    _box.put('fontSize', fontSize);
+    _settings.fontSize = fontSize;
+  }
+
   DefaultView get defaultView => _settings.defaultView;
   set defaultView(DefaultView view) {
     _box.put('defaultView', view);
@@ -29,16 +45,34 @@ class SettingsProvider {
     _settings.latestView = view;
   }
 
+  FirstUnreadEnum get firstUnread => _settings.firstUnread;
+  set firstUnread(FirstUnreadEnum value) {
+    _box.put('firstUnread', value);
+    _settings.firstUnread = value;
+  }
+
   bool get useCompactMode => _settings.useCompactMode;
   set useCompactMode(bool mode) {
     _box.put('useCompactMode', mode);
     _settings.useCompactMode = mode;
   }
 
+  bool get quickRating => _settings.quickRating;
+  set quickRating(bool mode) {
+    _box.put('quickRating', mode);
+    _settings.quickRating = mode;
+  }
+
   bool get useAutocorrect => _settings.useAutocorrect;
   set useAutocorrect(bool autocorrect) {
     _box.put('useAutocorrect', autocorrect);
     _settings.useAutocorrect = autocorrect;
+  }
+
+  LaunchModeEnum get linksMode => _settings.linksMode;
+  set linksMode(LaunchModeEnum mode) {
+    _box.put('linksMode', mode);
+    _settings.linksMode = mode;
   }
 
   List get blockedMails => _box.get('blockedMails', defaultValue: Settings().blockedMails);
@@ -57,14 +91,22 @@ class SettingsProvider {
     await Hive.initFlutter();
     Hive.registerAdapter(DefaultViewAdapter());
     Hive.registerAdapter(ThemeEnumAdapter());
+    Hive.registerAdapter(FirstUnreadEnumAdapter());
+    Hive.registerAdapter(SkinEnumAdapter());
+    Hive.registerAdapter(LaunchModeEnumAdapter());
     _box = await Hive.openBox('settings');
 
     _settings = new Settings();
     _settings.theme = _box.get('theme', defaultValue: Settings().theme);
+    _settings.fontSize = _box.get('fontSize', defaultValue: Settings().fontSize);
     _settings.defaultView = _box.get('defaultView', defaultValue: Settings().defaultView);
     _settings.latestView = _box.get('latestView', defaultValue: Settings().latestView);
+    _settings.quickRating = _box.get('quickRating', defaultValue: Settings().quickRating);
     _settings.useCompactMode = _box.get('useCompactMode', defaultValue: Settings().useCompactMode);
     _settings.useAutocorrect = _box.get('useAutocorrect', defaultValue: Settings().useAutocorrect);
+    _settings.firstUnread = _box.get('firstUnread', defaultValue: Settings().firstUnread);
+    _settings.skin = _box.get('skin', defaultValue: Settings().skin);
+    _settings.linksMode = _box.get('linksMode', defaultValue: Settings().linksMode);
 
     return _singleton;
   }

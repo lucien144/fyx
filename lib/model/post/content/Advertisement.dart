@@ -75,7 +75,7 @@ class ContentAdvertisement extends Content {
   }
 
   factory ContentAdvertisement.fromPostJson(Map<String, dynamic> json, {bool isCompact = false}) {
-    ContentAdvertisement ad = ContentAdvertisement.fromJson(json['content_raw']['data'], isCompact: isCompact);
+    ContentAdvertisement ad = ContentAdvertisement.fromJson(json, isCompact: isCompact);
     // We are not using 👇 anywhere + it causes the app to freeze
     // ad.contentRegular = ContentRegular(json['content']);
     return ad;

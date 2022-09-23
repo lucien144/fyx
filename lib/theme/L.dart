@@ -1,13 +1,22 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'package:fyx/model/reponses/UnifiedSearchResponse.dart';
+
 class L {
+  static Map<UnifiedSearchType, String> search = {
+    UnifiedSearchType.discussions: 'Nalezené diskuze',
+    UnifiedSearchType.events: 'Nalezené události',
+    UnifiedSearchType.advertisements: 'Nalezené inzeráty',
+  };
+
   // Errors
   static String AUTH_ERROR = 'Problém s přihlášením, přihlašte se znovu.';
   static String API_ERROR = 'Pardon, nastal problém v komunikaci se serverem.';
-  static String INAPPBROWSER_ERROR = 'Nepodařilo se otevřít prohlížeč.';
+  static String INAPPBROWSER_ERROR = 'Nepodařilo se otevřít prohlížeč. Zkus si v nastavení změnit otevírání odkazů.';
   static String REMINDER_ERROR = 'Příspěvek se nepodařilo uložit do upomínek.';
   static String RATING_ERROR = 'Příspěvek se nepodařilo lajknout.';
   static String ACCESS_DENIED_ERROR = 'Sem nemáš přístup.';
+  static String CONNECTION_ERROR = '🔌 Problém s připojením, zkus to znovu...';
 
   // General
   static String GENERAL_SKIP = 'Přeskočit';

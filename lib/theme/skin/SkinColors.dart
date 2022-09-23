@@ -1,11 +1,14 @@
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class SkinColors {
   final Color primary;
+
   //final Color secondaryColor;
   final Color highlight;
+  final Color highlightedText;
   final Color success;
   final Color danger;
   final Color barBackground;
@@ -20,6 +23,7 @@ class SkinColors {
   final Color dark;
   final BoxDecoration shadow;
   final LinearGradient gradient;
+  final BoxDecoration textFieldDecoration;
   Color? primaryContrasting;
 
   SkinColors({
@@ -30,6 +34,7 @@ class SkinColors {
     this.success = Colors.green,
     this.danger = Colors.redAccent,
     this.highlight = const Color(0xff33BB9A),
+    this.highlightedText = Colors.amber,
     this.light = Colors.white,
     this.dark = const Color(0xFF282828),
     this.grey = Colors.black38,
@@ -38,9 +43,23 @@ class SkinColors {
     this.pollAnswer = const Color(0xffa9ccd3),
     this.pollAnswerSelected = const Color(0xff76b9b9),
     this.gradient = const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xff1AD592), Color(0xFF196378)]),
+    this.textFieldDecoration = const BoxDecoration(
+      color: CupertinoDynamicColor.withBrightness(
+        color: CupertinoColors.white,
+        darkColor: CupertinoColors.black,
+      ),
+      border: Border.fromBorderSide(BorderSide(
+        color: CupertinoDynamicColor.withBrightness(
+          color: Color(0x33000000),
+          darkColor: Color(0x33FFFFFF),
+        ),
+        width: 0.0,
+      )),
+      borderRadius: BorderRadius.all(Radius.circular(5.0)),
+    ),
     this.primaryContrasting,
     //this.secondaryColor = const Color(0xff007F90),
-  })  : shadow = BoxDecoration(
+  }) : shadow = BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(8)),
             color: background,
             border: Border.fromBorderSide(BorderSide(color: primary, width: 1, style: BorderStyle.solid)),

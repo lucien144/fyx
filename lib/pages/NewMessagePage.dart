@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/Settings.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
@@ -141,10 +142,13 @@ class _NewMessagePageState extends State<NewMessagePage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        CupertinoButton(padding: EdgeInsets.all(0), child: Text('Zavřít'), onPressed: () => Navigator.of(context).pop()),
+                        CupertinoButton(
+                            padding: EdgeInsets.all(0),
+                            child: Text('Zavřít', style: TextStyle(fontSize: Settings().fontSize)),
+                            onPressed: () => Navigator.of(context).pop()),
                         CupertinoButton(
                           padding: EdgeInsets.all(0),
-                          child: _sending ? CupertinoActivityIndicator() : Text('Odeslat'),
+                          child: _sending ? CupertinoActivityIndicator() : Text('Odeslat', style: TextStyle(fontSize: Settings().fontSize)),
                           onPressed: _isSendDisabled()
                               ? null
                               : () async {
@@ -165,6 +169,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                     Visibility(
                         visible: _settings!.hasInputField == true,
                         child: CupertinoTextField(
+                          decoration: colors.textFieldDecoration,
                           controller: _recipientController,
                           inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9_]'))],
                           textCapitalization: TextCapitalization.characters,
@@ -177,6 +182,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                       height: 8,
                     ),
                     CupertinoTextField(
+                      decoration: colors.textFieldDecoration,
                       controller: _messageController,
                       maxLines: 10,
                       autofocus: _settings!.hasInputField != true || _settings!.inputFieldPlaceholder != null,

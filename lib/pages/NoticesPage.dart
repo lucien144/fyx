@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fyx/components/Avatar.dart' as component;
-import 'package:fyx/components/ContentBoxLayout.dart';
-import 'package:fyx/components/PullToRefreshList.dart';
-import 'package:fyx/components/post/PostThumbs.dart';
+import 'package:fyx/components/avatar.dart' as component;
+import 'package:fyx/components/content_box_layout.dart';
+import 'package:fyx/components/post/post_thumbs.dart';
+import 'package:fyx/components/pull_to_refresh_list.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/model/Settings.dart';
 import 'package:fyx/model/post/PostThumbItem.dart';
 import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/model/reponses/FeedNoticesResponse.dart';
@@ -32,13 +33,13 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
     AnalyticsProvider().setScreen('Notices', 'NoticesPage');
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -65,7 +66,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
         child: PullToRefreshList(
             rebuild: _refreshData,
             dataProvider: (lastId) async {
-              var result = await ApiController().loadFeedNotices();
+              var result = await Future.delayed(const Duration(milliseconds: 300), () => ApiController().loadFeedNotices());
               var feed = result.data.map((NoticeItem item) {
                 var highlight = false;
                 item.replies.forEach((NoticeReplies reply) => highlight = reply.time > result.lastVisit ? true : highlight);
@@ -77,7 +78,9 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
                   isHighlighted: highlight,
                   topRightWidget: Text(
                     item.wuRating > 0 ? '+${item.wuRating}' : item.wuRating.toString(),
-                    style: TextStyle(fontSize: 14, color: item.wuRating > 0 ? colors.success : (item.wuRating < 0 ? colors.danger : colors.grey)),
+                    style: TextStyle(
+                        fontSize: Settings().fontSize * 0.9,
+                        color: item.wuRating > 0 ? colors.success : (item.wuRating < 0 ? colors.danger : colors.grey)),
                   ),
                   topLeftWidget: Expanded(
                     child: GestureDetector(
@@ -86,7 +89,7 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
                         item.discussionName,
                         overflow: TextOverflow.ellipsis,
                         softWrap: false,
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: Settings().fontSize),
                       ),
                     ),
                   ),

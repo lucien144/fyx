@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -52,7 +53,7 @@ class _InfoPageState extends State<InfoPage> {
             future: _response,
             builder: (BuildContext context, AsyncSnapshot<Response> snapshot) {
               if (snapshot.hasData) {
-                return Markdown(data: snapshot.data!.body, styleSheet: MarkdownStyleSheet.fromCupertinoTheme(CupertinoTheme.of(context)), onTapLink: (String text, String? url, String title) => url != null ? T.openLink(url) : null);
+                return Markdown(data: snapshot.data!.body, styleSheet: MarkdownStyleSheet.fromCupertinoTheme(CupertinoTheme.of(context)), onTapLink: (String text, String? url, String title) => url != null ? T.openLink(url, mode: SettingsProvider().linksMode) : null);
               }
               if (snapshot.hasError) {
                 return T.feedbackScreen(

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fyx/FyxApp.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -19,7 +20,7 @@ void main() async {
       SentryFlutter.init((options) {
         options.dsn = dotenv.env['SENTRY_KEY'];
         options.environment = 'production';
-      }, appRunner: () => runApp(FyxApp()..setEnv(Environment.production)));
+      }, appRunner: () => runApp(ProviderScope(child: FyxApp()..setEnv(Environment.production))));
     },
     (error, stackTrace) async {
       try {

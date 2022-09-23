@@ -5,7 +5,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fyx/components/post/PostHeroAttachment.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:fyx/components/post/post_hero_attachment.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/exceptions/UnsupportedDownloadFormatException.dart';
 import 'package:fyx/theme/Helpers.dart';
@@ -40,7 +41,7 @@ class _GalleryPageState extends State<GalleryPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_arguments != null && _arguments!.images.length > 1) {
         _arguments!.images.asMap().forEach((key, image) {
           if (image.image == _arguments!.imageUrl) {
@@ -74,7 +75,8 @@ class _GalleryPageState extends State<GalleryPage> {
               scrollPhysics: const BouncingScrollPhysics(),
               builder: (BuildContext context, int index) {
                 return PhotoViewGalleryPageOptions(
-                    imageProvider: CachedNetworkImageProvider(_arguments!.images[index].image), onTapDown: (_, __, ___) => close(context));
+                    imageProvider: CachedNetworkImageProvider(
+                        _arguments!.images[index].image, cacheManager: CacheManager(Config(_arguments!.images[index].image, stalePeriod: const Duration(days: 7)))), onTapDown: (_, __, ___) => close(context));
               },
               itemCount: _arguments!.images.length,
               loadingBuilder: (context, chunkEvent) => CupertinoActivityIndicator(

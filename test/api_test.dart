@@ -85,7 +85,6 @@ class ApiMock implements IApiProvider {
     return _credentials;
   }
 
-
   @override
   Future<Response> giveRating(int discussionId, int postId, bool add, bool confirm, bool remove) {
     // TODO: implement giveRating
@@ -187,6 +186,24 @@ class ApiMock implements IApiProvider {
     // TODO: implement getPostRatings
     throw UnimplementedError();
   }
+
+  @override
+  Future<Response> searchDiscussions(String term) {
+    // TODO: implement getPostRatings
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> bookmarkDiscussion(int id, bool state) {
+    // TODO: implement getPostRatings
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> fetchDiscussionHeader(int id) {
+    // TODO: implement getPostRatings
+    throw UnimplementedError();
+  }
 }
 
 void main() {
@@ -225,10 +242,17 @@ void main() {
     var loginName = 'TOMMYSHELBY';
 
     var api = ApiController();
-    api.provider = ApiMock(
-        {"result": "error", "code": "401", "error": true, "auth_state": "AUTH_NEW", "auth_token": "44a3d1241830ca61a592e28df783007d", "auth_code": "6f9a10647d", "auth_dev_comment": "Direct user to PERSONAL \/ SETTINGS \/ AUTHORIZATIONS and tell him to accept request from this app. He will have to confirm it by transcribing passcode from [auth_code]. After confirming it, access using [token] should be working."},
-      emptyCredentials: true // 👀 👈
-    );
+    api.provider = ApiMock({
+      "result": "error",
+      "code": "401",
+      "error": true,
+      "auth_state": "AUTH_NEW",
+      "auth_token": "44a3d1241830ca61a592e28df783007d",
+      "auth_code": "6f9a10647d",
+      "auth_dev_comment":
+          "Direct user to PERSONAL \/ SETTINGS \/ AUTHORIZATIONS and tell him to accept request from this app. He will have to confirm it by transcribing passcode from [auth_code]. After confirming it, access using [token] should be working."
+    }, emptyCredentials: true // 👀 👈
+        );
 
     var prefs = await SharedPreferences.getInstance();
     String? identity = prefs.getString('identity');
@@ -257,7 +281,8 @@ void main() {
 
     var api = ApiController();
     api.provider = ApiMock({"error": true, "message": "Nepodařilo se načíst uživatele."});
-    expect(() async => await api.login(loginName), throwsA(predicate((e) => (e is AuthException && e.toString() == 'Nepodařilo se načíst uživatele.'))));
+    expect(
+        () async => await api.login(loginName), throwsA(predicate((e) => (e is AuthException && e.toString() == 'Nepodařilo se načíst uživatele.'))));
   });
 
   // TODO is this still possible response? Can't reproduce it

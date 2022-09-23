@@ -6,9 +6,10 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/enums/LaunchModeEnum.dart';
 import 'package:fyx/theme/L.dart';
-import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:sentry/sentry.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -39,12 +40,31 @@ class T {
         fontSize: 14.0);
   }
 
-  static Future<bool> openLink(String link) async {
+  static warn(String message, {int duration: 7, Color bg: Colors.orangeAccent}) {
+    Fluttertoast.showToast(
+        msg: message,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: duration,
+        backgroundColor: bg,
+        textColor: Colors.black,
+        fontSize: 14.0);
+  }
+
+  static Future<bool> openLink(String link, {mode: LaunchModeEnum.externalApplication}) async {
     try {
-      var status = await launch(link);
-      if (status == false) {
+      var encodedUri = Uri.parse(link);
+
+      var canLaunch = await canLaunchUrl(encodedUri);
+      if (!canLaunch) {
+        throw ('Cannot launch url: $link');
+      }
+
+      var status = await launchUrl(encodedUri, mode: mode.original);
+      if (!status) {
         throw ('Cannot open webview. URL: $link');
       }
+
       return true;
     } catch (e) {
       T.error(L.INAPPBROWSER_ERROR);
@@ -53,34 +73,38 @@ class T {
     }
   }
 
-  static prefillGithubIssue({MainRepository? appContext, String title = '', String body = '', String user = '-', String url = ''}) async {
+  static prefillGithubIssue({required MainRepository appContext, String title = '', String body = '', String user = '-', String url = ''}) async {
     var version = '-';
     var system = '-';
     var phone = '-';
-    if (appContext != null) {
-      var pkg = appContext.packageInfo;
-      var device = appContext.deviceInfo;
-      version = Uri.encodeComponent('${pkg.version} (${pkg.buildNumber})');
-      system = Uri.encodeComponent('${device.systemName} ${device.systemVersion}');
-      phone = Uri.encodeComponent(device.localizedModel);
-    }
+    var pkg = appContext.packageInfo;
+    var device = appContext.deviceInfo;
+    version = Uri.encodeComponent('${pkg.version} (${pkg.buildNumber})');
+    system = Uri.encodeComponent('${device.systemName} ${device.systemVersion}');
+    phone = Uri.encodeComponent(device.localizedModel);
 
     var _body = Uri.encodeComponent(body);
     var _title = Uri.encodeComponent(title);
     var _url = Uri.encodeComponent(url);
     var link =
         'https://docs.google.com/forms/d/e/1FAIpQLSdbUIaF8IFd-ybZVXARRmtdgIGbSuYg7Vs1HDCYUJrJFInV8w/viewform?entry.76077276=$_title&entry.1416760014=$_body&entry.1520830537=$version&entry.931510077=$user&entry.594008397=$system&entry.1758179395=$phone&entry.17618653=$_url';
-    T.openLink(link);
+    T.openLink(link, mode: appContext.settings.linksMode);
   }
 
-  static Widget somethingsWrongButton(String content, {String url = '', IconData icon = Icons.warning, String title = 'Chyba zobrazení příspěvku.', String stack = ''}) {
+  static Widget somethingsWrongButton(String content,
+      {String url = '', IconData icon = Icons.warning, String title = 'Chyba zobrazení příspěvku.', String stack = ''}) {
     return GestureDetector(
       onTap: () => T.prefillGithubIssue(
-          title: title, body: '**Zdroj:**\n```$content```\n\n**Stack:**\n```$stack```', user: MainRepository().credentials!.nickname, url: url, appContext: MainRepository()),
-      child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-        Icon(icon, size: 48,),
+          title: title,
+          body: '**Zdroj:**\n```$content```\n\n**Stack:**\n```$stack```',
+          user: MainRepository().credentials!.nickname,
+          url: url,
+          appContext: MainRepository()),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
+        Icon(
+          icon,
+          size: 48,
+        ),
         Text(
           '$title\n Problém nahlásíte kliknutím zde.',
           textAlign: TextAlign.center,
@@ -89,7 +113,8 @@ class T {
     );
   }
 
-  static Widget feedbackScreen(BuildContext context, {bool isLoading = false, bool isWarning = false, String label = '', String title = '', VoidCallback? onPress, IconData icon = Icons.warning}) {
+  static Widget feedbackScreen(BuildContext context,
+      {bool isLoading = false, bool isWarning = false, String label = '', String title = '', VoidCallback? onPress, IconData icon = Icons.warning}) {
     return Container(
       width: double.infinity,
       color: (Skin.of(context).theme.colors as SkinColors).background,

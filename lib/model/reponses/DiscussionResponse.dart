@@ -1,30 +1,47 @@
 import 'package:fyx/model/Discussion.dart';
+import 'package:fyx/model/DiscussionContent.dart';
 import 'package:fyx/model/ResponseContext.dart';
+import 'package:fyx/model/enums/DiscussionTypeEnum.dart';
+
+enum DiscussionSpecificDataEnum { header }
 
 class DiscussionResponse {
-  late Discussion _discussion;
-  List _posts = [];
-  late ResponseContext _context;
+  late final Discussion discussion; // TODO: Rename this to DiscussionCommon
+  Map<DiscussionSpecificDataEnum, List<DiscussionContent>>? discussionSpecificData;
+  late final List posts;
+  ResponseContext? context;
+  bool error = false;
 
   DiscussionResponse.accessDenied() {
-    this._discussion = Discussion.fromJson(null);
-    this._posts = [];
+    this.discussion = Discussion.fromJson(null);
+    this.posts = [];
   }
 
   // TODO: Return something more relevant.
   DiscussionResponse.error() {
-    DiscussionResponse.accessDenied();
+    this.error = true;
+    this.discussion = Discussion.fromJson(null);
+    this.posts = [];
   }
 
   DiscussionResponse.fromJson(Map<String, dynamic> json) {
-    this._discussion = Discussion.fromJson(json['discussion_common']);
-    this._posts = json['posts'] ?? [];
-    this._context = ResponseContext.fromJson(json['context']);
+    this.discussion = Discussion.fromJson(json['discussion_common']);
+    this.posts = json['posts'] ?? [];
+    this.context = ResponseContext.fromJson(json['context']);
+
+    switch (this.discussion.type) {
+      case DiscussionTypeEnum.discussion:
+        this.discussionSpecificData = {
+          DiscussionSpecificDataEnum.header:
+              List.from(json['discussion_common']['discussion_specific_data']['header']).map((item) => DiscussionContent.fromJson(item)).toList()
+        };
+        break;
+      case DiscussionTypeEnum.event:
+        // TODO: Handle this case.
+        break;
+      case DiscussionTypeEnum.advertisement:
+        // TODO: Handle this case.
+        break;
+    }
   }
-
-  Discussion get discussion => _discussion;
-
-  List get posts => _posts;
-
-  ResponseContext get context => _context;
 }
