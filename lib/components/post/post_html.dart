@@ -17,6 +17,7 @@ import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html_unescape/html_unescape.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class PostHtml extends StatelessWidget {
   final Content? content;
@@ -42,6 +43,9 @@ class PostHtml extends StatelessWidget {
         'body': Style(margin: EdgeInsets.all(0)),
         'pre': Style(color: Colors.transparent),
         'a': Style(color: colors.primary),
+        '.twitter-header a, .twitter-text a': Style(color: colors.twitter),
+        '.twitter-header .name': Style(fontWeight: FontWeight.bold),
+        '.twitter-text': Style(margin: EdgeInsets.symmetric(vertical: 10))
       },
       customRender: {
         'em': (
@@ -127,6 +131,23 @@ class PostHtml extends StatelessWidget {
             return Spoiler(parsedChild);
           }
 
+          // Twitter
+          if (element.attributes['data-embed-type'] == 'twitter') {
+            return Padding(
+              padding: const EdgeInsets.only(left: 10, top: 20),
+              child: Column(
+                children: [
+                  Icon(MdiIcons.twitter, color: colors.twitter),
+                  Container(
+                    padding: EdgeInsets.only(left: 10),
+                    child: parsedChild,
+                    decoration: BoxDecoration(border: Border(left: BorderSide(width: 6, color: colors.twitter))),
+                  ),
+                ],
+              ),
+            );
+          }
+
           // Youtube
           if (element.attributes['data-embed-type'] == 'youtube') {
             var img = element.querySelector('img');
@@ -199,8 +220,7 @@ class PostHtml extends StatelessWidget {
         // Click through to another discussion
         var parserResult = Helpers.parseDiscussionUri(link);
         if (parserResult.isNotEmpty) {
-          var arguments =
-              DiscussionPageArguments(parserResult[INTERNAL_URI_PARSER.discussionId]!, search: parserResult[INTERNAL_URI_PARSER.search]);
+          var arguments = DiscussionPageArguments(parserResult[INTERNAL_URI_PARSER.discussionId]!, search: parserResult[INTERNAL_URI_PARSER.search]);
           Navigator.of(context.buildContext, rootNavigator: true).pushNamed('/discussion', arguments: arguments);
           return;
         }

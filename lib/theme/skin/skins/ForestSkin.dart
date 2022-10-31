@@ -28,6 +28,7 @@ class ForestSkin extends SkinData {
       dark: const Color(0xFF282828),
       grey: Color(0xFF3B4F41).withOpacity(.7),
       disabled: Colors.black26,
+      twitter: const Color(0xFF3B4F41),
       pollBackground: const Color(0xffcccdb1),
       pollAnswer: const Color(0xffb8b992),
       pollAnswerSelected: const Color(0xffDBD68B),
