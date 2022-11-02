@@ -102,6 +102,10 @@ class FyxApp extends StatefulWidget {
     MainRepository().deviceInfo = results[2] as DeviceInfo;
     MainRepository().settings = results[3] as SettingsProvider;
 
+    Sentry.configureScope(
+          (scope) => scope.setUser(SentryUser(username: MainRepository().credentials?.nickname)),
+    );
+
     _notificationsService = NotificationService(
       onToken: (fcmToken) => ApiController().registerFcmToken(fcmToken),
       // TODO: Do not register if the token is already saved.

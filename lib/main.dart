@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fyx/FyxApp.dart';
@@ -17,9 +18,18 @@ void main() async {
   runZonedGuarded(
     () async {
       await FyxApp.init();
+
+      FutureOr<SentryEvent?> beforeSend(SentryEvent event, {dynamic hint}) async {
+        if (event.throwable is HttpExceptionWithStatus || event.throwable is FileSystemException) {
+          return null;
+        }
+        return event;
+      }
+
       SentryFlutter.init((options) {
         options.dsn = dotenv.env['SENTRY_KEY'];
         options.environment = 'development';
+        options.beforeSend = beforeSend;
       }, appRunner: () => runApp(ProviderScope(child: FyxApp()..setEnv(Environment.dev))));
     },
     (error, stackTrace) async {
