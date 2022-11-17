@@ -9,14 +9,15 @@ import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 
 class SearchBox extends ConsumerStatefulWidget {
+  final bool enabled;
   final String? label;
-  final ValueChanged onSearch;
+  final ValueChanged? onSearch;
   final VoidCallback? onClear;
   final String? searchTerm;
   final int limit;
   final bool loading;
 
-  SearchBox({Key? key, required this.onSearch, this.onClear, this.searchTerm, this.limit = 3, this.label = 'Hledej', this.loading = false})
+  SearchBox({Key? key, this.onSearch, this.enabled = false, this.onClear, this.searchTerm, this.limit = 3, this.label = 'Hledej', this.loading = false})
       : super(key: key);
 
   @override
@@ -35,7 +36,7 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
   void initState() {
     super.initState();
 
-    searchAnimation = AnimationController(vsync: this, value: widget.searchTerm == null ? 0 : 1);
+    searchAnimation = AnimationController(vsync: this, value: widget.enabled ? 1 : 0);
     searchController.text = widget.searchTerm ?? '';
     _loading = widget.loading;
   }
@@ -44,21 +45,16 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
   void didUpdateWidget(oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.searchTerm != widget.searchTerm) {
-      if (widget.searchTerm == null) {
-        searchController.clear();
-      }
+    if (oldWidget.enabled != widget.enabled) {
       searchAnimation.animateTo(
-        widget.searchTerm == null ? 0 : 1,
+        widget.enabled ? 1 : 0,
         curve: Curves.easeOutExpo,
         duration: const Duration(milliseconds: 600),
       );
     }
 
-    if (widget.searchTerm == null) {
+    if (!widget.enabled) {
       focus.unfocus();
-    } else if (widget.searchTerm == '' && oldWidget.searchTerm != '') {
-      focus.requestFocus();
     }
 
     // Update the loading only if has finished outside,
@@ -80,7 +76,8 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
       T.warn('Zadejte alespoň ${widget.limit} písmena...');
       setState(() => _loading = false);
     } else {
-      widget.onSearch(term);
+      if (widget.onSearch != null)
+        widget.onSearch!(term);
       setState(() => _loading = true);
     }
   }
@@ -112,7 +109,8 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
             },
             onSubmitted: _submit,
             onSuffixTap: () {
-              widget.onSearch('');
+              if (widget.onSearch != null)
+                widget.onSearch!('');
               searchController.clear();
               if (widget.onClear != null) {
                 widget.onClear!();

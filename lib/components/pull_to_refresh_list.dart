@@ -20,11 +20,13 @@ import 'package:sentry/sentry.dart';
 class PullToRefreshList<TProvider> extends StatefulWidget {
   final TDataProvider dataProvider;
   final Function? sliverListBuilder;
+  final bool searchEnabled;
   final String? searchLabel;
   final String? searchTerm;
   final int searchLimit;
   final ValueChanged? onSearch;
   final VoidCallback? onSearchClear;
+  final Function(ScrollNotification info)? onPullDown;
   final Widget? pinnedWidget;
   bool _disabled;
   bool _isInfinite;
@@ -32,11 +34,13 @@ class PullToRefreshList<TProvider> extends StatefulWidget {
 
   PullToRefreshList(
       {required this.dataProvider,
+      this.searchEnabled = false,
       this.onSearch, // TODO: move to SearchController
       this.onSearchClear, // TODO: move to SearchController
       this.searchLabel, // TODO: move to SearchController
       this.searchTerm, // TODO: move to SearchController
       this.searchLimit = 3, // TODO: move to SearchController
+      this.onPullDown,
       isInfinite = false,
       int rebuild = 0,
       this.sliverListBuilder,
@@ -62,6 +66,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
   List<Widget> _slivers = <Widget>[];
   int _lastRebuild = 0;
   String? _searchTerm;
+  bool _search = false;
   late AnimationController slideController;
   late Animation<Offset> slideOffset;
 
@@ -90,6 +95,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
       // Add the refresh control on first position
       _slivers.add(CupertinoSliverRefreshControl(
         builder: Platform.isIOS ? CupertinoSliverRefreshControl.buildRefreshIndicator : buildAndroidRefreshIndicator,
+        refreshTriggerPullDistance: widget.onSearch != null ? 160 : 100,
         onRefresh: () {
           setState(() => _hasPulledDown = true);
           if (!widget._disabled) {
@@ -132,15 +138,15 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
           height: double.infinity,
           width: double.infinity,
           child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            if (widget.onSearch != null)
-              SearchBox(
-                loading: _isLoading,
-                label: widget.searchLabel,
-                limit: widget.searchLimit,
-                searchTerm: widget.searchTerm,
-                onSearch: widget.onSearch!,
-                onClear: widget.onSearchClear,
-              ),
+            SearchBox(
+              enabled: widget.searchEnabled,
+              loading: _isLoading,
+              label: widget.searchLabel,
+              limit: widget.searchLimit,
+              searchTerm: _searchTerm,
+              onSearch: widget.onSearch,
+              onClear: widget.onSearchClear,
+            ),
             Expanded(child: T.feedbackScreen(context, isLoading: _isLoading, onPress: loadData, label: L.GENERAL_REFRESH)),
           ]));
     }
@@ -167,20 +173,19 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
         Column(
           mainAxisSize: MainAxisSize.max,
           children: [
-            if (widget.onSearch != null)
-              SearchBox(
-                loading: _isLoading,
-                label: widget.searchLabel,
-                limit: widget.searchLimit,
-                searchTerm: widget.searchTerm,
-                onSearch: widget.onSearch!,
-                onClear: widget.onSearchClear,
-              ),
+            SearchBox(
+              enabled: widget.searchEnabled,
+              loading: _isLoading,
+              label: widget.searchLabel,
+              limit: widget.searchLimit,
+              searchTerm: _searchTerm,
+              onSearch: widget.onSearch,
+              onClear: widget.onSearchClear,
+            ),
             Expanded(
               child: NotificationListener(
                 onNotification: (scrollInfo) {
                   if (scrollInfo is ScrollNotification) {
-
                     // Hide keyboard -> https://github.com/lucien144/fyx/issues/343
                     FocusManager.instance.primaryFocus?.unfocus();
 
@@ -188,6 +193,8 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
                     if (scrollInfo.metrics.pixels > 2 * MediaQuery.of(context).size.height) {
                       slideController.reverse();
                     }
+
+                    if (widget.onPullDown != null) widget.onPullDown!(scrollInfo);
 
                     if (widget._isInfinite) {
                       if (_controller.position.userScrollDirection == ScrollDirection.reverse && scrollInfo.metrics.outOfRange) {
