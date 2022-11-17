@@ -4,6 +4,7 @@ import 'package:fyx/model/enums/SkinEnum.dart';
 abstract class SkinData<C> {
   abstract final String name;
   abstract final SkinEnum id;
+  abstract final bool darkMode;
 
   late final SkinBrightnessData<C> lightData;
   late final SkinBrightnessData<C> darkData;

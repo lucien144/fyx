@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 class FyxSkin extends SkinData {
   final id = SkinEnum.fyx;
   final name = 'Fyx';
+  final darkMode = true;
 
   FyxSkin({lightData, darkData}) : super(lightData: lightData, darkData: darkData);
 

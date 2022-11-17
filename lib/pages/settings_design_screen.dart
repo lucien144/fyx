@@ -89,7 +89,7 @@ class _SettingsDesignScreenState extends State<SettingsDesignScreen> {
             ),
             SettingsSection(
               title: Text('Skin'),
-              tiles: Skin.of(context).skins.map((skin) => _skinFactory(skin.name, skin.id)).toList(),
+              tiles: Skin.of(context).skins.map((skin) => _skinFactory('${skin.name}${skin.darkMode ? '' : '*'}', skin.id, description: skin.id == SkinEnum.greymatter ? '* nepodporuje 🌗 dark mode.' : null)).toList(),
             ),
             SettingsSection(
               title: Text('Velikost písma'),

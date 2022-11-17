@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 class ForestSkin extends SkinData {
   final id = SkinEnum.forest;
   final name = 'Forest4';
+  final darkMode = false;
 
   ForestSkin({lightData, darkData}) : super(lightData: lightData, darkData: darkData);
 
