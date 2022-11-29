@@ -154,6 +154,15 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
         body: Stack(
           children: [
             PullToRefreshList<AutoDisposeStateProvider<String?>>(
+              onPullDown: (scrollInfo) {
+                if (scrollInfo.metrics.pixels > 80 && this._searchTerm != null) {
+                  if (this._searchTerm == '')
+                    setState(() => this._searchTerm = null);
+                } else if (scrollInfo.metrics.pixels < -60 && this._searchTerm == null) {
+                  setState(() => this._searchTerm = '');
+                }
+              },
+              searchEnabled: this._searchTerm != null,
               searchLabel: 'Hledej @nick a nebo text...',
               searchTerm: this._searchTerm,
               onSearch: (term) {
@@ -161,7 +170,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                 this.refresh();
               },
               onSearchClear: () {
-                setState(() => this._searchTerm = '');
+                setState(() => this._searchTerm = null);
                 this.refresh();
               },
               rebuild: _refreshList,
@@ -224,10 +233,11 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                     .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.isNew))
                     .toList();
 
-                int? id;
+                int? id = lastId;
                 try {
                   id = Post.fromJson((result as List).last, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode).id;
                 } catch (error) {}
+
                 return DataProviderResult(data,
                     lastId: id,
                     postId: pageArguments.postId,

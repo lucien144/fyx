@@ -21,6 +21,7 @@ class SkinColors {
   final Color grey;
   final Color light;
   final Color dark;
+  final Color twitter;
   final BoxDecoration shadow;
   final LinearGradient gradient;
   final BoxDecoration textFieldDecoration;
@@ -42,6 +43,7 @@ class SkinColors {
     this.pollBackground = const Color(0xffcde5e9),
     this.pollAnswer = const Color(0xffa9ccd3),
     this.pollAnswerSelected = const Color(0xff76b9b9),
+    this.twitter = const Color(0xff1DA1F2),
     this.gradient = const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xff1AD592), Color(0xFF196378)]),
     this.textFieldDecoration = const BoxDecoration(
       color: CupertinoDynamicColor.withBrightness(

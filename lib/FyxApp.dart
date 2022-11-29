@@ -29,6 +29,7 @@ import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/skins/ForestSkin.dart';
 import 'package:fyx/theme/skin/skins/FyxSkin.dart';
+import 'package:fyx/theme/skin/skins/GreyMatterSkin.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 import 'package:sentry/sentry.dart';
@@ -101,6 +102,10 @@ class FyxApp extends StatefulWidget {
     MainRepository().packageInfo = results[1] as PackageInfo;
     MainRepository().deviceInfo = results[2] as DeviceInfo;
     MainRepository().settings = results[3] as SettingsProvider;
+
+    Sentry.configureScope(
+          (scope) => scope.setUser(SentryUser(username: MainRepository().credentials?.nickname)),
+    );
 
     _notificationsService = NotificationService(
       onToken: (fcmToken) => ApiController().registerFcmToken(fcmToken),
@@ -204,7 +209,11 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
         builder: (ctx, widget) => Directionality(
             textDirection: TextDirection.ltr,
             child: Skin(
-                skins: [FyxSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize), ForestSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize)],
+                skins: [
+                  FyxSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
+                  ForestSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
+                  GreyMatterSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize)
+                ],
                 skin: ctx.watch<ThemeModel>().skin,
                 brightness: (() {
                   if (ctx.watch<ThemeModel>().theme == ThemeEnum.system && _platformBrightness != null) {

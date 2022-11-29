@@ -116,28 +116,6 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
       return CupertinoPageScaffold(
         resizeToAvoidBottomInset: false,
         navigationBar: CupertinoNavigationBar(
-            trailing: GestureDetector(child: (() {
-              if (activeTab == TabsEnum.history) {
-                return ref.watch(searchHistoryProvider) == null ? Icon(Icons.filter_alt_outlined) : Icon(Icons.filter_alt);
-              }
-              return ref.watch(searchBookmarksProvider) == null ? Icon(MdiIcons.magnify) : Icon(MdiIcons.magnifyRemoveOutline);
-            })(), onTap: () {
-              if (activeTab == TabsEnum.history) {
-                if (ref.read(searchHistoryProvider.notifier).state == null) {
-                  ref.read(searchHistoryProvider.notifier).state = ''; // Open the searchbox
-                } else {
-                  ref.read(searchHistoryProvider.notifier).state = null; // Close the searchbox
-                  this.refreshData(); // ... and reset the List
-                }
-              } else {
-                if (ref.read(searchBookmarksProvider.notifier).state == null) {
-                  ref.read(searchBookmarksProvider.notifier).state = ''; // Open the searchbox
-                } else {
-                  ref.read(searchBookmarksProvider.notifier).state = null; // Close the searchbox
-                  this.refreshData(); // ... and reset the List
-                }
-              }
-            }),
             leading: provider.Consumer<NotificationsModel>(
                 builder: (context, notifications, child) => NotificationBadge(
                     widget: CupertinoButton(
@@ -178,27 +156,36 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
             // -----
             PullToRefreshList<StateProvider<String?>>(
                 rebuild: _refreshData,
+                onPullDown: (scrollInfo) {
+                  if (scrollInfo.metrics.pixels > 80 && ref.watch(searchProvider).history) {
+                    if (ref.watch(searchProvider).historyTerm.isEmpty)
+                      ref.read(searchProvider.notifier).disableHistory();
+                  } else if (scrollInfo.metrics.pixels < -60 && !ref.watch(searchProvider).history) {
+                    ref.read(searchProvider.notifier).enableHistory();
+                  }
+                },
+                searchEnabled: ref.watch(searchProvider).history,
                 searchLimit: 1,
                 searchLabel: 'Filtruj kluby v historii...',
-                searchTerm: ref.read(searchHistoryProvider.notifier).state,
+                searchTerm: ref.watch(searchProvider).historyTerm,
                 onSearch: (term) {
-                  ref.read(searchHistoryProvider.notifier).state = term;
+                  ref.read(searchProvider.notifier).setHistoryTerm(term);
                   this.refreshData();
                 },
                 onSearchClear: () {
-                  ref.read(searchHistoryProvider.notifier).state = '';
+                  ref.read(searchProvider.notifier).disableHistory();
                   this.refreshData();
                 },
                 dataProvider: (lastId) async {
                   List<DiscussionListItem> withReplies = [];
-                  String? searchTerm = ref.read(searchHistoryProvider.notifier).state;
+                  String? searchTerm = ref.watch(searchProvider).historyTerm;
                   BookmarksHistoryResponse result = await ApiController().loadHistory();
 
                   var data = result.discussions
                       .map((discussion) => BookmarkedDiscussion.fromJson(discussion))
                       .where((discussion) => this._filterUnread ? discussion.unread > 0 : true)
                       .where((discussion) {
-                        if (searchTerm != null) {
+                        if (searchTerm.length > 0) {
                           final slugNeedle = removeDiacritics(searchTerm);
                           final slugHaystack = removeDiacritics(discussion.name);
                           return slugHaystack.contains(RegExp(slugNeedle, caseSensitive: false));
@@ -222,23 +209,32 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
             // -----
             PullToRefreshList<StateProvider<String?>>(
                 rebuild: _refreshData,
+                onPullDown: (scrollInfo) {
+                  if (scrollInfo.metrics.pixels > 80 && ref.watch(searchProvider).bookmarks) {
+                    if (ref.watch(searchProvider).bookmarksTerm.isEmpty)
+                      ref.read(searchProvider.notifier).disableBookmarks();
+                  } else if (scrollInfo.metrics.pixels < -60 && !ref.watch(searchProvider).bookmarks) {
+                    ref.read(searchProvider.notifier).enableBookmarks();
+                  }
+                },
+                searchEnabled: ref.watch(searchProvider).bookmarks,
                 searchLabel: 'Hledej diskuze, události a inzeráty...',
-                searchTerm: ref.read(searchBookmarksProvider.notifier).state,
+                searchTerm: ref.read(searchProvider).bookmarksTerm,
                 onSearch: (term) {
-                  ref.read(searchBookmarksProvider.notifier).state = term;
+                  ref.read(searchProvider.notifier).setBookmarksTerm(term);
                   this.refreshData();
                 },
                 onSearchClear: () {
-                  ref.read(searchBookmarksProvider.notifier).state = '';
+                  ref.read(searchProvider.notifier).disableBookmarks();
                   this.refreshData();
                 },
                 dataProvider: (lastId) async {
                   var categories = [];
 
                   try {
-                    if (ref.read(searchBookmarksProvider.notifier).state != null && ref.read(searchBookmarksProvider.notifier).state != '') {
-                      final term = ref.read(searchBookmarksProvider.notifier).state;
-                      final result = await ApiController().searchDiscussions(term!);
+                    if (ref.watch(searchProvider).bookmarksTerm.isNotEmpty) {
+                      final term = ref.watch(searchProvider).bookmarksTerm;
+                      final result = await ApiController().searchDiscussions(term);
                       result.discussion.forEach((type, list) {
                         categories.add({
                           'header': ListHeader(L.search[type] ?? ''),

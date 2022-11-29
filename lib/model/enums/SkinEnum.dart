@@ -8,4 +8,6 @@ enum SkinEnum {
   fyx,
   @HiveField(1)
   forest,
+  @HiveField(2)
+  greymatter,
 }
