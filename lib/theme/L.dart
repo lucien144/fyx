@@ -72,7 +72,7 @@ class L {
 
   // Post Action Sheet
   static String POST_SHEET_COPY_LINK = 'Kopírovat odkaz';
-  static String POST_SHEET_SHARE = 'Sdílet příspěvek';
+  static String POST_SHEET_SHARE = 'Sdílení';
   static String POST_SHEET_HIDE = 'Skrýt příspěvek';
   static String POST_SHEET_FLAG = 'Nahlásit nevhodný obsah';
   static String POST_SHEET_FLAG_SAVING = 'Nahlašuji...';

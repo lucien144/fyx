@@ -179,11 +179,14 @@ class ApiController {
     return await provider.bookmarkDiscussion(discussionId, state);
   }
 
-  Future<DiscussionResponse> loadDiscussion(int id, {int? lastId, String? user, String? search}) async {
+  Future<DiscussionResponse> loadDiscussion(int id, {int? lastId, String? user, String? search, bool filterReplies = false}) async {
     try {
-      var response = await provider.fetchDiscussion(id, lastId: lastId, user: user, search: search);
+      var response = await provider.fetchDiscussion(id, lastId: lastId, user: user, search: search, filterReplies: filterReplies);
       if (response.statusCode == 400) {
         return DiscussionResponse.accessDenied();
+      }
+      if (lastId != null && filterReplies) {
+        return DiscussionResponse.fromJsonReplies(response.data);
       }
       return DiscussionResponse.fromJson(response.data);
     } catch (error) {
@@ -199,6 +202,16 @@ class ApiController {
   Future<DiscussionHomeResponse> getDiscussionHome(int id) async {
     var response = await provider.fetchDiscussionHome(id);
     return DiscussionHomeResponse.fromJson(response.data);
+  }
+
+  Future<OkResponse> setDiscussionRights(int id, {required String username, required String right, required bool set}) async {
+    var response = await provider.setDiscussionRights(id, username: username, right: right, set: set);
+    return OkResponse.fromJson(response.data);
+  }
+
+  Future<OkResponse> setDiscussionRightsDaysLeft(int id, {required String username, required int daysLeft}) async {
+    var response = await provider.setDiscussionRightsDaysLeft(id, username: username, daysLeft: daysLeft);
+    return OkResponse.fromJson(response.data);
   }
 
   Future<DiscussionHomeResponse> getDiscussionHeader(int id) async {
@@ -239,8 +252,9 @@ class ApiController {
     return OkResponse.fromJson(result.data);
   }
 
-  Future<Response> deleteDiscussionMessage(int discussionId, int postId) {
-    return provider.deleteDiscussionMessage(discussionId, postId);
+  Future<OkResponse> deleteDiscussionMessage(int discussionId, int postId) async {
+    var result = await provider.deleteDiscussionMessage(discussionId, postId);
+    return OkResponse.fromJson(result.data);
   }
 
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder) {

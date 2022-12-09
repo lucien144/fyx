@@ -35,8 +35,9 @@ class DiscussionPageArguments {
   final int? postId;
   final String? filterByUser;
   final String? search;
+  final bool filterReplies;
 
-  DiscussionPageArguments(this.discussionId, {this.postId, this.filterByUser, this.search});
+  DiscussionPageArguments(this.discussionId, {this.postId, this.filterByUser, this.search, this.filterReplies = false});
 }
 
 class DiscussionPage extends ConsumerStatefulWidget {
@@ -66,10 +67,10 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
   // Progress indicator if some posts are being deleted...
   bool _deleting = false;
 
-  Future<DiscussionResponse> _fetchData(discussionId, postId, user, {String? search}) {
+  Future<DiscussionResponse> _fetchData(discussionId, postId, user, {String? search, bool filterReplies = false}) {
     return this._memoizer.runOnce(() {
       return Future.delayed(
-          Duration(milliseconds: 300), () => ApiController().loadDiscussion(discussionId, lastId: postId, user: user, search: search));
+          Duration(milliseconds: 300), () => ApiController().loadDiscussion(discussionId, lastId: postId, user: user, search: search, filterReplies: filterReplies));
     });
   }
 
@@ -98,7 +99,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
     }
 
     return FutureBuilder<DiscussionResponse>(
-        future: _fetchData(pageArguments.discussionId, pageArguments.postId, pageArguments.filterByUser, search: pageArguments.search),
+        future: _fetchData(pageArguments.discussionId, pageArguments.postId, pageArguments.filterByUser, search: pageArguments.search, filterReplies: pageArguments.filterReplies),
         builder: (BuildContext context, AsyncSnapshot<DiscussionResponse> snapshot) {
           if (snapshot.hasError) {
             return T.feedbackScreen(context,
@@ -230,7 +231,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                     })
                     .where((post) => !MainRepository().settings.isPostBlocked(post.id))
                     .where((post) => !MainRepository().settings.isUserBlocked(post.nick))
-                    .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.isNew))
+                    .map((post) => PostListItem(post, onUpdate: this.refresh, isHighlighted: post.isNew, discussion: discussionResponse.discussion))
                     .toList();
 
                 int? id = lastId;

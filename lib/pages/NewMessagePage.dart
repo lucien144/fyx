@@ -21,12 +21,13 @@ typedef F = Future<bool> Function(String? inputField, String message, List<Map<A
 
 class NewMessageSettings {
   String inputFieldPlaceholder;
+  String messageFieldPlaceholder;
   bool hasInputField;
   Widget? replyWidget;
   Function? onClose;
   F onSubmit;
 
-  NewMessageSettings({this.replyWidget, this.onClose, required this.onSubmit, this.hasInputField = false, this.inputFieldPlaceholder = ''});
+  NewMessageSettings({this.replyWidget, this.onClose, required this.onSubmit, this.hasInputField = false, this.inputFieldPlaceholder = '', this.messageFieldPlaceholder = ''});
 }
 
 class NewMessagePage extends StatefulWidget {
@@ -128,6 +129,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
     if (_settings == null) {
       _settings = ModalRoute.of(context)!.settings.arguments as NewMessageSettings;
       _recipientController.text = _settings!.inputFieldPlaceholder.toUpperCase();
+      _messageController.text = _settings!.messageFieldPlaceholder;
     }
 
     return CupertinoPageScaffold(

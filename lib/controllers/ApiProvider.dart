@@ -83,7 +83,7 @@ class ApiProvider implements IApiProvider {
       }
 
       // Other problem
-      if (e.response?.statusCode == 400) {
+      if ([400, 404].contains(e.response?.statusCode)) {
         if (onError != null) {
           onError!(e.response!.data['message']);
         }
@@ -121,8 +121,11 @@ class ApiProvider implements IApiProvider {
     return await dio.get('$URL/bookmarks/history', queryParameters: {'more_results': true, 'show_read': true});
   }
 
-  Future<Response> fetchDiscussion(int discussionId, {int? lastId, String? user, String? search}) async {
+  Future<Response> fetchDiscussion(int discussionId, {int? lastId, String? user, String? search, bool filterReplies = false}) async {
     Map<String, dynamic> params = {'order': lastId == null ? 'newest' : 'older_than', 'from_id': lastId, 'user': user, 'text': search};
+    if (lastId != null && filterReplies) {
+      return await dio.get('$URL/discussion/$discussionId/id/$lastId/replies');
+    }
     return await dio.get('$URL/discussion/$discussionId', queryParameters: params);
   }
 
@@ -133,6 +136,14 @@ class ApiProvider implements IApiProvider {
 
   Future<Response> fetchDiscussionHome(int id) async {
     return await dio.get('$URL/discussion/$id/content/home');
+  }
+
+  Future<Response> setDiscussionRights(int id, {required String username, required String right, required bool set}) async {
+    return await dio.post('$URL/discussion/rights?discussion_id=$id&username=$username&right=$right&set=${set ? 'true' : 'false'}');
+  }
+
+  Future<Response> setDiscussionRightsDaysLeft(int id, {required String username, required int daysLeft}) async {
+    return await dio.post('$URL/discussion/rights/days_left?discussion_id=$id&username=$username&days_left=$daysLeft');
   }
 
   Future<Response> fetchDiscussionHeader(int id) async {

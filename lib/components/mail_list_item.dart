@@ -14,6 +14,7 @@ import 'package:fyx/theme/IconReply.dart';
 import 'package:fyx/theme/IconUnread.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class MailListItem extends StatefulWidget {
   final Mail mail;
@@ -49,13 +50,11 @@ class _MailListItemState extends State<MailListItem> {
           ),
           GestureDetector(
             child: Icon(Icons.more_vert, color: colors.text.withOpacity(0.38)),
-            onTap: () => showCupertinoModalPopup(
+            onTap: () => showCupertinoModalBottomSheet(
                 context: context,
-                builder: (BuildContext context) => PostActionSheet(
+                builder: (BuildContext context) => PostContextMenu<Mail>(
                       parentContext: context,
-                      user: widget.mail.participant,
-                      postId: widget.mail.id,
-                      shareData: ShareData(subject: '@${widget.mail.participant}', body: widget.mail.content, link: widget.mail.link),
+                      item: widget.mail,
                       flagPostCallback: (mailId) => MainRepository().settings.blockMail(mailId),
                     )),
           ),

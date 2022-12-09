@@ -21,9 +21,11 @@ abstract class IApiProvider {
   Future<Response> bookmarkDiscussion(int discussionId, bool state);
   Future<Response> fetchBookmarks();
   Future<Response> fetchHistory();
-  Future<Response> fetchDiscussion(int id, {int? lastId, String? user, String? search});
+  Future<Response> fetchDiscussion(int id, {int? lastId, String? user, String? search, bool filterReplies});
   Future<Response> fetchDiscussionHome(int id);
   Future<Response> fetchDiscussionHeader(int id);
+  Future<Response> setDiscussionRights(int id, {required String username, required String right, required bool set});
+  Future<Response> setDiscussionRightsDaysLeft(int id, {required String username, required int daysLeft});
   Future<Response> fetchMail({int? lastId});
   Future<Response> fetchNotices();
   Future<Response> deleteFile(int id);

@@ -1,5 +1,6 @@
 import 'package:fyx/model/Discussion.dart';
 import 'package:fyx/model/DiscussionContent.dart';
+import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/ResponseContext.dart';
 import 'package:fyx/model/enums/DiscussionTypeEnum.dart';
 
@@ -22,6 +23,10 @@ class DiscussionResponse {
     this.error = true;
     this.discussion = Discussion.fromJson(null);
     this.posts = [];
+  }
+
+  DiscussionResponse.fromJsonReplies(List json) {
+    this.posts = json;
   }
 
   DiscussionResponse.fromJson(Map<String, dynamic> json) {

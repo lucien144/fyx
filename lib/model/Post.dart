@@ -3,9 +3,10 @@ import 'package:fyx/model/ContentRaw.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/content/Advertisement.dart';
 import 'package:fyx/model/post/content/Regular.dart';
+import 'package:fyx/model/post/ipost.dart';
 import 'package:fyx/theme/Helpers.dart';
 
-class Post {
+class Post extends IPost {
   // TODO: Refactor all params to follow names from the new API like _id_wu -> id ...
   final bool isCompact;
   bool _canReply = true;
@@ -15,19 +16,20 @@ class Post {
   String _nick = '';
   int _time = 0;
   int? rating;
+  List<int> replies = [];
   String _wu_type = '';
   String myRating = '';
   bool _reminder = false;
   bool _canBeRated = false;
   bool _canBeDeleted = false;
   bool _canBeReminded = false;
-  late Content _content;
 
   Post.fromJson(Map<String, dynamic> json, this.idKlub, {this.isCompact = false}) {
     this._id_wu = json['id'] ?? 0;
     this._nick = json['username'] ?? '';
     this._time = DateTime.parse(json['inserted_at'] ?? '0').millisecondsSinceEpoch;
     this.rating = json['rating'];
+    this.replies = List<int>.from(json['replies'] ?? []);
     this._wu_type = json['type'] ?? '';
     this._isNew = json['new'] ?? false;
     this.myRating = json['my_rating'] ?? 'none'; // positive / negative / negative_visible / none TODO: enums
@@ -38,14 +40,14 @@ class Post {
 
     if (json['content_raw'] != null && json['content_raw']['data'] != null && !json['content_raw']['data'].containsKey('DiscussionWelcome')) {
       try {
-        this._content = ContentRaw.fromJson(json: json['content_raw'], discussionId: json['discussion_id'], postId: json['id']).content;
-        this._canReply = !(this._content is ContentAdvertisement);
+        content = ContentRaw.fromJson(json: json['content_raw'], discussionId: json['discussion_id'], postId: json['id']).content;
+        this._canReply = !(content is ContentAdvertisement);
       } catch (error) {
-        this._content = ContentRegular('${json['content']}<br><br><small><em>Chyba: neošetřený druh příspěvku: "${this.type}"</em></small>',
+        content = ContentRegular('${json['content']}<br><br><small><em>Chyba: neošetřený druh příspěvku: "${this.type}"</em></small>',
             isCompact: this.isCompact);
       }
     } else {
-      this._content = ContentRegular(json['content'], isCompact: this.isCompact);
+      content = ContentRegular(json['content'], isCompact: this.isCompact);
     }
   }
 
@@ -57,8 +59,6 @@ class Post {
     }
     return '+$_rating';
   }
-
-  Content get content => _content;
 
   String get type => _wu_type;
 

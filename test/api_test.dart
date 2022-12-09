@@ -58,7 +58,7 @@ class ApiMock implements IApiProvider {
   var onContextData;
 
   @override
-  Future<Response> fetchDiscussion(int id, {int? lastId, String? search, String? user}) {
+  Future<Response> fetchDiscussion(int id, {int? lastId, String? search, String? user, bool filterReplies = false}) {
     // TODO: implement fetchDiscussion
     throw UnimplementedError();
   }
@@ -201,6 +201,18 @@ class ApiMock implements IApiProvider {
 
   @override
   Future<Response> fetchDiscussionHeader(int id) {
+    // TODO: implement getPostRatings
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> setDiscussionRights(int id, {required String username, required String right, required bool set}) {
+    // TODO: implement getPostRatings
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> setDiscussionRightsDaysLeft(int id, {required String username, required int daysLeft}) {
     // TODO: implement getPostRatings
     throw UnimplementedError();
   }
