@@ -67,6 +67,8 @@ if [ $android == true ]; then
   # shellcheck disable=SC2059
   printf "$GREEN Building Android: ${version}$NC\n"
 
+  (cd android && ./gradlew clean)
+
   if [ $ios == false ]; then
     flutter clean
   fi
