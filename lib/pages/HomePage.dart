@@ -9,7 +9,7 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
 import 'package:fyx/model/enums/RefreshDataEnum.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
-import 'package:fyx/pages/tab_bar/BookmarksTab.dart';
+import 'package:fyx/pages/tab_bar/bookmarks_tab.dart';
 import 'package:fyx/pages/tab_bar/MailboxTab.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';

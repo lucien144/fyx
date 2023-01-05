@@ -122,7 +122,7 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
                         padding: EdgeInsets.zero,
                         minSize: kMinInteractiveDimensionCupertino - 10,
                         child: Icon(
-                          Icons.notifications_none,
+                          MdiIcons.bellOutline,
                           size: 30,
                         ),
                         onPressed: () => Navigator.of(context, rootNavigator: true).pushNamed('/notices')),
