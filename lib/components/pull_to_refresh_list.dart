@@ -95,7 +95,6 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
       // Add the refresh control on first position
       _slivers.add(CupertinoSliverRefreshControl(
         builder: Platform.isIOS ? CupertinoSliverRefreshControl.buildRefreshIndicator : buildAndroidRefreshIndicator,
-        refreshTriggerPullDistance: widget.onSearch != null ? 160 : 100,
         onRefresh: () {
           setState(() => _hasPulledDown = true);
           if (!widget._disabled) {
