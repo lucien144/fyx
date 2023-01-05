@@ -18,7 +18,7 @@ class _GestureFeedbackState extends State<GestureFeedback> {
     return GestureDetector(
       child: Opacity(
         child: widget.child,
-        opacity: _isDown ? 0.8 : 1,
+        opacity: _isDown ? 0.6 : 1,
       ),
       onTap: () async {
         setState(() => _isDown = true);

@@ -5,7 +5,7 @@ import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 
 class RatingValue extends StatelessWidget {
-  final int rating;
+  final int? rating;
   final double fontSize;
 
   const RatingValue(this.rating, {this.fontSize = 14});
@@ -14,14 +14,21 @@ class RatingValue extends StatelessWidget {
   Widget build(BuildContext context) {
     SkinColors colors = Skin.of(context).theme.colors;
 
+    Color color = colors.text.withOpacity(0.2);
+    if (rating != null) {
+      if (rating! > 0) {
+        color = colors.success.withOpacity(Helpers.ratingRange(rating!));
+      } else if (rating! < 0) {
+        color = colors.danger.withOpacity(Helpers.ratingRange(rating!.abs()));
+      }
+    }
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 1),
       decoration: BoxDecoration(
-          color: rating > 0
-              ? colors.success.withOpacity(Helpers.ratingRange(rating))
-              : (rating < 0 ? colors.danger.withOpacity(Helpers.ratingRange(rating.abs())) : colors.text.withOpacity(0.2)),
+          color: color,
           borderRadius: BorderRadius.circular(2)),
-      child: Text(Post.formatRating(rating), style: TextStyle(fontSize: fontSize)),
+      child: Text(rating == null ? ' 0 ' : Post.formatRating(rating!), style: TextStyle(fontSize: fontSize)),
     );
   }
 }

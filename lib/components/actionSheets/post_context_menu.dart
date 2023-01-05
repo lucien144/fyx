@@ -221,8 +221,8 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
                             ]..shuffle();
                             return Column(
                               children: [
-                                if (positive.length > 0) PostThumbs(positive),
-                                if (negative.length > 0) PostThumbs(negative, isNegative: true),
+                                if (positive.length > 0) PostThumbs(positive, isHorizontal: false),
+                                if (negative.length > 0) PostThumbs(negative, isNegative: true, isHorizontal: false),
                                 if (positive.length + negative.length == 0)
                                   Text(
                                     quotes.first,

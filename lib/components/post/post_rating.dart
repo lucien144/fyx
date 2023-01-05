@@ -49,15 +49,19 @@ class _PostRatingState extends State<PostRating> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
+            if (_post!.rating == null)
+              Opacity(
+                opacity: .2,
+                child: RatingValue(null),
+              ),
             if (_post!.rating != null)
               Opacity(
                 opacity: _givingRating ? 0 : 1,
-                child: GestureDetector(
-                  child: RatingValue(_post!.rating!),
-                ),
+                child: RatingValue(_post!.rating!),
               ),
             if (_post!.canBeRated)
               GestureDetector(
+                behavior: HitTestBehavior.opaque,
                 child: TextIcon('Paleček',
                   icon: MdiIcons.thumbUp,
                   iconColor: _post!.myRating == 'positive' ? colors.success : colors.text.withOpacity(0.38),
@@ -82,6 +86,7 @@ class _PostRatingState extends State<PostRating> {
               ),
             if (_post!.canBeRated)
               GestureDetector(
+                behavior: HitTestBehavior.opaque,
                 child: TextIcon('Mínusko',
                   icon: MdiIcons.thumbDown,
                   iconColor: ['negative', 'negative_visible'].contains(_post!.myRating) ? colors.danger : colors.text.withOpacity(0.38),
@@ -147,7 +152,7 @@ class _PostRatingState extends State<PostRating> {
                         });
                       },
               ),
-            SizedBox(width: 12,)
+            SizedBox()
           ],
         ),
       ),

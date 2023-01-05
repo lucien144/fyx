@@ -11,11 +11,53 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 class PostThumbs extends StatelessWidget {
   final List<PostThumbItem> items;
   final isNegative;
+  final bool isHorizontal;
 
-  PostThumbs(this.items, {this.isNegative = false});
+  PostThumbs(this.items, {this.isNegative = false, this.isHorizontal = true});
 
-  @override
-  Widget build(BuildContext context) {
+  horizontalLayout(BuildContext context) {
+    SkinColors colors = Skin.of(context).theme.colors;
+
+    var avatars = items
+        .map((item) => Tooltip(
+              message: item.username,
+              waitDuration: Duration(milliseconds: 0),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 5, bottom: 0),
+                child: Avatar(
+                  Helpers.avatarUrl(item.username),
+                  size: 22,
+                  isHighlighted: item.isHighlighted,
+                ),
+              ),
+            ))
+        .toList();
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 6, right: 5),
+          child: Icon(
+            isNegative ? Icons.thumb_down : Icons.thumb_up,
+            size: 18,
+            color: isNegative ? colors.danger : colors.success,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Text(
+            items.length.toString(),
+            style: TextStyle(fontSize: 14),
+          ),
+        ),
+        Expanded(
+          child: Wrap(children: avatars),
+        )
+      ],
+    );
+  }
+
+  verticalLayout(BuildContext context) {
     SkinColors colors = Skin.of(context).theme.colors;
 
     var avatars = items
@@ -63,5 +105,11 @@ class PostThumbs extends StatelessWidget {
             children: avatars),
       ],
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (isHorizontal) return horizontalLayout(context);
+    return verticalLayout(context);
   }
 }
