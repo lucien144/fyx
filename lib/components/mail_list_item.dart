@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fyx/components/actionSheets/post_context_menu.dart';
+import 'package:fyx/components/bottom_sheets/post_context_menu.dart';
 import 'package:fyx/components/content_box_layout.dart';
 import 'package:fyx/components/gesture_feedback.dart';
 import 'package:fyx/components/post/post_avatar.dart';
