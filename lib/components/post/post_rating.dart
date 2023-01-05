@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fyx/components/bottom_sheets/post_rating_sheet.dart';
 import 'package:fyx/components/feedback_indicator.dart';
+import 'package:fyx/components/gesture_feedback.dart';
 import 'package:fyx/components/post/rating_value.dart';
 import 'package:fyx/components/text_icon.dart';
 import 'package:fyx/controllers/ApiController.dart';
@@ -10,6 +12,7 @@ import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class PostRating extends StatefulWidget {
   final Post post;
@@ -49,22 +52,25 @@ class _PostRatingState extends State<PostRating> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            if (_post!.rating == null)
-              Opacity(
-                opacity: .2,
-                child: RatingValue(null),
+            GestureFeedback(
+              onTap: () => showCupertinoModalBottomSheet(
+                  context: context,
+                  expand: true,
+                  builder: (context) {
+                    return PostRatingBottomSheet(_post!);
+                  }),
+              child: Opacity(
+                opacity: _givingRating ? 0 : (_post!.rating == null ? .2 : 1),
+                child: RatingValue(_post!.rating),
               ),
-            if (_post!.rating != null)
-              Opacity(
-                opacity: _givingRating ? 0 : 1,
-                child: RatingValue(_post!.rating!),
-              ),
+            ),
             if (_post!.canBeRated)
               GestureDetector(
                 behavior: HitTestBehavior.opaque,
-                child: TextIcon('Paleček',
-                  icon: MdiIcons.thumbUp,
-                  iconColor: _post!.myRating == 'positive' ? colors.success : colors.text.withOpacity(0.38),
+                child: TextIcon(
+                  'Paleček',
+                  icon: MdiIcons.thumbUpOutline,
+                  iconColor: _post!.myRating == 'positive' ? colors.primary : colors.text.withOpacity(0.38),
                 ),
                 onTap: _givingRating
                     ? null
@@ -87,9 +93,10 @@ class _PostRatingState extends State<PostRating> {
             if (_post!.canBeRated)
               GestureDetector(
                 behavior: HitTestBehavior.opaque,
-                child: TextIcon('Mínusko',
-                  icon: MdiIcons.thumbDown,
-                  iconColor: ['negative', 'negative_visible'].contains(_post!.myRating) ? colors.danger : colors.text.withOpacity(0.38),
+                child: TextIcon(
+                  'Mínusko',
+                  icon: MdiIcons.thumbDownOutline,
+                  iconColor: ['negative', 'negative_visible'].contains(_post!.myRating) ? Color.alphaBlend(colors.primary, colors.danger) : colors.text.withOpacity(0.38),
                 ),
                 onTap: _givingRating
                     ? null
