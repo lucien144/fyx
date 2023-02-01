@@ -65,11 +65,11 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
 
   Post get post => widget.item as Post;
 
-  Widget createGridView({required List<Widget> children}) {
+  Widget createGridView({required List<Widget> children, required BuildContext context}) {
     return GridView.count(
         physics: NeverScrollableScrollPhysics(),
         padding: const EdgeInsets.only(left: 16, top: 16, right: 16, bottom: 48),
-        crossAxisCount: 3,
+        crossAxisCount: MediaQuery.of(context).size.width < 600 ? 3 : (MediaQuery.of(context).size.width / 140).round(),
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
         shrinkWrap: true,
@@ -122,6 +122,7 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
     colors = Skin.of(context).theme.colors;
 
     return createGridView(
+      context: context,
       children: <Widget>[
         gridItem('Zkopírovat text', MdiIcons.contentCopy, onTap: () {
           var data = ClipboardData(text: widget.item.content.strippedContent);
@@ -132,13 +133,28 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
           AnalyticsProvider().logEvent('copyPostBody');
         }),
         if (isPost)
-          gridItem('Odpovědět soukromě', MdiIcons.reply, onTap: () {
+          gridItem('Poslat zprávu', MdiIcons.emailFastOutline, onTap: () {
             Navigator.pop(context); // Close the sheet first.
             Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
                 arguments: NewMessageSettings(
                     hasInputField: true,
                     inputFieldPlaceholder: post.nick,
-                    messageFieldPlaceholder: post.link,
+                    onClose: () => T.success('👍 Zpráva poslána.', bg: colors!.success),
+                    onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                      if (inputField == null) return false;
+
+                      var response = await ApiController().sendMail(inputField, message, attachments: attachments);
+                      return response.isOk;
+                    }));
+          }),
+        if (isPost)
+          gridItem('Odpovědět soukromě', MdiIcons.replyOutline, onTap: () {
+            Navigator.pop(context); // Close the sheet first.
+            Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
+                arguments: NewMessageSettings(
+                    hasInputField: true,
+                    inputFieldPlaceholder: post.nick,
+                    messageFieldPlaceholder: '${post.link}\n',
                     onClose: () => T.success('👍 Zpráva poslána.', bg: colors!.success),
                     onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
                       if (inputField == null) return false;
@@ -194,7 +210,7 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
             AnalyticsProvider().logEvent('filter_user_posts');
           }),
         if (isPost && post.rating != null)
-          gridItem('Zobrazit palečky', MdiIcons.thumbsUpDown, onTap: () {
+          gridItem('Zobrazit palečky', MdiIcons.thumbsUpDownOutline, onTap: () {
             showCupertinoModalBottomSheet(
                 context: context,
                 expand: true,
@@ -203,7 +219,7 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
                 });
           }),
         if (isPost)
-          gridItem('Příspěvky @${post.nick}', MdiIcons.accountFilter, onTap: () {
+          gridItem('Filtrovat\n@${post.nick}', MdiIcons.accountFilterOutline, onTap: () {
             Navigator.of(context).pop();
             Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(post.idKlub, filterByUser: post.nick));
             AnalyticsProvider().logEvent('filter_user_posts');
@@ -231,12 +247,12 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
           Navigator.pop(context);
           AnalyticsProvider().logEvent('shareSheet');
         }),
-        gridItem('Více', MdiIcons.skull, danger: true, onTap: () {
+        gridItem('Více', MdiIcons.skullOutline, danger: true, onTap: () {
           showCupertinoModalBottomSheet(
               context: context,
               builder: (context) {
                 return StatefulBuilder(
-                  builder: (context, StateSetter setState) => createGridView(children: <Widget>[
+                  builder: (context, StateSetter setState) => createGridView(context: context, children: <Widget>[
                     if (isPost && post.canBeDeleted)
                       FeedbackIndicator(
                         isLoading: _deleteIndicator,
@@ -262,29 +278,31 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
                     if (isPost && post.canBeDeleted && widget.adminTools)
                       FeedbackIndicator(
                         isLoading: _bananaIndicator,
-                        child: gridItem('Smazat\n+ RO (30)', MdiIcons.pencilLock, danger: true, onTap: () async {
-                          try {
-                            setState(() => _bananaIndicator = true);
-                            List<OkResponse> response = await Future.wait([
-                              ApiController().setDiscussionRights(post.idKlub, username: post.nick, right: 'write', set: false),
-                              ApiController().setDiscussionRightsDaysLeft(post.idKlub, username: post.nick, daysLeft: 30),
-                              ApiController().deleteDiscussionMessage(post.idKlub, post.id)
-                            ]);
+                        child: gridItem('Smazat\n+ RO (30)', MdiIcons.pencilLock, danger: true, onTap: () {
+                          confirmationDialog('Smazat a zabanovat?', 'Skutečně smazat příspěvěk a udělit read-only na 30 dní?', () async {
+                            try {
+                              setState(() => _bananaIndicator = true);
+                              List<OkResponse> response = await Future.wait([
+                                ApiController().setDiscussionRights(post.idKlub, username: post.nick, right: 'write', set: false),
+                                ApiController().setDiscussionRightsDaysLeft(post.idKlub, username: post.nick, daysLeft: 30),
+                                ApiController().deleteDiscussionMessage(post.idKlub, post.id)
+                              ]);
 
-                            if (response[2].isOk) {
-                              T.success('Smazáno a RO na 30 dní uděleno.');
-                              ref.read(PostsToDelete.provider.notifier).add(post);
-                              ref.read(PostsSelection.provider.notifier).remove(post);
-                            } else {
-                              T.success('RO na 30 dní uděleno.');
+                              if (response[2].isOk) {
+                                T.success('Smazáno a RO na 30 dní uděleno.');
+                                ref.read(PostsToDelete.provider.notifier).add(post);
+                                ref.read(PostsSelection.provider.notifier).remove(post);
+                              } else {
+                                T.success('RO na 30 dní uděleno.');
+                              }
+                              int counter = 0;
+                              Navigator.popUntil(context, (route) => counter++ == 2);
+                            } catch (error) {
+                              T.warn('Při udělení RO a mazání se něco pokazilo.');
+                            } finally {
+                              setState(() => _bananaIndicator = false);
                             }
-                            int counter = 0;
-                            Navigator.popUntil(context, (route) => counter++ == 2);
-                          } catch (error) {
-                            T.warn('Při udělení RO a mazání se něco pokazilo.');
-                          } finally {
-                            setState(() => _bananaIndicator = false);
-                          }
+                          });
                         }),
                       ),
                     if (widget.item.nick != MainRepository().credentials!.nickname)
@@ -303,7 +321,8 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
                       Navigator.pop(context);
                       AnalyticsProvider().logEvent('hidePost');
                     }),
-                    gridItem(_reportIndicator ? L.POST_SHEET_FLAG_SAVING : L.POST_SHEET_FLAG, MdiIcons.alertDecagram, danger: true, onTap: () async {
+                    gridItem(_reportIndicator ? L.POST_SHEET_FLAG_SAVING : L.POST_SHEET_FLAG, MdiIcons.alertDecagram, danger: true,
+                        onTap: () async {
                       try {
                         setState(() => _reportIndicator = true);
                         await ApiController().sendMail('FYXBOT', 'Inappropriate post/mail report: ${widget.item.link}.');
