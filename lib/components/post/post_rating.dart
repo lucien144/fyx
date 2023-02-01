@@ -55,7 +55,6 @@ class _PostRatingState extends State<PostRating> {
             GestureFeedback(
               onTap: () => showCupertinoModalBottomSheet(
                   context: context,
-                  expand: true,
                   builder: (context) {
                     return PostRatingBottomSheet(_post!);
                   }),
