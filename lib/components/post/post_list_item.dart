@@ -67,122 +67,115 @@ class _PostListItemState extends ConsumerState<PostListItem> {
 
     return Visibility(
       visible: !isDeleted,
-      child: Material(
-        textStyle: Skin.of(context).theme.data.textTheme.textStyle,
-        elevation: 0,
-        color: Colors.transparent,
-        child: Dismissible(
-          key: UniqueKey(),
-          direction: _post!.canBeDeleted ? DismissDirection.endToStart : DismissDirection.none,
-          confirmDismiss: (_) {
-            ref.read(PostsSelection.provider.notifier).toggle(this._post!);
-            return Future.value(false);
-          },
-          background: Container(
-            alignment: Alignment.centerRight,
-            color: colors.highlightedText,
-            padding: const EdgeInsets.all(32),
-            child: Icon(
-              isSelected ? MdiIcons.checkboxMarkedOutline : MdiIcons.checkboxBlankOutline,
-              size: 32,
-              color: colors.background,
-            ),
+      child: Dismissible(
+        key: UniqueKey(),
+        direction: _post!.canBeDeleted ? DismissDirection.endToStart : DismissDirection.none,
+        confirmDismiss: (_) {
+          ref.read(PostsSelection.provider.notifier).toggle(this._post!);
+          return Future.value(false);
+        },
+        background: Container(
+          alignment: Alignment.centerRight,
+          color: colors.highlightedText,
+          padding: const EdgeInsets.all(32),
+          child: Icon(
+            isSelected ? MdiIcons.checkboxMarkedOutline : MdiIcons.checkboxBlankOutline,
+            size: 32,
+            color: colors.background,
           ),
-          child: InkWell(
-            splashColor: colors.barBackground,
-            highlightColor: Colors.transparent,
-            onLongPress: showPostContext,
-            onDoubleTap: () {
-              if (!_post!.canBeRated || !MainRepository().settings.quickRating) {
-                return null;
-              }
+        ),
+        child: GestureDetector(
+          onLongPress: showPostContext,
+          onDoubleTap: () {
+            if (!_post!.canBeRated || !MainRepository().settings.quickRating) {
+              return null;
+            }
 
-              ApiController().giveRating(_post!.idKlub, _post!.id, remove: _post!.myRating != 'none').then((response) {
-                if (_post!.myRating != 'none') {
-                  T.success('👎', bg: colors.success);
-                } else {
-                  T.success('👍', bg: colors.success);
-                }
-                setState(() {
-                  _post!.rating = response.currentRating;
-                  _post!.myRating = response.myRating;
-                });
-              }).catchError((error) {
-                print(error);
-                T.error(L.RATING_ERROR, bg: colors.danger);
+            ApiController().giveRating(_post!.idKlub, _post!.id, remove: _post!.myRating != 'none').then((response) {
+              if (_post!.myRating != 'none') {
+                T.success('👎', bg: colors.success);
+              } else {
+                T.success('👍', bg: colors.success);
+              }
+              setState(() {
+                _post!.rating = response.currentRating;
+                _post!.myRating = response.myRating;
               });
-            },
-            child: ContentBoxLayout(
-              isPreview: widget._isPreview,
-              isHighlighted: widget._isHighlighted,
-              isSelected: isSelected,
-              topLeftWidget: PostAvatar(
-                _post!.nick,
-                descriptionWidget: Row(
-                  children: [
-                    if (_post!.rating != null)
-                      Text('${Post.formatRating(_post!.rating!)} | ',
-                          style: TextStyle(
-                              fontSize: 10, color: _post!.rating! > 0 ? colors.success : (_post!.rating! < 0 ? colors.danger : colors.text))),
-                    Text(
-                      '${Helpers.absoluteTime(_post!.time)}',
-                      style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10),
-                    ),
-                    Text(
-                      ' ~${Helpers.relativeTime(_post!.time)}',
-                      style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10),
-                    ),
-                    if (_post!.replies.length > 0)
-                      Text(
-                        ' | ${_post!.replies.length} ${Intl.plural(_post!.replies.length, one: 'odpověď', few: 'odpovědi', other: 'odpovědí', locale: 'cs_CZ')}',
-                        style: TextStyle(color: colors.primary, fontSize: 10),
-                      ),
-                  ],
-                ),
-              ),
-              topRightWidget: GestureFeedback(child: Icon(Icons.more_vert, color: colors.text.withOpacity(0.38)), onTap: showPostContext),
-              bottomWidget: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
+            }).catchError((error) {
+              print(error);
+              T.error(L.RATING_ERROR, bg: colors.danger);
+            });
+          },
+          child: ContentBoxLayout(
+            isPreview: widget._isPreview,
+            isHighlighted: widget._isHighlighted,
+            isSelected: isSelected,
+            topLeftWidget: PostAvatar(
+              _post!.nick,
+              descriptionWidget: Row(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      PostRating(_post!, onRatingChange: (post) => setState(() => _post = post)),
-                      Row(
-                        children: <Widget>[
-                          Visibility(
-                            visible: widget._isPreview != true && _post!.canReply,
-                            child: GestureDetector(
-                                behavior: HitTestBehavior.opaque,
-                                onTap: () => Navigator.of(context).pushNamed('/new-message',
-                                    arguments: NewMessageSettings(
-                                        replyWidget: PostListItem(
-                                          _post!,
-                                          isPreview: true,
-                                          discussion: widget.discussion,
-                                        ),
-                                        onClose: this.widget.onUpdate,
-                                        onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
-                                          var result = await ApiController()
-                                              .postDiscussionMessage(_post!.idKlub, message, attachments: attachments, replyPost: _post);
-                                          return result.isOk;
-                                        })),
-                                child: TextIcon(
-                                  'Odpovědět',
-                                  icon: MdiIcons.reply,
-                                  iconColor: colors.text.withOpacity(0.38),
-                                )),
-                          )
-                        ],
-                      )
-                    ],
+                  if (_post!.rating != null)
+                    Text('${Post.formatRating(_post!.rating!)} | ',
+                        style: TextStyle(
+                            fontSize: 10, color: _post!.rating! > 0 ? colors.success : (_post!.rating! < 0 ? colors.danger : colors.text))),
+                  Text(
+                    '${Helpers.absoluteTime(_post!.time)}',
+                    style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10),
                   ),
+                  Text(
+                    ' ~${Helpers.relativeTime(_post!.time)}',
+                    style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10),
+                  ),
+                  if (_post!.replies.length > 0)
+                    Text(
+                      ' | ${_post!.replies.length} ${Intl.plural(_post!.replies.length, one: 'odpověď', few: 'odpovědi', other: 'odpovědí', locale: 'cs_CZ')}',
+                      style: TextStyle(color: colors.primary, fontSize: 10),
+                    ),
                 ],
               ),
-              content: _post!.content,
             ),
+            topRightWidget: GestureFeedback(child: Icon(Icons.more_vert, color: colors.text.withOpacity(0.38)), onTap: showPostContext),
+            bottomWidget: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    PostRating(_post!, onRatingChange: (post) => setState(() => _post = post)),
+                    Row(
+                      children: <Widget>[
+                        Visibility(
+                          visible: widget._isPreview != true && _post!.canReply,
+                          child: GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () => Navigator.of(context).pushNamed('/new-message',
+                                  arguments: NewMessageSettings(
+                                      replyWidget: PostListItem(
+                                        _post!,
+                                        isPreview: true,
+                                        discussion: widget.discussion,
+                                      ),
+                                      onClose: this.widget.onUpdate,
+                                      onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                                        var result = await ApiController()
+                                            .postDiscussionMessage(_post!.idKlub, message, attachments: attachments, replyPost: _post);
+                                        return result.isOk;
+                                      })),
+                              child: TextIcon(
+                                'Odpovědět',
+                                icon: MdiIcons.reply,
+                                iconColor: colors.text.withOpacity(0.38),
+                              )),
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              ],
+            ),
+            content: _post!.content,
           ),
         ),
       ),

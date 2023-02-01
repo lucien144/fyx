@@ -44,64 +44,57 @@ class _MailListItemState extends State<MailListItem> {
   Widget build(BuildContext context) {
     SkinColors colors = Skin.of(context).theme.colors;
 
-    return Material(
-      textStyle: Skin.of(context).theme.data.textTheme.textStyle,
-      elevation: 0,
-      color: Colors.transparent,
-      child: InkWell(
-        splashColor: colors.barBackground,
-        highlightColor: Colors.transparent,
-        onLongPress: showMailContext,
-        child: ContentBoxLayout(
-          isHighlighted: widget.mail.isNew,
-          isPreview: widget.isPreview == true,
-          content: widget.mail.content,
-          topLeftWidget: PostAvatar(widget.mail.direction == MailDirection.from ? widget.mail.participant : MainRepository().credentials!.nickname,
-              description:
-                  '→ ${widget.mail.direction == MailDirection.to ? widget.mail.participant : MainRepository().credentials!.nickname}, ~${Helpers.relativeTime(widget.mail.time)}'),
-          topRightWidget: Row(
-            children: <Widget>[
-              Visibility(
-                visible: widget.mail.isUnread,
-                child: IconUnread(),
-              ),
-              SizedBox(
-                width: 4,
-              ),
-              GestureFeedback(
-                  child: Icon(Icons.more_vert, color: colors.text.withOpacity(0.38)),
-                  onTap: showMailContext,
-              ),
-            ],
-          ),
-          bottomWidget: widget.isPreview == true
-              ? null
-              : Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[IconReply(), Text('Odpovědět', style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 14))],
-                    ),
-                    onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
-                        arguments: NewMessageSettings(
-                            onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
-                              if (inputField == null) {
-                                return false;
-                              }
-                              var response = await ApiController().sendMail(inputField, message, attachments: attachments);
-                              return response.isOk;
-                            },
-                            onClose: this.widget.onUpdate!,
-                            inputFieldPlaceholder: widget.mail.participant,
-                            hasInputField: true,
-                            replyWidget: MailListItem(
-                              widget.mail,
-                              isPreview: true,
-                            ))),
-                  )
-                ]),
+    return GestureDetector(
+      onLongPress: showMailContext,
+      child: ContentBoxLayout(
+        isHighlighted: widget.mail.isNew,
+        isPreview: widget.isPreview == true,
+        content: widget.mail.content,
+        topLeftWidget: PostAvatar(widget.mail.direction == MailDirection.from ? widget.mail.participant : MainRepository().credentials!.nickname,
+            description:
+                '→ ${widget.mail.direction == MailDirection.to ? widget.mail.participant : MainRepository().credentials!.nickname}, ~${Helpers.relativeTime(widget.mail.time)}'),
+        topRightWidget: Row(
+          children: <Widget>[
+            Visibility(
+              visible: widget.mail.isUnread,
+              child: IconUnread(),
+            ),
+            SizedBox(
+              width: 4,
+            ),
+            GestureFeedback(
+                child: Icon(Icons.more_vert, color: colors.text.withOpacity(0.38)),
+                onTap: showMailContext,
+            ),
+          ],
         ),
+        bottomWidget: widget.isPreview == true
+            ? null
+            : Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[IconReply(), Text('Odpovědět', style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 14))],
+                  ),
+                  onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
+                      arguments: NewMessageSettings(
+                          onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                            if (inputField == null) {
+                              return false;
+                            }
+                            var response = await ApiController().sendMail(inputField, message, attachments: attachments);
+                            return response.isOk;
+                          },
+                          onClose: this.widget.onUpdate!,
+                          inputFieldPlaceholder: widget.mail.participant,
+                          hasInputField: true,
+                          replyWidget: MailListItem(
+                            widget.mail,
+                            isPreview: true,
+                          ))),
+                )
+              ]),
       ),
     );
   }
