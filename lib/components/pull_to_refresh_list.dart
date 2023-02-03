@@ -21,6 +21,7 @@ class PullToRefreshList<TProvider> extends StatefulWidget {
   final TDataProvider dataProvider;
   final Function? sliverListBuilder;
   final bool searchEnabled;
+  final bool searchFocus;
   final String? searchLabel;
   final String? searchTerm;
   final int searchLimit;
@@ -40,6 +41,7 @@ class PullToRefreshList<TProvider> extends StatefulWidget {
       this.searchLabel, // TODO: move to SearchController
       this.searchTerm, // TODO: move to SearchController
       this.searchLimit = 3, // TODO: move to SearchController
+      this.searchFocus = false, // TODO: move to SearchController
       this.onPullDown,
       isInfinite = false,
       int rebuild = 0,
@@ -139,6 +141,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
           child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             SearchBox(
               enabled: widget.searchEnabled,
+              focus: widget.searchFocus,
               loading: _isLoading,
               label: widget.searchLabel,
               limit: widget.searchLimit,
@@ -174,6 +177,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
           children: [
             SearchBox(
               enabled: widget.searchEnabled,
+              focus: widget.searchFocus,
               loading: _isLoading,
               label: widget.searchLabel,
               limit: widget.searchLimit,

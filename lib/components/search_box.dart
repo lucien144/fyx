@@ -10,6 +10,7 @@ import 'package:fyx/theme/skin/SkinColors.dart';
 
 class SearchBox extends ConsumerStatefulWidget {
   final bool enabled;
+  final bool focus;
   final String? label;
   final ValueChanged? onSearch;
   final VoidCallback? onClear;
@@ -17,7 +18,7 @@ class SearchBox extends ConsumerStatefulWidget {
   final int limit;
   final bool loading;
 
-  SearchBox({Key? key, this.onSearch, this.enabled = false, this.onClear, this.searchTerm, this.limit = 3, this.label = 'Hledej', this.loading = false})
+  SearchBox({Key? key, this.onSearch, this.enabled = false, this.focus = false, this.onClear, this.searchTerm, this.limit = 3, this.label = 'Hledej', this.loading = false})
       : super(key: key);
 
   @override
@@ -39,6 +40,10 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
     searchAnimation = AnimationController(vsync: this, value: widget.enabled ? 1 : 0);
     searchController.text = widget.searchTerm ?? '';
     _loading = widget.loading;
+    
+    if (widget.focus) {
+      focus.requestFocus();
+    }
   }
 
   @override
