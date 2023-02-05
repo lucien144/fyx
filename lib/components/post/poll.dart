@@ -116,57 +116,48 @@ class _PollState extends State<Poll> {
           ),
           buildAnswers(context),
           if (_poll!.canVote)
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: CupertinoButton(
-                onPressed: _votes.length == 0 || _loading
-                    ? null
-                    : () async {
-                        setState(() => _loading = true);
-                        try {
-                          var poll = await ApiController().votePoll(_poll!.discussionId, _poll!.postId, _votes);
-                          setState(() => _poll = poll);
-                        } catch (error) {
-                          T.error(error.toString(), bg: colors.danger);
-                        } finally {
-                          setState(() => _loading = false);
-                        }
-                      },
-                child: _loading
-                    ? CupertinoActivityIndicator()
-                    : Text('${_poll!.publicResults ? 'Veřejně hlasovat' : 'Hlasovat'} ${_votes.length}/${_poll!.allowedVotes}', style: TextStyle(color: colors.pollBackground),),
-                color: colors.primary,
-                padding: EdgeInsets.all(0),
-                disabledColor: colors.disabled,
-              ),
-            ),
+            buildPollButton(colors, false),
           if (_poll!.canVote && _poll!.allowEmptyVote)
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: CupertinoButton(
-                onPressed: _loading
-                    ? null
-                    : () async {
-                  setState(() => _loading = true);
-                  try {
-                    var poll = await ApiController().votePoll(_poll!.discussionId, _poll!.postId, List<int>.empty());
-                    setState(() => _poll = poll);
-                  } catch (error) {
-                    T.error(error.toString(), bg: colors.danger);
-                  } finally {
-                    setState(() => _loading = false);
-                  }
-                },
-                child: _loading
-                    ? CupertinoActivityIndicator()
-                    : Text('Přeskočit hlasování', style: TextStyle(color: colors.pollBackground),),
-                color: colors.primary,
-                padding: EdgeInsets.all(0),
-                disabledColor: colors.disabled,
-              ),
-            )
+            buildPollButton(colors, true),
         ]),
         color: colors.pollBackground,
         padding: EdgeInsets.all(15));
   }
+
+  Padding buildPollButton(SkinColors colors, bool emptyVote) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16.0),
+      child: CupertinoButton(
+        onPressed: (!emptyVote && _votes.length == 0) || _loading
+            ? null
+            : () async {
+                setState(() => _loading = true);
+                try {
+                  var poll = await ApiController().votePoll(
+                      _poll!.discussionId,
+                      _poll!.postId, emptyVote ? List<int>.empty() : _votes
+                  );
+                  setState(() => _poll = poll);
+                } catch (error) {
+                  T.error(error.toString(), bg: colors.danger);
+                } finally {
+                  setState(() => _loading = false);
+                }
+              },
+        child: _loading
+            ? CupertinoActivityIndicator()
+            : Text(
+                buttonText(emptyVote),
+                style: TextStyle(color: colors.pollBackground),
+              ),
+        color: colors.primary,
+        padding: EdgeInsets.all(0),
+        disabledColor: colors.disabled,
+      ),
+    );
+  }
+
+  String buttonText(bool emptyVote) => emptyVote
+      ? 'Přeskočit hlasování'
+      : '${_poll!.publicResults ? 'Veřejně hlasovat' : 'Hlasovat'} ${_votes.length}/${_poll!.allowedVotes}';
 }
