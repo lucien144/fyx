@@ -139,6 +139,31 @@ class _PollState extends State<Poll> {
                 padding: EdgeInsets.all(0),
                 disabledColor: colors.disabled,
               ),
+            ),
+          if (_poll!.canVote && _poll!.allowEmptyVote)
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: CupertinoButton(
+                onPressed: _loading
+                    ? null
+                    : () async {
+                  setState(() => _loading = true);
+                  try {
+                    var poll = await ApiController().votePoll(_poll!.discussionId, _poll!.postId, List<int>.empty());
+                    setState(() => _poll = poll);
+                  } catch (error) {
+                    T.error(error.toString(), bg: colors.danger);
+                  } finally {
+                    setState(() => _loading = false);
+                  }
+                },
+                child: _loading
+                    ? CupertinoActivityIndicator()
+                    : Text('Přeskočit hlasování', style: TextStyle(color: colors.pollBackground),),
+                color: colors.primary,
+                padding: EdgeInsets.all(0),
+                disabledColor: colors.disabled,
+              ),
             )
         ]),
         color: colors.pollBackground,

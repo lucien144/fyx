@@ -11,6 +11,7 @@ class ContentPoll extends Content {
   String _instructions = '';
   bool _publicResults = false;
   int _allowedVotes = 0;
+  bool _allowEmptyVote = false;
   int _allowAnswersUntil = 0;
   int _showAnswersAfter = 0;
   List<PollAnswer> _answers = <PollAnswer>[];
@@ -23,6 +24,8 @@ class ContentPoll extends Content {
   bool get publicResults => _publicResults;
 
   int get allowedVotes => _allowedVotes;
+
+  bool get allowEmptyVote => _allowEmptyVote;
 
   int get allowAnswersUntil => _allowAnswersUntil;
 
@@ -45,6 +48,7 @@ class ContentPoll extends Content {
     _instructions = json['instructions'] ?? '';
     _publicResults = json['public_results'] ?? false;
     _allowedVotes = json['allowed_votes'] ?? 0;
+    _allowEmptyVote = json['allow_empty_vote'] ?? false;
     _allowAnswersUntil = json['allow_answers_until'] != null ? DateTime.parse(json['allow_answers_until']).millisecondsSinceEpoch : 0;
     _showAnswersAfter = json['show_answers_after'] != null ? DateTime.parse(json['show_answers_after']).millisecondsSinceEpoch : 0;
     if (json['answers'] != null) {

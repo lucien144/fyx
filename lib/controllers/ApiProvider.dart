@@ -219,7 +219,11 @@ class ApiProvider implements IApiProvider {
   }
 
   Future<Response> votePoll(int discussionId, int postId, List<int> votes) async {
-    return await dio.post('$URL/discussion/$discussionId/poll/$postId/vote/${votes.join(',')}');
+    if (votes.isEmpty) {
+      return await dio.post('$URL/discussion/$discussionId/poll/$postId/empty-vote');
+    } else {
+      return await dio.post('$URL/discussion/$discussionId/poll/$postId/vote/${votes.join(',')}');
+    }
   }
 
   Future<Response> rollDice(int discussionId, int postId) async {
