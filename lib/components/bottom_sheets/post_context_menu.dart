@@ -213,7 +213,7 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
           gridItem('Zobrazit palečky', MdiIcons.thumbsUpDownOutline, onTap: () {
             showCupertinoModalBottomSheet(
                 context: context,
-                expand: true,
+                expand: false,
                 builder: (context) {
                   return PostRatingBottomSheet(post);
                 });
