@@ -43,6 +43,7 @@ class PostHtml extends StatelessWidget {
         'body': Style(margin: EdgeInsets.all(0)),
         'pre': Style(color: Colors.transparent),
         'a': Style(color: colors.primary),
+        '.fill': Style(textDecoration: TextDecoration.none, display: Display.BLOCK, color: colors.text),
         '.twitter-header a, .twitter-text a': Style(color: colors.twitter),
         '.twitter-header .name': Style(fontWeight: FontWeight.bold),
         '.twitter-text': Style(margin: EdgeInsets.symmetric(vertical: 10))

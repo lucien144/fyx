@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'package:fyx/components/search/search_notfound.dart';
 import 'package:fyx/components/search_box.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/FirstUnreadEnum.dart';
@@ -29,12 +30,17 @@ class PullToRefreshList<TProvider> extends StatefulWidget {
   final VoidCallback? onSearchClear;
   final Function(ScrollNotification info)? onPullDown;
   final Widget? pinnedWidget;
+
+  // false => display Vencent Vega
+  Widget? emptyWidget;
+
   bool _disabled;
   bool _isInfinite;
   int _rebuild;
 
   PullToRefreshList(
       {required this.dataProvider,
+      this.emptyWidget,
       this.searchEnabled = false,
       this.onSearch, // TODO: move to SearchController
       this.onSearchClear, // TODO: move to SearchController
@@ -153,22 +159,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
           ]));
     }
 
-    if (_slivers.length == 1 && !_isLoading && widget.searchTerm == null) {
-      return Container(
-        height: double.infinity,
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Text(
-              L.GENERAL_EMPTY,
-              textAlign: TextAlign.center,
-            ),
-            Image.asset('travolta.gif')
-          ],
-        ),
-      );
-    }
+    var showTravolta = _slivers.length == 1 && !_isLoading && (widget.searchTerm == null || widget.searchTerm!.length >= 3);
 
     return Stack(
       children: [
@@ -185,42 +176,45 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
               onSearch: widget.onSearch,
               onClear: widget.onSearchClear,
             ),
-            Expanded(
-              child: NotificationListener(
-                onNotification: (scrollInfo) {
-                  if (scrollInfo is ScrollNotification) {
-                    // Hide keyboard -> https://github.com/lucien144/fyx/issues/343
-                    FocusManager.instance.primaryFocus?.unfocus();
+            if (showTravolta && widget.emptyWidget == null) SearchNotFound(),
+            if (showTravolta && widget.emptyWidget != null) widget.emptyWidget!,
+            if (!showTravolta)
+              Expanded(
+                child: NotificationListener(
+                  onNotification: (scrollInfo) {
+                    if (scrollInfo is ScrollNotification) {
+                      // Hide keyboard -> https://github.com/lucien144/fyx/issues/343
+                      FocusManager.instance.primaryFocus?.unfocus();
 
-                    // Hide the jump to first unread button if user scrolls twice the height of the screen height
-                    if (scrollInfo.metrics.pixels > 2 * MediaQuery.of(context).size.height) {
-                      slideController.reverse();
-                    }
+                      // Hide the jump to first unread button if user scrolls twice the height of the screen height
+                      if (scrollInfo.metrics.pixels > 2 * MediaQuery.of(context).size.height) {
+                        slideController.reverse();
+                      }
 
-                    if (widget.onPullDown != null) widget.onPullDown!(scrollInfo);
+                      if (widget.onPullDown != null) widget.onPullDown!(scrollInfo);
 
-                    if (widget._isInfinite) {
-                      if (_controller.position.userScrollDirection == ScrollDirection.reverse && scrollInfo.metrics.outOfRange) {
-                        if (_slivers.last is! SliverPadding) {
-                          setState(() => _slivers.add(SliverPadding(
-                              padding: EdgeInsets.symmetric(vertical: 16), sliver: SliverToBoxAdapter(child: CupertinoActivityIndicator()))));
-                          this.loadData(append: true);
+                      if (widget._isInfinite) {
+                        if (_controller.position.userScrollDirection == ScrollDirection.reverse && scrollInfo.metrics.outOfRange) {
+                          if (_slivers.last is! SliverPadding) {
+                            setState(() => _slivers.add(SliverPadding(
+                                padding: EdgeInsets.symmetric(vertical: 16), sliver: SliverToBoxAdapter(child: CupertinoActivityIndicator()))));
+                            this.loadData(append: true);
+                          }
                         }
                       }
                     }
-                  }
-                  return false;
-                },
-                child: CupertinoScrollbar(
-                  controller: _controller,
-                  child: CustomScrollView(
-                    physics: Platform.isIOS ? const AlwaysScrollableScrollPhysics() : const RefreshScrollPhysics(),
-                    slivers: _slivers,
+                    return false;
+                  },
+                  child: CupertinoScrollbar(
                     controller: _controller,
+                    child: CustomScrollView(
+                      physics: Platform.isIOS ? const AlwaysScrollableScrollPhysics() : const RefreshScrollPhysics(),
+                      slivers: _slivers,
+                      controller: _controller,
+                    ),
                   ),
                 ),
               ),
-            ),
           ],
         ),
         if (_result != null &&
