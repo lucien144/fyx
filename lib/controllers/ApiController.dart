@@ -175,6 +175,10 @@ class ApiController {
     return UnifiedSearchResponse.fromJson(response.data);
   }
 
+  Future<Response> search(String term, {int? lastId}) async {
+    return await provider.search(term, lastId: lastId);
+  }
+
   Future<Response> bookmarkDiscussion(int discussionId, bool state) async {
     return await provider.bookmarkDiscussion(discussionId, state);
   }

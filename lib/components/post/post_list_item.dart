@@ -28,10 +28,11 @@ class PostListItem extends ConsumerStatefulWidget {
   final Post post;
   final bool _isPreview;
   final bool _isHighlighted;
+  final bool disabled;
   final Function? onUpdate;
   final Discussion? discussion;
 
-  PostListItem(this.post, {this.discussion, this.onUpdate, isPreview = false, isHighlighted = false})
+  PostListItem(this.post, {this.discussion, this.onUpdate, this.disabled = false, isPreview = false, isHighlighted = false})
       : _isPreview = isPreview,
         _isHighlighted = isHighlighted;
 
@@ -135,8 +136,8 @@ class _PostListItemState extends ConsumerState<PostListItem> {
                 ],
               ),
             ),
-            topRightWidget: GestureFeedback(child: Icon(Icons.more_vert, color: colors.text.withOpacity(0.38)), onTap: showPostContext),
-            bottomWidget: Column(
+            topRightWidget: widget.disabled ? Container() : GestureFeedback(child: Icon(Icons.more_vert, color: colors.text.withOpacity(0.38)), onTap: showPostContext),
+            bottomWidget: widget.disabled ? null : Column(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,

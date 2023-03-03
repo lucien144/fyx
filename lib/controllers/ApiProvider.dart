@@ -113,6 +113,11 @@ class ApiProvider implements IApiProvider {
     return await dio.get('$URL/search/unified?search=$term&limit=100');
   }
 
+  Future<Response> search(String term, {int? lastId}) async {
+    Map<String, dynamic> params = {'order': lastId == null ? 'newest' : 'older_than', 'from_id': lastId, 'text': term};
+    return await dio.get('$URL/search', queryParameters: params);
+  }
+
   Future<Response> fetchBookmarks() async {
     return await dio.get('$URL/bookmarks/all');
   }

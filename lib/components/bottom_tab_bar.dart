@@ -118,19 +118,17 @@ class _BottomTabBarState extends State<BottomTabBar> {
                 )),
               )),
               Expanded(
-                  child: Opacity(
-                opacity: .35,
-                child: GestureDetector(
-                    child: Column(
-                  children: [
-                    Icon(MdiIcons.magnify, size: 34, color: colors.grey),
-                    Text(
-                      'Hledání',
-                      style: TextStyle(fontSize: 11, color: colors.grey),
-                    )
-                  ],
-                )),
-              )),
+                  child: GestureDetector(
+                      onTap: () => Navigator.of(context).pushNamed('/search'),
+                      child: Column(
+                    children: [
+                      Icon(MdiIcons.magnify, size: 34, color: colors.grey),
+                      Text(
+                        'Hledání',
+                        style: TextStyle(fontSize: 11, color: colors.grey),
+                      )
+                    ],
+                  ))),
             ],
           ),
           const SizedBox(height: 30),
