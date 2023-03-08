@@ -26,7 +26,6 @@ jobs:
       if: |
         contains(github.event.issue.labels.*.name, 'bug 🐛') ||
         contains(github.event.issue.labels.*.name, 'enhancement 🚀')
-        #contains(github.event.pull_request.labels.*.name, 'bug')
       with:
         project: 'https://github.com/users/lucien144/projects/4'
         #column_name: 'Labeled'
