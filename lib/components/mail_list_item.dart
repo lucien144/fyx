@@ -12,9 +12,9 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/IconReply.dart';
-import 'package:fyx/theme/IconUnread.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class MailListItem extends StatefulWidget {
@@ -56,8 +56,11 @@ class _MailListItemState extends State<MailListItem> {
         topRightWidget: Row(
           children: <Widget>[
             Visibility(
-              visible: widget.mail.isUnread,
-              child: IconUnread(),
+              visible: widget.mail.isOutgoing && widget.mail.isUnread,
+              child: Icon(
+                MdiIcons.emailMarkAsUnread,
+                color: colors.text.withOpacity(0.38),
+              ),
             ),
             SizedBox(
               width: 4,

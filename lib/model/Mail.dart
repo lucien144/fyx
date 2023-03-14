@@ -24,12 +24,15 @@ class Mail extends IPost {
     _time = DateTime.parse(json['inserted_at'] ?? '0').millisecondsSinceEpoch;
     _direction = json['incoming'] ?? false;
     content = ContentRegular(json['content'], isCompact: this.isCompact);
-    _message_status = (json['unread'] ?? false) ? MailStatus.unread : MailStatus.read;
+    _message_status = json['unread'] == null ? MailStatus.unknown : (json['unread'] ? MailStatus.unread : MailStatus.read);
     _new = json['new'] ?? false;
     _active = json['activity'];
   }
 
   bool get isUnread => status == MailStatus.unread;
+
+  bool get isIncoming => _direction == true;
+  bool get isOutgoing => _direction == false;
 
   bool get isNew => _new;
 
