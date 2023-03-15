@@ -7,18 +7,20 @@ class SearchNotFound extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-        child: Container(
-      child: Column(
+      child: Container(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom * .8),
+        child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Container(),
-          Text(
-            L.GENERAL_EMPTY,
-            textAlign: TextAlign.center,
-          ),
-          Image.asset('travolta.gif')
+        Container(),
+        Text(
+          L.GENERAL_EMPTY,
+          textAlign: TextAlign.center,
+        ),
+        Image.asset('travolta.gif')
         ],
+        ),
       ),
-    ));
+    );
   }
 }
