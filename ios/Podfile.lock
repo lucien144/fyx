@@ -130,7 +130,7 @@ PODS:
     - Flutter
   - permission_handler_apple (9.0.4):
     - Flutter
-  - PromisesObjC (2.1.1)
+  - PromisesObjC (2.2.0)
   - Sentry (7.23.0):
     - Sentry/Core (= 7.23.0)
   - Sentry/Core (7.23.0)
@@ -260,7 +260,7 @@ SPEC CHECKSUMS:
   package_info_plus: 6c92f08e1f853dc01228d6f553146438dafcd14e
   path_provider_ios: 7d7ce634493af4477d156294792024ec3485acd5
   permission_handler_apple: 44366e37eaf29454a1e7b1b7d736c2cceaeb17ce
-  PromisesObjC: ab77feca74fa2823e7af4249b8326368e61014cb
+  PromisesObjC: 09985d6d70fbe7878040aa746d78236e6946d2ef
   Sentry: a0d4563fa4ddacba31fdcc35daaa8573d87224d6
   sentry_flutter: 8bde7d0e57a721727fe573f13bb292c497b5a249
   share_plus: 056a1e8ac890df3e33cb503afffaf1e9b4fbae68
