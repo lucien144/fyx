@@ -13,6 +13,12 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 
+class SearchPageArguments {
+  final String? searchTerm;
+
+  SearchPageArguments({this.searchTerm});
+}
+
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
 
@@ -36,6 +42,11 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    SearchPageArguments? pageArguments = ModalRoute.of(context)?.settings.arguments as SearchPageArguments?;
+    if (pageArguments?.searchTerm != null && _searchTerm == null) {
+      setState(() => _searchTerm = pageArguments!.searchTerm);
+    }
+
     Widget emptyWidget = SearchPostsHelp();
 
     if (this._searchTerm != null) {

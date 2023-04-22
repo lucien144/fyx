@@ -11,6 +11,7 @@ import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/Image.dart' as post;
 import 'package:fyx/model/post/Video.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
+import 'package:fyx/pages/search_page.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -215,6 +216,14 @@ class PostHtml extends StatelessWidget {
         }
 
         if (link == null) {
+          return;
+        }
+
+        // Search click through
+        var searchTerm = Helpers.parseSearchUri(link);
+        if (searchTerm != null) {
+          var arguments = SearchPageArguments(searchTerm: searchTerm);
+          Navigator.of(context.buildContext, rootNavigator: true).pushNamed('/search', arguments: arguments);
           return;
         }
 

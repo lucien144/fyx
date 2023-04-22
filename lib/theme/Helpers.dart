@@ -78,6 +78,15 @@ class Helpers {
     return {};
   }
 
+  static String? parseSearchUri(String uri) {
+    RegExp test = new RegExp(r"/search\?text=(.*)?$");
+    Iterable<RegExpMatch> matches = test.allMatches(uri);
+    if (matches.length == 1) {
+      return matches.first.group(1);
+    }
+    return null;
+  }
+
   static Map<INTERNAL_URI_PARSER, dynamic> parseDiscussionUri(String uri) {
     RegExp test = new RegExp(r"(\?l=topic;id=([0-9]+))|(/discussion/([0-9]+)(\?(.*))?)$");
     final parsed = Uri.parse(uri);
