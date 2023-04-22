@@ -32,13 +32,15 @@ class _GalleryPageState extends State<GalleryPage> {
   GalleryArguments? _arguments;
   int _page = 1;
   bool _saving = false;
-  final _controller = PageController();
   bool _throwAway = true;
   bool _hideUI = false;
 
+  final pageController = PageController();
+  final photoController = PhotoViewController();
+
   @override
   void dispose() {
-    _controller.dispose();
+    pageController.dispose();
     super.dispose();
   }
 
@@ -49,7 +51,7 @@ class _GalleryPageState extends State<GalleryPage> {
       if (_arguments != null && _arguments!.images.length > 1) {
         _arguments!.images.asMap().forEach((key, image) {
           if (image.image == _arguments!.imageUrl) {
-            _controller.jumpToPage(key);
+            pageController.jumpToPage(key);
           }
         });
       }
@@ -74,25 +76,38 @@ class _GalleryPageState extends State<GalleryPage> {
           ),
           child: PhotoViewGallery.builder(
             scaleStateChangedCallback: (_) => setState(() => _throwAway = !_.isScaleStateZooming),
-            pageController: _controller,
+            pageController: pageController,
             backgroundDecoration: BoxDecoration(color: Colors.transparent),
             scrollPhysics: const BouncingScrollPhysics(),
             builder: (BuildContext context, int index) {
               return PhotoViewGalleryPageOptions.customChild(
+                  controller: photoController,
                   minScale: 1.0,
                   child: ThrowItAway(
                     enabled: _throwAway,
                     onTap: () => setState(() => _hideUI = !_hideUI),
+                    onDoubleTap: (details) {
+                      var x = (details.globalPosition.dx - MediaQuery.of(context).size.width / 2);
+                      var y = (details.globalPosition.dy - MediaQuery.of(context).size.height / 2);
+                      if (photoController.scale == 1) {
+                        photoController.scale = 2;
+                        photoController.position = Offset(-x * 2, -y * 2);
+                      } else {
+                        setState(() => _throwAway = true);
+                        photoController.scale = 1;
+                      }
+                    },
                     onDismiss: () {
                       close(context);
                     },
                     child: CachedNetworkImage(
                         imageUrl: _arguments!.images[index].image,
-                        cacheManager: CacheManager(Config(_arguments!.images[index].image, stalePeriod: const Duration(days: 7)))),
+                        cacheManager: CacheManager(Config(_arguments!.images[index].thumb, stalePeriod: const Duration(days: 7)))),
                   ));
             },
             itemCount: _arguments!.images.length,
             loadingBuilder: (context, chunkEvent) => CupertinoActivityIndicator(
+              color: colors.primary,
               radius: 16,
             ),
             onPageChanged: (i) => setState(() => _page = i + 1),
@@ -103,22 +118,15 @@ class _GalleryPageState extends State<GalleryPage> {
           right: 30,
           child: Visibility(
             visible: !_hideUI,
-            maintainAnimation: true,
-            maintainState: true,
-            child: AnimatedOpacity(
-              opacity: _hideUI ? 0 : 1,
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.fastOutSlowIn,
-              child: CupertinoButton(
-                padding: EdgeInsets.zero,
-                color: colors.primary,
-                child: Icon(
-                  CupertinoIcons.clear_thick,
-                  color: colors.background,
-                  size: 32,
-                ),
-                onPressed: () => close(context),
+            child: CupertinoButton(
+              padding: EdgeInsets.zero,
+              color: colors.primary,
+              child: Icon(
+                CupertinoIcons.clear_thick,
+                color: colors.background,
+                size: 32,
               ),
+              onPressed: () => close(context),
             ),
           ),
         ),
@@ -128,89 +136,77 @@ class _GalleryPageState extends State<GalleryPage> {
             left: (MediaQuery.of(context).size.width - 100) / 2,
             child: Visibility(
                 visible: !_hideUI,
-                maintainAnimation: true,
-                maintainState: true,
-                child: AnimatedOpacity(
-                    opacity: _hideUI ? 0 : 1,
-                    duration: const Duration(milliseconds: 200),
-                    curve: Curves.fastOutSlowIn,
-                    child: CupertinoButton(
-                      color: colors.primary,
-                      padding: EdgeInsets.zero,
-                      onPressed: () => close(context),
-                      child: Text(
-                        '$_page / ${_arguments!.images.length}',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: colors.background),
-                      ),
-                    )))),
+                child: CupertinoButton(
+                  color: colors.primary,
+                  padding: EdgeInsets.zero,
+                  onPressed: () => close(context),
+                  child: Text(
+                    '$_page / ${_arguments!.images.length}',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: colors.background),
+                  ),
+                ))),
         Positioned(
             bottom: 30,
             right: 30,
             child: Visibility(
                 visible: !_hideUI,
-                maintainAnimation: true,
-                maintainState: true,
-                child: AnimatedOpacity(
-                    opacity: _hideUI ? 0 : 1,
-                    duration: const Duration(milliseconds: 200),
-                    curve: Curves.fastOutSlowIn,
-                    child: CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      color: colors.primary,
-                      child: _saving
-                          ? CupertinoActivityIndicator()
-                          : Icon(
-                              Icons.save_alt_rounded,
-                              color: colors.background,
-                              size: 32,
-                            ),
-                      onPressed: () async {
-                        if (_saving) {
-                          return;
+                child: CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  color: colors.primary,
+                  child: _saving
+                      ? CupertinoActivityIndicator()
+                      : Icon(
+                          Icons.save_alt_rounded,
+                          color: colors.background,
+                          size: 32,
+                        ),
+                  onPressed: () async {
+                    if (_saving) {
+                      return;
+                    }
+
+                    setState(() => _saving = true);
+                    try {
+                      PermissionStatus status = await Permission.storage.request();
+                      if (status.isGranted) {
+                        // See https://github.com/lucien144/fyx/issues/304#issuecomment-1094851596
+
+                        var appDocDir = await getTemporaryDirectory();
+                        String url = _arguments!.images[_page - 1].image;
+                        String savePath = '${appDocDir.path}/${Helpers.uuid(6)}';
+                        await Dio().download(url, savePath);
+
+                        File file = new File(savePath);
+                        Uint8List headerBytes = file.readAsBytesSync();
+                        var ext = extensionFromMime(lookupMimeType(savePath, headerBytes: headerBytes.getRange(0, 20).toList()) ?? '');
+                        ext = ext == 'jpe' ? 'jpg' : ext; // https://github.com/dart-lang/mime/issues/55
+                        if (!['jpg', 'png', 'gif', 'heic'].contains(ext)) {
+                          file.delete();
+                          throw UnsupportedDownloadFormatException('Nelze uložit. Neznámý typ souboru ($ext).');
                         }
 
-                        setState(() => _saving = true);
-                        try {
-                          PermissionStatus status = await Permission.storage.request();
-                          if (status.isGranted) {
-                            // See https://github.com/lucien144/fyx/issues/304#issuecomment-1094851596
-
-                            var appDocDir = await getTemporaryDirectory();
-                            String url = _arguments!.images[_page - 1].image;
-                            String savePath = '${appDocDir.path}/${Helpers.uuid(6)}';
-                            await Dio().download(url, savePath);
-
-                            File file = new File(savePath);
-                            Uint8List headerBytes = file.readAsBytesSync();
-                            var ext = extensionFromMime(lookupMimeType(savePath, headerBytes: headerBytes.getRange(0, 20).toList()) ?? '');
-                            ext = ext == 'jpe' ? 'jpg' : ext; // https://github.com/dart-lang/mime/issues/55
-                            if (!['jpg', 'png', 'gif', 'heic'].contains(ext)) {
-                              file.delete();
-                              throw UnsupportedDownloadFormatException('Nelze uložit. Neznámý typ souboru ($ext).');
-                            }
-
-                            file = await file.rename('$savePath.$ext');
-                            final result = await ImageGallerySaver.saveFile('$savePath.$ext', isReturnPathOfIOS: Platform.isIOS);
-                            if (!result['isSuccess']) {
-                              throw Error();
-                            }
-                            T.success(L.TOAST_IMAGE_SAVE_OK, bg: colors.success);
-                            file.delete();
-                          } else {
-                            T.error('Nelze uložit. Povolte ukládání, prosím.', bg: colors.danger);
-                          }
-                        } on UnsupportedDownloadFormatException catch (exception) {
-                          T.error(exception.message, bg: colors.danger);
-                        } catch (error) {
-                          T.error(L.TOAST_IMAGE_SAVE_ERROR, bg: colors.danger);
-                          Sentry.captureException(error);
-                          print((error as Error).stackTrace);
-                        } finally {
-                          setState(() => _saving = false);
+                        file = await file.rename('$savePath.$ext');
+                        final result = await ImageGallerySaver.saveFile('$savePath.$ext', isReturnPathOfIOS: Platform.isIOS);
+                        if (!result['isSuccess']) {
+                          throw Error();
                         }
-                      },
-                    ))))
+                        T.success(L.TOAST_IMAGE_SAVE_OK, bg: colors.success);
+                        file.delete();
+                      } else {
+                        T.error('Nelze uložit. Povolte ukládání, prosím.', bg: colors.danger);
+                      }
+                    } on UnsupportedDownloadFormatException catch (exception) {
+                      T.error(exception.message, bg: colors.danger);
+                    } catch (error) {
+                      T.error(L.TOAST_IMAGE_SAVE_ERROR, bg: colors.danger);
+                      Sentry.captureException(error);
+                      print((error as Error).stackTrace);
+                    } finally {
+                      setState(() => _saving = false);
+                    }
+                  },
+                )))
       ],
     );
   }
