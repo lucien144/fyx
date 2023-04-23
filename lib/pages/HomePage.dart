@@ -140,7 +140,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     ];
 
     return WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: () async => true,
       child: Stack(children: [
         Positioned.fill(
           // Do not prevent the scroll down if the submenu is up. Only hide the submenu and keep scrolling...
