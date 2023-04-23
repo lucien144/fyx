@@ -55,9 +55,12 @@ class T {
     try {
       var encodedUri = Uri.parse(link);
 
-      var canLaunch = await canLaunchUrl(encodedUri);
-      if (!canLaunch) {
-        throw ('Cannot launch url: $link');
+      // canLaunchUrl returns false on Android, if app handling the http(s) url is installed, even though launchUrl works afterwards
+      if (encodedUri.scheme != 'https' && encodedUri.scheme != 'http') {
+        var canLaunch = await canLaunchUrl(encodedUri);
+        if (!canLaunch) {
+          throw ('Cannot launch url: $link');
+        }
       }
 
       var status = await launchUrl(encodedUri, mode: mode.original);
