@@ -17,7 +17,7 @@ class SearchNotFound extends StatelessWidget {
           L.GENERAL_EMPTY,
           textAlign: TextAlign.center,
         ),
-        Image.asset('travolta.gif')
+        Image.asset('assets/travolta.gif')
         ],
         ),
       ),

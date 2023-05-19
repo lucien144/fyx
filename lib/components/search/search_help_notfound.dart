@@ -10,7 +10,7 @@ class SearchHelpNotFound extends StatelessWidget {
       Text('Nic nebylo nalezeno.', style: TextStyle(fontWeight: FontWeight.bold),),
       const SizedBox(height: 10,),
       Image.asset(
-        'philosoraptor.png',
+        'assets/philosoraptor.png',
         width: 56,
       ),
       Text('Pokud nebylo nic nalezeno, znamená to,\nže nic neexistuje?\n\nPak by ale něco nalezeno být mělo, nebo ne?', textAlign: TextAlign.center,)
