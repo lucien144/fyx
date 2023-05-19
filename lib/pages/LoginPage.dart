@@ -188,7 +188,7 @@ class _LoginPageState extends State<LoginPage> {
                       // TODO: Refactor 👇? This is edge case usage...
                       ApiController().provider.setCredentials(credentials);
                       MainRepository().credentials = credentials;
-                      Navigator.of(context).pushNamed('/home');
+                      Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
                     }
                   }).whenComplete(() {
                     setState(() => _isRunning = false);

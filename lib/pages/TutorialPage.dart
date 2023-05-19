@@ -75,7 +75,7 @@ class _TutorialPageState extends State<TutorialPage> {
                     setState(() => _loggingIn = true);
                     ApiController().getCredentials().then((credentials) {
                       MainRepository().credentials = credentials!;
-                      Navigator.of(context).pushNamedAndRemoveUntil('/home', ModalRoute.withName('/'));
+                      Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
                     }).catchError((error) => onError(error));
                   })
                 : slideButton(L.TUTORIAL_NYX,
