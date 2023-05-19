@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/shims/dart_ui.dart';
 import 'package:fyx/components/post/advertisement.dart';
 import 'package:fyx/components/post/dice.dart';
 import 'package:fyx/components/post/poll.dart';
