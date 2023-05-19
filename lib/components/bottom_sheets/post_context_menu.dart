@@ -19,6 +19,7 @@ import 'package:fyx/model/reponses/OkResponse.dart';
 import 'package:fyx/model/reponses/PostRatingsResponse.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
+import 'package:fyx/pages/search_page.dart';
 import 'package:fyx/state/batch_actions_provider.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
@@ -224,7 +225,13 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
             Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(post.idKlub, filterByUser: post.nick));
             AnalyticsProvider().logEvent('filter_user_posts');
           }),
-        //gridItem('Vyhledat příspěvky', MdiIcons.accountSearch),
+        if (isPost)
+          gridItem('Vyhledat příspěvky\n@${post.nick}', MdiIcons.accountSearchOutline, onTap: () {
+            Navigator.of(context).pop();
+            var arguments = SearchPageArguments(searchTerm: '@${post.nick}');
+            Navigator.of(context, rootNavigator: true).pushNamed('/search', arguments: arguments);
+            AnalyticsProvider().logEvent('filter_user_discussions');
+          }),
         gridItem(L.POST_SHEET_COPY_LINK, MdiIcons.link, onTap: () {
           var data = ClipboardData(text: widget.item.link);
           Clipboard.setData(data).then((_) {
