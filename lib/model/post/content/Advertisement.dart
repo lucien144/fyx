@@ -89,6 +89,8 @@ class ContentAdvertisement extends Content {
 
   String get summary => _summary;
 
+  String get link => 'https://nyx.cz/discussion/${this.discussionId}';
+
   AdStateEnum get state {
     switch (_state) {
       case 'active':

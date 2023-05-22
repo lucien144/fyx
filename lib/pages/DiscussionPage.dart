@@ -323,7 +323,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                         FloatingActionButton(
                           backgroundColor: colors.primary,
                           foregroundColor: colors.background,
-                          child: Icon(Icons.add),
+                          child: Icon(discussionResponse.discussion.advertisement != null ? MdiIcons.reply : MdiIcons.plus),
                           onPressed: () => Navigator.of(context).pushNamed('/new-message',
                               arguments: NewMessageSettings(
                                   onClose: this.refresh,
