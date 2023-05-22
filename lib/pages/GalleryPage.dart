@@ -101,15 +101,20 @@ class _GalleryPageState extends State<GalleryPage> {
                       close(context);
                     },
                     child: CachedNetworkImage(
+                        fadeInDuration: Duration.zero,
+                        fadeOutDuration: Duration.zero,
+                        progressIndicatorBuilder: (context, url, progress) => Center(
+                              child: Container(
+                                width: 40.0,
+                                height: 40.0,
+                                child: CircularProgressIndicator(value: progress.progress, color: colors.primary),
+                              ),
+                            ),
                         imageUrl: _arguments!.images[index].image,
                         cacheManager: CacheManager(Config(_arguments!.images[index].thumb, stalePeriod: const Duration(days: 7)))),
                   ));
             },
             itemCount: _arguments!.images.length,
-            loadingBuilder: (context, chunkEvent) => CupertinoActivityIndicator(
-              color: colors.primary,
-              radius: 16,
-            ),
             onPageChanged: (i) => setState(() => _page = i + 1),
           ),
         ),
