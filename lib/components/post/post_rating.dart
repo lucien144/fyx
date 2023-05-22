@@ -103,7 +103,7 @@ class _PostRatingState extends State<PostRating> {
                     ? null
                     : () {
                         setState(() => _givingRating = true);
-                        ApiController().giveRating(_post!.idKlub, _post!.id, positive: false, remove: _post!.myRating == 'negative').then((response) {
+                        ApiController().giveRating(_post!.idKlub, _post!.id, positive: false, remove: _post!.myRating.startsWith('negative')).then((response) {
                           if (response.needsConfirmation) {
                             showCupertinoDialog(
                               context: context,
