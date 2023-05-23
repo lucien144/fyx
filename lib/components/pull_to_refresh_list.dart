@@ -95,7 +95,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
 
     () async {
       await Future.delayed(Duration.zero);
-      _controller.parentController = PrimaryScrollController.of(context)!;
+      _controller.parentController = PrimaryScrollController.of(context);
 
       slideController = AnimationController(vsync: this, duration: Duration(milliseconds: 600));
       slideOffset = Tween<Offset>(begin: Offset(0.0, 1.0), end: Offset.zero).animate(slideController);

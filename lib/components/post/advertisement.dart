@@ -116,7 +116,7 @@ class Advertisement extends StatelessWidget {
                               hasInputField: true,
                               inputFieldPlaceholder: this.username,
                               messageFieldPlaceholder: '${content.link}\n',
-                              onClose: () => T.success('👍 Zpráva poslána.', bg: colors!.success),
+                              onClose: () => T.success('👍 Zpráva poslána.', bg: colors.success),
                               onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
                                 if (inputField == null) return false;
 
@@ -148,7 +148,7 @@ class Advertisement extends StatelessWidget {
                     onTap: () {
                       var data = ClipboardData(text: content.link);
                       Clipboard.setData(data).then((_) {
-                        T.success(L.TOAST_COPIED, bg: colors!.success);
+                        T.success(L.TOAST_COPIED, bg: colors.success);
                         Navigator.pop(context);
                       });
                       AnalyticsProvider().logEvent('copyLink / ad');
