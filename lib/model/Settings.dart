@@ -21,4 +21,5 @@ class Settings {
   double fontSize = 16;
   FirstUnreadEnum firstUnread = FirstUnreadEnum.button;
   LaunchModeEnum linksMode = LaunchModeEnum.externalApplication;
+  String whatsNew = '';
 }

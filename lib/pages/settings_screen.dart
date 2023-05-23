@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/FyxApp.dart';
+import 'package:fyx/components/WhatsNew.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
@@ -16,6 +17,7 @@ import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -127,8 +129,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       },
                       initialValue: _quickRating,
                       leading: Icon(MdiIcons.thumbsUpDown, color: colors.grey),
-                      title: Text('Rychlé hodnocení')
-                  ),
+                      title: Text('Rychlé hodnocení')),
                   SettingsTile.switchTile(
                     onToggle: (bool value) {
                       setState(() => _compactMode = value);
@@ -139,8 +140,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     title: Text('Kompaktní zobrazení'),
                     description: Text(
                       'Kompaktní zobrazení: zobrazuje obrázky po stranách pokud to obsah příspěvku dovoluje (nedojde tak k narušení kontextu).'
-                          '\n'
-                          'Rychlé hodnocení: možnost hodnotit příspěvek na dvojklik (double-tap).',
+                      '\n'
+                      'Rychlé hodnocení: možnost hodnotit příspěvek na dvojklik (double-tap).',
                     ),
                   ),
                 ],
@@ -275,6 +276,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onPressed: (_) {
                     T.openLink('https://nyx.cz/terms', mode: _linksMode);
                     AnalyticsProvider().logEvent('openTerms');
+                  },
+                ),
+                SettingsTile.navigation(
+                  leading: Icon(MdiIcons.star, color: colors.grey),
+                  title: Text('Co je nového v této verzi?'),
+                  onPressed: (_) {
+                    showCupertinoModalBottomSheet(context: context, expand: false, builder: (context) => WhatsNew());
+                    AnalyticsProvider().logEvent('openWhatsNew');
                   },
                 )
               ]),

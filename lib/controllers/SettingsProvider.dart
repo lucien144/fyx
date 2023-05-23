@@ -33,6 +33,12 @@ class SettingsProvider {
     _settings.fontSize = fontSize;
   }
 
+  String get whatsNew => _settings.whatsNew;
+  set whatsNew(String whatsNew) {
+    _box.put('whatsNew', whatsNew);
+    _settings.whatsNew = whatsNew;
+  }
+
   DefaultView get defaultView => _settings.defaultView;
   set defaultView(DefaultView view) {
     _box.put('defaultView', view);
@@ -107,6 +113,7 @@ class SettingsProvider {
     _settings.firstUnread = _box.get('firstUnread', defaultValue: Settings().firstUnread);
     _settings.skin = _box.get('skin', defaultValue: Settings().skin);
     _settings.linksMode = _box.get('linksMode', defaultValue: Settings().linksMode);
+    _settings.whatsNew = _box.get('whatsNew', defaultValue: Settings().whatsNew);
 
     return _singleton;
   }
