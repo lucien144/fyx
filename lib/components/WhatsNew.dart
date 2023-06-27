@@ -96,7 +96,7 @@ class WhatsNew extends StatelessWidget {
           title: 'Opravy a drobná vylepšení.',
           description:
               'Nehlasovat v anketě, neresetovat hodnocení při změně palečků, krátký spoiler, ikona přečteno v pošte, odpověď na inzerát a další...'),
-      CupertinoButton(child: Text('Pokračovat'), onPressed: () => Navigator.of(context).pop(), color: colors.primary)
+      CupertinoButton(child: Text('Pokračovat', style: TextStyle(color: colors.background),), onPressed: () => Navigator.of(context).pop(), color: colors.primary)
     ]);
   }
 }
