@@ -222,7 +222,7 @@ class PostHtml extends StatelessWidget {
         // Search click through
         var searchTerm = Helpers.parseSearchUri(link);
         if (searchTerm != null) {
-          var arguments = SearchPageArguments(searchTerm: searchTerm);
+          var arguments = SearchPageArguments(searchTerm: searchTerm, focus: false);
           Navigator.of(context.buildContext, rootNavigator: true).pushNamed('/search', arguments: arguments);
           return;
         }

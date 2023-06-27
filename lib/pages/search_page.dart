@@ -15,8 +15,9 @@ import 'package:fyx/pages/DiscussionPage.dart';
 
 class SearchPageArguments {
   final String? searchTerm;
+  final bool focus;
 
-  SearchPageArguments({this.searchTerm});
+  SearchPageArguments({this.searchTerm, this.focus = true});
 }
 
 class SearchPage extends StatefulWidget {
@@ -58,7 +59,7 @@ class _SearchPageState extends State<SearchPage> {
         child: PullToRefreshList(
             emptyWidget: emptyWidget,
             searchEnabled: true,
-            searchFocus: true,
+            searchFocus: pageArguments?.focus ?? true,
             searchLabel: 'Hledej v příspěvcích...',
             searchTerm: this._searchTerm,
             onSearch: (term) {

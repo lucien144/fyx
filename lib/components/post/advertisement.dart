@@ -138,7 +138,7 @@ class Advertisement extends StatelessWidget {
                     icon: MdiIcons.accountSearchOutline,
                     onTap: () {
                       Navigator.of(context).pop();
-                      var arguments = SearchPageArguments(searchTerm: '@${this.username}');
+                      var arguments = SearchPageArguments(searchTerm: '@${this.username}', focus: false);
                       Navigator.of(context, rootNavigator: true).pushNamed('/search', arguments: arguments);
                       AnalyticsProvider().logEvent('filter_user_discussions / ad');
                     }),

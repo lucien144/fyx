@@ -205,7 +205,7 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
         if (isPost)
           gridItem('Vyhledat příspěvky\n@${post.nick}', MdiIcons.accountSearchOutline, onTap: () {
             Navigator.of(context).pop();
-            var arguments = SearchPageArguments(searchTerm: '@${post.nick}');
+            var arguments = SearchPageArguments(searchTerm: '@${post.nick}', focus: false);
             Navigator.of(context, rootNavigator: true).pushNamed('/search', arguments: arguments);
             AnalyticsProvider().logEvent('filter_user_discussions');
           }),

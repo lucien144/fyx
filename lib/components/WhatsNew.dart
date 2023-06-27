@@ -87,15 +87,15 @@ class WhatsNew extends StatelessWidget {
           description: 'Další novinkou je fulltextové hledání příspěvků napříč Nyxem. Hledání je dostupné z hlavního menu.',
           action: new WhatsNewAction(action: () {
             Navigator.of(context).pop();
-            var arguments = SearchPageArguments(searchTerm: 'fyx');
+            var arguments = SearchPageArguments(searchTerm: MainRepository().credentials!.nickname, focus: false);
             Navigator.of(context, rootNavigator: true).pushNamed('/search', arguments: arguments);
-          }, label: 'Chci si vyzkoušet hledání.')),
+          }, label: 'Vyzkoušet hledání.')),
       item(
           context: context,
           icon: MdiIcons.bug,
           title: 'Opravy a drobná vylepšení.',
           description:
-              'Nehlasovat v anketě, neresetovat hodnocení při mínusu, krátký spoiler, ikona přečteno v pošte, odpověď na inzerát a další...'),
+              'Nehlasovat v anketě, neresetovat hodnocení při změně palečků, krátký spoiler, ikona přečteno v pošte, odpověď na inzerát a další...'),
       CupertinoButton(child: Text('Pokračovat'), onPressed: () => Navigator.of(context).pop(), color: colors.primary)
     ]);
   }
