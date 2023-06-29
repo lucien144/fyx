@@ -77,25 +77,9 @@ class WhatsNew extends StatelessWidget {
       SizedBox(height: 24),
       item(
           context: context,
-          icon: MdiIcons.imageAlbum,
-          title: 'Změny v galerii.',
-          description: 'Galerie se nově zavírá zahozením obrázku. Zoom by měl fungovat lépe. Na klik se schovají vešekré UI elementy.'),
-      item(
-          context: context,
-          icon: MdiIcons.magnify,
-          title: 'Fulltextové hledání.',
-          description: 'Další novinkou je fulltextové hledání příspěvků napříč Nyxem. Hledání je dostupné z hlavního menu.',
-          action: new WhatsNewAction(action: () {
-            Navigator.of(context).pop();
-            var arguments = SearchPageArguments(searchTerm: MainRepository().credentials!.nickname, focus: false);
-            Navigator.of(context, rootNavigator: true).pushNamed('/search', arguments: arguments);
-          }, label: 'Vyzkoušet hledání.')),
-      item(
-          context: context,
-          icon: MdiIcons.bug,
-          title: 'Opravy a drobná vylepšení.',
-          description:
-              'Nehlasovat v anketě, neresetovat hodnocení při změně palečků, krátký spoiler, ikona přečteno v pošte, odpověď na inzerát a další...'),
+          icon: MdiIcons.blur,
+          title: 'NSFW posty.',
+          description: 'Diskuze si můžete označit jako NSFW, což rozmaže náhledy obrázků.\nHappy safe for work browsing!'),
       CupertinoButton(child: Text('Pokračovat', style: TextStyle(color: colors.background),), onPressed: () => Navigator.of(context).pop(), color: colors.primary)
     ]);
   }
