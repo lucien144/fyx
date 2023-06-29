@@ -22,10 +22,11 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 
 class PostHtml extends StatelessWidget {
   final Content? content;
+  final bool blur;
   bool _isImageTap = false;
 
   /// overloadRaw - if true, the content.rawBody is used to parse no matter what settings is on.
-  PostHtml(this.content);
+  PostHtml(this.content, {this.blur = false});
 
   @override
   Widget build(BuildContext context) {
@@ -109,6 +110,7 @@ class PostHtml extends StatelessWidget {
               openGallery: openGallery,
               onTap: () => openGallery ? _isImageTap = true : null,
               crop: false,
+              blur: blur,
             ),
           );
         },
@@ -167,6 +169,7 @@ class PostHtml extends StatelessWidget {
                     thumb: img.attributes['src']!),
                 size: Size(double.infinity, MediaQuery.of(context).size.width * (0.5)),
                 showStrip: false,
+                blur: blur,
               ),
             );
           }

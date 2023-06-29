@@ -241,9 +241,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         }),
                   ),
                   SettingsTile(
+                    title: Text('NSFW diskzuzí'),
+                    trailing: ValueListenableBuilder(
+                        valueListenable: MainRepository().settings.box.listenable(keys: ['nsfwDiscussionList']),
+                        builder: (BuildContext context, value, Widget? child) {
+                          return Text(
+                            MainRepository().settings.nsfwDiscussionList.length.toString(),
+                            style: TextStyle(color: colors.text, fontSize: Settings().fontSize),
+                          );
+                        }),
+                  ),
+                  SettingsTile(
                       title: Text('Resetovat', style: TextStyle(color: colors.danger), textAlign: TextAlign.center),
                       onPressed: (_) {
                         MainRepository().settings.resetBlockedContent();
+                        MainRepository().settings.resetNsfwDiscussion();
                         T.success(L.SETTINGS_CACHE_RESET, bg: colors.success);
                         AnalyticsProvider().logEvent('resetBlockedContent');
                       }),

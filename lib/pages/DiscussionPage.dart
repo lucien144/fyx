@@ -21,6 +21,7 @@ import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/pages/discussion_home_page.dart';
 import 'package:fyx/state/batch_actions_provider.dart';
+import 'package:fyx/state/nsfw_provider.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -446,6 +447,22 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                                     width: 10,
                                   ),
                                   Expanded(child: Icon(this._searchTerm == null ? MdiIcons.magnify : MdiIcons.magnifyRemoveOutline)),
+                                ],
+                              ),
+                            ),
+                            Divider(
+                              color: colors.grey,
+                              height: 26,
+                            ),
+                            GestureDetector(
+                              onTap: () => ref.read(NsfwDiscussionList.provider.notifier).toggle(pageArguments.discussionId, discussionResponse.discussion.nameMain),
+                              child: Row(
+                                children: [
+                                  Text(!ref.watch(NsfwDiscussionList.provider).containsKey(pageArguments.discussionId) ? 'Zapnout NSFW' : 'Vypnout NSFW', style: textStyleContext),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Expanded(child: Icon(!ref.watch(NsfwDiscussionList.provider).containsKey(pageArguments.discussionId) ? MdiIcons.blur : MdiIcons.blurOff)),
                                 ],
                               ),
                             ),

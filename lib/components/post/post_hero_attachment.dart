@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -23,11 +25,12 @@ class PostHeroAttachment extends StatelessWidget {
   final bool _crop;
   final Function? _onTap;
   final bool _openGallery;
+  final bool blur;
   Size size;
   bool showStrip;
 
   PostHeroAttachment(this.attachment,
-      {images = const <model.Image>[], crop = true, this.showStrip = true, this.size = const Size(100, 100), onTap, openGallery = true})
+      {images = const <model.Image>[], crop = true, this.showStrip = true, this.size = const Size(100, 100), onTap, openGallery = true, this.blur = false})
       : this._crop = crop,
         this._onTap = onTap,
         this._openGallery = openGallery,
@@ -87,15 +90,20 @@ class PostHeroAttachment extends StatelessWidget {
         },
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8),
-          child: CachedNetworkImage(
-            alignment: Alignment.topLeft,
-            imageUrl: attachment.thumb,
-            placeholder: (context, url) => CupertinoActivityIndicator(),
-            errorWidget: (context, url, error) => Icon(Icons.error),
-            fit: BoxFit.cover,
-            width: _crop ? size.width : null,
-            height: _crop ? size.height : null,
-            cacheManager: CacheManager(Config(attachment.thumb, stalePeriod: const Duration(days: 7))),
+          child: Stack(
+            children: [
+              CachedNetworkImage(
+                alignment: Alignment.topLeft,
+                imageUrl: attachment.thumb,
+                placeholder: (context, url) => CupertinoActivityIndicator(),
+                errorWidget: (context, url, error) => Icon(Icons.error),
+                fit: BoxFit.cover,
+                width: _crop ? size.width : null,
+                height: _crop ? size.height : null,
+                cacheManager: CacheManager(Config(attachment.thumb, stalePeriod: const Duration(days: 7))),
+              ),
+              if (blur) Positioned.fill(child: BackdropFilter(filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), child: Container()))
+            ],
           ),
         ),
       );

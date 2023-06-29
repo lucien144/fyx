@@ -16,6 +16,7 @@ class Settings {
   List<int> blockedPosts = [];
   List<int> blockedMails = [];
   List<String> blockedUsers = [];
+  Map<int, String> nsfwDiscussionList = {};
   ThemeEnum theme = ThemeEnum.system;
   SkinEnum skin = SkinEnum.fyx;
   double fontSize = 16;

@@ -15,6 +15,7 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/state/batch_actions_provider.dart';
+import 'package:fyx/state/nsfw_provider.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
@@ -113,6 +114,7 @@ class _PostListItemState extends ConsumerState<PostListItem> {
             isPreview: widget._isPreview,
             isHighlighted: widget._isHighlighted,
             isSelected: isSelected,
+            blur: ref.watch(NsfwDiscussionList.provider).containsKey(_post!.idKlub),
             topLeftWidget: PostAvatar(
               _post!.nick,
               descriptionWidget: Row(

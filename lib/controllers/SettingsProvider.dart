@@ -4,6 +4,7 @@ import 'package:fyx/model/enums/FirstUnreadEnum.dart';
 import 'package:fyx/model/enums/LaunchModeEnum.dart';
 import 'package:fyx/model/enums/SkinEnum.dart';
 import 'package:fyx/model/enums/ThemeEnum.dart';
+import 'package:fyx/state/nsfw_provider.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -87,6 +88,8 @@ class SettingsProvider {
 
   List get blockedUsers => _box.get('blockedUsers', defaultValue: Settings().blockedUsers);
 
+  Map get nsfwDiscussionList => _box.get('nsfwDiscussionList', defaultValue: Settings().nsfwDiscussionList);
+
   factory SettingsProvider() {
     return _singleton;
   }
@@ -152,5 +155,24 @@ class SettingsProvider {
       blockedUsers.add(user);
     }
     _box.put('blockedUsers', blockedUsers);
+  }
+
+  void toggleNsfwDiscussion(int id, String name) {
+    Map list = _box.get('nsfwDiscussionList', defaultValue: Settings().nsfwDiscussionList);
+    if (this.isNsfw(id)) {
+      list.remove(id);
+    } else {
+      list[id] = name;
+    }
+    _box.put('nsfwDiscussionList', list);
+  }
+
+  void resetNsfwDiscussion() {
+    _box.delete('nsfwDiscussionList');
+  }
+
+  bool isNsfw(int id) {
+    Map list = _box.get('nsfwDiscussionList', defaultValue: Settings().nsfwDiscussionList);
+    return list.containsKey(id);
   }
 }

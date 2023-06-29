@@ -32,6 +32,7 @@ class ContentBoxLayout extends StatelessWidget {
   final bool isSelected;
   final Map<LAYOUT_TYPES, TLayout> _layoutMap = {};
   final VoidCallback? onTap;
+  final bool blur;
 
   ContentBoxLayout(
       {required this.topLeftWidget,
@@ -41,6 +42,7 @@ class ContentBoxLayout extends StatelessWidget {
       required this.content,
       isPreview = false,
       isHighlighted = false,
+      this.blur = false,
       this.onTap})
       : _isPreview = isPreview,
         _isHighlighted = isHighlighted {
@@ -49,7 +51,7 @@ class ContentBoxLayout extends StatelessWidget {
         LAYOUT_TYPES.textOnly,
         () => () {
               if (content.strippedContent.isNotEmpty && content.attachments.isEmpty) {
-                return PostHtml(content);
+                return PostHtml(content, blur: blur);
               }
               return null;
             });
@@ -65,6 +67,7 @@ class ContentBoxLayout extends StatelessWidget {
                 content.images[0],
                 images: content.images,
                 crop: false,
+                blur: blur,
               );
             });
 
@@ -77,7 +80,7 @@ class ContentBoxLayout extends StatelessWidget {
 
               var children = <Widget>[];
               content.attachments.forEach((attachment) {
-                children.add(PostHeroAttachment(attachment, images: content.images));
+                children.add(PostHeroAttachment(attachment, images: content.images, blur: blur,));
               });
 
               return Wrap(children: children, spacing: 8, alignment: WrapAlignment.start);
@@ -92,17 +95,18 @@ class ContentBoxLayout extends StatelessWidget {
 
               // If there are NOT consecutive images, do not display the post with hero attachment and render it from raw HTML body instead.
               if (!content.consecutiveImages) {
-                return PostHtml(content);
+                return PostHtml(content, blur: blur);
               }
 
               var children = <Widget>[];
               children.add(Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Expanded(child: PostHtml(content)),
+                  Expanded(child: PostHtml(content, blur: blur)),
                   PostHeroAttachment(
                     content.attachmentsWithFeatured['featured'],
                     images: content.images,
+                    blur: blur,
                   )
                 ],
               ));
@@ -116,6 +120,7 @@ class ContentBoxLayout extends StatelessWidget {
                           attachment,
                           images: content.images,
                           size: Size(50, 50),
+                          blur: blur,
                         ));
                   }).toList();
                   return Row(children: children, mainAxisAlignment: MainAxisAlignment.start);
@@ -225,7 +230,7 @@ class ContentBoxLayout extends StatelessWidget {
       case PostTypeEnum.dice:
         return Dice(content as ContentDice);
       case PostTypeEnum.text:
-        return PostHtml(content);
+        return PostHtml(content, blur: blur);
       case PostTypeEnum.advertisement:
         return Advertisement(content as ContentAdvertisement);
       default:
