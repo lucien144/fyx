@@ -180,7 +180,11 @@ class ApiController {
   }
 
   Future<Response> last() async {
-    return await provider.last();
+    return await provider.fetchLast();
+  }
+
+  Future<Response> reminders() async {
+    return await provider.fetchReminders();
   }
 
   Future<Response> bookmarkDiscussion(int discussionId, bool state) async {

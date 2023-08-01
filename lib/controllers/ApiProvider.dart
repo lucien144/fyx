@@ -118,8 +118,12 @@ class ApiProvider implements IApiProvider {
     return await dio.get('$URL/search', queryParameters: params);
   }
 
-  Future<Response> last() async {
+  Future<Response> fetchLast() async {
     return await dio.get('$URL/last');
+  }
+
+  Future<Response> fetchReminders() async {
+    return await dio.get('$URL/bookmarks/reminders');
   }
 
   Future<Response> fetchBookmarks() async {

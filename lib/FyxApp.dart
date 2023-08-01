@@ -24,6 +24,7 @@ import 'package:fyx/pages/NoticesPage.dart';
 import 'package:fyx/pages/TutorialPage.dart';
 import 'package:fyx/pages/discussion_home_page.dart';
 import 'package:fyx/pages/last_page.dart';
+import 'package:fyx/pages/reminders_page.dart';
 import 'package:fyx/pages/search_page.dart';
 import 'package:fyx/pages/settings_design_screen.dart';
 import 'package:fyx/pages/settings_screen.dart';
@@ -184,6 +185,9 @@ class FyxApp extends StatefulWidget {
       case '/last':
         print('[Router] Last');
         return CupertinoPageRoute(builder: (_) => LastPage(), settings: settings);
+      case '/reminders':
+        print('[Router] Reminders');
+        return CupertinoPageRoute(builder: (_) => RemindersPage(), settings: settings);
       default:
         print('[Router] Discussion');
         return CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings);

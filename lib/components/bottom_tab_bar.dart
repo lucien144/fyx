@@ -103,20 +103,18 @@ class _BottomTabBarState extends State<BottomTabBar> {
                     )),
               ),
               Expanded(
-                  child: Opacity(
-                opacity: .35,
-                child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    child: Column(
-                      children: [
-                        Icon(MdiIcons.pinOutline, size: 34, color: colors.grey),
-                        Text(
-                          'Uložené',
-                          style: TextStyle(fontSize: 11, color: colors.grey),
-                        )
-                      ],
-                    )),
-              )),
+                  child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => Navigator.of(context).pushNamed('/reminders'),
+                      child: Column(
+                        children: [
+                          Icon(MdiIcons.pinOutline, size: 34, color: colors.grey),
+                          Text(
+                            'Uložené',
+                            style: TextStyle(fontSize: 11, color: colors.grey),
+                          )
+                        ],
+                      ))),
               Expanded(
                 child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
