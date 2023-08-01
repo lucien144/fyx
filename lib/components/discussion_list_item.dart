@@ -3,9 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/components/discussion_list_item_base.dart';
+import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/model/BookmarkedDiscussion.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class DiscussionListItem extends StatelessWidget {
   final BookmarkedDiscussion discussion;
@@ -44,8 +46,9 @@ class DiscussionListItem extends StatelessWidget {
               width: 8,
             ),
             Expanded(child: Text(discussion.name, overflow: TextOverflow.ellipsis)),
-            Visibility(visible: discussion.links > 0, child: Icon(Icons.link)),
-            Visibility(visible: discussion.images > 0, child: Icon(Icons.image)),
+            Visibility(visible: SettingsProvider().isNsfw(this.discussion.idKlub), child: Icon(MdiIcons.chiliHot)),
+            Visibility(visible: discussion.links > 0, child: Icon(MdiIcons.link)),
+            Visibility(visible: discussion.images > 0, child: Icon(MdiIcons.image)),
           ],
         ));
   }

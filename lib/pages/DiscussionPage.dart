@@ -462,7 +462,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                                   SizedBox(
                                     width: 10,
                                   ),
-                                  Expanded(child: Icon(!ref.watch(NsfwDiscussionList.provider).containsKey(pageArguments.discussionId) ? MdiIcons.blur : MdiIcons.blurOff)),
+                                  Expanded(child: Icon(!ref.watch(NsfwDiscussionList.provider).containsKey(pageArguments.discussionId) ? MdiIcons.chiliHot : MdiIcons.chiliOff)),
                                 ],
                               ),
                             ),
