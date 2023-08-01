@@ -77,9 +77,19 @@ class WhatsNew extends StatelessWidget {
       SizedBox(height: 24),
       item(
           context: context,
-          icon: MdiIcons.blur,
-          title: 'NSFW posty.',
-          description: 'Diskuze si můžete označit jako NSFW, což rozmaže náhledy obrázků.\nHappy safe for work browsing!'),
+          icon: MdiIcons.flashOutline,
+          title: 'Poslední příspěvky',
+          description: 'Oblíbená sekce s posledními příspěvky z Nyxu konečně ve Fyxu! Filtry brzy...'),
+      item(
+          context: context,
+          icon: MdiIcons.pinOutline,
+          title: 'Uložené příspěvky',
+          description: 'Seznam vašich uložených příspěvků (neboli upomínek).'),
+      item(
+          context: context,
+          icon: MdiIcons.chiliHot,
+          title: 'Peprné posty',
+          description: 'Diskuze si můžete označit jako peprnou, což rozmaže náhledy obrázků. Obrázky se po rozkliku zobrazí normálně.'),
       CupertinoButton(child: Text('Pokračovat', style: TextStyle(color: colors.background),), onPressed: () => Navigator.of(context).pop(), color: colors.primary)
     ]);
   }
