@@ -23,6 +23,7 @@ import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/pages/NoticesPage.dart';
 import 'package:fyx/pages/TutorialPage.dart';
 import 'package:fyx/pages/discussion_home_page.dart';
+import 'package:fyx/pages/last_page.dart';
 import 'package:fyx/pages/search_page.dart';
 import 'package:fyx/pages/settings_design_screen.dart';
 import 'package:fyx/pages/settings_screen.dart';
@@ -180,6 +181,9 @@ class FyxApp extends StatefulWidget {
       case '/search':
         print('[Router] Search');
         return CupertinoPageRoute(builder: (_) => SearchPage(), settings: settings);
+      case '/last':
+        print('[Router] Last');
+        return CupertinoPageRoute(builder: (_) => LastPage(), settings: settings);
       default:
         print('[Router] Discussion');
         return CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings);

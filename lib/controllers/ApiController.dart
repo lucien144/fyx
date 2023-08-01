@@ -179,6 +179,10 @@ class ApiController {
     return await provider.search(term, lastId: lastId);
   }
 
+  Future<Response> last() async {
+    return await provider.last();
+  }
+
   Future<Response> bookmarkDiscussion(int discussionId, bool state) async {
     return await provider.bookmarkDiscussion(discussionId, state);
   }
