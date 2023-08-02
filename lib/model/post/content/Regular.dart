@@ -158,11 +158,26 @@ class ContentRegular extends Content {
   /// -> Solved. It's the Nyx API. It wraps all images into the <a> tag with full image and replaces the img with thumbnail.
   void _parseAttachedImages() {
     try {
-      Document document = parse(_body);
 
-      RegExp reg = RegExp(r'^((?!<img).)*(((<a([^>]*?)>)?(\s*)<img([^>]*?)>(\s*)(<\/\s*a\s*>)?(\s*(\s*<\s*br\s*\/?\s*>\s*)*\s*))*)$',
-          caseSensitive: false, dotAll: true);
-      _consecutiveImages = reg.hasMatch(_body);
+      // Check if consecutive images
+      Document testDocument = parse(_body);
+      Document document = parse(_body);
+      List<Element> imgTags = testDocument.querySelectorAll('img');
+      imgTags.forEach((imgTag) {
+        // Check if the <img> tag is inside an <a> tag
+        if (imgTag.parent != null && imgTag.parent?.localName == 'a') {
+          imgTag.parent?.remove();
+        } else {
+          imgTag.remove();
+        }
+      });
+      List<Element> whitespaceTags = testDocument.querySelectorAll('br');
+      whitespaceTags.forEach((whitespaceTag) {
+        whitespaceTag.remove();
+      });
+      String start = testDocument.body!.innerHtml.replaceAll(new RegExp(r"\s|\n|\r|\t"), "");
+      String cleanedBody = document.body!.innerHtml.replaceAll(new RegExp(r"\s|\n|\r|\t"), "");
+      _consecutiveImages = cleanedBody.startsWith(start);
 
       document.querySelectorAll('img[src]').forEach((Element el) {
         var image = el.attributes['src'] ?? '';
