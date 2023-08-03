@@ -222,6 +222,18 @@ class ApiMock implements IApiProvider {
     // TODO: implement getPostRatings
     throw UnimplementedError();
   }
+
+  @override
+  Future<Response> fetchLast() {
+    // TODO: implement fetchLast
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> fetchReminders() {
+    // TODO: implement fetchReminders
+    throw UnimplementedError();
+  }
 }
 
 void main() {
