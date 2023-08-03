@@ -91,7 +91,7 @@ class _RemindersPageState extends State<RemindersPage> {
                                         mainAxisSize: MainAxisSize.max,
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Icon(MdiIcons.bookmark, size: 32),
+                                          Icon(MdiIcons.bookmarkMultipleOutline, size: 32),
                                           SizedBox(width: 4),
                                           Expanded(
                                             child: Padding(
