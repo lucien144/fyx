@@ -9,6 +9,8 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
+import 'package:fyx/theme/L.dart';
+import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
@@ -37,73 +39,82 @@ class _LastPageState extends State<LastPage> {
     final colors = Skin.of(context).theme.colors;
 
     return DiscussionPageScaffold(
-      title: 'Poslední',
-      child: PullToRefreshList(
-        rebuild: _refreshData,
-        isInfinite: true,
-        dataProvider: (lastId) async {
-          var response = await ApiController().last();
-          var posts = response.data['posts'] as List;
+        title: 'Poslední',
+        child: FutureBuilder(
+            future: ApiController().last(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return T.feedbackScreen(context,
+                    isWarning: true, title: snapshot.error.toString(), label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
+              } else if (snapshot.hasData) {
+                List posts = snapshot.data!.data['posts'];
+                return PullToRefreshList(
+                  rebuild: _refreshData,
+                  isInfinite: true,
+                  dataProvider: (lastId) async {
+                    int max = (lastId ?? 0) + 10;
+                    max = max >= posts.length ? posts.length : max;
 
-          List data = posts
-              .map((post) => Post.fromJson(post, post['discussion_id'], isCompact: MainRepository().settings.useCompactMode))
-              .where((post) => !MainRepository().settings.isPostBlocked(post.id))
-              .where((post) => !MainRepository().settings.isUserBlocked(post.nick))
-              .map((post) => Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Stack(children: [
-                        PostListItem(
-                          post,
-                          onUpdate: this.refreshData,
-                          disabled: true,
-                        ),
-                        Positioned.fill(
-                            child: GestureDetector(
-                                onTap: () {
-                                  var arguments = DiscussionPageArguments(post.idKlub, postId: post.id + 1);
-                                  Navigator.of(context, rootNavigator: true).pushNamed('/discussion', arguments: arguments);
-                                },
-                                behavior: HitTestBehavior.opaque,
-                                child: Container()))
-                      ]),
-                      if (post.discussionName != null)
-                        GestureDetector(
-                          onTap: () {
-                            var arguments = DiscussionPageArguments(post.idKlub);
-                            Navigator.of(context, rootNavigator: true).pushNamed('/discussion', arguments: arguments);
-                          },
-                          child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Icon(MdiIcons.bookmark, size: 32),
-                                  SizedBox(width: 4),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(top: 4),
-                                      child: Text(
-                                        post.discussionName!,
-                                        softWrap: true,
-                                        style: TextStyle(color: colors.primary, fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
+                    List data = posts
+                        .getRange(lastId ?? 0, max)
+                        .map((post) => Post.fromJson(post, post['discussion_id'], isCompact: MainRepository().settings.useCompactMode))
+                        .where((post) => !MainRepository().settings.isPostBlocked(post.id))
+                        .where((post) => !MainRepository().settings.isUserBlocked(post.nick))
+                        .map((post) => Column(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Stack(children: [
+                                  PostListItem(
+                                    post,
+                                    onUpdate: this.refreshData,
+                                    disabled: true,
                                   ),
-                                ],
-                              )),
-                        ),
-                    ],
-                  ))
-              .toList();
-
-          int? id = posts.length > 0 ? posts.last['id'] : null;
-          return DataProviderResult(data, lastId: id);
-        },
-      ),
-    );
+                                  Positioned.fill(
+                                      child: GestureDetector(
+                                          onTap: () {
+                                            var arguments = DiscussionPageArguments(post.idKlub, postId: post.id + 1);
+                                            Navigator.of(context, rootNavigator: true).pushNamed('/discussion', arguments: arguments);
+                                          },
+                                          behavior: HitTestBehavior.opaque,
+                                          child: Container()))
+                                ]),
+                                if (post.discussionName != null)
+                                  GestureDetector(
+                                    onTap: () {
+                                      var arguments = DiscussionPageArguments(post.idKlub);
+                                      Navigator.of(context, rootNavigator: true).pushNamed('/discussion', arguments: arguments);
+                                    },
+                                    child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.max,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Icon(MdiIcons.bookmarkMultipleOutline, size: 32),
+                                            SizedBox(width: 4),
+                                            Expanded(
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(top: 4),
+                                                child: Text(
+                                                  post.discussionName!,
+                                                  softWrap: true,
+                                                  style: TextStyle(color: colors.primary, fontWeight: FontWeight.bold),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        )),
+                                  ),
+                              ],
+                            ))
+                        .toList();
+                    return DataProviderResult(data, lastId: max);
+                  },
+                );
+              }
+              return T.feedbackScreen(context, isLoading: true);
+            }));
   }
 }
