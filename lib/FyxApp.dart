@@ -1,13 +1,16 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:fyx/SkinnedApp.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
+import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/libs/DeviceInfo.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
@@ -35,10 +38,11 @@ import 'package:fyx/theme/skin/skins/FyxSkin.dart';
 import 'package:fyx/theme/skin/skins/GreyMatterSkin.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
-import 'package:sentry/sentry.dart';
 import 'package:tap_canvas/tap_canvas.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'controllers/NotificationsService.dart';
+import 'libs/firebase_options.dart';
 
 enum Environment { dev, staging, production }
 
@@ -72,21 +76,15 @@ class FyxApp extends StatefulWidget {
   }
 
   static init() async {
-    await Firebase.initializeApp();
+    await dotenv.load();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform(dotenv.env),
+    );
 
-    // This must be initialized after WidgetsFlutterBinding.ensureInitialized
-    FlutterError.onError = (details, {bool forceReport = false}) {
-      try {
-        Sentry.captureException(
-          details.exception,
-          stackTrace: details.stack,
-        );
-      } catch (e) {
-        print('Sending report to sentry.io failed: $e');
-      } finally {
-        // Also use Flutter's pretty error logging to the device's console.
-        FlutterError.dumpErrorToConsole(details, forceReport: forceReport);
-      }
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
     };
 
     if (FyxApp.isProduction) {
@@ -106,9 +104,8 @@ class FyxApp extends StatefulWidget {
     MainRepository().deviceInfo = results[2] as DeviceInfo;
     MainRepository().settings = results[3] as SettingsProvider;
 
-    Sentry.configureScope(
-          (scope) => scope.setUser(SentryUser(username: MainRepository().credentials?.nickname)),
-    );
+    LogService.init(provider: FirebaseCrashlyticsProvider());
+    LogService.setUser(MainRepository().credentials?.nickname ?? 'unknown');
 
     _notificationsService = NotificationService(
       onToken: (fcmToken) => ApiController().registerFcmToken(fcmToken),
@@ -129,7 +126,7 @@ class FyxApp extends StatefulWidget {
     };
     _notificationsService.onError = (error) {
       print(error);
-      Sentry.captureException(error);
+      FirebaseCrashlytics.instance.recordError(error, null);
     };
     MainRepository().notifications = _notificationsService;
 

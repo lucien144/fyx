@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/model/enums/PostTypeEnum.dart';
 import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/Image.dart';
@@ -9,7 +10,6 @@ import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
-import 'package:sentry/sentry.dart';
 
 class ContentRegular extends Content {
   String _body;
@@ -116,7 +116,7 @@ class ContentRegular extends Content {
       _body = _body.replaceAllMapped(xmpTag, (match) => '<pre>${HtmlEscape().convert(match.group(1) ?? '')}</pre>'); // TODO: Improve performance?
       _rawBody = _rawBody.replaceAllMapped(xmpTag, (match) => '<pre>${HtmlEscape().convert(match.group(1) ?? '')}</pre>'); // TODO: Improve performance?
     } catch (error) {
-      Sentry.captureException(error, stackTrace: StackTrace.current);
+      LogService.captureError(error, stack: StackTrace.current);
     }
   }
 
@@ -190,7 +190,7 @@ class ContentRegular extends Content {
       });
       _body = document.body!.innerHtml;
     } catch (error) {
-      Sentry.captureException(error, stackTrace: StackTrace.current);
+      LogService.captureError(error, stack: StackTrace.current);
     }
   }
 
@@ -222,7 +222,7 @@ class ContentRegular extends Content {
         }
       });
     } catch (error) {
-      Sentry.captureException(error, stackTrace: StackTrace.current);
+      LogService.captureError(error, stack: StackTrace.current);
     }
   }
 }

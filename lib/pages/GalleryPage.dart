@@ -9,6 +9,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:fyx/components/post/post_hero_attachment.dart';
 import 'package:fyx/components/throw_it_away.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/exceptions/UnsupportedDownloadFormatException.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/L.dart';
@@ -21,7 +22,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
-import 'package:sentry/sentry.dart';
 
 class GalleryPage extends StatefulWidget {
   @override
@@ -205,8 +205,8 @@ class _GalleryPageState extends State<GalleryPage> {
                       T.error(exception.message, bg: colors.danger);
                     } catch (error) {
                       T.error(L.TOAST_IMAGE_SAVE_ERROR, bg: colors.danger);
-                      Sentry.captureException(error);
                       print((error as Error).stackTrace);
+                      LogService.captureError(error, stack: (error as Error).stackTrace);
                     } finally {
                       setState(() => _saving = false);
                     }

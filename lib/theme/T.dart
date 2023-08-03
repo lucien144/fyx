@@ -5,12 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/LaunchModeEnum.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
-import 'package:sentry/sentry.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // Theme helpers
@@ -71,7 +71,7 @@ class T {
       return true;
     } catch (e) {
       T.error(L.INAPPBROWSER_ERROR);
-      Sentry.captureException(e);
+      LogService.captureError(e);
       return false;
     }
   }

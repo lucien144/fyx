@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:fyx/components/search/search_notfound.dart';
 import 'package:fyx/components/search_box.dart';
+import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/FirstUnreadEnum.dart';
 import 'package:fyx/theme/L.dart';
@@ -15,7 +16,6 @@ import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
-import 'package:sentry/sentry.dart';
 
 // ignore: must_be_immutable
 class PullToRefreshList<TProvider> extends StatefulWidget {
@@ -380,7 +380,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
 
       print('[PullToRefresh error]: $error');
       print(StackTrace.current);
-      Sentry.captureException(error);
+      LogService.captureError(error, stack: StackTrace.current);
     } finally {
       setState(() {
         _hasPulledDown = false;
