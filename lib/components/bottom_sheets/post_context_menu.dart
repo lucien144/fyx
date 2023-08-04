@@ -153,7 +153,10 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
                     .catchError((error) => T.error(L.REMINDER_ERROR, bg: colors!.danger))
                     .then((response) {
                   post.hasReminder = !post.hasReminder;
-                }).whenComplete(() => setState(() => _reminderIndicator = false));
+                }).whenComplete(() {
+                  setState(() => _reminderIndicator = false);
+                  Navigator.pop(context);
+                });
                 AnalyticsProvider().logEvent(post.hasReminder ? 'reminder_remove' : 'reminder_add');
               })),
         if (isPost && post.replies.length > 0)
