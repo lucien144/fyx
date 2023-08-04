@@ -1,9 +1,13 @@
+import 'dart:io';
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/FyxApp.dart';
 import 'package:fyx/components/WhatsNew.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Settings.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
@@ -18,8 +22,8 @@ import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:settings_ui/settings_ui.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -30,6 +34,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _compactMode = false;
   bool _autocorrect = false;
   bool _quickRating = true;
+  bool _emptyingCache = false;
   DefaultView _defaultView = DefaultView.latest;
   FirstUnreadEnum _firstUnread = FirstUnreadEnum.button;
   LaunchModeEnum _linksMode = LaunchModeEnum.externalApplication;
@@ -241,7 +246,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         }),
                   ),
                   SettingsTile(
-                    title: Text('NSFW diskzuzí'),
+                    title: Text('Peprných diskzuzí'),
                     trailing: ValueListenableBuilder(
                         valueListenable: MainRepository().settings.box.listenable(keys: ['nsfwDiscussionList']),
                         builder: (BuildContext context, value, Widget? child) {
@@ -261,6 +266,64 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       }),
                 ],
               ),
+              CustomSettingsSection(
+                  child: FutureBuilder<Map>(
+                future: getCacheSize(),
+                builder: (context, snapshot) {
+                  var tiles = [
+                    SettingsTile(
+                      title: Text('Obrázky'),
+                      trailing: Text('${snapshot.data?['images'].round() ?? 0}M'),
+                    ),
+                    SettingsTile(
+                      title: Text('Gify'),
+                      trailing: Text('${snapshot.data?['gifs'].round() ?? 0}M'),
+                    ),
+                    SettingsTile(
+                      title: Text('Videa'),
+                      trailing: Text('${snapshot.data?['videos'].round() ?? 0}M'),
+                    ),
+                    SettingsTile(
+                      title: Text('Ostatní'),
+                      trailing: Text('${snapshot.data?['other'].round() ?? 0}M'),
+                    ),
+                    SettingsTile(
+                        title: Text(_emptyingCache ? 'Mažu...' : 'Smazat',
+                            style: TextStyle(color: _emptyingCache ? colors.danger : colors.danger), textAlign: TextAlign.center),
+                        onPressed: (_) async {
+                          if (_emptyingCache) {
+                            return;
+                          }
+
+                          setState(() => _emptyingCache = true);
+                          try {
+                            await _emptyCache();
+                            T.success('👍 Úložiště promazáno.', bg: colors.success);
+                          } catch (error) {
+                            T.success('👎 Úložiště se nepodařilo promazat.', bg: colors.danger);
+                          } finally {
+                            getCacheSize();
+                            setState(() => _emptyingCache = false);
+                            AnalyticsProvider().logEvent('emptyCache');
+                          }
+                        })
+                  ];
+
+                  if (snapshot.hasError) {
+                    tiles = [
+                      SettingsTile(
+                        title: Text('Nastala chyba, nelze spočítat.'),
+                      )
+                    ];
+                    LogService.captureError(snapshot.error);
+                  }
+
+                  return Stack(children: [
+                    Opacity(opacity: snapshot.hasData || snapshot.hasError ? 1 : 0.5, child: SettingsSection(title: Text('Úložiště'), tiles: tiles)),
+                    Visibility(visible: !snapshot.hasData && !snapshot.hasError, child: Positioned.fill(child: CupertinoActivityIndicator()))
+                  ]);
+                },
+              )),
               SettingsSection(title: Text('Informace'), tiles: <SettingsTile>[
                 SettingsTile.navigation(
                   leading: Icon(Icons.volunteer_activism, color: colors.grey),
@@ -340,5 +403,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
         ));
+  }
+
+  Map usage = {'images': 0.0, 'gifs': 0.0, 'videos': 0.0, 'other': 0.0};
+
+  // https://stackoverflow.com/questions/62117279/how-to-get-application-cache-size-in-flutter
+  Future<Map<String, double>> getCacheSize() async {
+    Directory tempDir = await getTemporaryDirectory();
+    if (tempDir.existsSync()) {
+      _getSize(tempDir);
+      return usage.map((key, value) => MapEntry(key, value / pow(1024, 2)));
+    }
+    return Future.value({'images': 0.0, 'gifs': 0.0, 'videos': 0.0, 'other': 0.0});
+  }
+
+  void _getSize(FileSystemEntity file) {
+    if (file is File) {
+      if (RegExp(r'\.(jpg|jpeg|png|webp)$', caseSensitive: false).hasMatch(file.path)) {
+        usage['images'] += file.lengthSync();
+      } else if (RegExp(r'\.(gif|gifv)$', caseSensitive: false).hasMatch(file.path)) {
+        usage['gifs'] += file.lengthSync();
+      } else if (RegExp(r'\.(mp4|webm|mkv)$', caseSensitive: false).hasMatch(file.path)) {
+        usage['videos'] += file.lengthSync();
+      } else {
+        usage['other'] += file.lengthSync();
+      }
+    } else if (file is Directory) {
+      List<FileSystemEntity> children = file.listSync();
+      for (FileSystemEntity child in children) {
+        _getSize(child);
+      }
+    }
+  }
+
+  Future<FileSystemEntity> _emptyCache() async {
+    Directory tempDir = await getTemporaryDirectory();
+    return tempDir.delete(recursive: true);
   }
 }
