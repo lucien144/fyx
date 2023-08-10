@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
@@ -53,6 +54,28 @@ class PostHtml extends StatelessWidget {
         '.twitter-text': Style(margin: EdgeInsets.symmetric(vertical: 10))
       },
       customRender: {
+        // Fixes https://github.com/lucien144/fyx/issues/414
+        // For some reason Html() has a bug of stripping whitespaces between 2 (or more) links.
+        // Fixed by adding custom padding (extending styles does not work)...
+        'a': (
+          RenderContext renderContext,
+          Widget parsedChild,
+        ) {
+          final element = renderContext.tree.element;
+          if (element == null) {
+            return Padding(
+              padding: const EdgeInsets.only(right: 2.0),
+              child: parsedChild,
+            );
+          }
+
+          return Padding(
+            padding: const EdgeInsets.only(right: 2.0),
+            child: GestureDetector(child: parsedChild, onTap: () {
+              _onLinkTap(element.attributes['href'], renderContext, LinkedHashMap.from(element.attributes), element);
+            }),
+          );
+        },
         'em': (
           RenderContext renderContext,
           Widget parsedChild,
@@ -213,7 +236,11 @@ class PostHtml extends StatelessWidget {
         _isImageTap = true;
         Navigator.of(context.buildContext).pushNamed('/gallery', arguments: GalleryArguments(src!, images: content!.images));
       },
-      onLinkTap: (String? link, RenderContext context, Map<String, String> attributes, dom.Element? element) async {
+      onLinkTap: _onLinkTap
+    );
+  }
+
+  _onLinkTap(String? link, RenderContext context, Map<String, String> attributes, dom.Element? element) async {
         // 👇 https://github.com/Sub6Resources/flutter_html/issues/121#issuecomment-581593467
         if (_isImageTap) {
           _isImageTap = false;
@@ -260,7 +287,5 @@ class PostHtml extends StatelessWidget {
         }
 
         T.openLink(link, mode: SettingsProvider().linksMode);
-      },
-    );
-  }
+      }
 }

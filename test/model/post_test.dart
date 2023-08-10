@@ -265,4 +265,18 @@ void main() {
     var post = Post.fromJson(json, 1, isCompact: true);
     expect(post.content.body, expectedContent);
   });
+
+  test('Keep whitespaces between links', () {
+    var content = """Mohu poprosit <a href='/discussion/275939?text=%23prosim'>#prosim</a> <a href='https://www.idnes.cz/zpravy/zahranicni/izrael-tel-aviv-metro-doprava.A200904_182525_zahranicni_cern' class='extlink'>https://www.idnes.cz/zpravy/zahranicni/izrael-tel-aviv-metro-doprava.A200904_182525_zahranicni_cern</a>"""
+        .trim();
+
+    var expectedContent = """Mohu poprosit <a href="/discussion/275939?text=%23prosim">#prosim</a> <a href="https://www.idnes.cz/zpravy/zahranicni/izrael-tel-aviv-metro-doprava.A200904_182525_zahranicni_cern" class="extlink">https://www.idnes.cz/zpravy/zahranicni/izrael-tel-aviv-metro-doprava.A200904_182525_zahranicni_cern</a>"""
+        .trim();
+
+    var json = Map<String, dynamic>.from(_json);
+    json.putIfAbsent("content", () => content);
+
+    var post = Post.fromJson(json, 1, isCompact: true);
+    expect(post.content.body, expectedContent);
+  });
 }
