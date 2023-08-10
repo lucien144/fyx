@@ -80,10 +80,19 @@ class ContentBoxLayout extends StatelessWidget {
 
               var children = <Widget>[];
               content.attachments.forEach((attachment) {
-                children.add(PostHeroAttachment(attachment, images: content.images, blur: blur,));
+                children.add(PostHeroAttachment(
+                  attachment,
+                  images: content.images,
+                  blur: blur,
+                ));
               });
 
-              return Wrap(children: children, spacing: 8, alignment: WrapAlignment.start, runSpacing: 8,);
+              return Wrap(
+                children: children,
+                spacing: 8,
+                alignment: WrapAlignment.start,
+                runSpacing: 8,
+              );
             });
 
     _layoutMap.putIfAbsent(
@@ -114,20 +123,26 @@ class ContentBoxLayout extends StatelessWidget {
               if ((content.attachmentsWithFeatured['attachments'] as List).whereType<model.Image>().length > 0) {
                 children.add(() {
                   var children = (content.attachmentsWithFeatured['attachments'] as List).whereType<model.Image>().map((attachment) {
-                    return Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: PostHeroAttachment(
-                          attachment,
-                          images: content.images,
-                          size: Size(50, 50),
-                          blur: blur,
-                        ));
+                    return PostHeroAttachment(
+                      attachment,
+                      images: content.images,
+                      size: Size(50, 50),
+                      blur: blur,
+                    );
                   }).toList();
-                  return Row(children: children, mainAxisAlignment: MainAxisAlignment.start);
+                  return Padding(
+                      padding: EdgeInsets.only(top: 16),
+                      child: Wrap(
+                        children: children,
+                        alignment: WrapAlignment.start,
+                        spacing: 8,
+                        runSpacing: 8,
+                      ));
                 }());
               }
 
               return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: children,
               );
             });
