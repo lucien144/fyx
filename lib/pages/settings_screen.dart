@@ -30,11 +30,16 @@ class SettingsScreen extends StatefulWidget {
   _SettingsScreenState createState() => _SettingsScreenState();
 }
 
+enum CacheKeys {images, gifs, videos, other}
+
 class _SettingsScreenState extends State<SettingsScreen> {
+  Map cacheUsage = {CacheKeys.images: 0.0, CacheKeys.gifs: 0.0, CacheKeys.videos: 0.0, CacheKeys.other: 0.0};
+
   bool _compactMode = false;
   bool _autocorrect = false;
   bool _quickRating = true;
   bool _emptyingCache = false;
+  Future<Map<CacheKeys, double>> _cacheSize = Future.value({});
   DefaultView _defaultView = DefaultView.latest;
   FirstUnreadEnum _firstUnread = FirstUnreadEnum.button;
   LaunchModeEnum _linksMode = LaunchModeEnum.externalApplication;
@@ -48,6 +53,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _firstUnread = MainRepository().settings.firstUnread;
     _linksMode = MainRepository().settings.linksMode;
     _quickRating = MainRepository().settings.quickRating;
+    _cacheSize = _getCacheSize();
     AnalyticsProvider().setScreen('Settings', 'SettingsPage');
   }
 
@@ -268,24 +274,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               CustomSettingsSection(
                   child: FutureBuilder<Map>(
-                future: getCacheSize(),
+                future: _cacheSize,
                 builder: (context, snapshot) {
                   var tiles = [
                     SettingsTile(
                       title: Text('Obrázky'),
-                      trailing: Text('${snapshot.data?['images'].round() ?? 0}M'),
+                      trailing: Text('~${snapshot.data?[CacheKeys.images].round() ?? 0} MB'),
                     ),
                     SettingsTile(
                       title: Text('Gify'),
-                      trailing: Text('${snapshot.data?['gifs'].round() ?? 0}M'),
+                      trailing: Text('~${snapshot.data?[CacheKeys.gifs].round() ?? 0} MB'),
                     ),
-                    SettingsTile(
-                      title: Text('Videa'),
-                      trailing: Text('${snapshot.data?['videos'].round() ?? 0}M'),
-                    ),
+                    // SettingsTile(
+                    //   title: Text('Videa'),
+                    //   trailing: Text('${snapshot.data?[CacheKeys.videos].round() ?? 0}M'),
+                    // ),
                     SettingsTile(
                       title: Text('Ostatní'),
-                      trailing: Text('${snapshot.data?['other'].round() ?? 0}M'),
+                      trailing: Text('~${snapshot.data?[CacheKeys.other].round() ?? 0} MB'),
                     ),
                     SettingsTile(
                         title: Text(_emptyingCache ? 'Mažu...' : 'Smazat',
@@ -300,10 +306,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             await _emptyCache();
                             T.success('👍 Úložiště promazáno.', bg: colors.success);
                           } catch (error) {
-                            T.success('👎 Úložiště se nepodařilo promazat.', bg: colors.danger);
+                            T.error('👎 Úložiště se nepodařilo promazat.', bg: colors.danger);
+                            LogService.captureError(error);
                           } finally {
-                            getCacheSize();
-                            setState(() => _emptyingCache = false);
+                            setState(() {
+                              _emptyingCache = false;
+                              _cacheSize = _getCacheSize();
+                            });
                             AnalyticsProvider().logEvent('emptyCache');
                           }
                         })
@@ -405,28 +414,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ));
   }
 
-  Map usage = {'images': 0.0, 'gifs': 0.0, 'videos': 0.0, 'other': 0.0};
-
   // https://stackoverflow.com/questions/62117279/how-to-get-application-cache-size-in-flutter
-  Future<Map<String, double>> getCacheSize() async {
+  Future<Map<CacheKeys, double>> _getCacheSize() async {
     Directory tempDir = await getTemporaryDirectory();
     if (tempDir.existsSync()) {
       _getSize(tempDir);
-      return usage.map((key, value) => MapEntry(key, value / pow(1024, 2)));
+      return cacheUsage.map((key, value) => MapEntry(key, value / pow(1024, 2)));
     }
-    return Future.value({'images': 0.0, 'gifs': 0.0, 'videos': 0.0, 'other': 0.0});
+    return Future.value({CacheKeys.images: 0.0, CacheKeys.gifs: 0.0, CacheKeys.videos: 0.0, CacheKeys.other: 0.0});
   }
 
   void _getSize(FileSystemEntity file) {
     if (file is File) {
       if (RegExp(r'\.(jpg|jpeg|png|webp)$', caseSensitive: false).hasMatch(file.path)) {
-        usage['images'] += file.lengthSync();
+        cacheUsage[CacheKeys.images] += file.lengthSync();
       } else if (RegExp(r'\.(gif|gifv)$', caseSensitive: false).hasMatch(file.path)) {
-        usage['gifs'] += file.lengthSync();
+        cacheUsage[CacheKeys.gifs] += file.lengthSync();
       } else if (RegExp(r'\.(mp4|webm|mkv)$', caseSensitive: false).hasMatch(file.path)) {
-        usage['videos'] += file.lengthSync();
+        cacheUsage[CacheKeys.videos] += file.lengthSync();
       } else {
-        usage['other'] += file.lengthSync();
+        cacheUsage[CacheKeys.other] += file.lengthSync();
       }
     } else if (file is Directory) {
       List<FileSystemEntity> children = file.listSync();
