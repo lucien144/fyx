@@ -109,13 +109,14 @@ class PostHtml extends StatelessWidget {
           Widget parsedChild,
         ) {
           final element = renderContext.tree.element;
-          String? src = element!.attributes['src'];
-          String? thumb = element!.attributes['data-thumb'] ?? src;
+          final String? thumb = element!.attributes['src'];
 
-          if (src == null) {
+
+          if (thumb == null) {
             return parsedChild;
           }
 
+          String src = thumb;
           bool openGallery = true;
           if (element.parent!.localName == 'a') {
             final RegExp r = RegExp(r'\.(jpg|jpeg|png|gif|webp)(\?.*)?$');
