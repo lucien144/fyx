@@ -11,6 +11,7 @@ import 'package:fyx/components/throw_it_away.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/exceptions/UnsupportedDownloadFormatException.dart';
+import 'package:fyx/libs/fyx_image_cache_manager.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
@@ -111,7 +112,11 @@ class _GalleryPageState extends State<GalleryPage> {
                               ),
                             ),
                         imageUrl: _arguments!.images[index].image,
-                        cacheManager: CacheManager(Config(_arguments!.images[index].thumb, stalePeriod: const Duration(days: 7)))),
+                        memCacheWidth: 2048*2,
+                        memCacheHeight: 2048*2,
+                        maxWidthDiskCache: 2048*2,
+                        maxHeightDiskCache: 2048*2,
+                        cacheManager: FyxImageCacheManager()),
                   ));
             },
             itemCount: _arguments!.images.length,
