@@ -83,7 +83,7 @@ class ContentBoxLayout extends StatelessWidget {
                 children.add(PostHeroAttachment(attachment, images: content.images, blur: blur,));
               });
 
-              return Wrap(children: children, spacing: 8, alignment: WrapAlignment.start);
+              return Wrap(children: children, spacing: 8, alignment: WrapAlignment.start, runSpacing: 8,);
             });
 
     _layoutMap.putIfAbsent(
