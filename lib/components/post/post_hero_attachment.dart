@@ -102,7 +102,7 @@ class PostHeroAttachment extends StatelessWidget {
                 height: _crop ? size.height : null,
                 cacheManager: CacheManager(Config(attachment.thumb, stalePeriod: const Duration(days: 7))),
               ),
-              if (blur) Positioned.fill(child: BackdropFilter(filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), child: Container()))
+              if (blur) Positioned.fill(child: T.nsfwMask())
             ],
           ),
         ),

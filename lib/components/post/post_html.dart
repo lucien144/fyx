@@ -120,7 +120,7 @@ class PostHtml extends StatelessWidget {
         ) {
           final element = renderContext.tree.element;
           if (element != null) {
-            return VideoPlayer(element);
+            return VideoPlayer(element, blur: blur);
           }
           return T.somethingsWrongButton(content!.rawBody);
         },

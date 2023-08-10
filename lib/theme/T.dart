@@ -1,5 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -15,6 +17,9 @@ import 'package:url_launcher/url_launcher.dart';
 
 // Theme helpers
 class T {
+
+  static nsfwMask() => BackdropFilter(filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15), child: Container());
+
   // ************************
   // Theme mixins
   // ************************
@@ -97,12 +102,13 @@ class T {
   static Widget somethingsWrongButton(String content,
       {String url = '', IconData icon = Icons.warning, String title = 'Chyba zobrazení příspěvku.', String stack = ''}) {
     return GestureDetector(
-      onTap: () => T.prefillGithubIssue(
-          title: title,
-          body: '**Zdroj:**\n```$content```\n\n**Stack:**\n```$stack```',
-          user: MainRepository().credentials!.nickname,
-          url: url,
-          appContext: MainRepository()),
+      onTap: () =>
+          T.prefillGithubIssue(
+              title: title,
+              body: '**Zdroj:**\n```$content```\n\n**Stack:**\n```$stack```',
+              user: MainRepository().credentials!.nickname,
+              url: url,
+              appContext: MainRepository()),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
         Icon(
           icon,
@@ -120,7 +126,10 @@ class T {
       {bool isLoading = false, bool isWarning = false, String label = '', String title = '', VoidCallback? onPress, IconData icon = Icons.warning}) {
     return Container(
       width: double.infinity,
-      color: (Skin.of(context).theme.colors as SkinColors).background,
+      color: (Skin
+          .of(context)
+          .theme
+          .colors as SkinColors).background,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -143,11 +152,11 @@ class T {
               padding: const EdgeInsets.only(bottom: 8, left: 16, right: 16),
               child: isWarning
                   ? Container(
-                      padding: const EdgeInsets.all(8),
-                      child: Text(
-                        title,
-                        style: TextStyle(fontFamily: 'JetBrainsMono', fontSize: 14),
-                      ))
+                  padding: const EdgeInsets.all(8),
+                  child: Text(
+                    title,
+                    style: TextStyle(fontFamily: 'JetBrainsMono', fontSize: 14),
+                  ))
                   : Text(title),
             ),
           ),
