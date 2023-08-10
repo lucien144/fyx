@@ -18,7 +18,7 @@ import 'package:url_launcher/url_launcher.dart';
 // Theme helpers
 class T {
 
-  static nsfwMask() => BackdropFilter(filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15), child: Container());
+  static nsfwMask() => ClipRRect(borderRadius: BorderRadius.circular(8), child: BackdropFilter(filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), child: Container(color: Colors.transparent,)));
 
   // ************************
   // Theme mixins
