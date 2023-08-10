@@ -458,7 +458,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                               onTap: () => ref.read(NsfwDiscussionList.provider.notifier).toggle(pageArguments.discussionId, discussionResponse.discussion.nameMain),
                               child: Row(
                                 children: [
-                                  Text(!ref.watch(NsfwDiscussionList.provider).containsKey(pageArguments.discussionId) ? 'Zapnout NSFW' : 'Vypnout NSFW', style: textStyleContext),
+                                  Text(!ref.watch(NsfwDiscussionList.provider).containsKey(pageArguments.discussionId) ? 'Označit za peprné' : 'Označit za ne-peprné', style: textStyleContext),
                                   SizedBox(
                                     width: 10,
                                   ),
