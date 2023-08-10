@@ -109,8 +109,8 @@ class PostHtml extends StatelessWidget {
           Widget parsedChild,
         ) {
           final element = renderContext.tree.element;
-          final String? thumb = element!.attributes['data-thumb'];
           String? src = element!.attributes['src'];
+          String? thumb = element!.attributes['data-thumb'] ?? src;
 
           if (src == null) {
             return parsedChild;
