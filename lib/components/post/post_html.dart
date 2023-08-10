@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -84,13 +86,13 @@ class PostHtml extends StatelessWidget {
           Widget parsedChild,
         ) {
           final element = renderContext.tree.element;
-          final String? thumb = element!.attributes['src'];
+          final String? thumb = element!.attributes['data-thumb'];
+          String? src = element!.attributes['src'];
 
-          if (thumb == null) {
+          if (src == null) {
             return parsedChild;
           }
 
-          String src = thumb;
           bool openGallery = true;
           if (element.parent!.localName == 'a') {
             final RegExp r = RegExp(r'\.(jpg|jpeg|png|gif|webp)(\?.*)?$');
