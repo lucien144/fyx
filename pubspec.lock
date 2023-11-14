@@ -133,26 +133,26 @@ packages:
     dependency: "direct main"
     description:
       name: cached_network_image
-      sha256: e764e48ef036cabdf84319ba7b8b5871b6b43266e14de787cb43f77639089ae5
+      sha256: fd3d0dc1d451f9a252b32d95d3f0c3c487bc41a75eba2e6097cb0b9c71491b15
       url: "https://pub.dev"
     source: hosted
-    version: "3.2.1"
+    version: "3.2.3"
   cached_network_image_platform_interface:
     dependency: transitive
     description:
       name: cached_network_image_platform_interface
-      sha256: "8e2b5befefec5063bee8f209fda21751f6328d405d4237c70f21104568b2fee7"
+      sha256: bb2b8403b4ccdc60ef5f25c70dead1f3d32d24b9d6117cfc087f496b178594a7
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0"
+    version: "2.0.0"
   cached_network_image_web:
     dependency: transitive
     description:
       name: cached_network_image_web
-      sha256: d4351c7eb16767df129b0474a5ebc4e028870379c063e8ba265a56aa00831e70
+      sha256: b8eb814ebfcb4dea049680f8c1ffb2df399e4d03bf7a352c775e26fa06e02fa0
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.1"
+    version: "1.0.2"
   carousel_slider:
     dependency: "direct main"
     description:
@@ -490,10 +490,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_cache_manager
-      sha256: "32cd900555219333326a2d0653aaaf8671264c29befa65bbd9856d204a4c9fb3"
+      sha256: "8207f27539deb83732fdda03e259349046a39a4c767269285f449ade355d54ba"
       url: "https://pub.dev"
     source: hosted
-    version: "3.3.0"
+    version: "3.3.1"
   flutter_dotenv:
     dependency: "direct main"
     description:
@@ -1271,18 +1271,18 @@ packages:
     dependency: transitive
     description:
       name: sqflite
-      sha256: "643ab681a84d299bb5b661995668008e732f0577725b5be50d1dd25c1ed42d53"
+      sha256: b4d6710e1200e96845747e37338ea8a819a12b51689a3bcf31eff0003b37a0b9
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.0+3"
+    version: "2.2.8+4"
   sqflite_common:
     dependency: transitive
     description:
       name: sqflite_common
-      sha256: b229e2c783cccb451a5a0702e9c2d755a1efb6b6e035385437d11d5036ee37b9
+      sha256: "8f7603f3f8f126740bc55c4ca2d1027aab4b74a1267a3e31ce51fe40e3b65b8f"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.0+2"
+    version: "2.4.5+1"
   stack_trace:
     dependency: transitive
     description:
