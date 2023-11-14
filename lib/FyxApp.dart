@@ -81,7 +81,16 @@ class FyxApp extends StatefulWidget {
       options: DefaultFirebaseOptions.currentPlatform(dotenv.env),
     );
 
-    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+    FlutterError.onError = (flutterErrorDetails) async {
+      // Filter out invalid images error
+      if (flutterErrorDetails.library == 'image resource service' &&
+          flutterErrorDetails.exception.toString().startsWith('HttpException: Invalid statusCode: 404, uri')) {
+        return;
+      }
+      await FirebaseCrashlytics.instance.recordFlutterFatalError(flutterErrorDetails);
+      return;
+    };
+
     PlatformDispatcher.instance.onError = (error, stack) {
       FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
       return true;
