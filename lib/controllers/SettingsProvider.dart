@@ -157,12 +157,16 @@ class SettingsProvider {
     _box.put('blockedUsers', blockedUsers);
   }
 
-  void toggleNsfwDiscussion(int id, String name) {
+  void addNsfwDiscussion(int id, String name) {
+    Map list = _box.get('nsfwDiscussionList', defaultValue: Settings().nsfwDiscussionList);
+    list[id] = name;
+    _box.put('nsfwDiscussionList', list);
+  }
+
+  void removeNsfwDiscussion(int id) {
     Map list = _box.get('nsfwDiscussionList', defaultValue: Settings().nsfwDiscussionList);
     if (this.isNsfw(id)) {
       list.remove(id);
-    } else {
-      list[id] = name;
     }
     _box.put('nsfwDiscussionList', list);
   }

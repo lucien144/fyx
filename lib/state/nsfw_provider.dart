@@ -18,12 +18,13 @@ class NsfwDiscussionList extends StateNotifier<Map<int, String>> {
   }
 
   void toggle(int id, String name) {
-    if (state.containsKey(id))
+    if (state.containsKey(id)) {
       this.remove(id);
-    else
+      MainRepository().settings.removeNsfwDiscussion(id);
+    } else {
       this.add(id, name);
-
-    MainRepository().settings.toggleNsfwDiscussion(id, name);
+      MainRepository().settings.addNsfwDiscussion(id, name);
+    }
   }
 
   void reset() {
