@@ -112,10 +112,7 @@ class _GalleryPageState extends State<GalleryPage> {
                               ),
                             ),
                         imageUrl: _arguments!.images[index].image,
-                        memCacheWidth: 2048*2,
-                        memCacheHeight: 2048*2,
-                        maxWidthDiskCache: 2048*2,
-                        maxHeightDiskCache: 2048*2,
+                        memCacheWidth: (MediaQuery.of(context).size.width * MediaQuery.of(context).devicePixelRatio).toInt(),
                         cacheManager: FyxImageCacheManager()),
                   ));
             },

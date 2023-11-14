@@ -5,8 +5,8 @@ class FyxImageCacheManager extends CacheManager with ImageCacheManager {
 
   static Config config = Config(
     key,
-    stalePeriod: const Duration(days: 5),
-    maxNrOfCacheObjects: 384,
+    stalePeriod: const Duration(days: 7),
+    maxNrOfCacheObjects: 200,
     repo: JsonCacheInfoRepository(databaseName: key),
     // fileSystem: IOFileSystem(key),
     fileService: HttpFileService(),

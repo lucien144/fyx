@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/components/post/post_hero_attachment_box.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
+import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/libs/fyx_image_cache_manager.dart';
 import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/model/post/Link.dart';
@@ -30,7 +31,13 @@ class PostHeroAttachment extends StatelessWidget {
   bool showStrip;
 
   PostHeroAttachment(this.attachment,
-      {images = const <model.Image>[], crop = true, this.showStrip = true, this.size = const Size(100, 100), onTap, openGallery = true, this.blur = false})
+      {images = const <model.Image>[],
+      crop = true,
+      this.showStrip = true,
+      this.size = const Size(100, 100),
+      onTap,
+      openGallery = true,
+      this.blur = false})
       : this._crop = crop,
         this._onTap = onTap,
         this._openGallery = openGallery,
@@ -54,17 +61,19 @@ class PostHeroAttachment extends StatelessWidget {
           child: Stack(
             children: [
               CachedNetworkImage(
+                fadeInDuration: Duration.zero,
+                fadeOutDuration: Duration.zero,
                 alignment: Alignment.topLeft,
                 imageUrl: attachment.thumb,
                 placeholder: (context, url) => CupertinoActivityIndicator(),
-                errorWidget: (context, url, error) => Icon(Icons.error),
+                errorWidget: (context, url, error) {
+                  LogService.captureError(error);
+                  return Icon(Icons.error);
+                },
                 fit: BoxFit.cover,
                 width: _crop ? size.width : null,
                 height: _crop ? size.height : null,
-                memCacheWidth: 2048,
-                memCacheHeight: 2048,
-                maxWidthDiskCache: 2048,
-                maxHeightDiskCache: 2048,
+                memCacheWidth: (MediaQuery.of(context).size.width * 0.5 * MediaQuery.of(context).devicePixelRatio).toInt(),
                 cacheManager: FyxImageCacheManager(),
               ),
               if (blur) Positioned.fill(child: T.nsfwMask())
