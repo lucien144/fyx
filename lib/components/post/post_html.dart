@@ -15,6 +15,7 @@ import 'package:fyx/model/post/Image.dart' as post;
 import 'package:fyx/model/post/Video.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/pages/search_page.dart';
+import 'package:fyx/pages/tab_bar/MailboxTab.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -265,6 +266,14 @@ class PostHtml extends StatelessWidget {
         if (parserResult.isNotEmpty) {
           var arguments = DiscussionPageArguments(parserResult[INTERNAL_URI_PARSER.discussionId]!, search: parserResult[INTERNAL_URI_PARSER.search]);
           Navigator.of(context.buildContext, rootNavigator: true).pushNamed('/discussion', arguments: arguments);
+          return;
+        }
+
+        // Click through to another mail
+        parserResult = Helpers.parseMailUri(link);
+        if (parserResult.isNotEmpty) {
+          var arguments = MailboxTabArguments(mailId: parserResult[INTERNAL_URI_PARSER.mailId] + 1);
+          Navigator.of(context.buildContext, rootNavigator: true).pushNamed('/mail', arguments: arguments);
           return;
         }
 

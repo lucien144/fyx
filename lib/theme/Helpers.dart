@@ -4,7 +4,7 @@ import 'package:fyx/theme/L.dart';
 import 'package:html/parser.dart';
 import 'package:intl/intl.dart';
 
-enum INTERNAL_URI_PARSER { discussionId, postId, search }
+enum INTERNAL_URI_PARSER { discussionId, postId, search, mailId }
 
 class Helpers {
   static stripHtmlTags(String html) {
@@ -85,6 +85,17 @@ class Helpers {
       return matches.first.group(1);
     }
     return null;
+  }
+
+  static Map<INTERNAL_URI_PARSER, dynamic> parseMailUri(String uri) {
+    RegExp test = new RegExp(r"/mail/id/([0-9]+)/?");
+    
+    if (test.hasMatch(uri)) {
+      final mailId = int.parse(test.firstMatch(uri)?.group(1) ?? '0');
+      print(uri);
+      return {INTERNAL_URI_PARSER.mailId: mailId > 0 ? mailId : null};
+    }
+    return {};
   }
 
   static Map<INTERNAL_URI_PARSER, dynamic> parseDiscussionUri(String uri) {

@@ -31,6 +31,7 @@ import 'package:fyx/pages/reminders_page.dart';
 import 'package:fyx/pages/search_page.dart';
 import 'package:fyx/pages/settings_design_screen.dart';
 import 'package:fyx/pages/settings_screen.dart';
+import 'package:fyx/pages/tab_bar/MailboxTab.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/skins/ForestSkin.dart';
@@ -153,6 +154,9 @@ class FyxApp extends StatefulWidget {
       case '/login':
         print('[Router] Login');
         return CupertinoPageRoute(builder: (_) => LoginPage(), settings: settings);
+      case '/mail':
+        print('[Router] Mail');
+        return CupertinoPageRoute(builder: (_) => MailboxTab(), settings: settings);
       case '/discussion':
         print('[Router] Discussion');
         return CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings);

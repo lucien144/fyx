@@ -13,6 +13,11 @@ import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+class MailboxTabArguments {
+  final int? mailId;
+  MailboxTabArguments({this.mailId});
+}
+
 class MailboxTab extends StatefulWidget {
   final int refreshTimestamp;
 
@@ -50,9 +55,18 @@ class _MailboxTabState extends State<MailboxTab> {
     SyntaxHighlighter.languageContext = '';
     SkinColors colors = Skin.of(context).theme.colors;
 
+    MailboxTabArguments? tabArguments = ModalRoute.of(context)?.settings.arguments as MailboxTabArguments?;
+
     return CupertinoTabView(builder: (context) {
       return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
+          leading: Visibility(
+            visible: tabArguments?.mailId != null,
+            child: CupertinoNavigationBarBackButton(
+              color: colors.primary,
+              onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+            ),
+          ),
             middle: Text(
           'Pošta',
           style: TextStyle(color: colors.text),
@@ -82,7 +96,7 @@ class _MailboxTabState extends State<MailboxTab> {
                 );
               },
               dataProvider: (lastId) async {
-                var result = await ApiController().loadMail(lastId: lastId);
+                var result = await ApiController().loadMail(lastId: lastId ?? tabArguments?.mailId);
                 var mails = result.mails
                     .map((_mail) => Mail.fromJson(_mail, isCompact: MainRepository().settings.useCompactMode))
                     .where((mail) => !MainRepository().settings.isMailBlocked(mail.id))
