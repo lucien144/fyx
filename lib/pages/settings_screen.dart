@@ -252,7 +252,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         }),
                   ),
                   SettingsTile(
-                    title: Text('Peprných diskzuzí'),
+                    title: Text('Peprných diskuzí'),
                     trailing: ValueListenableBuilder(
                         valueListenable: MainRepository().settings.box.listenable(keys: ['nsfwDiscussionList']),
                         builder: (BuildContext context, value, Widget? child) {
