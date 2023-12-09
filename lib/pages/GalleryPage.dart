@@ -12,6 +12,7 @@ import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/exceptions/UnsupportedDownloadFormatException.dart';
 import 'package:fyx/libs/fyx_image_cache_manager.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
@@ -113,7 +114,7 @@ class _GalleryPageState extends State<GalleryPage> {
                             ),
                         imageUrl: _arguments!.images[index].image,
                         memCacheWidth: (MediaQuery.of(context).size.width * MediaQuery.of(context).devicePixelRatio).toInt(),
-                        cacheManager: FyxImageCacheManager()),
+                        cacheManager: MainRepository().settings.useFyxImageCache ? FyxImageCacheManager() : null),
                   ));
             },
             itemCount: _arguments!.images.length,

@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/libs/fyx_image_cache_manager.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 
@@ -34,7 +35,7 @@ class Avatar extends StatelessWidget {
               errorWidget: (context, url, error) => Icon(Icons.error),
               width: width,
               height: height,
-              cacheManager: FyxImageCacheManager(),
+              cacheManager: MainRepository().settings.useFyxImageCache ? FyxImageCacheManager() : null,
             ),
           )),
     );

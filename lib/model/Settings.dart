@@ -9,6 +9,7 @@ class Settings {
   bool useCompactMode = false;
   bool useAutocorrect = true;
   bool quickRating = true;
+  bool useFyxImageCache = false; // Wheter to use internal image case or not. May fix crashes on big images. #413
   // Settings -> what is the default view when app restart?
   DefaultView defaultView = DefaultView.history;
   // Save the last screen view

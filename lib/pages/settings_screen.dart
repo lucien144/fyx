@@ -30,7 +30,7 @@ class SettingsScreen extends StatefulWidget {
   _SettingsScreenState createState() => _SettingsScreenState();
 }
 
-enum CacheKeys {images, gifs, videos, other}
+enum CacheKeys { images, gifs, videos, other }
 
 class _SettingsScreenState extends State<SettingsScreen> {
   Map cacheUsage = {CacheKeys.images: 0.0, CacheKeys.gifs: 0.0, CacheKeys.videos: 0.0, CacheKeys.other: 0.0};
@@ -38,6 +38,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _compactMode = false;
   bool _autocorrect = false;
   bool _quickRating = true;
+  bool _useFyxImageCache = false;
   bool _emptyingCache = false;
   Future<Map<CacheKeys, double>> _cacheSize = Future.value({});
   DefaultView _defaultView = DefaultView.latest;
@@ -53,6 +54,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _firstUnread = MainRepository().settings.firstUnread;
     _linksMode = MainRepository().settings.linksMode;
     _quickRating = MainRepository().settings.quickRating;
+    _useFyxImageCache = MainRepository().settings.useFyxImageCache;
     _cacheSize = _getCacheSize();
     AnalyticsProvider().setScreen('Settings', 'SettingsPage');
   }
@@ -218,6 +220,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SettingsSection(
                 title: Text('Paměť'),
                 tiles: <SettingsTile>[
+                  SettingsTile.switchTile(
+                      onToggle: (bool value) {
+                        setState(() => _useFyxImageCache = value);
+                        MainRepository().settings.useFyxImageCache = value;
+                      },
+                      initialValue: _useFyxImageCache,
+                      title: Text('Zmenšovat obrázky')),
                   SettingsTile(
                     title: Text('Blokovaných uživatelů'),
                     trailing: ValueListenableBuilder(
@@ -269,7 +278,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         MainRepository().settings.resetNsfwDiscussion();
                         T.success(L.SETTINGS_CACHE_RESET, bg: colors.success);
                         AnalyticsProvider().logEvent('resetBlockedContent');
-                      }),
+                      },
+                  description: Text('Zmenšovat obrázky - zmenšuje obrázky před stažením a předchází tak pádům aplikavce. V určitých případech ale může snižovat FPS.')),
                 ],
               ),
               CustomSettingsSection(

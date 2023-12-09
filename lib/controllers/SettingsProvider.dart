@@ -70,6 +70,12 @@ class SettingsProvider {
     _settings.quickRating = mode;
   }
 
+  bool get useFyxImageCache => _settings.useFyxImageCache;
+  set useFyxImageCache(bool mode) {
+    _box.put('useFyxImageCache', mode);
+    _settings.useFyxImageCache = mode;
+  }
+
   bool get useAutocorrect => _settings.useAutocorrect;
   set useAutocorrect(bool autocorrect) {
     _box.put('useAutocorrect', autocorrect);
@@ -111,6 +117,7 @@ class SettingsProvider {
     _settings.defaultView = _box.get('defaultView', defaultValue: Settings().defaultView);
     _settings.latestView = _box.get('latestView', defaultValue: Settings().latestView);
     _settings.quickRating = _box.get('quickRating', defaultValue: Settings().quickRating);
+    _settings.useFyxImageCache = _box.get('useFyxImageCache', defaultValue: Settings().useFyxImageCache);
     _settings.useCompactMode = _box.get('useCompactMode', defaultValue: Settings().useCompactMode);
     _settings.useAutocorrect = _box.get('useAutocorrect', defaultValue: Settings().useAutocorrect);
     _settings.firstUnread = _box.get('firstUnread', defaultValue: Settings().firstUnread);

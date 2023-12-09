@@ -8,6 +8,7 @@ import 'package:fyx/components/post/post_hero_attachment_box.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/libs/fyx_image_cache_manager.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/model/post/Link.dart';
 import 'package:fyx/model/post/Video.dart';
@@ -74,7 +75,7 @@ class PostHeroAttachment extends StatelessWidget {
                 width: _crop ? size.width : null,
                 height: _crop ? size.height : null,
                 memCacheWidth: (MediaQuery.of(context).size.width * 0.5 * MediaQuery.of(context).devicePixelRatio).toInt(),
-                cacheManager: FyxImageCacheManager(),
+                cacheManager: MainRepository().settings.useFyxImageCache ? FyxImageCacheManager() : null,
               ),
               if (blur) Positioned.fill(child: T.nsfwMask())
             ],
