@@ -23,7 +23,7 @@ class T {
   // ************************
   // Theme mixins
   // ************************
-  static error(String message, {int duration: 7, Color bg: Colors.red}) {
+  static error(String message, {int duration = 7, Color bg = Colors.red}) {
     Fluttertoast.showToast(
         msg: message,
         toastLength: Toast.LENGTH_LONG,
@@ -34,7 +34,7 @@ class T {
         fontSize: 14.0);
   }
 
-  static success(String message, {int duration: 7, Color bg: Colors.green}) {
+  static success(String message, {int duration = 7, Color bg = Colors.green}) {
     Fluttertoast.showToast(
         msg: message,
         toastLength: Toast.LENGTH_LONG,
@@ -45,7 +45,7 @@ class T {
         fontSize: 14.0);
   }
 
-  static warn(String message, {int duration: 7, Color bg: Colors.orangeAccent}) {
+  static warn(String message, {int duration = 7, Color bg = Colors.orangeAccent}) {
     Fluttertoast.showToast(
         msg: message,
         toastLength: Toast.LENGTH_LONG,
@@ -56,7 +56,7 @@ class T {
         fontSize: 14.0);
   }
 
-  static Future<bool> openLink(String link, {mode: LaunchModeEnum.externalApplication}) async {
+  static Future<bool> openLink(String link, {mode = LaunchModeEnum.externalApplication}) async {
     try {
       var encodedUri = Uri.parse(link);
 

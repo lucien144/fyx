@@ -354,7 +354,7 @@ class ApiController {
     return ContentDice.fromJson(json['content_raw']['data'], discussionId: json['discussion_id'] ?? 0, postId: json['post_id'] ?? 0);
   }
 
-  throwAuthException(LoginResponse loginResponse, {String message: ''}) {
+  throwAuthException(LoginResponse loginResponse, {String message = ''}) {
     if (loginResponse.error) {
       throw AuthException(loginResponse.message);
     }

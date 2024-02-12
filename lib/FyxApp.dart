@@ -60,7 +60,7 @@ class FyxApp extends StatefulWidget {
 
   static get isProduction => FyxApp.env == Environment.production;
 
-  static FirebaseAnalytics analytics = FirebaseAnalytics();
+  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
   static RouteObserver<PageRoute> _routeObserver = RouteObserver<PageRoute>();
 

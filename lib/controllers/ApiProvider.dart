@@ -91,10 +91,10 @@ class ApiProvider implements IApiProvider {
       }
 
       if (onError != null) {
-        if (e.message.contains('SocketException')) {
+        if (e.message?.contains('SocketException') ?? false) {
           onError!(L.CONNECTION_ERROR);
         } else {
-          onError!(e.message);
+          onError!(e.message ?? '');
         }
       }
     }));
@@ -217,7 +217,7 @@ class ApiProvider implements IApiProvider {
     return await dio.get('$URL/discussion/$id/waiting_files');
   }
 
-  Future<List> uploadFile(List<Map<ATTACHMENT, dynamic>> attachments, {int id: 0}) async {
+  Future<List> uploadFile(List<Map<ATTACHMENT, dynamic>> attachments, {int id = 0}) async {
     List<Future> uploads = [];
     for (Map<ATTACHMENT, dynamic> attachment in attachments) {
       FormData fileData = new FormData.fromMap({

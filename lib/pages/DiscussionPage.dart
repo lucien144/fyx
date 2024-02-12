@@ -500,9 +500,10 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         postItem,
-        const Divider(
+        Divider(
           height: 8,
           thickness: 8,
+          color: colors.divider,
         ),
         Container(
           color: colors.grey.withOpacity(.1),
@@ -512,7 +513,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
               child: Container(
                 child: Text(
                   '↑ Nové příspěvky ($unseenCount)',
-                  style: TextStyle(color: colors.background, fontSize: FontSize.medium.size),
+                  style: TextStyle(color: colors.background, fontSize: FontSize.medium.value),
                 ),
                 decoration: BoxDecoration(color: colors.primary, borderRadius: BorderRadius.all(Radius.circular(12))),
                 padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),

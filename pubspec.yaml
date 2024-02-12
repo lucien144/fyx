@@ -11,10 +11,10 @@ description: A new Flutter project.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 0.9.4+104
+version: 0.9.4+115
 
 environment:
-  sdk: ">=2.19.0 <=3.0.0"
+  sdk: ">=3.0.0 <=3.3.0"
   flutter: ^3.3.0
 
 dependencies:
@@ -25,38 +25,38 @@ dependencies:
   chewie: ^1.3.0
   device_info: ^2.0.3
   diacritic: ^0.1.3
-  dio: ^4.0.3
-  file: ^6.1.4
-  firebase_analytics: ^8.3.4
-  firebase_messaging: ^11.1.0
+  dio: ^5.4.0
+  file: ^7.0.0
+  firebase_analytics: ^10.8.5
+  firebase_messaging: ^14.7.15
   flutter_cache_manager: ^3.3.1
   flutter_dotenv: ^5.0.2
   flutter_highlight: ^0.7.0
-  flutter_html: ^2.2.1
+  flutter_html: ^3.0.0-beta.2
   flutter_markdown: ^0.6.9
   flutter_riverpod: ^2.0.0-dev.4
   flutter_sticky_header: ^0.6.0
   fluttertoast: ^8.0.9
-  google_fonts: ^3.0.1
+  google_fonts: ^6.1.0
   hive: ^2.0.6
   hive_flutter: ^1.1.0
   html: ^0.15.0
   html_unescape: ^2.0.0
-  http: ^0.13.4
-  image: ^3.1.3
-  image_gallery_saver: ^1.7.1
-  image_picker: ^0.8.4+10
-  material_design_icons_flutter: 5.0.6996
+  http: ^1.2.0
+  image: ^4.1.7
+  image_gallery_saver: ^2.0.3
+  image_picker: ^1.0.7
+  material_design_icons_flutter: ^7.0.7296
   meta: ^1.7.0
   package_info: ^2.0.2
   path: ^1.8.0
-  path_provider: 2.0.9
-  permission_handler: 9.2.0
-  photo_view: ^0.13.0
+  path_provider: ^2.1.2
+  permission_handler: ^11.3.0
+  photo_view: ^0.14.0
   provider: ^6.0.2
   scroll_to_index: any
   settings_ui: ^2.0.2
-  share_plus: ^6.0.1
+  share_plus: ^7.2.2
   shared_preferences: ^2.0.13
   tap_canvas: ^0.9.4
   url_launcher: ^6.1.5
@@ -66,7 +66,7 @@ dependencies:
   # Dart-lang core plugins 👇
   http_parser: ^4.0.0
   mime: ^1.0.1
-  intl: ^0.17.0
+  intl: ^0.18.1
 
   flutter:
     sdk: flutter
@@ -82,19 +82,21 @@ dependencies:
       url: https://github.com/eli1stark/modal_bottom_sheet.git
       ref: 2b3f9f84f46418c1b337968c88883995f65f47e7
       path: modal_bottom_sheet
-  firebase_crashlytics: ^2.9.0
-  firebase_performance: ^0.8.3+3
-  firebase_core: ^1.24.0
+  firebase_crashlytics: ^3.0.0
+  firebase_performance: ^0.9.0
+  firebase_core: ^2.25.4
+  quiver: ^3.2.1
 
 dependency_overrides:
 #  # https://github.com/flutter/flutter/issues/44435#issuecomment-817583694
   webview_flutter: ^3.0.4
+  sqflite: ^2.3.2
 
 dev_dependencies:
-  hive_generator: ^1.1.0
+  hive_generator: ^2.0.1
   build_runner: ^2.0.6
-  flutter_launcher_icons: ^0.9.3
-  analyzer: ^4.6.0
+  flutter_launcher_icons: ^0.13.1
+  analyzer: ^6.2.0
   flutter_test:
     sdk: flutter
 

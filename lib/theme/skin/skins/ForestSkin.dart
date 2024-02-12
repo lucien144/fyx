@@ -24,6 +24,7 @@ class ForestSkin extends SkinData {
       success: Color(0xff4D6654),
       danger: const Color(0xffb60f0f),
       highlight: const Color(0xffDBD68B),
+      divider: const Color(0xffa2a082),
       highlightedText: Colors.amber,
       light: Colors.white,
       dark: const Color(0xFF282828),

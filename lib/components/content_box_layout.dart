@@ -161,6 +161,8 @@ class ContentBoxLayout extends StatelessWidget {
             child: Divider(
               height: 8,
               thickness: 8,
+              color: colors.divider,
+
             ),
           ),
           Container(
