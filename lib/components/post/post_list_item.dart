@@ -88,7 +88,6 @@ class _PostListItemState extends ConsumerState<PostListItem> {
           ),
         ),
         child: GestureDetector(
-          onLongPress: showPostContext,
           behavior: HitTestBehavior.opaque,
           onDoubleTap: () {
             if (!_post!.canBeRated || !MainRepository().settings.quickRating) {
