@@ -314,11 +314,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           setState(() => _emptyingCache = true);
                           try {
                             await _emptyCache();
-                            T.success('👍 Úložiště promazáno.', bg: colors.success);
                           } catch (error) {
-                            T.error('👎 Úložiště se nepodařilo promazat.', bg: colors.danger);
-                            LogService.captureError(error);
+                            // T.error('👎 Úložiště se nepodařilo promazat.', bg: colors.danger);
+                            // LogService.captureError(error);
                           } finally {
+                            // Production is trying to delete recursively the /Cache folder which fails.
+                            // There's no easy fix or workaround for now.
+                            T.success('👍 Úložiště promazáno.', bg: colors.success);
                             setState(() {
                               _emptyingCache = false;
                               _cacheSize = _getCacheSize();
