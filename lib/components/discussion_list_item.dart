@@ -46,7 +46,7 @@ class DiscussionListItem extends StatelessWidget {
               width: 8,
             ),
             Expanded(child: Text(discussion.name, overflow: TextOverflow.ellipsis)),
-            Visibility(visible: SettingsProvider().isNsfw(this.discussion.idKlub), child: Icon(MdiIcons.chiliHot)),
+            Visibility(visible: SettingsProvider().isNsfw(this.discussion.idKlub), child: Icon(MdiIcons.chiliHot, color: discussion.unread > 0 ? colors.primary : colors.grey,)),
             Visibility(visible: discussion.links > 0, child: Icon(MdiIcons.link)),
             Visibility(visible: discussion.images > 0, child: Icon(MdiIcons.image)),
           ],
