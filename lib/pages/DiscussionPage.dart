@@ -441,12 +441,13 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                                 });
                               },
                               child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(this._searchTerm == null ? 'Hledat v diskuzi' : 'Zavřít hledání', style: textStyleContext),
                                   SizedBox(
                                     width: 10,
                                   ),
-                                  Expanded(child: Icon(this._searchTerm == null ? MdiIcons.magnify : MdiIcons.magnifyRemoveOutline)),
+                                  Icon(this._searchTerm == null ? MdiIcons.magnify : MdiIcons.magnifyRemoveOutline),
                                 ],
                               ),
                             ),
