@@ -15,6 +15,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 class MailboxTabArguments {
   final int? mailId;
+
   MailboxTabArguments({this.mailId});
 }
 
@@ -55,22 +56,23 @@ class _MailboxTabState extends State<MailboxTab> {
     SyntaxHighlighter.languageContext = '';
     SkinColors colors = Skin.of(context).theme.colors;
 
-    MailboxTabArguments? tabArguments = ModalRoute.of(context)?.settings.arguments as MailboxTabArguments?;
+    MailboxTabArguments? tabArguments =
+        ModalRoute.of(context)?.settings.arguments is MailboxTabArguments ? ModalRoute.of(context)?.settings.arguments as MailboxTabArguments : null;
 
     return CupertinoTabView(builder: (context) {
       return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
-          leading: Visibility(
-            visible: tabArguments?.mailId != null,
-            child: CupertinoNavigationBarBackButton(
-              color: colors.primary,
-              onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+            leading: Visibility(
+              visible: tabArguments?.mailId != null,
+              child: CupertinoNavigationBarBackButton(
+                color: colors.primary,
+                onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+              ),
             ),
-          ),
             middle: Text(
-          'Pošta',
-          style: TextStyle(color: colors.text),
-        )),
+              'Pošta',
+              style: TextStyle(color: colors.text),
+            )),
         child: Stack(children: [
           PullToRefreshList(
               rebuild: _refreshData,
