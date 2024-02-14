@@ -38,15 +38,12 @@ class PostHtml extends StatelessWidget {
 
     return SelectionArea(
       child: Html(
-          data: (() {
-            var data = MainRepository().settings.useCompactMode && content!.consecutiveImages ? content!.body : content!.rawBody;
-            return '$data<span class="eob"></span>'; // TODO: eob - end of body -> https://github.com/lucien144/fyx/issues/353#issuecomment-1231598155
-          })(),
+          data: MainRepository().settings.useCompactMode && content!.consecutiveImages ? content!.body : content!.rawBody,
           style: {
             'html': Style.fromTextStyle(CupertinoTheme.of(context).textTheme.textStyle),
             '.image-link': Style(textDecoration: TextDecoration.none),
             'span.r': Style(fontWeight: FontWeight.bold),
-            'span.eob': Style(display: Display.inline, height: Height(0)),
+            'span.eob': Style(display: Display.none, height: Height(0)),
             'body': Style(margin: Margins.all(0)),
             'pre': Style(color: Colors.transparent),
             'a': Style(color: colors.primary, textDecoration: TextDecoration.underline),
