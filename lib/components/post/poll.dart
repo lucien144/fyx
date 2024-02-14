@@ -148,7 +148,7 @@ class _PollState extends State<Poll> {
             ? CupertinoActivityIndicator()
             : Text(
                 buttonText(emptyVote),
-                style: TextStyle(color: colors.pollBackground),
+                style: TextStyle(color: colors.background),
               ),
         color: colors.primary,
         padding: EdgeInsets.all(0),
