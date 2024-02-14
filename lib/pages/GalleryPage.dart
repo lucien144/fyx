@@ -9,6 +9,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:fyx/components/post/post_hero_attachment.dart';
 import 'package:fyx/components/throw_it_away.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/exceptions/UnsupportedDownloadFormatException.dart';
 import 'package:fyx/libs/fyx_image_cache_manager.dart';
@@ -19,6 +20,7 @@ import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:mime/mime.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -159,61 +161,78 @@ class _GalleryPageState extends State<GalleryPage> {
             right: 30,
             child: Visibility(
                 visible: !_hideUI,
-                child: CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  color: colors.primary,
-                  child: _saving
-                      ? CupertinoActivityIndicator()
-                      : Icon(
-                          Icons.save_alt_rounded,
-                          color: colors.background,
-                          size: 32,
-                        ),
-                  onPressed: () async {
-                    if (_saving) {
-                      return;
-                    }
-
-                    setState(() => _saving = true);
-                    try {
-                      PermissionStatus status = await Permission.storage.request();
-                      if (status.isGranted) {
-                        // See https://github.com/lucien144/fyx/issues/304#issuecomment-1094851596
-
-                        var appDocDir = await getTemporaryDirectory();
+                child: Column(
+                  children: [
+                    CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      color: colors.primary,
+                      child: Icon(
+                              MdiIcons.openInNew,
+                              color: colors.background,
+                              size: 32,
+                            ),
+                      onPressed: () {
                         String url = _arguments!.images[_page - 1].image;
-                        String savePath = '${appDocDir.path}/${Helpers.uuid(6)}';
-                        await Dio().download(url, savePath);
-
-                        File file = new File(savePath);
-                        Uint8List headerBytes = file.readAsBytesSync();
-                        var ext = extensionFromMime(lookupMimeType(savePath, headerBytes: headerBytes.getRange(0, 20).toList()) ?? '');
-                        ext = ext == 'jpe' ? 'jpg' : ext; // https://github.com/dart-lang/mime/issues/55
-                        if (!['jpg', 'png', 'gif', 'heic'].contains(ext)) {
-                          file.delete();
-                          throw UnsupportedDownloadFormatException('Nelze uložit. Neznámý typ souboru ($ext).');
+                        T.openLink(url, mode: SettingsProvider().linksMode);
+                      }),
+                    const SizedBox(height: 16),
+                    CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      color: colors.primary,
+                      child: _saving
+                          ? CupertinoActivityIndicator()
+                          : Icon(
+                              MdiIcons.download,
+                              color: colors.background,
+                              size: 32,
+                            ),
+                      onPressed: () async {
+                        if (_saving) {
+                          return;
                         }
 
-                        file = await file.rename('$savePath.$ext');
-                        final result = await ImageGallerySaver.saveFile('$savePath.$ext', isReturnPathOfIOS: Platform.isIOS);
-                        if (!result['isSuccess']) {
-                          throw Error();
+                        setState(() => _saving = true);
+                        try {
+                          PermissionStatus status = await Permission.storage.request();
+                          if (status.isGranted) {
+                            // See https://github.com/lucien144/fyx/issues/304#issuecomment-1094851596
+
+                            var appDocDir = await getTemporaryDirectory();
+                            String url = _arguments!.images[_page - 1].image;
+                            String savePath = '${appDocDir.path}/${Helpers.uuid(6)}';
+                            await Dio().download(url, savePath);
+
+                            File file = new File(savePath);
+                            Uint8List headerBytes = file.readAsBytesSync();
+                            var ext = extensionFromMime(lookupMimeType(savePath, headerBytes: headerBytes.getRange(0, 20).toList()) ?? '');
+                            ext = ext == 'jpe' ? 'jpg' : ext; // https://github.com/dart-lang/mime/issues/55
+                            if (!['jpg', 'png', 'gif', 'heic'].contains(ext)) {
+                              file.delete();
+                              throw UnsupportedDownloadFormatException('Nelze uložit. Neznámý typ souboru ($ext).');
+                            }
+
+                            file = await file.rename('$savePath.$ext');
+                            final result = await ImageGallerySaver.saveFile('$savePath.$ext', isReturnPathOfIOS: Platform.isIOS);
+                            if (!result['isSuccess']) {
+                              throw Error();
+                            }
+                            T.success(L.TOAST_IMAGE_SAVE_OK, bg: colors.success);
+                            file.delete();
+                          } else {
+                            T.error('Nelze uložit. Povolte ukládání, prosím.', bg: colors.danger);
+                          }
+                        } on UnsupportedDownloadFormatException catch (exception) {
+                          T.error(exception.message, bg: colors.danger);
+                        } catch (error) {
+                          T.error(L.TOAST_IMAGE_SAVE_ERROR, bg: colors.danger);
+                          print((error as Error).stackTrace);
+                          LogService.captureError(error, stack: (error as Error).stackTrace);
+                        } finally {
+                          setState(() => _saving = false);
                         }
-                        T.success(L.TOAST_IMAGE_SAVE_OK, bg: colors.success);
-                        file.delete();
-                      } else {
-                        T.error('Nelze uložit. Povolte ukládání, prosím.', bg: colors.danger);
-                      }
-                    } on UnsupportedDownloadFormatException catch (exception) {
-                      T.error(exception.message, bg: colors.danger);
-                    } catch (error) {
-                      T.error(L.TOAST_IMAGE_SAVE_ERROR, bg: colors.danger);
-                      print((error as Error).stackTrace);
-                      LogService.captureError(error, stack: (error as Error).stackTrace);
-                    } finally {
-                      setState(() => _saving = false);
-                    }
-                  },
+                      },
+                    ),
+                  ],
                 )))
       ],
     );
