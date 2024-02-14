@@ -24,72 +24,6 @@ import 'package:html/dom.dart' as dom;
 import 'package:html_unescape/html_unescape.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-class FyxTagWrapExtension extends HtmlExtension {
-  final Set<String> tagsToWrap;
-  final Widget Function(Widget child, ExtensionContext context) builder;
-
-  /// [TagWrapExtension] allows you to easily wrap a specific tag (or tags)
-  /// in another element. For example, you could wrap `<table>` in a
-  /// `SingleChildScrollView`:
-  ///
-  /// ```dart
-  /// extensions: [
-  ///   WrapperExtension(
-  ///     tagsToWrap: {"table"},
-  ///     builder: (child) {
-  ///       return SingleChildScrollView(
-  ///         scrollDirection: Axis.horizontal,
-  ///         child: child,
-  ///       );
-  ///     },
-  ///   ),
-  /// ],
-  /// ```
-  FyxTagWrapExtension({
-    required this.tagsToWrap,
-    required this.builder,
-  });
-
-  @override
-  Set<String> get supportedTags => tagsToWrap;
-
-  @override
-  bool matches(ExtensionContext context) {
-    switch (context.currentStep) {
-      case CurrentStep.preparing:
-        return super.matches(context);
-      case CurrentStep.preStyling:
-      case CurrentStep.preProcessing:
-        return false;
-      case CurrentStep.building:
-        return context.styledElement is WrapperElement;
-    }
-  }
-
-  @override
-  StyledElement prepare(ExtensionContext context, List<StyledElement> children) {
-    return WrapperElement(
-      child: context.parser.prepareFromExtension(
-        context,
-        children,
-        extensionsToIgnore: {this},
-      ),
-    );
-  }
-
-  @override
-  InlineSpan build(ExtensionContext context) {
-    final child = CssBoxWidget.withInlineSpanChildren(
-      children: context.inlineSpanChildren!,
-      style: context.style!,
-    );
-
-    return WidgetSpan(
-      child: builder.call(child, context),
-    );
-  }
-}
-
 class PostHtml extends StatelessWidget {
   final fyx.Content? content;
   final bool blur;
@@ -115,7 +49,7 @@ class PostHtml extends StatelessWidget {
             'span.eob': Style(display: Display.inline, height: Height(0)),
             'body': Style(margin: Margins.all(0)),
             'pre': Style(color: Colors.transparent),
-            'a': Style(color: colors.primary),
+            'a': Style(color: colors.primary, textDecoration: TextDecoration.underline),
             '.fill': Style(textDecoration: TextDecoration.none, display: Display.block, color: colors.text),
             '.twitter-header a, .twitter-text a': Style(color: colors.twitter),
             '.twitter-header .name': Style(fontWeight: FontWeight.bold),
@@ -135,7 +69,7 @@ class PostHtml extends StatelessWidget {
                       child: parsedChild,
                     );
                   }
-      
+
                   return Padding(
                     padding: const EdgeInsets.only(right: 2.0),
                     child: GestureDetector(
@@ -183,11 +117,11 @@ class PostHtml extends StatelessWidget {
                 ) {
                   final element = renderContext.element;
                   final String? thumb = element!.attributes['src'];
-      
+
                   if (thumb == null) {
                     return parsedChild;
                   }
-      
+
                   String src = thumb;
                   bool openGallery = true;
                   if (element.parent!.localName == 'a') {
@@ -198,7 +132,7 @@ class PostHtml extends StatelessWidget {
                       openGallery = false;
                     }
                   }
-      
+
                   post.Image img = post.Image(src, thumb: thumb);
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 16.0),
@@ -231,12 +165,12 @@ class PostHtml extends StatelessWidget {
                   renderContext,
                 ) {
                   final element = renderContext.element;
-      
+
                   // Spoiler
                   if (element!.classes.contains('spoiler')) {
                     return Spoiler(parsedChild);
                   }
-      
+
                   // Twitter
                   if (element.attributes['data-embed-type'] == 'twitter') {
                     return Padding(
@@ -253,14 +187,14 @@ class PostHtml extends StatelessWidget {
                       ),
                     );
                   }
-      
+
                   // Youtube
                   if (element.attributes['data-embed-type'] == 'youtube') {
                     var img = element.querySelector('img');
                     if (img == null) {
                       return parsedChild;
                     }
-      
+
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: PostHeroAttachment(
@@ -275,7 +209,7 @@ class PostHtml extends StatelessWidget {
                       ),
                     );
                   }
-      
+
                   return parsedChild;
                 }),
             FyxTagWrapExtension(
@@ -285,12 +219,12 @@ class PostHtml extends StatelessWidget {
                   renderContext,
                 ) {
                   final element = renderContext.element;
-      
+
                   // Spoiler
                   if (element!.classes.contains('spoiler')) {
                     return Spoiler(parsedChild);
                   }
-      
+
                   return parsedChild;
                 }),
             FyxTagWrapExtension(
@@ -300,11 +234,11 @@ class PostHtml extends StatelessWidget {
                   renderContext,
                 ) {
                   final element = renderContext.element;
-      
+
                   if (element == null) {
                     return parsedChild;
                   }
-      
+
                   if (element.attributes['style'] == 'background-color:#272822') {
                     final source = HtmlUnescape().convert(element.text);
                     return SyntaxHighlighter(source);
@@ -377,5 +311,31 @@ class PostHtml extends StatelessWidget {
     }
 
     T.openLink(link, mode: SettingsProvider().linksMode);
+  }
+}
+
+// flutter_html widget v3 doesn't allow to pass parsedChild -> this is workaround
+class FyxTagWrapExtension extends HtmlExtension {
+  final Set<String> tagsToWrap;
+  final Widget Function(Widget child, ExtensionContext context) builder;
+
+  FyxTagWrapExtension({
+    required this.tagsToWrap,
+    required this.builder,
+  });
+
+  @override
+  Set<String> get supportedTags => tagsToWrap;
+
+  @override
+  InlineSpan build(ExtensionContext context) {
+    final child = CssBoxWidget.withInlineSpanChildren(
+      children: context.inlineSpanChildren!,
+      style: context.style!,
+    );
+
+    return WidgetSpan(
+      child: builder.call(child, context),
+    );
   }
 }
