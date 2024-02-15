@@ -9,6 +9,7 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/Mail.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/IconReply.dart';
