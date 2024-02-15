@@ -8,6 +8,7 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/Mail.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
@@ -103,12 +104,15 @@ class _MailboxTabState extends State<MailboxTab> {
                     .map((_mail) => Mail.fromJson(_mail, isCompact: MainRepository().settings.useCompactMode))
                     .where((mail) => !MainRepository().settings.isMailBlocked(mail.id))
                     .where((mail) => !MainRepository().settings.isUserBlocked(mail.participant))
-                    .map((mail) => MailListItem(
-                          mail,
-                          onUpdate: this.refreshData,
-                        ))
-                    .toList();
-                var id = Mail.fromJson(result.mails.last, isCompact: MainRepository().settings.useCompactMode).id;
+                    .map((mail) {
+                  (mail.content as ContentRegular).parseEmailAddresses();
+                  (mail.content as ContentRegular).parsePhoneNumbers();
+                  return MailListItem(
+                    mail,
+                    onUpdate: this.refreshData,
+                  );
+                }).toList();
+                var id = result.mails.isEmpty ? lastId : Mail.fromJson(result.mails.last, isCompact: MainRepository().settings.useCompactMode).id;
                 return DataProviderResult(mails, lastId: id);
               }),
           Positioned(
