@@ -71,6 +71,7 @@ if [ $android == true ]; then
 
   if [ $ios == false ]; then
     flutter clean
+    flutter pub get
   fi
 
   flutter build appbundle -t lib/main_production.dart
