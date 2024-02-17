@@ -3,6 +3,7 @@
 # Fyx
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/c5dd9261a8154bddb7f317f607307a1c)](https://app.codacy.com/gh/lucien144/fyx?utm_source=github.com&utm_medium=referral&utm_content=lucien144/fyx&utm_campaign=Badge_Grade_Settings)
+[![Codemagic build status](https://api.codemagic.io/apps/64d5e8624479a8f7a878b6c9/64d5e8624479a8f7a878b6c8/status_badge.svg)](https://codemagic.io/apps/64d5e8624479a8f7a878b6c9/64d5e8624479a8f7a878b6c8/latest_build)
 [![Build Status](https://travis-ci.com/lucien144/fyx.svg?branch=develop)](https://travis-ci.com/lucien144/fyx) [![Coverage Status](https://coveralls.io/repos/github/lucien144/fyx/badge.svg?branch=develop)](https://coveralls.io/github/lucien144/fyx?branch=develop)
 
 Fyx je neoficiální mobilní klient (Android a iOS) pro diskuzní server [Nyx.cz](https://nyx.cz) ve [Flutteru](https://flutter.dev/).
@@ -79,6 +80,21 @@ Také si můžete projít [Issues](https://github.com/lucien144/fyx/issues) př�
 Build produkce lze spustit zavoláním skpriput `$ ./build.sh`, který zároveň zvýší build verzi o +1.
 
 Tento repozitář používá [Gitflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow). Připravujte veškerou práci ve `feature` větvích nebo forku, pak pošlete PR do `develop` větve. PR jsou mergovány pouze adminy (a jako `squash commits`).
+
+
+### CI/CD
+
+Pro úspěšný build je potřeba nastavit správně Firebase, doporučuji se podívat na `.env.example`, `ios/firebase_app_id_file.json.example` a skript níže. 
+
+Buildy se spouští automaticky přes [![Codemagic build status](https://api.codemagic.io/apps/64d5e8624479a8f7a878b6c9/64d5e8624479a8f7a878b6c8/status_badge.svg)](https://codemagic.io/apps/64d5e8624479a8f7a878b6c9/64d5e8624479a8f7a878b6c8/latest_build) v případě nového tagu ve formátu `vX.Y.Z+XXX` na branchích `develop` a `master`.
+
+#### iOS
+```shell
+mv ios/firebase_app_id_file.json.example ios/firebase_app_id_file.json
+sed -i '' "s/{GOOGLE_APP_ID}/$GOOGLE_APP_ID/g" ios/firebase_app_id_file.json
+sed -i '' "s/{FIREBASE_PROJECT_ID}/$FIREBASE_PROJECT_ID/g" ios/firebase_app_id_file.json
+sed -i '' "s/{GCM_SENDER_ID}/$GCM_SENDER_ID/g" ios/firebase_app_id_file.json
+```
 
 ## Hlášení chyb
 Pokud jste našli chybu, pak ji nahlaste ideálně přes aplikaci. Pokud to nejde, pak přes [Issues](https://github.com/lucien144/fyx/issues) - nezapomeňte uvést verzi aplikace a popsat chybu.
