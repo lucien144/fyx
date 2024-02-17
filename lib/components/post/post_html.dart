@@ -36,222 +36,220 @@ class PostHtml extends StatelessWidget {
   Widget build(BuildContext context) {
     final SkinColors colors = Skin.of(context).theme.colors;
 
-    return SelectionArea(
-      child: Html(
-          data: MainRepository().settings.useCompactMode && content!.consecutiveImages ? content!.body : content!.rawBody,
-          style: {
-            'html': Style.fromTextStyle(CupertinoTheme.of(context).textTheme.textStyle),
-            '.image-link': Style(textDecoration: TextDecoration.none),
-            'span.r': Style(fontWeight: FontWeight.bold),
-            'span.eob': Style(display: Display.none, height: Height(0)),
-            'body': Style(margin: Margins.all(0)),
-            'pre': Style(color: Colors.transparent),
-            'a': Style(color: colors.primary, textDecoration: TextDecoration.underline),
-            '.fill': Style(textDecoration: TextDecoration.none, display: Display.block, color: colors.text),
-            '.twitter-header a, .twitter-text a': Style(color: colors.twitter),
-            '.twitter-header .name': Style(fontWeight: FontWeight.bold),
-            '.twitter-text': Style(margin: Margins.symmetric(vertical: 10))
-          },
-          extensions: [
-            // Fixes https://github.com/lucien144/fyx/issues/414
-            // For some reason Html() has a bug of stripping whitespaces between 2 (or more) links.
-            // Fixed by adding custom padding (extending styles does not work)...
-            FyxTagWrapExtension(
-                tagsToWrap: {'a'},
-                builder: (parsedChild, renderContext) {
-                  final element = renderContext.element;
-                  if (element == null) {
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 2.0),
-                      child: parsedChild,
-                    );
-                  }
-
+    return Html(
+        data: MainRepository().settings.useCompactMode && content!.consecutiveImages ? content!.body : content!.rawBody,
+        style: {
+          'html': Style.fromTextStyle(CupertinoTheme.of(context).textTheme.textStyle),
+          '.image-link': Style(textDecoration: TextDecoration.none),
+          'span.r': Style(fontWeight: FontWeight.bold),
+          'span.eob': Style(display: Display.none, height: Height(0)),
+          'body': Style(margin: Margins.all(0)),
+          'pre': Style(color: Colors.transparent),
+          'a': Style(color: colors.primary, textDecoration: TextDecoration.underline),
+          '.fill': Style(textDecoration: TextDecoration.none, display: Display.block, color: colors.text),
+          '.twitter-header a, .twitter-text a': Style(color: colors.twitter),
+          '.twitter-header .name': Style(fontWeight: FontWeight.bold),
+          '.twitter-text': Style(margin: Margins.symmetric(vertical: 10))
+        },
+        extensions: [
+          // Fixes https://github.com/lucien144/fyx/issues/414
+          // For some reason Html() has a bug of stripping whitespaces between 2 (or more) links.
+          // Fixed by adding custom padding (extending styles does not work)...
+          FyxTagWrapExtension(
+              tagsToWrap: {'a'},
+              builder: (parsedChild, renderContext) {
+                final element = renderContext.element;
+                if (element == null) {
                   return Padding(
                     padding: const EdgeInsets.only(right: 2.0),
-                    child: GestureDetector(
-                        child: parsedChild,
-                        onTap: () {
-                          _onLinkTap(context, element.attributes['href'], LinkedHashMap.from(element.attributes), element);
-                        }),
+                    child: parsedChild,
                   );
-                }),
-            FyxTagWrapExtension(
-                tagsToWrap: {'em'},
-                builder: (
-                  parsedChild,
-                  renderContext,
-                ) {
-                  final element = renderContext.element;
-                  if (element!.classes.contains('search-match')) {
-                    return RichText(
-                        text: WidgetSpan(
-                            child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
-                      decoration: BoxDecoration(
-                          color: colors.highlightedText,
-                          border: Border.all(width: 1, color: colors.highlightedText),
-                          borderRadius: BorderRadius.circular(4),
-                          boxShadow: [
-                            BoxShadow(
-                                color: colors.grey.withOpacity(0.4), //New
-                                blurRadius: 2.0,
-                                offset: Offset(0, 0))
-                          ]),
-                      child: Text(
-                        element.text,
-                        style: TextStyle(color: colors.dark, fontStyle: FontStyle.italic, fontSize: 15),
-                      ),
-                    )));
-                  }
-                  return parsedChild;
-                }),
-            FyxTagWrapExtension(
-                tagsToWrap: {'img'},
-                builder: (
-                  parsedChild,
-                  renderContext,
-                ) {
-                  final element = renderContext.element;
-                  final String? thumb = element!.attributes['src'];
+                }
 
-                  if (thumb == null) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 2.0),
+                  child: GestureDetector(
+                      child: parsedChild,
+                      onTap: () {
+                        _onLinkTap(context, element.attributes['href'], LinkedHashMap.from(element.attributes), element);
+                      }),
+                );
+              }),
+          FyxTagWrapExtension(
+              tagsToWrap: {'em'},
+              builder: (
+                parsedChild,
+                renderContext,
+              ) {
+                final element = renderContext.element;
+                if (element!.classes.contains('search-match')) {
+                  return RichText(
+                      text: WidgetSpan(
+                          child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 4),
+                    decoration: BoxDecoration(
+                        color: colors.highlightedText,
+                        border: Border.all(width: 1, color: colors.highlightedText),
+                        borderRadius: BorderRadius.circular(4),
+                        boxShadow: [
+                          BoxShadow(
+                              color: colors.grey.withOpacity(0.4), //New
+                              blurRadius: 2.0,
+                              offset: Offset(0, 0))
+                        ]),
+                    child: Text(
+                      element.text,
+                      style: TextStyle(color: colors.dark, fontStyle: FontStyle.italic, fontSize: 15),
+                    ),
+                  )));
+                }
+                return parsedChild;
+              }),
+          FyxTagWrapExtension(
+              tagsToWrap: {'img'},
+              builder: (
+                parsedChild,
+                renderContext,
+              ) {
+                final element = renderContext.element;
+                final String? thumb = element!.attributes['src'];
+
+                if (thumb == null) {
+                  return parsedChild;
+                }
+
+                String src = thumb;
+                bool openGallery = true;
+                if (element.parent!.localName == 'a') {
+                  final RegExp r = RegExp(r'\.(jpg|jpeg|png|gif|webp)(\?.*)?$');
+                  if (r.hasMatch(element.parent!.attributes['href'] ?? '')) {
+                    src = element.parent!.attributes['href'] ?? '';
+                  } else {
+                    openGallery = false;
+                  }
+                }
+
+                post.Image img = post.Image(src, thumb: thumb);
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: PostHeroAttachment(
+                    img,
+                    images: content!.images,
+                    openGallery: openGallery,
+                    onTap: () => openGallery ? _isImageTap = true : null,
+                    crop: false,
+                    blur: blur,
+                  ),
+                );
+              }),
+          FyxTagWrapExtension(
+              tagsToWrap: {'video'},
+              builder: (
+                parsedChild,
+                renderContext,
+              ) {
+                final element = renderContext.element;
+                if (element != null) {
+                  return VideoPlayer(element, blur: blur);
+                }
+                return T.somethingsWrongButton(content!.rawBody);
+              }),
+          FyxTagWrapExtension(
+              tagsToWrap: {'div'},
+              builder: (
+                parsedChild,
+                renderContext,
+              ) {
+                final element = renderContext.element;
+
+                // Spoiler
+                if (element!.classes.contains('spoiler')) {
+                  return Spoiler(parsedChild);
+                }
+
+                // Twitter
+                if (element.attributes['data-embed-type'] == 'twitter') {
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 10, top: 20),
+                    child: Column(
+                      children: [
+                        Icon(MdiIcons.twitter, color: colors.twitter),
+                        Container(
+                          padding: EdgeInsets.only(left: 10),
+                          child: parsedChild,
+                          decoration: BoxDecoration(border: Border(left: BorderSide(width: 6, color: colors.twitter))),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                // Youtube
+                if (element.attributes['data-embed-type'] == 'youtube') {
+                  var img = element.querySelector('img');
+                  if (img == null) {
                     return parsedChild;
                   }
 
-                  String src = thumb;
-                  bool openGallery = true;
-                  if (element.parent!.localName == 'a') {
-                    final RegExp r = RegExp(r'\.(jpg|jpeg|png|gif|webp)(\?.*)?$');
-                    if (r.hasMatch(element.parent!.attributes['href'] ?? '')) {
-                      src = element.parent!.attributes['href'] ?? '';
-                    } else {
-                      openGallery = false;
-                    }
-                  }
-
-                  post.Image img = post.Image(src, thumb: thumb);
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: PostHeroAttachment(
-                      img,
-                      images: content!.images,
-                      openGallery: openGallery,
-                      onTap: () => openGallery ? _isImageTap = true : null,
-                      crop: false,
+                      Video(
+                          id: element.attributes['data-embed-value']!,
+                          type: Video.findVideoType(element.attributes['data-embed-type']!),
+                          image: img.attributes['src']!,
+                          thumb: img.attributes['src']!),
+                      size: Size(double.infinity, MediaQuery.of(context).size.width * (0.5)),
+                      showStrip: false,
                       blur: blur,
                     ),
                   );
-                }),
-            FyxTagWrapExtension(
-                tagsToWrap: {'video'},
-                builder: (
-                  parsedChild,
-                  renderContext,
-                ) {
-                  final element = renderContext.element;
-                  if (element != null) {
-                    return VideoPlayer(element, blur: blur);
-                  }
-                  return T.somethingsWrongButton(content!.rawBody);
-                }),
-            FyxTagWrapExtension(
-                tagsToWrap: {'div'},
-                builder: (
-                  parsedChild,
-                  renderContext,
-                ) {
-                  final element = renderContext.element;
+                }
 
-                  // Spoiler
-                  if (element!.classes.contains('spoiler')) {
-                    return Spoiler(parsedChild);
-                  }
+                return parsedChild;
+              }),
+          FyxTagWrapExtension(
+              tagsToWrap: {'span'},
+              builder: (
+                parsedChild,
+                renderContext,
+              ) {
+                final element = renderContext.element;
 
-                  // Twitter
-                  if (element.attributes['data-embed-type'] == 'twitter') {
-                    return Padding(
-                      padding: const EdgeInsets.only(left: 10, top: 20),
-                      child: Column(
-                        children: [
-                          Icon(MdiIcons.twitter, color: colors.twitter),
-                          Container(
-                            padding: EdgeInsets.only(left: 10),
-                            child: parsedChild,
-                            decoration: BoxDecoration(border: Border(left: BorderSide(width: 6, color: colors.twitter))),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
+                // Spoiler
+                if (element!.classes.contains('spoiler')) {
+                  return Spoiler(parsedChild);
+                }
 
-                  // Youtube
-                  if (element.attributes['data-embed-type'] == 'youtube') {
-                    var img = element.querySelector('img');
-                    if (img == null) {
-                      return parsedChild;
-                    }
+                return parsedChild;
+              }),
+          FyxTagWrapExtension(
+              tagsToWrap: {'pre'},
+              builder: (
+                parsedChild,
+                renderContext,
+              ) {
+                final element = renderContext.element;
 
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: PostHeroAttachment(
-                        Video(
-                            id: element.attributes['data-embed-value']!,
-                            type: Video.findVideoType(element.attributes['data-embed-type']!),
-                            image: img.attributes['src']!,
-                            thumb: img.attributes['src']!),
-                        size: Size(double.infinity, MediaQuery.of(context).size.width * (0.5)),
-                        showStrip: false,
-                        blur: blur,
-                      ),
-                    );
-                  }
-
+                if (element == null) {
                   return parsedChild;
-                }),
-            FyxTagWrapExtension(
-                tagsToWrap: {'span'},
-                builder: (
-                  parsedChild,
-                  renderContext,
-                ) {
-                  final element = renderContext.element;
+                }
 
-                  // Spoiler
-                  if (element!.classes.contains('spoiler')) {
-                    return Spoiler(parsedChild);
-                  }
-
-                  return parsedChild;
-                }),
-            FyxTagWrapExtension(
-                tagsToWrap: {'pre'},
-                builder: (
-                  parsedChild,
-                  renderContext,
-                ) {
-                  final element = renderContext.element;
-
-                  if (element == null) {
-                    return parsedChild;
-                  }
-
-                  if (element.attributes['style'] == 'background-color:#272822') {
-                    final source = HtmlUnescape().convert(element.text);
-                    return SyntaxHighlighter(source);
-                  } else {
-                    return Text(element.text, style: TextStyle(fontFamily: 'JetBrainsMono'));
-                  }
-                }),
-            OnImageTapExtension(
-              onImageTap: (src, imgAttributes, element) {
-                _isImageTap = true;
-                Navigator.of(context).pushNamed('/gallery', arguments: GalleryArguments(src!, images: content!.images));
-              },
-            ),
-          ],
-          onLinkTap: (link, attr, el) => _onLinkTap(context, link, attr, el)),
-    );
+                if (element.attributes['style'] == 'background-color:#272822') {
+                  final source = HtmlUnescape().convert(element.text);
+                  return SyntaxHighlighter(source);
+                } else {
+                  return Text(element.text, style: TextStyle(fontFamily: 'JetBrainsMono'));
+                }
+              }),
+          OnImageTapExtension(
+            onImageTap: (src, imgAttributes, element) {
+              _isImageTap = true;
+              Navigator.of(context).pushNamed('/gallery', arguments: GalleryArguments(src!, images: content!.images));
+            },
+          ),
+        ],
+        onLinkTap: (link, attr, el) => _onLinkTap(context, link, attr, el));
   }
 
   _onLinkTap(BuildContext buildContext, String? link, Map<String, String> attributes, dom.Element? element) async {
