@@ -17,6 +17,7 @@ class Settings {
   List<int> blockedPosts = [];
   List<int> blockedMails = [];
   List<String> blockedUsers = [];
+  List<String> savedSearch = [];
   Map<int, String> nsfwDiscussionList = {};
   ThemeEnum theme = ThemeEnum.system;
   SkinEnum skin = SkinEnum.fyx;

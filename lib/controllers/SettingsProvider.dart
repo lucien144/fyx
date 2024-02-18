@@ -94,6 +94,8 @@ class SettingsProvider {
 
   List get blockedUsers => _box.get('blockedUsers', defaultValue: Settings().blockedUsers);
 
+  List<String> get savedSearch => _box.get('savedSearch', defaultValue: Settings().savedSearch);
+
   Map get nsfwDiscussionList => _box.get('nsfwDiscussionList', defaultValue: Settings().nsfwDiscussionList);
 
   factory SettingsProvider() {
@@ -124,6 +126,7 @@ class SettingsProvider {
     _settings.skin = _box.get('skin', defaultValue: Settings().skin);
     _settings.linksMode = _box.get('linksMode', defaultValue: Settings().linksMode);
     _settings.whatsNew = _box.get('whatsNew', defaultValue: Settings().whatsNew);
+    _settings.savedSearch = _box.get('savedSearch', defaultValue: Settings().savedSearch);
 
     return _singleton;
   }
@@ -162,6 +165,21 @@ class SettingsProvider {
       blockedUsers.add(user);
     }
     _box.put('blockedUsers', blockedUsers);
+  }
+
+  void toggleSavedSearch(String term) {
+    List<String> savedSearch = _box.get('savedSearch', defaultValue: Settings().savedSearch);
+    if (savedSearch.contains(term)) {
+      savedSearch.remove(term);
+    } else {
+      savedSearch.add(term);
+    }
+    _box.put('savedSearch', savedSearch);
+  }
+
+  bool isSearchTermSaved(String term) {
+    List<String> savedSearch = _box.get('savedSearch', defaultValue: Settings().savedSearch);
+    return savedSearch.contains(term);
   }
 
   void addNsfwDiscussion(int id, String name) {
