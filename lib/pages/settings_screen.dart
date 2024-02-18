@@ -279,7 +279,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         T.success(L.SETTINGS_CACHE_RESET, bg: colors.success);
                         AnalyticsProvider().logEvent('resetBlockedContent');
                       },
-                  description: Text('Zmenšovat obrázky - zmenšuje obrázky před stažením a předchází tak pádům aplikavce. V určitých případech ale může snižovat FPS.')),
+                      description: Text(
+                          'Zmenšovat obrázky - zmenšuje obrázky před stažením a předchází tak pádům aplikavce. V určitých případech ale může snižovat FPS.')),
                 ],
               ),
               CustomSettingsSection(
@@ -378,7 +379,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   leading: Icon(MdiIcons.star, color: colors.grey),
                   title: Text('Co je nového v této verzi?'),
                   onPressed: (_) {
-                    showCupertinoModalBottomSheet(context: context, expand: false, builder: (context) => WhatsNew());
+                    showCupertinoModalBottomSheet(
+                      context: context,
+                      expand: false,
+                      builder: (context) => WhatsNew(),
+                      backgroundColor: colors.barBackground,
+                      barrierColor: colors.dark.withOpacity(0.5),
+                    );
                     AnalyticsProvider().logEvent('openWhatsNew');
                   },
                 )

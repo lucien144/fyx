@@ -14,6 +14,7 @@ import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/pages/tab_bar/bookmarks_tab.dart';
 import 'package:fyx/pages/tab_bar/MailboxTab.dart';
 import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
@@ -101,12 +102,19 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   void didPush() {
     // Called when the current route has been pushed.
+    SkinColors colors = Skin.of(context).theme.colors;
     var pkg = MainRepository().packageInfo;
     var version = '${pkg.version} (${pkg.buildNumber})';
     if (SettingsProvider().whatsNew != version) {
       SettingsProvider().whatsNew = version;
       Future.delayed(Duration(seconds: 2), () {
-        showCupertinoModalBottomSheet(context: context, expand: false, builder: (context) => WhatsNew());
+        showCupertinoModalBottomSheet(
+          context: context,
+          expand: false,
+          builder: (context) => WhatsNew(),
+          backgroundColor: colors.barBackground,
+          barrierColor: colors.dark.withOpacity(0.5),
+        );
       });
     }
   }
