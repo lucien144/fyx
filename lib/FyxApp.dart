@@ -37,6 +37,7 @@ import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/skins/ForestSkin.dart';
 import 'package:fyx/theme/skin/skins/FyxSkin.dart';
 import 'package:fyx/theme/skin/skins/GreyMatterSkin.dart';
+import 'package:fyx/theme/skin/skins/dark_skin.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 import 'package:tap_canvas/tap_canvas.dart';
@@ -234,7 +235,8 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
                 skins: [
                   FyxSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
                   ForestSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
-                  GreyMatterSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize)
+                  GreyMatterSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
+                  DarkSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
                 ],
                 skin: ctx.watch<ThemeModel>().skin,
                 brightness: (() {
