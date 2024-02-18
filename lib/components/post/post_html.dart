@@ -27,16 +27,17 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 class PostHtml extends StatelessWidget {
   final fyx.Content? content;
   final bool blur;
+  final bool selectable;
   bool _isImageTap = false;
 
   /// overloadRaw - if true, the content.rawBody is used to parse no matter what settings is on.
-  PostHtml(this.content, {this.blur = false});
+  PostHtml(this.content, {this.blur = false, this.selectable = true});
 
   @override
   Widget build(BuildContext context) {
     final SkinColors colors = Skin.of(context).theme.colors;
 
-    return Html(
+    final html = Html(
         data: MainRepository().settings.useCompactMode && content!.consecutiveImages ? content!.body : content!.rawBody,
         style: {
           'html': Style.fromTextStyle(CupertinoTheme.of(context).textTheme.textStyle),
@@ -250,6 +251,11 @@ class PostHtml extends StatelessWidget {
           ),
         ],
         onLinkTap: (link, attr, el) => _onLinkTap(context, link, attr, el));
+
+    if (this.selectable) {
+      return SelectionArea(child: html);
+    }
+    return html;
   }
 
   _onLinkTap(BuildContext buildContext, String? link, Map<String, String> attributes, dom.Element? element) async {
