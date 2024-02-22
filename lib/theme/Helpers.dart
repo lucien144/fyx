@@ -92,7 +92,6 @@ class Helpers {
     
     if (test.hasMatch(uri)) {
       final mailId = int.parse(test.firstMatch(uri)?.group(1) ?? '0');
-      print(uri);
       return {INTERNAL_URI_PARSER.mailId: mailId > 0 ? mailId : null};
     }
     return {};
