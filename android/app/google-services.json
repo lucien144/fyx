@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "759579571053-3k26dunt55s9lo1l72ra05vatgnhceia.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "net.lucien144.fyx",
+            "certificate_hash": "ce463949f7ca1ce66f02050883254ada1860a000"
+          }
+        },
+        {
           "client_id": "759579571053-kdemllrl5us6m1hof31o5m410659dct3.apps.googleusercontent.com",
           "client_type": 3
         }

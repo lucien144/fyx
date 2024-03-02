@@ -4,6 +4,7 @@ import 'package:fyx/model/enums/FirstUnreadEnum.dart';
 import 'package:fyx/model/enums/LaunchModeEnum.dart';
 import 'package:fyx/model/enums/SkinEnum.dart';
 import 'package:fyx/model/enums/ThemeEnum.dart';
+import 'package:fyx/state/nsfw_provider.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -31,6 +32,12 @@ class SettingsProvider {
   set fontSize(double fontSize) {
     _box.put('fontSize', fontSize);
     _settings.fontSize = fontSize;
+  }
+
+  String get whatsNew => _settings.whatsNew;
+  set whatsNew(String whatsNew) {
+    _box.put('whatsNew', whatsNew);
+    _settings.whatsNew = whatsNew;
   }
 
   DefaultView get defaultView => _settings.defaultView;
@@ -63,6 +70,12 @@ class SettingsProvider {
     _settings.quickRating = mode;
   }
 
+  bool get useFyxImageCache => _settings.useFyxImageCache;
+  set useFyxImageCache(bool mode) {
+    _box.put('useFyxImageCache', mode);
+    _settings.useFyxImageCache = mode;
+  }
+
   bool get useAutocorrect => _settings.useAutocorrect;
   set useAutocorrect(bool autocorrect) {
     _box.put('useAutocorrect', autocorrect);
@@ -80,6 +93,8 @@ class SettingsProvider {
   List get blockedPosts => _box.get('blockedPosts', defaultValue: Settings().blockedPosts);
 
   List get blockedUsers => _box.get('blockedUsers', defaultValue: Settings().blockedUsers);
+
+  Map get nsfwDiscussionList => _box.get('nsfwDiscussionList', defaultValue: Settings().nsfwDiscussionList);
 
   factory SettingsProvider() {
     return _singleton;
@@ -102,11 +117,13 @@ class SettingsProvider {
     _settings.defaultView = _box.get('defaultView', defaultValue: Settings().defaultView);
     _settings.latestView = _box.get('latestView', defaultValue: Settings().latestView);
     _settings.quickRating = _box.get('quickRating', defaultValue: Settings().quickRating);
+    _settings.useFyxImageCache = _box.get('useFyxImageCache', defaultValue: Settings().useFyxImageCache);
     _settings.useCompactMode = _box.get('useCompactMode', defaultValue: Settings().useCompactMode);
     _settings.useAutocorrect = _box.get('useAutocorrect', defaultValue: Settings().useAutocorrect);
     _settings.firstUnread = _box.get('firstUnread', defaultValue: Settings().firstUnread);
     _settings.skin = _box.get('skin', defaultValue: Settings().skin);
     _settings.linksMode = _box.get('linksMode', defaultValue: Settings().linksMode);
+    _settings.whatsNew = _box.get('whatsNew', defaultValue: Settings().whatsNew);
 
     return _singleton;
   }
@@ -145,5 +162,28 @@ class SettingsProvider {
       blockedUsers.add(user);
     }
     _box.put('blockedUsers', blockedUsers);
+  }
+
+  void addNsfwDiscussion(int id, String name) {
+    Map list = _box.get('nsfwDiscussionList', defaultValue: Settings().nsfwDiscussionList);
+    list[id] = name;
+    _box.put('nsfwDiscussionList', list);
+  }
+
+  void removeNsfwDiscussion(int id) {
+    Map list = _box.get('nsfwDiscussionList', defaultValue: Settings().nsfwDiscussionList);
+    if (this.isNsfw(id)) {
+      list.remove(id);
+    }
+    _box.put('nsfwDiscussionList', list);
+  }
+
+  void resetNsfwDiscussion() {
+    _box.delete('nsfwDiscussionList');
+  }
+
+  bool isNsfw(int id) {
+    Map list = _box.get('nsfwDiscussionList', defaultValue: Settings().nsfwDiscussionList);
+    return list.containsKey(id);
   }
 }

@@ -9,12 +9,13 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/Mail.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/IconReply.dart';
-import 'package:fyx/theme/IconUnread.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class MailListItem extends StatefulWidget {
@@ -52,12 +53,15 @@ class _MailListItemState extends State<MailListItem> {
         content: widget.mail.content,
         topLeftWidget: PostAvatar(widget.mail.direction == MailDirection.from ? widget.mail.participant : MainRepository().credentials!.nickname,
             description:
-                '→ ${widget.mail.direction == MailDirection.to ? widget.mail.participant : MainRepository().credentials!.nickname}, ~${Helpers.relativeTime(widget.mail.time)}'),
+                '→ ${widget.mail.direction == MailDirection.to ? widget.mail.participant : MainRepository().credentials!.nickname}, ${Helpers.absoluteTime(widget.mail.time)} ~${Helpers.relativeTime(widget.mail.time)}'),
         topRightWidget: Row(
           children: <Widget>[
             Visibility(
-              visible: widget.mail.isUnread,
-              child: IconUnread(),
+              visible: widget.mail.isOutgoing && widget.mail.isUnread,
+              child: Icon(
+                MdiIcons.emailMarkAsUnread,
+                color: colors.text.withOpacity(0.38),
+              ),
             ),
             SizedBox(
               width: 4,

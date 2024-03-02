@@ -30,7 +30,7 @@ class _SpoilerState extends State<Spoiler> {
       child: Stack(
         fit: StackFit.loose,
         children: [
-          _parsedChild,
+          ConstrainedBox(child: _parsedChild, constraints: BoxConstraints(minWidth: double.infinity)),
           Positioned.fill(
               child: Container(
                   alignment: Alignment.center,

@@ -2,12 +2,12 @@ import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:fyx/FyxApp.dart';
+import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/pages/HomePage.dart';
 import 'package:fyx/pages/LoginPage.dart';
 import 'package:fyx/theme/skin/Skin.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 
 class SkinnedApp extends StatelessWidget {
   const SkinnedApp({Key? key}) : super(key: key);
@@ -26,7 +26,7 @@ class SkinnedApp extends StatelessWidget {
           FyxApp.routeObserver,
           FirebaseAnalyticsObserver(
               analytics: FyxApp.analytics,
-              onError: (error) async => await Sentry.captureException(
+              onError: (error) => LogService.captureError(
                     error,
                   ))
         ],

@@ -1,24 +1,34 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/LaunchModeEnum.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
-import 'package:sentry/sentry.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // Theme helpers
 class T {
+  static nsfwMask() => ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            color: Colors.transparent,
+          )));
+
   // ************************
   // Theme mixins
   // ************************
-  static error(String message, {int duration: 7, Color bg: Colors.red}) {
+  static error(String message, {int duration = 7, Color bg = Colors.red}) {
     Fluttertoast.showToast(
         msg: message,
         toastLength: Toast.LENGTH_LONG,
@@ -29,7 +39,7 @@ class T {
         fontSize: 14.0);
   }
 
-  static success(String message, {int duration: 7, Color bg: Colors.green}) {
+  static success(String message, {int duration = 7, Color bg = Colors.green}) {
     Fluttertoast.showToast(
         msg: message,
         toastLength: Toast.LENGTH_LONG,
@@ -40,7 +50,7 @@ class T {
         fontSize: 14.0);
   }
 
-  static warn(String message, {int duration: 7, Color bg: Colors.orangeAccent}) {
+  static warn(String message, {int duration = 7, Color bg = Colors.orangeAccent}) {
     Fluttertoast.showToast(
         msg: message,
         toastLength: Toast.LENGTH_LONG,
@@ -51,13 +61,19 @@ class T {
         fontSize: 14.0);
   }
 
-  static Future<bool> openLink(String link, {mode: LaunchModeEnum.externalApplication}) async {
+  static Future<bool> openLink(String link, {mode = LaunchModeEnum.externalApplication}) async {
     try {
       var encodedUri = Uri.parse(link);
 
-      var canLaunch = await canLaunchUrl(encodedUri);
-      if (!canLaunch) {
-        throw ('Cannot launch url: $link');
+      // canLaunchUrl returns false on Android, if app handling the http(s) url is installed, even though launchUrl works afterwards
+      if (['http', 'https'].contains(encodedUri.scheme)) {
+        var canLaunch = await canLaunchUrl(encodedUri);
+        if (!canLaunch) {
+          throw ('Cannot launch url: $link');
+        }
+      } else if (['mailto', 'tel'].contains(encodedUri.scheme)) {
+        launchUrl(encodedUri);
+        return true;
       }
 
       var status = await launchUrl(encodedUri, mode: mode.original);
@@ -68,7 +84,7 @@ class T {
       return true;
     } catch (e) {
       T.error(L.INAPPBROWSER_ERROR);
-      Sentry.captureException(e);
+      LogService.captureError(e);
       return false;
     }
   }

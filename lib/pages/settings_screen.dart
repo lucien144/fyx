@@ -1,8 +1,13 @@
+import 'dart:io';
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/FyxApp.dart';
+import 'package:fyx/components/WhatsNew.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Settings.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
@@ -16,18 +21,26 @@ import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:settings_ui/settings_ui.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override
   _SettingsScreenState createState() => _SettingsScreenState();
 }
 
+enum CacheKeys { images, gifs, videos, other }
+
 class _SettingsScreenState extends State<SettingsScreen> {
+  Map cacheUsage = {CacheKeys.images: 0.0, CacheKeys.gifs: 0.0, CacheKeys.videos: 0.0, CacheKeys.other: 0.0};
+
   bool _compactMode = false;
   bool _autocorrect = false;
   bool _quickRating = true;
+  bool _useFyxImageCache = false;
+  bool _emptyingCache = false;
+  Future<Map<CacheKeys, double>> _cacheSize = Future.value({});
   DefaultView _defaultView = DefaultView.latest;
   FirstUnreadEnum _firstUnread = FirstUnreadEnum.button;
   LaunchModeEnum _linksMode = LaunchModeEnum.externalApplication;
@@ -41,6 +54,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _firstUnread = MainRepository().settings.firstUnread;
     _linksMode = MainRepository().settings.linksMode;
     _quickRating = MainRepository().settings.quickRating;
+    _useFyxImageCache = MainRepository().settings.useFyxImageCache;
+    _cacheSize = _getCacheSize();
     AnalyticsProvider().setScreen('Settings', 'SettingsPage');
   }
 
@@ -127,8 +142,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       },
                       initialValue: _quickRating,
                       leading: Icon(MdiIcons.thumbsUpDown, color: colors.grey),
-                      title: Text('Rychlé hodnocení')
-                  ),
+                      title: Text('Rychlé hodnocení')),
                   SettingsTile.switchTile(
                     onToggle: (bool value) {
                       setState(() => _compactMode = value);
@@ -139,8 +153,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     title: Text('Kompaktní zobrazení'),
                     description: Text(
                       'Kompaktní zobrazení: zobrazuje obrázky po stranách pokud to obsah příspěvku dovoluje (nedojde tak k narušení kontextu).'
-                          '\n'
-                          'Rychlé hodnocení: možnost hodnotit příspěvek na dvojklik (double-tap).',
+                      '\n'
+                      'Rychlé hodnocení: možnost hodnotit příspěvek na dvojklik (double-tap).',
                     ),
                   ),
                 ],
@@ -206,6 +220,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               SettingsSection(
                 title: Text('Paměť'),
                 tiles: <SettingsTile>[
+                  SettingsTile.switchTile(
+                      onToggle: (bool value) {
+                        setState(() => _useFyxImageCache = value);
+                        MainRepository().settings.useFyxImageCache = value;
+                      },
+                      initialValue: _useFyxImageCache,
+                      title: Text('Zmenšovat obrázky')),
                   SettingsTile(
                     title: Text('Blokovaných uživatelů'),
                     trailing: ValueListenableBuilder(
@@ -240,14 +261,90 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         }),
                   ),
                   SettingsTile(
+                    title: Text('Peprných diskuzí'),
+                    trailing: ValueListenableBuilder(
+                        valueListenable: MainRepository().settings.box.listenable(keys: ['nsfwDiscussionList']),
+                        builder: (BuildContext context, value, Widget? child) {
+                          return Text(
+                            MainRepository().settings.nsfwDiscussionList.length.toString(),
+                            style: TextStyle(color: colors.text, fontSize: Settings().fontSize),
+                          );
+                        }),
+                  ),
+                  SettingsTile(
                       title: Text('Resetovat', style: TextStyle(color: colors.danger), textAlign: TextAlign.center),
                       onPressed: (_) {
                         MainRepository().settings.resetBlockedContent();
+                        MainRepository().settings.resetNsfwDiscussion();
                         T.success(L.SETTINGS_CACHE_RESET, bg: colors.success);
                         AnalyticsProvider().logEvent('resetBlockedContent');
-                      }),
+                      },
+                  description: Text('Zmenšovat obrázky - zmenšuje obrázky před stažením a předchází tak pádům aplikavce. V určitých případech ale může snižovat FPS.')),
                 ],
               ),
+              CustomSettingsSection(
+                  child: FutureBuilder<Map>(
+                future: _cacheSize,
+                builder: (context, snapshot) {
+                  var tiles = [
+                    SettingsTile(
+                      title: Text('Obrázky'),
+                      trailing: Text('~${snapshot.data?[CacheKeys.images].round() ?? 0} MB'),
+                    ),
+                    SettingsTile(
+                      title: Text('Gify'),
+                      trailing: Text('~${snapshot.data?[CacheKeys.gifs].round() ?? 0} MB'),
+                    ),
+                    // SettingsTile(
+                    //   title: Text('Videa'),
+                    //   trailing: Text('${snapshot.data?[CacheKeys.videos].round() ?? 0}M'),
+                    // ),
+                    SettingsTile(
+                      title: Text('Ostatní'),
+                      trailing: Text('~${snapshot.data?[CacheKeys.other].round() ?? 0} MB'),
+                    ),
+                    SettingsTile(
+                        title: Text(_emptyingCache ? 'Mažu...' : 'Smazat',
+                            style: TextStyle(color: _emptyingCache ? colors.danger : colors.danger), textAlign: TextAlign.center),
+                        onPressed: (_) async {
+                          if (_emptyingCache) {
+                            return;
+                          }
+
+                          setState(() => _emptyingCache = true);
+                          try {
+                            await _emptyCache();
+                          } catch (error) {
+                            // T.error('👎 Úložiště se nepodařilo promazat.', bg: colors.danger);
+                            // LogService.captureError(error);
+                          } finally {
+                            // Production is trying to delete recursively the /Cache folder which fails.
+                            // There's no easy fix or workaround for now.
+                            T.success('👍 Úložiště promazáno.', bg: colors.success);
+                            setState(() {
+                              _emptyingCache = false;
+                              _cacheSize = _getCacheSize();
+                            });
+                            AnalyticsProvider().logEvent('emptyCache');
+                          }
+                        })
+                  ];
+
+                  if (snapshot.hasError) {
+                    tiles = [
+                      SettingsTile(
+                        title: Text('Nastala chyba, nelze spočítat.'),
+                      )
+                    ];
+                    LogService.captureError(snapshot.error);
+                  }
+
+                  return Stack(children: [
+                    Opacity(opacity: snapshot.hasData || snapshot.hasError ? 1 : 0.5, child: SettingsSection(title: Text('Úložiště'), tiles: tiles)),
+                    Visibility(visible: !snapshot.hasData && !snapshot.hasError, child: Positioned.fill(child: CupertinoActivityIndicator()))
+                  ]);
+                },
+              )),
               SettingsSection(title: Text('Informace'), tiles: <SettingsTile>[
                 SettingsTile.navigation(
                   leading: Icon(Icons.volunteer_activism, color: colors.grey),
@@ -275,6 +372,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onPressed: (_) {
                     T.openLink('https://nyx.cz/terms', mode: _linksMode);
                     AnalyticsProvider().logEvent('openTerms');
+                  },
+                ),
+                SettingsTile.navigation(
+                  leading: Icon(MdiIcons.star, color: colors.grey),
+                  title: Text('Co je nového v této verzi?'),
+                  onPressed: (_) {
+                    showCupertinoModalBottomSheet(context: context, expand: false, builder: (context) => WhatsNew());
+                    AnalyticsProvider().logEvent('openWhatsNew');
                   },
                 )
               ]),
@@ -319,5 +424,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
         ));
+  }
+
+  // https://stackoverflow.com/questions/62117279/how-to-get-application-cache-size-in-flutter
+  Future<Map<CacheKeys, double>> _getCacheSize() async {
+    Directory tempDir = await getTemporaryDirectory();
+    if (tempDir.existsSync()) {
+      _getSize(tempDir);
+      return cacheUsage.map((key, value) => MapEntry(key, value / pow(1024, 2)));
+    }
+    return Future.value({CacheKeys.images: 0.0, CacheKeys.gifs: 0.0, CacheKeys.videos: 0.0, CacheKeys.other: 0.0});
+  }
+
+  void _getSize(FileSystemEntity file) {
+    if (file is File) {
+      if (RegExp(r'\.(jpg|jpeg|png|webp)$', caseSensitive: false).hasMatch(file.path)) {
+        cacheUsage[CacheKeys.images] += file.lengthSync();
+      } else if (RegExp(r'\.(gif|gifv)$', caseSensitive: false).hasMatch(file.path)) {
+        cacheUsage[CacheKeys.gifs] += file.lengthSync();
+      } else if (RegExp(r'\.(mp4|webm|mkv)$', caseSensitive: false).hasMatch(file.path)) {
+        cacheUsage[CacheKeys.videos] += file.lengthSync();
+      } else {
+        cacheUsage[CacheKeys.other] += file.lengthSync();
+      }
+    } else if (file is Directory) {
+      List<FileSystemEntity> children = file.listSync();
+      for (FileSystemEntity child in children) {
+        _getSize(child);
+      }
+    }
+  }
+
+  Future<FileSystemEntity> _emptyCache() async {
+    Directory tempDir = await getTemporaryDirectory();
+    return tempDir.delete(recursive: true);
   }
 }

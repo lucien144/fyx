@@ -1,13 +1,16 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:fyx/SkinnedApp.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
+import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/libs/DeviceInfo.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
@@ -23,8 +26,12 @@ import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/pages/NoticesPage.dart';
 import 'package:fyx/pages/TutorialPage.dart';
 import 'package:fyx/pages/discussion_home_page.dart';
+import 'package:fyx/pages/last_page.dart';
+import 'package:fyx/pages/reminders_page.dart';
+import 'package:fyx/pages/search_page.dart';
 import 'package:fyx/pages/settings_design_screen.dart';
 import 'package:fyx/pages/settings_screen.dart';
+import 'package:fyx/pages/tab_bar/MailboxTab.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/skins/ForestSkin.dart';
@@ -32,10 +39,11 @@ import 'package:fyx/theme/skin/skins/FyxSkin.dart';
 import 'package:fyx/theme/skin/skins/GreyMatterSkin.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
-import 'package:sentry/sentry.dart';
 import 'package:tap_canvas/tap_canvas.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'controllers/NotificationsService.dart';
+import 'libs/firebase_options.dart';
 
 enum Environment { dev, staging, production }
 
@@ -52,7 +60,7 @@ class FyxApp extends StatefulWidget {
 
   static get isProduction => FyxApp.env == Environment.production;
 
-  static FirebaseAnalytics analytics = FirebaseAnalytics();
+  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
   static RouteObserver<PageRoute> _routeObserver = RouteObserver<PageRoute>();
 
@@ -69,21 +77,24 @@ class FyxApp extends StatefulWidget {
   }
 
   static init() async {
-    await Firebase.initializeApp();
+    await dotenv.load();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform(dotenv.env),
+    );
 
-    // This must be initialized after WidgetsFlutterBinding.ensureInitialized
-    FlutterError.onError = (details, {bool forceReport = false}) {
-      try {
-        Sentry.captureException(
-          details.exception,
-          stackTrace: details.stack,
-        );
-      } catch (e) {
-        print('Sending report to sentry.io failed: $e');
-      } finally {
-        // Also use Flutter's pretty error logging to the device's console.
-        FlutterError.dumpErrorToConsole(details, forceReport: forceReport);
+    FlutterError.onError = (flutterErrorDetails) async {
+      // Filter out invalid images error
+      if (flutterErrorDetails.library == 'image resource service' &&
+          flutterErrorDetails.exception.toString().startsWith('HttpException: Invalid statusCode: 404, uri')) {
+        return;
       }
+      await FirebaseCrashlytics.instance.recordFlutterFatalError(flutterErrorDetails);
+      return;
+    };
+
+    PlatformDispatcher.instance.onError = (error, stack) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+      return true;
     };
 
     if (FyxApp.isProduction) {
@@ -103,9 +114,8 @@ class FyxApp extends StatefulWidget {
     MainRepository().deviceInfo = results[2] as DeviceInfo;
     MainRepository().settings = results[3] as SettingsProvider;
 
-    Sentry.configureScope(
-          (scope) => scope.setUser(SentryUser(username: MainRepository().credentials?.nickname)),
-    );
+    LogService.init(provider: FirebaseCrashlyticsProvider());
+    LogService.setUser(MainRepository().credentials?.nickname ?? 'unknown');
 
     _notificationsService = NotificationService(
       onToken: (fcmToken) => ApiController().registerFcmToken(fcmToken),
@@ -126,7 +136,7 @@ class FyxApp extends StatefulWidget {
     };
     _notificationsService.onError = (error) {
       print(error);
-      Sentry.captureException(error);
+      FirebaseCrashlytics.instance.recordError(error, null);
     };
     MainRepository().notifications = _notificationsService;
 
@@ -144,6 +154,9 @@ class FyxApp extends StatefulWidget {
       case '/login':
         print('[Router] Login');
         return CupertinoPageRoute(builder: (_) => LoginPage(), settings: settings);
+      case '/mail':
+        print('[Router] Mail');
+        return CupertinoPageRoute(builder: (_) => MailboxTab(), settings: settings);
       case '/discussion':
         print('[Router] Discussion');
         return CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings);
@@ -176,6 +189,15 @@ class FyxApp extends StatefulWidget {
       case '/notices':
         print('[Router] Notices');
         return CupertinoPageRoute(builder: (_) => NoticesPage(), settings: settings);
+      case '/search':
+        print('[Router] Search');
+        return CupertinoPageRoute(builder: (_) => SearchPage(), settings: settings);
+      case '/last':
+        print('[Router] Last');
+        return CupertinoPageRoute(builder: (_) => LastPage(), settings: settings);
+      case '/reminders':
+        print('[Router] Reminders');
+        return CupertinoPageRoute(builder: (_) => RemindersPage(), settings: settings);
       default:
         print('[Router] Discussion');
         return CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings);

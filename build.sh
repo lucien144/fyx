@@ -7,7 +7,7 @@ cd "$(dirname "$0")"
 usage() {
   echo "Builds Android and iOS build and bumps up the build number."
   echo ""
-  echo "Usage: build.sh [-b] [-i] [-a]"
+  echo "Usage: build.sh [-k] [-i] [-a]"
   echo "  -k: keep the current build number"
   echo "  -i: build ios only"
   echo "  -a: build android only"
@@ -71,6 +71,7 @@ if [ $android == true ]; then
 
   if [ $ios == false ]; then
     flutter clean
+    flutter pub get
   fi
 
   flutter build appbundle -t lib/main_production.dart

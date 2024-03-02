@@ -24,9 +24,12 @@ class Post extends IPost {
   bool _canBeDeleted = false;
   bool _canBeReminded = false;
 
+  String? discussionName;
+
   Post.fromJson(Map<String, dynamic> json, this.idKlub, {this.isCompact = false}) {
     this._id_wu = json['id'] ?? 0;
     this._nick = json['username'] ?? '';
+    this.discussionName = json['discussion_name'];
     this._time = DateTime.parse(json['inserted_at'] ?? '0').millisecondsSinceEpoch;
     this.rating = json['rating'];
     this.replies = List<int>.from(json['replies'] ?? []);

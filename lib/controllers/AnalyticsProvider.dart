@@ -14,7 +14,7 @@ class AnalyticsProvider {
   AnalyticsProvider._init();
 
   Future<void> setUser(String userId) async {
-    await provider!.setUserId(userId);
+    await provider!.setUserId(id: userId);
   }
 
   Future<void> setScreen(String screenName, String screenClassOverride) async {

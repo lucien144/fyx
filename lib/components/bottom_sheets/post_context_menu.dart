@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fyx/components/bottom_sheets/context_menu/grid.dart';
+import 'package:fyx/components/bottom_sheets/context_menu/item.dart';
 import 'package:fyx/components/bottom_sheets/post_rating_sheet.dart';
 import 'package:fyx/components/feedback_indicator.dart';
 import 'package:fyx/components/post/post_list_item.dart';
-import 'package:fyx/components/post/post_thumbs.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
@@ -13,12 +13,11 @@ import 'package:fyx/model/Mail.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/post/Content.dart';
-import 'package:fyx/model/post/PostThumbItem.dart';
 import 'package:fyx/model/post/ipost.dart';
 import 'package:fyx/model/reponses/OkResponse.dart';
-import 'package:fyx/model/reponses/PostRatingsResponse.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
+import 'package:fyx/pages/search_page.dart';
 import 'package:fyx/state/batch_actions_provider.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
@@ -66,14 +65,7 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
   Post get post => widget.item as Post;
 
   Widget createGridView({required List<Widget> children, required BuildContext context}) {
-    return GridView.count(
-        physics: NeverScrollableScrollPhysics(),
-        padding: const EdgeInsets.only(left: 16, top: 16, right: 16, bottom: 48),
-        crossAxisCount: MediaQuery.of(context).size.width < 600 ? 3 : (MediaQuery.of(context).size.width / 140).round(),
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        shrinkWrap: true,
-        children: children);
+    return ContextMenuGrid(children: children);
   }
 
   void confirmationDialog(String title, String content, Function()? onPressed) {
@@ -100,21 +92,7 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
   }
 
   Widget gridItem(String label, IconData? icon, {Function()? onTap, bool danger = false}) {
-    return GestureDetector(
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(color: danger ? colors?.danger.withOpacity(0.1) : colors?.barBackground, borderRadius: BorderRadius.circular(8)),
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children: [
-            Icon(icon, size: 32, color: danger ? colors?.danger : colors?.primary),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: danger ? colors?.danger : colors?.primary),
-            )
-          ]),
-        ),
-        onTap: onTap);
+    return ContextMenuItem(label: label, icon: icon, onTap: onTap, danger: danger);
   }
 
   @override
@@ -175,7 +153,10 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
                     .catchError((error) => T.error(L.REMINDER_ERROR, bg: colors!.danger))
                     .then((response) {
                   post.hasReminder = !post.hasReminder;
-                }).whenComplete(() => setState(() => _reminderIndicator = false));
+                }).whenComplete(() {
+                  setState(() => _reminderIndicator = false);
+                  Navigator.pop(context);
+                });
                 AnalyticsProvider().logEvent(post.hasReminder ? 'reminder_remove' : 'reminder_add');
               })),
         if (isPost && post.replies.length > 0)
@@ -213,7 +194,7 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
           gridItem('Zobrazit palečky', MdiIcons.thumbsUpDownOutline, onTap: () {
             showCupertinoModalBottomSheet(
                 context: context,
-                expand: true,
+                expand: false,
                 builder: (context) {
                   return PostRatingBottomSheet(post);
                 });
@@ -224,7 +205,13 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
             Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(post.idKlub, filterByUser: post.nick));
             AnalyticsProvider().logEvent('filter_user_posts');
           }),
-        //gridItem('Vyhledat příspěvky', MdiIcons.accountSearch),
+        if (isPost)
+          gridItem('Vyhledat příspěvky\n@${post.nick}', MdiIcons.accountSearchOutline, onTap: () {
+            Navigator.of(context).pop();
+            var arguments = SearchPageArguments(searchTerm: '@${post.nick}', focus: false);
+            Navigator.of(context, rootNavigator: true).pushNamed('/search', arguments: arguments);
+            AnalyticsProvider().logEvent('filter_user_discussions');
+          }),
         gridItem(L.POST_SHEET_COPY_LINK, MdiIcons.link, onTap: () {
           var data = ClipboardData(text: widget.item.link);
           Clipboard.setData(data).then((_) {

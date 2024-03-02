@@ -23,6 +23,7 @@ class GreyMatterSkin extends SkinData {
       text: const Color(0xFF282828),
       success: Color(0xff4D6654),
       danger: const Color(0xffb60f0f),
+      divider: const Color(0xffe0e0e0),
       highlight: const Color(0xffFFFFFF),
       highlightedText: Colors.amber,
       light: Colors.white,

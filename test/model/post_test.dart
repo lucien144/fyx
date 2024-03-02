@@ -40,7 +40,7 @@ void main() {
     expect(post.id, 43695891);
     expect(post.nick, 'HYPNOGEN');
     expect(post.avatar, 'https://nyx.cz/H/HYPNOGEN.gif');
-    expect(post.time, 1425854167000);
+    expect(post.time, 1425850567000);
     expect(post.rating, 7);
     expect(post.content.rawBody, rawContent.trim());
     expect(parse(post.content.body).querySelectorAll('img').length, 1, reason: 'No consecutive image, therefore image not removed.');
@@ -257,6 +257,20 @@ void main() {
     <a href="http://i.mg/full.jpg" class="image-link"><img src="http://i.mg/thumb.jpg"></a>
     test<br>adasd
     """
+        .trim();
+
+    var json = Map<String, dynamic>.from(_json);
+    json.putIfAbsent("content", () => content);
+
+    var post = Post.fromJson(json, 1, isCompact: true);
+    expect(post.content.body, expectedContent);
+  });
+
+  test('Keep whitespaces between links', () {
+    var content = """Mohu poprosit <a href='/discussion/275939?text=%23prosim'>#prosim</a> <a href='https://www.idnes.cz/zpravy/zahranicni/izrael-tel-aviv-metro-doprava.A200904_182525_zahranicni_cern' class='extlink'>https://www.idnes.cz/zpravy/zahranicni/izrael-tel-aviv-metro-doprava.A200904_182525_zahranicni_cern</a>"""
+        .trim();
+
+    var expectedContent = """Mohu poprosit <a href="/discussion/275939?text=%23prosim">#prosim</a> <a href="https://www.idnes.cz/zpravy/zahranicni/izrael-tel-aviv-metro-doprava.A200904_182525_zahranicni_cern" class="extlink">https://www.idnes.cz/zpravy/zahranicni/izrael-tel-aviv-metro-doprava.A200904_182525_zahranicni_cern</a>"""
         .trim();
 
     var json = Map<String, dynamic>.from(_json);

@@ -70,7 +70,7 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
   // isInverted
   // Sometimes the activeTab var is changed after the listener where we call updateLatestView() finishes.
   // Therefore, the var activeTab needs to be handled as inverted.
-  void updateLatestView({bool isInverted: false}) {
+  void updateLatestView({bool isInverted = false}) {
     DefaultView latestView = activeTab == TabsEnum.history ? DefaultView.history : DefaultView.bookmarks;
     if (isInverted) {
       latestView = activeTab == TabsEnum.history ? DefaultView.bookmarks : DefaultView.history;

@@ -1,16 +1,30 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fyx/components/bottom_sheets/context_menu/grid.dart';
+import 'package:fyx/components/bottom_sheets/context_menu/item.dart';
 import 'package:fyx/components/post/post_avatar.dart';
 import 'package:fyx/components/post/post_hero_attachment.dart';
 import 'package:fyx/components/post/post_html.dart';
+import 'package:fyx/components/post/post_list_item.dart';
+import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/UserReferences.dart';
 import 'package:fyx/model/enums/AdEnums.dart';
 import 'package:fyx/model/post/Image.dart' as i;
 import 'package:fyx/model/post/content/Advertisement.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
+import 'package:fyx/pages/NewMessagePage.dart';
+import 'package:fyx/pages/search_page.dart';
 import 'package:fyx/theme/Helpers.dart';
+import 'package:fyx/theme/L.dart';
+import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:share_plus/share_plus.dart';
 
 class Advertisement extends StatelessWidget {
   final ContentAdvertisement content;
@@ -89,6 +103,66 @@ class Advertisement extends StatelessWidget {
           Navigator.of(context, rootNavigator: true).pushNamed('/discussion', arguments: arguments);
         }
       },
+      onLongPress: () => showCupertinoModalBottomSheet(
+          context: context,
+          builder: (BuildContext context) => ContextMenuGrid(children: [
+                ContextMenuItem(
+                    label: 'Odpovědět soukromě',
+                    icon: MdiIcons.replyOutline,
+                    onTap: () {
+                      Navigator.pop(context); // Close the sheet first.
+                      Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
+                          arguments: NewMessageSettings(
+                              hasInputField: true,
+                              inputFieldPlaceholder: this.username,
+                              messageFieldPlaceholder: '${content.link}\n',
+                              onClose: () => T.success('👍 Zpráva poslána.', bg: colors.success),
+                              onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                                if (inputField == null) return false;
+
+                                var response = await ApiController().sendMail(inputField, message, attachments: attachments);
+                                return response.isOk;
+                              }));
+                    }),
+                ContextMenuItem(
+                    label: 'Filtrovat\n@${this.username}',
+                    icon: MdiIcons.accountFilterOutline,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context)
+                          .pushNamed('/discussion', arguments: DiscussionPageArguments(content.discussionId, filterByUser: this.username));
+                      AnalyticsProvider().logEvent('filter_user_posts / ad');
+                    }),
+                ContextMenuItem(
+                    label: 'Vyhledat příspěvky\n@${this.username}',
+                    icon: MdiIcons.accountSearchOutline,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      var arguments = SearchPageArguments(searchTerm: '@${this.username}', focus: false);
+                      Navigator.of(context, rootNavigator: true).pushNamed('/search', arguments: arguments);
+                      AnalyticsProvider().logEvent('filter_user_discussions / ad');
+                    }),
+                ContextMenuItem(
+                    label: L.POST_SHEET_COPY_LINK,
+                    icon: MdiIcons.link,
+                    onTap: () {
+                      var data = ClipboardData(text: content.link);
+                      Clipboard.setData(data).then((_) {
+                        T.success(L.TOAST_COPIED, bg: colors.success);
+                        Navigator.pop(context);
+                      });
+                      AnalyticsProvider().logEvent('copyLink / ad');
+                    }),
+                ContextMenuItem(
+                    label: L.POST_SHEET_SHARE,
+                    icon: MdiIcons.shareVariant,
+                    onTap: () {
+                      final RenderBox box = context.findRenderObject() as RenderBox;
+                      Share.share(content.link, subject: heading, sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
+                      Navigator.pop(context);
+                      AnalyticsProvider().logEvent('shareSheet / ad');
+                    })
+              ])),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

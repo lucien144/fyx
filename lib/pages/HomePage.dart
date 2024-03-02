@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/FyxApp.dart';
+import 'package:fyx/components/WhatsNew.dart';
 import 'package:fyx/components/bottom_tab_bar.dart';
 import 'package:fyx/components/notification_badge.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
 import 'package:fyx/model/enums/RefreshDataEnum.dart';
@@ -13,6 +15,7 @@ import 'package:fyx/pages/tab_bar/bookmarks_tab.dart';
 import 'package:fyx/pages/tab_bar/MailboxTab.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 
 class HomePageArguments {
@@ -98,13 +101,21 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
   void didPush() {
     // Called when the current route has been pushed.
+    var pkg = MainRepository().packageInfo;
+    var version = '${pkg.version} (${pkg.buildNumber})';
+    if (SettingsProvider().whatsNew != version) {
+      SettingsProvider().whatsNew = version;
+      Future.delayed(Duration(seconds: 2), () {
+        showCupertinoModalBottomSheet(context: context, expand: false, builder: (context) => WhatsNew());
+      });
+    }
   }
 
   void didPop() {
     // Called when the current route has been popped off.
   }
 
-  // Called when a new route has been pushed, and the current route is no longer visible.
+// Called when a new route has been pushed, and the current route is no longer visible.
   void didPushNext() {
     setState(() => _showSubmenu = false);
   }
@@ -139,57 +150,54 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
       MailboxTab(refreshTimestamp: _refreshData[RefreshDataEnum.mail] ?? 0),
     ];
 
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Stack(children: [
-        Positioned.fill(
-          // Do not prevent the scroll down if the submenu is up. Only hide the submenu and keep scrolling...
-          child: GestureDetector(
-            child: tabs[_pageIndex],
-            onVerticalDragDown: (_) => _showSubmenu ? setState(() => _showSubmenu = false) : null,
-          ),
-          bottom: 50 + bottomPadding,
+    return Stack(children: [
+      Positioned.fill(
+        // Do not prevent the scroll down if the submenu is up. Only hide the submenu and keep scrolling...
+        child: GestureDetector(
+          child: tabs[_pageIndex],
+          onVerticalDragDown: (_) => _showSubmenu ? setState(() => _showSubmenu = false) : null,
         ),
-        Positioned.fill(
-          // Prevent the tap if submenu is up!
-          child: GestureDetector(
-            behavior: _showSubmenu ? HitTestBehavior.translucent : HitTestBehavior.deferToChild,
-            onTap: () => _showSubmenu ? setState(() => _showSubmenu = false) : null,
-            child: BottomTabBar(
-              activeSubmenu: _showSubmenu,
-              onTap: (index) {
-                if (index == tabs.length) {
-                  setState(() => _showSubmenu = !_showSubmenu);
-                  return;
-                }
+        bottom: 50 + bottomPadding,
+      ),
+      Positioned.fill(
+        // Prevent the tap if submenu is up!
+        child: GestureDetector(
+          behavior: _showSubmenu ? HitTestBehavior.translucent : HitTestBehavior.deferToChild,
+          onTap: () => _showSubmenu ? setState(() => _showSubmenu = false) : null,
+          child: BottomTabBar(
+            activeSubmenu: _showSubmenu,
+            onTap: (index) {
+              if (index == tabs.length) {
+                setState(() => _showSubmenu = !_showSubmenu);
+                return;
+              }
 
-                if (_pageIndex == index && index == HomePage.PAGE_BOOKMARK) {
-                  setState(() => _filterUnread = !_filterUnread);
-                }
-                setState(() {
-                  _pageIndex = index;
-                  _showSubmenu = false;
-                });
-                this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? RefreshDataEnum.mail : RefreshDataEnum.bookmarks);
-              },
-              items: [
-                Icon(_filterUnread ? Icons.bookmarks : Icons.bookmarks_outlined, size: 34, color: _pageIndex == 0 ? colors.primary : colors.grey),
-                Consumer<NotificationsModel>(
-                  builder: (context, notifications, child) => NotificationBadge(
-                      widget: Icon(Icons.email_outlined, size: 42, color: _pageIndex == 1 ? colors.primary : colors.grey),
-                      counter: notifications.newMails,
-                      isVisible: notifications.newMails > 0),
-                ),
-                Center(
-                    child: Icon(
-                  MdiIcons.menu,
-                  size: 34,
-                ))
-              ],
-            ),
+              if (_pageIndex == index && index == HomePage.PAGE_BOOKMARK) {
+                setState(() => _filterUnread = !_filterUnread);
+              }
+              setState(() {
+                _pageIndex = index;
+                _showSubmenu = false;
+              });
+              this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? RefreshDataEnum.mail : RefreshDataEnum.bookmarks);
+            },
+            items: [
+              Icon(_filterUnread ? Icons.bookmarks : Icons.bookmarks_outlined, size: 34, color: _pageIndex == 0 ? colors.primary : colors.grey),
+              Consumer<NotificationsModel>(
+                builder: (context, notifications, child) => NotificationBadge(
+                    widget: Icon(Icons.email_outlined, size: 42, color: _pageIndex == 1 ? colors.primary : colors.grey),
+                    counter: notifications.newMails,
+                    isVisible: notifications.newMails > 0),
+              ),
+              Center(
+                  child: Icon(
+                MdiIcons.menu,
+                size: 34,
+              ))
+            ],
           ),
-        )
-      ]),
-    );
+        ),
+      )
+    ]);
   }
 }

@@ -8,10 +8,17 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/model/Mail.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+
+class MailboxTabArguments {
+  final int? mailId;
+
+  MailboxTabArguments({this.mailId});
+}
 
 class MailboxTab extends StatefulWidget {
   final int refreshTimestamp;
@@ -50,13 +57,23 @@ class _MailboxTabState extends State<MailboxTab> {
     SyntaxHighlighter.languageContext = '';
     SkinColors colors = Skin.of(context).theme.colors;
 
+    MailboxTabArguments? tabArguments =
+        ModalRoute.of(context)?.settings.arguments is MailboxTabArguments ? ModalRoute.of(context)?.settings.arguments as MailboxTabArguments : null;
+
     return CupertinoTabView(builder: (context) {
       return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
+            leading: Visibility(
+              visible: tabArguments?.mailId != null,
+              child: CupertinoNavigationBarBackButton(
+                color: colors.primary,
+                onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+              ),
+            ),
             middle: Text(
-          'Pošta',
-          style: TextStyle(color: colors.text),
-        )),
+              'Pošta',
+              style: TextStyle(color: colors.text),
+            )),
         child: Stack(children: [
           PullToRefreshList(
               rebuild: _refreshData,
@@ -82,17 +99,20 @@ class _MailboxTabState extends State<MailboxTab> {
                 );
               },
               dataProvider: (lastId) async {
-                var result = await ApiController().loadMail(lastId: lastId);
+                var result = await ApiController().loadMail(lastId: lastId ?? tabArguments?.mailId);
                 var mails = result.mails
                     .map((_mail) => Mail.fromJson(_mail, isCompact: MainRepository().settings.useCompactMode))
                     .where((mail) => !MainRepository().settings.isMailBlocked(mail.id))
                     .where((mail) => !MainRepository().settings.isUserBlocked(mail.participant))
-                    .map((mail) => MailListItem(
-                          mail,
-                          onUpdate: this.refreshData,
-                        ))
-                    .toList();
-                var id = Mail.fromJson(result.mails.last, isCompact: MainRepository().settings.useCompactMode).id;
+                    .map((mail) {
+                  (mail.content as ContentRegular).parseEmailAddresses();
+                  (mail.content as ContentRegular).parsePhoneNumbers();
+                  return MailListItem(
+                    mail,
+                    onUpdate: this.refreshData,
+                  );
+                }).toList();
+                var id = result.mails.isEmpty ? lastId : Mail.fromJson(result.mails.last, isCompact: MainRepository().settings.useCompactMode).id;
                 return DataProviderResult(mails, lastId: id);
               }),
           Positioned(

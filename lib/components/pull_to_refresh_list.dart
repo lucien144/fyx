@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'package:fyx/components/search/search_notfound.dart';
 import 'package:fyx/components/search_box.dart';
+import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/FirstUnreadEnum.dart';
 import 'package:fyx/theme/L.dart';
@@ -14,13 +16,13 @@ import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
-import 'package:sentry/sentry.dart';
 
 // ignore: must_be_immutable
 class PullToRefreshList<TProvider> extends StatefulWidget {
   final TDataProvider dataProvider;
   final Function? sliverListBuilder;
   final bool searchEnabled;
+  final bool searchFocus;
   final String? searchLabel;
   final String? searchTerm;
   final int searchLimit;
@@ -28,18 +30,24 @@ class PullToRefreshList<TProvider> extends StatefulWidget {
   final VoidCallback? onSearchClear;
   final Function(ScrollNotification info)? onPullDown;
   final Widget? pinnedWidget;
+
+  // false => display Vencent Vega
+  Widget? emptyWidget;
+
   bool _disabled;
   bool _isInfinite;
   int _rebuild;
 
   PullToRefreshList(
       {required this.dataProvider,
+      this.emptyWidget,
       this.searchEnabled = false,
       this.onSearch, // TODO: move to SearchController
       this.onSearchClear, // TODO: move to SearchController
       this.searchLabel, // TODO: move to SearchController
       this.searchTerm, // TODO: move to SearchController
       this.searchLimit = 3, // TODO: move to SearchController
+      this.searchFocus = false, // TODO: move to SearchController
       this.onPullDown,
       isInfinite = false,
       int rebuild = 0,
@@ -87,7 +95,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
 
     () async {
       await Future.delayed(Duration.zero);
-      _controller.parentController = PrimaryScrollController.of(context)!;
+      _controller.parentController = PrimaryScrollController.of(context);
 
       slideController = AnimationController(vsync: this, duration: Duration(milliseconds: 600));
       slideOffset = Tween<Offset>(begin: Offset(0.0, 1.0), end: Offset.zero).animate(slideController);
@@ -139,6 +147,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
           child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             SearchBox(
               enabled: widget.searchEnabled,
+              focus: widget.searchFocus,
               loading: _isLoading,
               label: widget.searchLabel,
               limit: widget.searchLimit,
@@ -150,22 +159,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
           ]));
     }
 
-    if (_slivers.length == 1 && !_isLoading && widget.searchTerm == null) {
-      return Container(
-        height: double.infinity,
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Text(
-              L.GENERAL_EMPTY,
-              textAlign: TextAlign.center,
-            ),
-            Image.asset('travolta.gif')
-          ],
-        ),
-      );
-    }
+    var showTravolta = _slivers.length == 1 && !_isLoading && (widget.searchTerm == null || widget.searchTerm!.length >= 3);
 
     return Stack(
       children: [
@@ -174,6 +168,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
           children: [
             SearchBox(
               enabled: widget.searchEnabled,
+              focus: widget.searchFocus,
               loading: _isLoading,
               label: widget.searchLabel,
               limit: widget.searchLimit,
@@ -181,42 +176,45 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
               onSearch: widget.onSearch,
               onClear: widget.onSearchClear,
             ),
-            Expanded(
-              child: NotificationListener(
-                onNotification: (scrollInfo) {
-                  if (scrollInfo is ScrollNotification) {
-                    // Hide keyboard -> https://github.com/lucien144/fyx/issues/343
-                    FocusManager.instance.primaryFocus?.unfocus();
+            if (showTravolta && widget.emptyWidget == null) SearchNotFound(),
+            if (showTravolta && widget.emptyWidget != null) widget.emptyWidget!,
+            if (!showTravolta)
+              Expanded(
+                child: NotificationListener(
+                  onNotification: (scrollInfo) {
+                    if (scrollInfo is ScrollNotification) {
+                      // Hide keyboard -> https://github.com/lucien144/fyx/issues/343
+                      FocusManager.instance.primaryFocus?.unfocus();
 
-                    // Hide the jump to first unread button if user scrolls twice the height of the screen height
-                    if (scrollInfo.metrics.pixels > 2 * MediaQuery.of(context).size.height) {
-                      slideController.reverse();
-                    }
+                      // Hide the jump to first unread button if user scrolls twice the height of the screen height
+                      if (scrollInfo.metrics.pixels > 2 * MediaQuery.of(context).size.height) {
+                        slideController.reverse();
+                      }
 
-                    if (widget.onPullDown != null) widget.onPullDown!(scrollInfo);
+                      if (widget.onPullDown != null) widget.onPullDown!(scrollInfo);
 
-                    if (widget._isInfinite) {
-                      if (_controller.position.userScrollDirection == ScrollDirection.reverse && scrollInfo.metrics.outOfRange) {
-                        if (_slivers.last is! SliverPadding) {
-                          setState(() => _slivers.add(SliverPadding(
-                              padding: EdgeInsets.symmetric(vertical: 16), sliver: SliverToBoxAdapter(child: CupertinoActivityIndicator()))));
-                          this.loadData(append: true);
+                      if (widget._isInfinite) {
+                        if (_controller.position.userScrollDirection == ScrollDirection.reverse && scrollInfo.metrics.outOfRange) {
+                          if (_slivers.last is! SliverPadding) {
+                            setState(() => _slivers.add(SliverPadding(
+                                padding: EdgeInsets.symmetric(vertical: 16), sliver: SliverToBoxAdapter(child: CupertinoActivityIndicator()))));
+                            this.loadData(append: true);
+                          }
                         }
                       }
                     }
-                  }
-                  return false;
-                },
-                child: CupertinoScrollbar(
-                  controller: _controller,
-                  child: CustomScrollView(
-                    physics: Platform.isIOS ? const AlwaysScrollableScrollPhysics() : const RefreshScrollPhysics(),
-                    slivers: _slivers,
+                    return false;
+                  },
+                  child: CupertinoScrollbar(
                     controller: _controller,
+                    child: CustomScrollView(
+                      physics: Platform.isIOS ? const AlwaysScrollableScrollPhysics() : const RefreshScrollPhysics(),
+                      slivers: _slivers,
+                      controller: _controller,
+                    ),
                   ),
                 ),
               ),
-            ),
           ],
         ),
         if (_result != null &&
@@ -382,7 +380,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
 
       print('[PullToRefresh error]: $error');
       print(StackTrace.current);
-      Sentry.captureException(error);
+      LogService.captureError(error, stack: StackTrace.current);
     } finally {
       setState(() {
         _hasPulledDown = false;

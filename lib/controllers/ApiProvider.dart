@@ -91,10 +91,10 @@ class ApiProvider implements IApiProvider {
       }
 
       if (onError != null) {
-        if (e.message.contains('SocketException')) {
+        if (e.message?.contains('SocketException') ?? false) {
           onError!(L.CONNECTION_ERROR);
         } else {
-          onError!(e.message);
+          onError!(e.message ?? '');
         }
       }
     }));
@@ -111,6 +111,19 @@ class ApiProvider implements IApiProvider {
 
   Future<Response> searchDiscussions(String term) async {
     return await dio.get('$URL/search/unified?search=$term&limit=100');
+  }
+
+  Future<Response> search(String term, {int? lastId}) async {
+    Map<String, dynamic> params = {'order': lastId == null ? 'newest' : 'older_than', 'from_id': lastId, 'text': term};
+    return await dio.get('$URL/search', queryParameters: params);
+  }
+
+  Future<Response> fetchLast() async {
+    return await dio.get('$URL/last');
+  }
+
+  Future<Response> fetchReminders() async {
+    return await dio.get('$URL/bookmarks/reminders');
   }
 
   Future<Response> fetchBookmarks() async {
@@ -204,7 +217,7 @@ class ApiProvider implements IApiProvider {
     return await dio.get('$URL/discussion/$id/waiting_files');
   }
 
-  Future<List> uploadFile(List<Map<ATTACHMENT, dynamic>> attachments, {int id: 0}) async {
+  Future<List> uploadFile(List<Map<ATTACHMENT, dynamic>> attachments, {int id = 0}) async {
     List<Future> uploads = [];
     for (Map<ATTACHMENT, dynamic> attachment in attachments) {
       FormData fileData = new FormData.fromMap({
@@ -219,7 +232,11 @@ class ApiProvider implements IApiProvider {
   }
 
   Future<Response> votePoll(int discussionId, int postId, List<int> votes) async {
-    return await dio.post('$URL/discussion/$discussionId/poll/$postId/vote/${votes.join(',')}');
+    if (votes.isEmpty) {
+      return await dio.post('$URL/discussion/$discussionId/poll/$postId/empty-vote');
+    } else {
+      return await dio.post('$URL/discussion/$discussionId/poll/$postId/vote/${votes.join(',')}');
+    }
   }
 
   Future<Response> rollDice(int discussionId, int postId) async {

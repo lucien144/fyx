@@ -15,6 +15,7 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/state/batch_actions_provider.dart';
+import 'package:fyx/state/nsfw_provider.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
@@ -28,10 +29,11 @@ class PostListItem extends ConsumerStatefulWidget {
   final Post post;
   final bool _isPreview;
   final bool _isHighlighted;
+  final bool disabled;
   final Function? onUpdate;
   final Discussion? discussion;
 
-  PostListItem(this.post, {this.discussion, this.onUpdate, isPreview = false, isHighlighted = false})
+  PostListItem(this.post, {this.discussion, this.onUpdate, this.disabled = false, isPreview = false, isHighlighted = false})
       : _isPreview = isPreview,
         _isHighlighted = isHighlighted;
 
@@ -41,6 +43,7 @@ class PostListItem extends ConsumerStatefulWidget {
 
 class _PostListItemState extends ConsumerState<PostListItem> {
   Post? _post;
+  bool get makeDense => MediaQuery.of(context).textScaleFactor > 1 || MediaQuery.of(context).size.width <= 375;
 
   bool get adminTools => !(widget.discussion?.accessRights.canRights == false || // Do not have rights
       widget.post.nick == MainRepository().credentials?.nickname || // ... or is post owner
@@ -85,8 +88,8 @@ class _PostListItemState extends ConsumerState<PostListItem> {
           ),
         ),
         child: GestureDetector(
-          onLongPress: showPostContext,
           behavior: HitTestBehavior.opaque,
+          onLongPress: showPostContext,
           onDoubleTap: () {
             if (!_post!.canBeRated || !MainRepository().settings.quickRating) {
               return null;
@@ -111,6 +114,7 @@ class _PostListItemState extends ConsumerState<PostListItem> {
             isPreview: widget._isPreview,
             isHighlighted: widget._isHighlighted,
             isSelected: isSelected,
+            blur: ref.watch(NsfwDiscussionList.provider).containsKey(_post!.idKlub),
             topLeftWidget: PostAvatar(
               _post!.nick,
               descriptionWidget: Row(
@@ -135,8 +139,8 @@ class _PostListItemState extends ConsumerState<PostListItem> {
                 ],
               ),
             ),
-            topRightWidget: GestureFeedback(child: Icon(Icons.more_vert, color: colors.text.withOpacity(0.38)), onTap: showPostContext),
-            bottomWidget: Column(
+            topRightWidget: widget.disabled ? Container() : GestureFeedback(child: Icon(Icons.more_vert, color: colors.text.withOpacity(0.38)), onTap: showPostContext),
+            bottomWidget: widget.disabled ? null : Column(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,7 +169,7 @@ class _PostListItemState extends ConsumerState<PostListItem> {
                                         return result.isOk;
                                       })),
                               child: TextIcon(
-                                'Odpovědět',
+                                makeDense ? '' : 'Odpovědět',
                                 icon: MdiIcons.reply,
                                 iconColor: colors.text.withOpacity(0.38),
                               )),

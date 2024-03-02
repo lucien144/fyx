@@ -21,6 +21,7 @@ import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/pages/discussion_home_page.dart';
 import 'package:fyx/state/batch_actions_provider.dart';
+import 'package:fyx/state/nsfw_provider.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -323,7 +324,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                         FloatingActionButton(
                           backgroundColor: colors.primary,
                           foregroundColor: colors.background,
-                          child: Icon(Icons.add),
+                          child: Icon(discussionResponse.discussion.advertisement != null ? MdiIcons.reply : MdiIcons.plus),
                           onPressed: () => Navigator.of(context).pushNamed('/new-message',
                               arguments: NewMessageSettings(
                                   onClose: this.refresh,
@@ -440,12 +441,29 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                                 });
                               },
                               child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(this._searchTerm == null ? 'Hledat v diskuzi' : 'Zavřít hledání', style: textStyleContext),
                                   SizedBox(
                                     width: 10,
                                   ),
-                                  Expanded(child: Icon(this._searchTerm == null ? MdiIcons.magnify : MdiIcons.magnifyRemoveOutline)),
+                                  Icon(this._searchTerm == null ? MdiIcons.magnify : MdiIcons.magnifyRemoveOutline),
+                                ],
+                              ),
+                            ),
+                            Divider(
+                              color: colors.grey,
+                              height: 26,
+                            ),
+                            GestureDetector(
+                              onTap: () => ref.read(NsfwDiscussionList.provider.notifier).toggle(pageArguments.discussionId, discussionResponse.discussion.nameMain),
+                              child: Row(
+                                children: [
+                                  Text(!ref.watch(NsfwDiscussionList.provider).containsKey(pageArguments.discussionId) ? 'Označit za peprné' : 'Označit za ne-peprné', style: textStyleContext),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Expanded(child: Icon(!ref.watch(NsfwDiscussionList.provider).containsKey(pageArguments.discussionId) ? MdiIcons.chiliHot : MdiIcons.chiliOff)),
                                 ],
                               ),
                             ),
@@ -483,9 +501,10 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         postItem,
-        const Divider(
+        Divider(
           height: 8,
           thickness: 8,
+          color: colors.divider,
         ),
         Container(
           color: colors.grey.withOpacity(.1),
@@ -495,7 +514,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
               child: Container(
                 child: Text(
                   '↑ Nové příspěvky ($unseenCount)',
-                  style: TextStyle(color: colors.background, fontSize: FontSize.medium.size),
+                  style: TextStyle(color: colors.background, fontSize: FontSize.medium.value),
                 ),
                 decoration: BoxDecoration(color: colors.primary, borderRadius: BorderRadius.all(Radius.circular(12))),
                 padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),

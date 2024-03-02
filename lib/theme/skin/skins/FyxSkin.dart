@@ -22,6 +22,7 @@ class FyxSkin extends SkinData {
         text: const Color(0xFFadbac7),
         grey: CupertinoColors.inactiveGray,
         danger: const Color(0xffe5534b),
+        divider: const Color(0xff1a1d22),
         highlight: const Color(0xff33BB9A),
         disabled: const Color(0xFFadbac7),
         pollBackground: const Color(0xff2d333b),

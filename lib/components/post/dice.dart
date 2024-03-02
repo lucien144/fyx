@@ -113,7 +113,12 @@ class _DiceState extends State<Dice> {
                           setState(() => _loading = false);
                         }
                       },
-                child: _loading ? CupertinoActivityIndicator() : Text('Hodit! ${_dice!.diceCount}d${_dice!.diceSides}'),
+                child: _loading
+                    ? CupertinoActivityIndicator()
+                    : Text(
+                        'Hodit! ${_dice!.diceCount}d${_dice!.diceSides}',
+                        style: TextStyle(color: colors.background),
+                      ),
                 color: colors.primary,
                 padding: EdgeInsets.all(0),
                 disabledColor: colors.disabled,

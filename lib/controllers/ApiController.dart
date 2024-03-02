@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:fyx/FyxApp.dart';
 import 'package:fyx/controllers/ApiProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
+import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/exceptions/AuthException.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/Post.dart';
@@ -28,7 +29,6 @@ import 'package:fyx/model/reponses/WaitingFilesResponse.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:provider/provider.dart';
-import 'package:sentry/sentry.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum AUTH_STATES { AUTH_INVALID_USERNAME, AUTH_NEW, AUTH_EXISTING }
@@ -137,7 +137,7 @@ class ApiController {
           this.setCredentials(creds.copyWith(fcmToken: token));
         } catch (error) {
           debugPrint(error.toString());
-          Sentry.captureException(error);
+          LogService.captureError(error);
         }
       }
     });
@@ -155,7 +155,7 @@ class ApiController {
         this.setCredentials(creds.copyWith(fcmToken: token));
       } catch (error) {
         debugPrint(error.toString());
-        Sentry.captureException(error);
+        LogService.captureError(error);
       }
     });
   }
@@ -173,6 +173,18 @@ class ApiController {
   Future<UnifiedSearchResponse> searchDiscussions(String term) async {
     var response = await provider.searchDiscussions(term);
     return UnifiedSearchResponse.fromJson(response.data);
+  }
+
+  Future<Response> search(String term, {int? lastId}) async {
+    return await provider.search(term, lastId: lastId);
+  }
+
+  Future<Response> last() async {
+    return await provider.fetchLast();
+  }
+
+  Future<Response> reminders() async {
+    return await provider.fetchReminders();
   }
 
   Future<Response> bookmarkDiscussion(int discussionId, bool state) async {
@@ -231,7 +243,7 @@ class ApiController {
         await this.deleteAllWaitingFiles(waitingFilesResponse.files);
       } catch (error) {
         debugPrint(error.toString());
-        Sentry.captureException(error);
+        LogService.captureError(error);
         // TODO: Notify user?
       }
 
@@ -304,7 +316,7 @@ class ApiController {
         await this.deleteAllWaitingFiles(waitingFilesResponse.files);
       } catch (error) {
         debugPrint(error.toString());
-        Sentry.captureException(error);
+        LogService.captureError(error);
         // TODO: Notify user?
       }
       try {
@@ -342,7 +354,7 @@ class ApiController {
     return ContentDice.fromJson(json['content_raw']['data'], discussionId: json['discussion_id'] ?? 0, postId: json['post_id'] ?? 0);
   }
 
-  throwAuthException(LoginResponse loginResponse, {String message: ''}) {
+  throwAuthException(LoginResponse loginResponse, {String message = ''}) {
     if (loginResponse.error) {
       throw AuthException(loginResponse.message);
     }

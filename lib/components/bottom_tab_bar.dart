@@ -89,48 +89,46 @@ class _BottomTabBarState extends State<BottomTabBar> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: Opacity(
-                  opacity: .35,
-                  child: GestureDetector(
-                      child: Column(
-                    children: [
-                      Icon(MdiIcons.flashOutline, size: 34, color: colors.grey),
-                      Text(
-                        'Poslední',
-                        style: TextStyle(fontSize: 11, color: colors.grey),
-                      )
-                    ],
-                  )),
-                ),
+                child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => Navigator.of(context).pushNamed('/last'),
+                    child: Column(
+                      children: [
+                        Icon(MdiIcons.flashOutline, size: 34, color: colors.grey),
+                        Text(
+                          'Poslední',
+                          style: TextStyle(fontSize: 11, color: colors.grey),
+                        )
+                      ],
+                    )),
               ),
               Expanded(
-                  child: Opacity(
-                opacity: .35,
-                child: GestureDetector(
-                    child: Column(
-                  children: [
-                    Icon(MdiIcons.pinOutline, size: 34, color: colors.grey),
-                    Text(
-                      'Uložené',
-                      style: TextStyle(fontSize: 11, color: colors.grey),
-                    )
-                  ],
-                )),
-              )),
+                  child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => Navigator.of(context).pushNamed('/reminders'),
+                      child: Column(
+                        children: [
+                          Icon(MdiIcons.pinOutline, size: 34, color: colors.grey),
+                          Text(
+                            'Uložené',
+                            style: TextStyle(fontSize: 11, color: colors.grey),
+                          )
+                        ],
+                      ))),
               Expanded(
-                  child: Opacity(
-                opacity: .35,
                 child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => Navigator.of(context).pushNamed('/search'),
                     child: Column(
-                  children: [
-                    Icon(MdiIcons.magnify, size: 34, color: colors.grey),
-                    Text(
-                      'Hledání',
-                      style: TextStyle(fontSize: 11, color: colors.grey),
-                    )
-                  ],
-                )),
-              )),
+                      children: [
+                        Icon(MdiIcons.magnify, size: 34, color: colors.grey),
+                        Text(
+                          'Hledání',
+                          style: TextStyle(fontSize: 11, color: colors.grey),
+                        )
+                      ],
+                    )),
+              ),
             ],
           ),
           const SizedBox(height: 30),
@@ -138,6 +136,7 @@ class _BottomTabBarState extends State<BottomTabBar> {
             children: [
               Expanded(
                   child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
                       onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(17067)),
                       child: Column(
                         children: [
@@ -150,6 +149,7 @@ class _BottomTabBarState extends State<BottomTabBar> {
                       ))),
               Expanded(
                   child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
                       onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/settings'),
                       child: Column(
                         children: [
@@ -162,6 +162,7 @@ class _BottomTabBarState extends State<BottomTabBar> {
                       ))),
               Expanded(
                   child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
                       onTap: () {
                         T.prefillGithubIssue(appContext: MainRepository(), user: MainRepository().credentials!.nickname);
                         AnalyticsProvider().logEvent('reportBug');
