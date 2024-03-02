@@ -99,14 +99,14 @@ class ContentRegular extends Content {
   }
 
   void parseEmailAddresses() {
-    final r = RegExp(r"([a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+)");
+    final r = RegExp(r"(?<!<[^>]*)([a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+)");
     final replace = (match) => '<a href="mailto:${match[1]}">${match[1]}</a>';
     _body = _body.replaceAllMapped(r, replace);
     _rawBody = _rawBody.replaceAllMapped(r, replace);
   }
 
   void parsePhoneNumbers() {
-    final r = RegExp(r"((\+420\s?)?[1-9][0-9]{2}\s?[0-9]{3}\s?[0-9]{3})");
+    final r = RegExp(r"(?<!<[^>]*)((\+420\s?)?[1-9][0-9]{2}\s?[0-9]{3}\s?[0-9]{3})");
     final replace = (match) => '<a href="tel:${match[1]}">${match[1]}</a>';
     _body = _body.replaceAllMapped(r, replace);
     _rawBody = _rawBody.replaceAllMapped(r, replace);
