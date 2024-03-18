@@ -70,8 +70,8 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
 
   Future<DiscussionResponse> _fetchData(discussionId, postId, user, {String? search, bool filterReplies = false}) {
     return this._memoizer.runOnce(() {
-      return Future.delayed(
-          Duration(milliseconds: 300), () => ApiController().loadDiscussion(discussionId, lastId: postId, user: user, search: search, filterReplies: filterReplies));
+      return Future.delayed(Duration(milliseconds: 300),
+          () => ApiController().loadDiscussion(discussionId, lastId: postId, user: user, search: search, filterReplies: filterReplies));
     });
   }
 
@@ -100,7 +100,8 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
     }
 
     return FutureBuilder<DiscussionResponse>(
-        future: _fetchData(pageArguments.discussionId, pageArguments.postId, pageArguments.filterByUser, search: pageArguments.search, filterReplies: pageArguments.filterReplies),
+        future: _fetchData(pageArguments.discussionId, pageArguments.postId, pageArguments.filterByUser,
+            search: pageArguments.search, filterReplies: pageArguments.filterReplies),
         builder: (BuildContext context, AsyncSnapshot<DiscussionResponse> snapshot) {
           if (snapshot.hasError) {
             return T.feedbackScreen(context,
@@ -158,8 +159,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
             PullToRefreshList<AutoDisposeStateProvider<String?>>(
               onPullDown: (scrollInfo) {
                 if (scrollInfo.metrics.pixels > 80 && this._searchTerm != null) {
-                  if (this._searchTerm == '')
-                    setState(() => this._searchTerm = null);
+                  if (this._searchTerm == '') setState(() => this._searchTerm = null);
                 } else if (scrollInfo.metrics.pixels < -60 && this._searchTerm == null) {
                   setState(() => this._searchTerm = '');
                 }
@@ -175,6 +175,24 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                 setState(() => this._searchTerm = null);
                 this.refresh();
               },
+              searchBottomWidget: Container(
+                width: double.infinity,
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.only(top: 6),
+                  scrollDirection: Axis.horizontal,
+                  clipBehavior: Clip.hardEdge,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      _searchShortcut('obrázky', 'img src', icon: MdiIcons.image),
+                      _searchShortcut('odkazy', 'href extlink', icon: MdiIcons.link),
+                      ...discussionResponse.discussion.hashtags.map((hashtag) => _searchShortcut('#$hashtag', '#$hashtag')),
+                    ],
+                  ),
+                ),
+              ),
               rebuild: _refreshList,
               isInfinite: true,
               pinnedWidget: getPinnedWidget(discussionResponse),
@@ -295,21 +313,20 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                               onPressed: _deleting
                                   ? null
                                   : () async {
-                                setState(() => _deleting = true);
-                                try {
-                                  await Future.wait(ref
-                                      .read(PostsSelection.provider)
-                                      .map((post) => ApiController().deleteDiscussionMessage(discussionResponse.discussion.idKlub, post.id).then((_) {
-                                    ref.read(PostsToDelete.provider.notifier).add(post);
-                                    ref.read(PostsSelection.provider.notifier).remove(post);
-                                  })));
-                                  T.success('Smazáno.');
-                                } catch (error) {
-                                  T.warn('Některé příspěvky se nepodařilo smazat.');
-                                } finally {
-                                  setState(() => _deleting = false);
-                                }
-                              },
+                                      setState(() => _deleting = true);
+                                      try {
+                                        await Future.wait(ref.read(PostsSelection.provider).map((post) =>
+                                            ApiController().deleteDiscussionMessage(discussionResponse.discussion.idKlub, post.id).then((_) {
+                                              ref.read(PostsToDelete.provider.notifier).add(post);
+                                              ref.read(PostsSelection.provider.notifier).remove(post);
+                                            })));
+                                        T.success('Smazáno.');
+                                      } catch (error) {
+                                        T.warn('Některé příspěvky se nepodařilo smazat.');
+                                      } finally {
+                                        setState(() => _deleting = false);
+                                      }
+                                    },
                             )
                           ],
                         ),
@@ -456,14 +473,23 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                               height: 26,
                             ),
                             GestureDetector(
-                              onTap: () => ref.read(NsfwDiscussionList.provider.notifier).toggle(pageArguments.discussionId, discussionResponse.discussion.nameMain),
+                              onTap: () => ref
+                                  .read(NsfwDiscussionList.provider.notifier)
+                                  .toggle(pageArguments.discussionId, discussionResponse.discussion.nameMain),
                               child: Row(
                                 children: [
-                                  Text(!ref.watch(NsfwDiscussionList.provider).containsKey(pageArguments.discussionId) ? 'Označit za peprné' : 'Označit za ne-peprné', style: textStyleContext),
+                                  Text(
+                                      !ref.watch(NsfwDiscussionList.provider).containsKey(pageArguments.discussionId)
+                                          ? 'Označit za peprné'
+                                          : 'Označit za ne-peprné',
+                                      style: textStyleContext),
                                   SizedBox(
                                     width: 10,
                                   ),
-                                  Expanded(child: Icon(!ref.watch(NsfwDiscussionList.provider).containsKey(pageArguments.discussionId) ? MdiIcons.chiliHot : MdiIcons.chiliOff)),
+                                  Expanded(
+                                      child: Icon(!ref.watch(NsfwDiscussionList.provider).containsKey(pageArguments.discussionId)
+                                          ? MdiIcons.chiliHot
+                                          : MdiIcons.chiliOff)),
                                 ],
                               ),
                             ),
@@ -523,6 +549,30 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
           ),
         )
       ],
+    );
+  }
+
+  Widget _searchShortcut(String label, String term, {IconData? icon}) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 12),
+      child: GestureDetector(
+        child: Row(
+          children: [
+            if (icon != null) Icon(icon),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                decoration: icon == null ? TextDecoration.underline : null,
+              ),
+            ),
+          ],
+        ),
+        onTap: () {
+          setState(() => this._searchTerm = term);
+          this.refresh();
+        },
+      ),
     );
   }
 }

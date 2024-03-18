@@ -19,6 +19,8 @@ class Discussion {
   bool _has_header = false;
   int _id_domain = 0;
 
+  List<String> _hashtags = [];
+
   bool _accessDenied = false;
 
   late DiscussionRights _discussion_rights;
@@ -60,6 +62,7 @@ class Discussion {
     this._has_header = json['discussion']['has_header'];
     this._id_domain = json['domain_id'] ?? 0;
     this._discussion_type = json['discussion']['discussion_type'] ?? 'discussion';
+    this._hashtags = List.from(json['discussion']['hashtags'] ?? []).cast<String>().toList();
 
     if (json['owner'] is Map) {
       this._owner = DiscussionOwner.fromJson(json['owner']);
@@ -111,6 +114,7 @@ class Discussion {
   AccessRights get accessRights => _access_rights;
 
   DiscussionRights get rights => _discussion_rights;
+  List<String> get hashtags => _hashtags;
 
   DiscussionTypeEnum get type {
     switch (_discussion_type) {

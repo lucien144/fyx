@@ -17,9 +17,20 @@ class SearchBox extends ConsumerStatefulWidget {
   final String? searchTerm;
   final int limit;
   final bool loading;
+  final Widget? bottomWidget;
 
-  SearchBox({Key? key, this.onSearch, this.enabled = false, this.focus = false, this.onClear, this.searchTerm, this.limit = 3, this.label = 'Hledej', this.loading = false})
-      : super(key: key);
+  SearchBox({
+    Key? key,
+    this.onSearch,
+    this.enabled = false,
+    this.focus = false,
+    this.onClear,
+    this.searchTerm,
+    this.limit = 3,
+    this.label = 'Hledej',
+    this.loading = false,
+    this.bottomWidget,
+  }) : super(key: key);
 
   @override
   _SearchBoxState createState() => _SearchBoxState();
@@ -33,6 +44,7 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
   bool _loading = false;
 
   TextEditingController searchController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -40,7 +52,7 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
     searchAnimation = AnimationController(vsync: this, value: widget.enabled ? 1 : 0);
     searchController.text = widget.searchTerm ?? '';
     _loading = widget.loading;
-    
+
     if (widget.focus) {
       focus.requestFocus();
     }
@@ -56,6 +68,10 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
         curve: Curves.easeOutExpo,
         duration: const Duration(milliseconds: 600),
       );
+    }
+
+    if (oldWidget.searchTerm != this.searchTerm) {
+      searchController.text = widget.searchTerm ?? '';
     }
 
     if (!widget.enabled) {
@@ -81,8 +97,7 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
       T.warn('Zadejte alespoň ${widget.limit} písmena...');
       setState(() => _loading = false);
     } else {
-      if (widget.onSearch != null)
-        widget.onSearch!(term);
+      if (widget.onSearch != null) widget.onSearch!(term);
       setState(() => _loading = true);
     }
   }
@@ -98,30 +113,34 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
         ),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-          child: CupertinoSearchTextField(
-            style: TextStyle(fontSize: Settings().fontSize, color: colors.text),
-            placeholderStyle: TextStyle(fontSize: Settings().fontSize, color: colors.text.withOpacity(.5)),
-            backgroundColor: colors.text.withOpacity(.1),
-            focusNode: focus,
-            placeholder: widget.label,
-            controller: searchController,
-            prefixIcon: _loading ? const CupertinoActivityIndicator(radius: 10) : Icon(CupertinoIcons.search, color: colors.text.withOpacity(.5)),
-            onChanged: (term) {
-              if (_debounce?.isActive ?? false) _debounce?.cancel();
-              _debounce = Timer(const Duration(milliseconds: 650), () {
-                _submit(term);
-              });
-            },
-            onSubmitted: _submit,
-            onSuffixTap: () {
-              if (widget.onSearch != null)
-                widget.onSearch!('');
-              searchController.clear();
-              if (widget.onClear != null) {
-                widget.onClear!();
-              }
-            },
-            autocorrect: false,
+          child: Column(
+            children: [
+              CupertinoSearchTextField(
+                style: TextStyle(fontSize: Settings().fontSize, color: colors.text),
+                placeholderStyle: TextStyle(fontSize: Settings().fontSize, color: colors.text.withOpacity(.5)),
+                backgroundColor: colors.text.withOpacity(.1),
+                focusNode: focus,
+                placeholder: widget.label,
+                controller: searchController,
+                prefixIcon: _loading ? const CupertinoActivityIndicator(radius: 10) : Icon(CupertinoIcons.search, color: colors.text.withOpacity(.5)),
+                onChanged: (term) {
+                  if (_debounce?.isActive ?? false) _debounce?.cancel();
+                  _debounce = Timer(const Duration(milliseconds: 650), () {
+                    _submit(term);
+                  });
+                },
+                onSubmitted: _submit,
+                onSuffixTap: () {
+                  if (widget.onSearch != null) widget.onSearch!('');
+                  searchController.clear();
+                  if (widget.onClear != null) {
+                    widget.onClear!();
+                  }
+                },
+                autocorrect: false,
+              ),
+              if (widget.bottomWidget != null) widget.bottomWidget!
+            ],
           ),
           color: colors.barBackground,
         ));
