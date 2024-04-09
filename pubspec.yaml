@@ -1,5 +1,5 @@
 name: fyx
-description: A new Flutter project.
+description: Fyx for Nyx.cz
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -11,7 +11,7 @@ description: A new Flutter project.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 0.10.0+128
+version: 0.10.0+129
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
