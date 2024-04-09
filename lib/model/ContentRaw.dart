@@ -3,6 +3,7 @@ import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/content/Advertisement.dart';
 import 'package:fyx/model/post/content/Dice.dart';
 import 'package:fyx/model/post/content/Poll.dart';
+import 'package:fyx/model/post/content/discussion_request.dart';
 import 'package:fyx/model/post/content/post_content_text.dart';
 
 class ContentRaw {
@@ -26,6 +27,9 @@ class ContentRaw {
         break;
       case 'advertisement':
         this.content = ContentAdvertisement.fromPostJson(this.data);
+        break;
+      case 'discussion_request':
+        this.content = ContentDiscussionRequest.fromJson(this.data, parentDiscussionId: discussionId ?? 0, parentPostId: postId ?? 0);
         break;
       default:
         throw UnsupportedContentTypeException(this.type);

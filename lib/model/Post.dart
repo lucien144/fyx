@@ -46,7 +46,8 @@ class Post extends IPost {
         content = ContentRaw.fromJson(json: json['content_raw'], discussionId: json['discussion_id'], postId: json['id']).content;
         this._canReply = !(content is ContentAdvertisement);
       } catch (error) {
-        content = ContentRegular('${json['content']}<br><br><small><em>Chyba: neošetřený druh příspěvku: "${this.type}"</em></small>',
+        print(error);
+        content = ContentRegular('${json['content']}<br><br><small><em>Chyba: neošetřený druh příspěvku: "${json['content_raw']['type']}"</em></small>',
             isCompact: this.isCompact);
       }
     } else {

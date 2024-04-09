@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/post/advertisement.dart';
 import 'package:fyx/components/post/dice.dart';
+import 'package:fyx/components/post/discussion_request.dart';
 import 'package:fyx/components/post/poll.dart';
 import 'package:fyx/components/post/post_footer_link.dart';
 import 'package:fyx/components/post/post_hero_attachment.dart';
@@ -13,6 +14,7 @@ import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/model/post/content/Advertisement.dart';
 import 'package:fyx/model/post/content/Dice.dart';
 import 'package:fyx/model/post/content/Poll.dart';
+import 'package:fyx/model/post/content/discussion_request.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/UnreadBadgeDecoration.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -162,7 +164,6 @@ class ContentBoxLayout extends StatelessWidget {
               height: 8,
               thickness: 8,
               color: colors.divider,
-
             ),
           ),
           Container(
@@ -250,6 +251,8 @@ class ContentBoxLayout extends StatelessWidget {
         return PostHtml(content, blur: blur);
       case PostTypeEnum.advertisement:
         return Advertisement(content as ContentAdvertisement);
+      case PostTypeEnum.discussion_request:
+        return PostDiscussionRequest(content: content as ContentDiscussionRequest);
       default:
         return T.somethingsWrongButton(content.rawBody);
     }

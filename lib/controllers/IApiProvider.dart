@@ -43,4 +43,6 @@ abstract class IApiProvider {
   Future<Response> getPostRatings(int discussionId, int postId);
   Future<Response> votePoll(int discussionId, int postId, List<int> votes);
   Future<Response> rollDice(int discussionId, int postId);
+
+  Future<Response> discussionCreateRequest(int discussionId, int postId, [bool against = false]);
 }
