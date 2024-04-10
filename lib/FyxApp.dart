@@ -82,6 +82,7 @@ class FyxApp extends StatefulWidget {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform(dotenv.env),
     );
+    await Future.delayed(Duration(seconds: 1)); // https://stackoverflow.com/a/77175299/4026345
 
     FlutterError.onError = (flutterErrorDetails) async {
       // Filter out invalid images error
