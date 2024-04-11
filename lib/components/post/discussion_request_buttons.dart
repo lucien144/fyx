@@ -44,7 +44,7 @@ class _DiscussionRequestButtonsState extends State<DiscussionRequestButtons> {
           mainAxisSize: MainAxisSize.min,
           children: [
             CupertinoButton(
-              child: Text('👍 Pro'),
+              child: Text('👍 Pro', style: TextStyle(color: colors.background)),
               onPressed: $loading
                   ? null
                   : () async {
@@ -61,7 +61,7 @@ class _DiscussionRequestButtonsState extends State<DiscussionRequestButtons> {
             ),
             const SizedBox(width: 16),
             CupertinoButton(
-              child: Text('👎 Proti'),
+              child: Text('👎 Proti', style: TextStyle(color: colors.background),),
               onPressed: $loading
                   ? null
                   : () async {
