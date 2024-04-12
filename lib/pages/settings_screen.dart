@@ -36,6 +36,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Map cacheUsage = {CacheKeys.images: 0.0, CacheKeys.gifs: 0.0, CacheKeys.videos: 0.0, CacheKeys.other: 0.0};
 
   bool _compactMode = false;
+  bool _markdown = false;
   bool _autocorrect = false;
   bool _quickRating = true;
   bool _useFyxImageCache = false;
@@ -49,6 +50,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void initState() {
     super.initState();
     _compactMode = MainRepository().settings.useCompactMode;
+    _markdown = MainRepository().settings.useMarkdown;
     _autocorrect = MainRepository().settings.useAutocorrect;
     _defaultView = MainRepository().settings.defaultView;
     _firstUnread = MainRepository().settings.firstUnread;
@@ -143,6 +145,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       initialValue: _quickRating,
                       leading: Icon(MdiIcons.thumbsUpDown, color: colors.grey),
                       title: Text('Rychlé hodnocení')),
+                  SettingsTile.switchTile(
+                    onToggle: (bool value) {
+                      setState(() => _markdown = value);
+                      MainRepository().settings.useMarkdown = value;
+                    },
+                    initialValue: _markdown,
+                    leading: Icon(MdiIcons.languageMarkdown, color: colors.grey),
+                    title: Text('Markdown'),
+                  ),
                   SettingsTile.switchTile(
                     onToggle: (bool value) {
                       setState(() => _compactMode = value);

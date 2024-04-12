@@ -64,6 +64,12 @@ class SettingsProvider {
     _settings.useCompactMode = mode;
   }
 
+  bool get useMarkdown => _settings.useMarkdown;
+  set useMarkdown(bool mode) {
+    _box.put('useMarkdown', mode);
+    _settings.useMarkdown = mode;
+  }
+
   bool get quickRating => _settings.quickRating;
   set quickRating(bool mode) {
     _box.put('quickRating', mode);

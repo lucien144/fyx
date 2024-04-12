@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
+import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Settings.dart';
 import 'package:fyx/theme/Helpers.dart';
@@ -14,6 +15,8 @@ import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:markdown/markdown.dart' as md;
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart';
 
@@ -47,6 +50,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
   FocusNode _recipientFocusNode = FocusNode();
   FocusNode _messageFocusNode = FocusNode();
   bool recipientHasFocus = true;
+  bool _useMarkdown = SettingsProvider().useMarkdown;
 
   Future getImage(ImageSource source) async {
     final picker = ImagePicker();
@@ -89,6 +93,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
     _messageFocusNode.addListener(_focusCallback);
     _messageController.addListener(() => setState(() => _message = _messageController.text));
     _recipientController.addListener(() => setState(() => _recipient = _recipientController.text));
+    _useMarkdown = SettingsProvider().useMarkdown;
     AnalyticsProvider().setScreen('New Message', 'NewMessagePage');
     super.initState();
   }
@@ -155,8 +160,16 @@ class _NewMessagePageState extends State<NewMessagePage> {
                               ? null
                               : () async {
                                   setState(() => _sending = true);
+                                  String message = _useMarkdown
+                                      ? md.markdownToHtml(
+                                          _messageController.text,
+                                          inlineSyntaxes: [
+                                            md.DelimiterSyntax('§+', tags: [md.DelimiterTag('span class="spoiler"', 1)], requiresDelimiterRun: true),
+                                          ],
+                                        ).replaceAll('</span class="spoiler">', '</span>')
+                                      : _messageController.text;
                                   var response = await _settings!.onSubmit(_settings!.hasInputField == true ? _recipientController.text : null,
-                                      _messageController.text, _images.length > 0 ? _images : []);
+                                      message, _images.length > 0 ? _images : []);
                                   if (response) {
                                     if (_settings!.onClose != null) {
                                       _settings!.onClose!();
@@ -191,51 +204,120 @@ class _NewMessagePageState extends State<NewMessagePage> {
                       textCapitalization: TextCapitalization.sentences,
                       autocorrect: MainRepository().settings.useAutocorrect,
                       focusNode: _messageFocusNode,
+                      contextMenuBuilder: (_, editableTextState) {
+                        final buttonsMatrix = {
+                          'B': {
+                            'htmlStart': '<b>',
+                            'htmlEnd': '</b>',
+                            'md': '**',
+                          },
+                          'I': {
+                            'htmlStart': '<i>',
+                            'htmlEnd': '</i>',
+                            'md': '*',
+                          },
+                          'Spoiler': {
+                            'htmlStart': '<span class="spoiler">',
+                            'htmlEnd': '</span>',
+                            'md': '§',
+                          },
+                          'Code': {
+                            'htmlStart': '<code>',
+                            'htmlEnd': '</code>',
+                            'md': '```',
+                          },
+                        };
+                        final TextEditingValue value = editableTextState.textEditingValue;
+                        final List<ContextMenuButtonItem> buttonItems = editableTextState.contextMenuButtonItems;
+                        buttonsMatrix.entries.forEach((element) {
+                          buttonItems.add(
+                            ContextMenuButtonItem(
+                              label: element.key,
+                              onPressed: () {
+                                String replacement = '';
+                                final selected = value.selection.textInside(value.text);
+
+                                if (_useMarkdown) {
+                                  replacement = '${element.value['md']}${selected}${element.value['md']}';
+                                } else {
+                                  replacement = '${element.value['htmlStart']}${selected}${element.value['htmlEnd']}';
+                                }
+
+                                // Update the message
+                                _messageController.text = value.text.replaceRange(value.selection.start, value.selection.end, replacement);
+
+                                // Move the cursor
+                                final isSelected = value.selection.start != value.selection.end;
+                                int offset = value.selection.extentOffset + (replacement.length - selected.length);
+                                if (!isSelected) {
+                                  offset -= _useMarkdown ? element.value['md']!.length : element.value['htmlEnd']!.length;
+                                }
+                                _messageController.selection = TextSelection(baseOffset: offset, extentOffset: offset);
+                                ContextMenuController.removeAny();
+                              },
+                            ),
+                          );
+                        });
+
+                        return AdaptiveTextSelectionToolbar.buttonItems(
+                          anchors: editableTextState.contextMenuAnchors,
+                          buttonItems: buttonItems,
+                        );
+                      },
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          CupertinoButton(
-                            padding: EdgeInsets.all(0),
-                            child: Icon(Icons.camera_alt),
-                            onPressed: () async {
-                              FocusScope.of(context).unfocus();
-                              await getImage(ImageSource.camera);
-                              FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
-                            },
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              CupertinoButton(
+                                padding: EdgeInsets.all(0),
+                                child: Icon(MdiIcons.camera),
+                                onPressed: () async {
+                                  FocusScope.of(context).unfocus();
+                                  await getImage(ImageSource.camera);
+                                  FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
+                                },
+                              ),
+                              CupertinoButton(
+                                padding: EdgeInsets.all(0),
+                                child: Icon(MdiIcons.image),
+                                onPressed: () async {
+                                  FocusScope.of(context).unfocus();
+                                  await getImage(ImageSource.gallery);
+                                  FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
+                                },
+                              ),
+                            ],
                           ),
                           CupertinoButton(
                             padding: EdgeInsets.all(0),
-                            child: Icon(Icons.image),
-                            onPressed: () async {
-                              FocusScope.of(context).unfocus();
-                              await getImage(ImageSource.gallery);
-                              FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
-                            },
-                          ),
-                          Visibility(
-                            visible: _images.length > 0,
-                            child: Container(
-                              width: 16,
-                              height: 1,
-                              color: colors.grey,
+                            child: Icon(
+                              MdiIcons.languageMarkdown,
+                              color: _useMarkdown ? colors.primary : colors.disabled,
                             ),
+                            onPressed: () => setState(() => _useMarkdown = !_useMarkdown),
                           ),
-                          SizedBox(width: 12),
-                          if (_loadingImage)
-                            CupertinoActivityIndicator()
-                          else
-                            Row(
-                              children: _images
-                                  .map((Map<ATTACHMENT, dynamic> image) =>
-                                      _buildPreviewWidget(image[ATTACHMENT.bytes], image[ATTACHMENT.previewWidget]))
-                                  .toList(),
-                            ),
                         ],
                       ),
                     ),
+                    if (_loadingImage)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0, left: 10),
+                        child: Align(child: CupertinoActivityIndicator(), alignment: Alignment.centerLeft),
+                      )
+                    else
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0, left: 10),
+                        child: Row(
+                          children: _images
+                              .map((Map<ATTACHMENT, dynamic> image) => _buildPreviewWidget(image[ATTACHMENT.bytes], image[ATTACHMENT.previewWidget]))
+                              .toList(),
+                        ),
+                      ),
                   ],
                 ),
                 SizedBox(height: 16),
