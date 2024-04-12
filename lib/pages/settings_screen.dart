@@ -37,6 +37,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   bool _compactMode = false;
   bool _markdown = false;
+  bool _bulkActions = true;
   bool _autocorrect = false;
   bool _quickRating = true;
   bool _useFyxImageCache = false;
@@ -51,6 +52,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     super.initState();
     _compactMode = MainRepository().settings.useCompactMode;
     _markdown = MainRepository().settings.useMarkdown;
+    _bulkActions = MainRepository().settings.useBulkActions;
     _autocorrect = MainRepository().settings.useAutocorrect;
     _defaultView = MainRepository().settings.defaultView;
     _firstUnread = MainRepository().settings.firstUnread;
@@ -153,6 +155,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     initialValue: _markdown,
                     leading: Icon(MdiIcons.languageMarkdown, color: colors.grey),
                     title: Text('Markdown'),
+                  ),
+                  SettingsTile.switchTile(
+                    onToggle: (bool value) {
+                      setState(() => _bulkActions = value);
+                      MainRepository().settings.useBulkActions = value;
+                    },
+                    initialValue: _bulkActions,
+                    leading: Icon(MdiIcons.checkboxMultipleMarked, color: colors.grey),
+                    title: Text('Hromadné akce'),
                   ),
                   SettingsTile.switchTile(
                     onToggle: (bool value) {

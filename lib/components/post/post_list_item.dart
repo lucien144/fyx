@@ -10,6 +10,7 @@ import 'package:fyx/components/post/post_rating.dart';
 import 'package:fyx/components/text_icon.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
+import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/model/Discussion.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
@@ -72,7 +73,7 @@ class _PostListItemState extends ConsumerState<PostListItem> {
       visible: !isDeleted,
       child: Dismissible(
         key: UniqueKey(),
-        direction: _post!.canBeDeleted ? DismissDirection.endToStart : DismissDirection.none,
+        direction: _post!.canBeDeleted && SettingsProvider().useBulkActions ? DismissDirection.endToStart : DismissDirection.none,
         confirmDismiss: (_) {
           ref.read(PostsSelection.provider.notifier).toggle(this._post!);
           return Future.value(false);
