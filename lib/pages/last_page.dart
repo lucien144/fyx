@@ -40,23 +40,17 @@ class _LastPageState extends State<LastPage> {
 
     return DiscussionPageScaffold(
         title: 'Poslední',
-        child: FutureBuilder(
-            future: ApiController().last(),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return T.feedbackScreen(context,
-                    isWarning: true, title: snapshot.error.toString(), label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
-              } else if (snapshot.hasData) {
-                List posts = snapshot.data!.data['posts'];
-                return PullToRefreshList(
+        child: PullToRefreshList(
                   rebuild: _refreshData,
                   isInfinite: true,
                   dataProvider: (lastId) async {
-                    int max = (lastId ?? 0) + 10;
-                    max = max >= posts.length ? posts.length : max;
+                    // For smoother transition
+                    await Future.delayed(Duration(milliseconds: 300));
+
+                    final response = await ApiController().last();
+                    final posts = response.data['posts'];
 
                     List data = posts
-                        .getRange(lastId ?? 0, max)
                         .map((post) => Post.fromJson(post, post['discussion_id'], isCompact: MainRepository().settings.useCompactMode))
                         .where((post) => !MainRepository().settings.isPostBlocked(post.id))
                         .where((post) => !MainRepository().settings.isUserBlocked(post.nick))
@@ -110,11 +104,8 @@ class _LastPageState extends State<LastPage> {
                               ],
                             ))
                         .toList();
-                    return DataProviderResult(data, lastId: max);
+                    return DataProviderResult(data);
                   },
-                );
-              }
-              return T.feedbackScreen(context, isLoading: true);
-            }));
+                ));
   }
 }
