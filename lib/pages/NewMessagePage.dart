@@ -169,15 +169,21 @@ class _NewMessagePageState extends State<NewMessagePage> {
                                           ],
                                         ).replaceAll('</span class="spoiler">', '</span>')
                                       : _messageController.text;
-                                  var response = await _settings!.onSubmit(_settings!.hasInputField == true ? _recipientController.text : null,
-                                      message, _images.length > 0 ? _images : []);
+
+                                  var response = false;
+                                  try {
+                                    response = await _settings!.onSubmit(_settings!.hasInputField == true ? _recipientController.text : null,
+                                        message, _images.length > 0 ? _images : []);
+                                  } finally {
+                                    setState(() => _sending = false);
+                                  }
+
                                   if (response) {
                                     if (_settings!.onClose != null) {
                                       _settings!.onClose!();
                                     }
                                     Navigator.of(context).pop();
                                   }
-                                  setState(() => _sending = false);
                                 },
                         )
                       ],
