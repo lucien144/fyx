@@ -29,6 +29,7 @@ class _PostRatingState extends State<PostRating> {
   bool _givingRating = false;
 
   bool get makeDense => MediaQuery.of(context).textScaleFactor > 1 || MediaQuery.of(context).size.width <= 375;
+  bool get isVelvetTime => DateTime.now().day == 17 && DateTime.now().month == 11;
 
   @override
   void initState() {
@@ -42,6 +43,23 @@ class _PostRatingState extends State<PostRating> {
       setState(() => _post = widget.post);
     }
     super.didUpdateWidget(oldWidget);
+  }
+
+  Widget _thumbsUp(SkinColors colors) {
+    if (this.isVelvetTime) {
+      return TextIcon(
+        makeDense ? '' : 'Pravda & láska',
+        icon: MdiIcons.handPeaceVariant,
+        iconColor: _post!.myRating == 'positive' ? colors.primary : colors.text.withOpacity(0.38),
+        shader: _post!.myRating == 'positive' ? true : false,
+      );
+    }
+
+    return TextIcon(
+      makeDense ? '' : 'Paleček',
+      icon: MdiIcons.thumbUpOutline,
+      iconColor: _post!.myRating == 'positive' ? colors.primary : colors.text.withOpacity(0.38),
+    );
   }
 
   @override
@@ -68,11 +86,7 @@ class _PostRatingState extends State<PostRating> {
             if (_post!.canBeRated)
               GestureDetector(
                 behavior: HitTestBehavior.opaque,
-                child: TextIcon(
-                  makeDense ? '' : 'Paleček',
-                  icon: MdiIcons.thumbUpOutline,
-                  iconColor: _post!.myRating == 'positive' ? colors.primary : colors.text.withOpacity(0.38),
-                ),
+                child: _thumbsUp(colors),
                 onTap: _givingRating
                     ? null
                     : () {
@@ -95,7 +109,7 @@ class _PostRatingState extends State<PostRating> {
               GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 child: TextIcon(
-                  makeDense ? '' : 'Mínusko',
+                  makeDense || this.isVelvetTime ? '' : 'Mínusko',
                   icon: MdiIcons.thumbDownOutline,
                   iconColor: ['negative', 'negative_visible'].contains(_post!.myRating) ? Color.alphaBlend(colors.primary, colors.danger) : colors.text.withOpacity(0.38),
                 ),
