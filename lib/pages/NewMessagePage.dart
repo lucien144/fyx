@@ -165,6 +165,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                                           _messageController.text,
                                           inlineSyntaxes: [
                                             md.DelimiterSyntax('§+', tags: [md.DelimiterTag('span class="spoiler"', 1)], requiresDelimiterRun: true),
+                                            md.AutolinkExtensionSyntax()
                                           ],
                                         ).replaceAll('</span class="spoiler">', '</span>')
                                       : _messageController.text;
