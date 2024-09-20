@@ -3,11 +3,13 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fyx/FyxApp.dart';
 import 'package:fyx/components/WhatsNew.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/log_service.dart';
+import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Settings.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
@@ -46,6 +48,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   DefaultView _defaultView = DefaultView.latest;
   FirstUnreadEnum _firstUnread = FirstUnreadEnum.button;
   LaunchModeEnum _linksMode = LaunchModeEnum.externalApplication;
+
+  int $showDebug = 5;
 
   @override
   void initState() {
@@ -441,15 +445,81 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ],
               ),
               CustomSettingsSection(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20),
-                  child: Text(
-                    'Verze: $version',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: colors.disabled, fontFamily: 'JetBrainsMono', fontSize: 13),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => setState(() => $showDebug--),
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: Text(
+                      'Verze: $version ${$showDebug <= 3 ? $showDebug : ''}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: colors.disabled, fontFamily: 'JetBrainsMono', fontSize: 13),
+                    ),
                   ),
                 ),
-              )
+              ),
+              if ($showDebug <= 0)
+                CustomSettingsSection(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        FutureBuilder(
+                            future: ApiController().getCredentials(),
+                            builder: (context, AsyncSnapshot<Credentials?> snapshot) {
+                              var token = 'Loading...';
+                              var fcmToken = 'Loading...';
+                              switch (snapshot.connectionState) {
+                                case ConnectionState.none:
+                                case ConnectionState.waiting:
+                                default:
+                                  if (snapshot.hasError) {
+                                    fcmToken = snapshot.error.toString();
+                                    token = snapshot.error.toString();
+                                  } else {
+                                    fcmToken = snapshot.data?.fcmToken ?? 'Invalid';
+                                    token = snapshot.data?.token ?? 'Invalid';
+                                  }
+                              }
+
+                              return Column(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      var data = ClipboardData(text: fcmToken);
+                                      Clipboard.setData(data).then((_) {
+                                        T.success(L.TOAST_COPIED, bg: colors.success);
+                                      });
+                                    },
+                                    child: Text(
+                                      'FCM token: ${fcmToken}...',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(color: colors.disabled, fontFamily: 'JetBrainsMono', fontSize: 13),
+                                    ),
+                                  ),
+                                  SizedBox(height: 8),
+                                  GestureDetector(
+                                    onTap: () {
+                                      var data = ClipboardData(text: token);
+                                      Clipboard.setData(data).then((_) {
+                                        T.success(L.TOAST_COPIED, bg: colors.success);
+                                      });
+                                    },
+                                    child: Text(
+                                      'Bearer: ${token}...',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(color: colors.disabled, fontFamily: 'JetBrainsMono', fontSize: 13),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }),
+                      ],
+                    ),
+                  ),
+                ),
             ],
           ),
         ));
