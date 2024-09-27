@@ -239,6 +239,11 @@ class ApiMock implements IApiProvider {
   Future<Response> discussionCreateRequest(int discussionId, int postId, [bool against = false]) {
     throw UnimplementedError();
   }
+
+  @override
+  Future<Response> deleteMail(int mailId) {
+    throw UnimplementedError();
+  }
 }
 
 void main() {

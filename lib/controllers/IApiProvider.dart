@@ -38,6 +38,7 @@ abstract class IApiProvider {
   Future<Response> sendMail(String recipient, String message);
   Future<Response> postDiscussionMessage(int id, String message);
   Future<Response> deleteDiscussionMessage(int discussionId, int postId);
+  Future<Response> deleteMail(int mailId);
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder);
   Future<Response> giveRating(int discussionId, int postId, bool add, bool confirm, bool remove);
   Future<Response> getPostRatings(int discussionId, int postId);

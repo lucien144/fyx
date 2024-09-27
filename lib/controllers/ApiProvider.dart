@@ -176,6 +176,10 @@ class ApiProvider implements IApiProvider {
     return await dio.delete('$URL/discussion/$discussionId/delete/$postId');
   }
 
+  Future<Response> deleteMail(int mailId) async {
+    return await dio.delete('$URL/mail/delete/$mailId');
+  }
+
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder) async {
     return await dio.post('$URL/discussion/$discussionId/reminder/$postId/$setReminder');
   }

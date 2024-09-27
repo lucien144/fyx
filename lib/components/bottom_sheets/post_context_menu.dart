@@ -19,6 +19,7 @@ import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/pages/search_page.dart';
 import 'package:fyx/state/batch_actions_provider.dart';
+import 'package:fyx/state/mail_provider.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -64,6 +65,8 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
 
   Post get post => widget.item as Post;
 
+  bool get canDeletePost => isPost && post.canBeDeleted;
+
   Widget createGridView({required List<Widget> children, required BuildContext context}) {
     return ContextMenuGrid(children: children);
   }
@@ -89,6 +92,33 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
                 ),
               ],
             ));
+  }
+
+  void deleteItem() {
+    var label = canDeletePost
+        ? 'Skutečně smazat příspěvěk od @${post.nick}?'
+        : (mail.isIncoming ? 'Skutečně smazat poštu od @${mail.nick}?' : 'Skutečně smazat poštu pro @${mail.participant}?');
+    confirmationDialog('Smazat?', label, () async {
+      try {
+        setState(() => _deleteIndicator = true);
+        if (canDeletePost) {
+          await ApiController().deleteDiscussionMessage(post.idKlub, post.id);
+          ref.read(PostsToDelete.provider.notifier).add(post);
+          ref.read(PostsSelection.provider.notifier).remove(post);
+        } else {
+          ApiController().deleteMail(mail.id);
+          ref.read(MailsToDelete.provider.notifier).add(mail);
+        }
+        T.success('Smazáno.');
+
+        int counter = 0;
+        Navigator.popUntil(context, (route) => counter++ == 2);
+      } catch (error) {
+        T.warn('Některé příspěvky se nepodařilo smazat.');
+      } finally {
+        setState(() => _deleteIndicator = false);
+      }
+    });
   }
 
   Widget gridItem(String label, IconData? icon, {Function()? onTap, bool danger = false}) {
@@ -240,27 +270,10 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
               builder: (context) {
                 return StatefulBuilder(
                   builder: (context, StateSetter setState) => createGridView(context: context, children: <Widget>[
-                    if (isPost && post.canBeDeleted)
+                    if (canDeletePost || isMail)
                       FeedbackIndicator(
                         isLoading: _deleteIndicator,
-                        child: gridItem('Smazat', MdiIcons.delete, danger: true, onTap: () {
-                          confirmationDialog('Smazat?', 'Skutečně smazat příspěvěk od @${post.nick}?', () async {
-                            try {
-                              setState(() => _deleteIndicator = true);
-                              await ApiController().deleteDiscussionMessage(post.idKlub, post.id);
-                              ref.read(PostsToDelete.provider.notifier).add(post);
-                              ref.read(PostsSelection.provider.notifier).remove(post);
-                              T.success('Smazáno.');
-
-                              int counter = 0;
-                              Navigator.popUntil(context, (route) => counter++ == 2);
-                            } catch (error) {
-                              T.warn('Některé příspěvky se nepodařilo smazat.');
-                            } finally {
-                              setState(() => _deleteIndicator = false);
-                            }
-                          });
-                        }),
+                        child: gridItem('Smazat', MdiIcons.delete, danger: true, onTap: deleteItem),
                       ),
                     if (isPost && post.canBeDeleted && widget.adminTools)
                       FeedbackIndicator(
@@ -308,8 +321,7 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
                       Navigator.pop(context);
                       AnalyticsProvider().logEvent('hidePost');
                     }),
-                    gridItem(_reportIndicator ? L.POST_SHEET_FLAG_SAVING : L.POST_SHEET_FLAG, MdiIcons.alertDecagram, danger: true,
-                        onTap: () async {
+                    gridItem(_reportIndicator ? L.POST_SHEET_FLAG_SAVING : L.POST_SHEET_FLAG, MdiIcons.alertDecagram, danger: true, onTap: () async {
                       try {
                         setState(() => _reportIndicator = true);
                         await ApiController().sendMail('FYXBOT', 'Inappropriate post/mail report: ${widget.item.link}.');
