@@ -115,28 +115,34 @@ class _PostListItemState extends ConsumerState<PostListItem> {
             isHighlighted: widget._isHighlighted,
             isSelected: isSelected,
             blur: ref.watch(NsfwDiscussionList.provider).containsKey(_post!.idKlub),
-            topLeftWidget: PostAvatar(
-              _post!.nick,
-              descriptionWidget: Row(
-                children: [
-                  if (_post!.rating != null)
-                    Text('${Post.formatRating(_post!.rating!)} | ',
-                        style: TextStyle(
-                            fontSize: 10, color: _post!.rating! > 0 ? colors.success : (_post!.rating! < 0 ? colors.danger : colors.text))),
-                  Text(
-                    '${Helpers.absoluteTime(_post!.time)}',
-                    style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10),
+            topLeftWidget: Expanded(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onLongPress: () => showPostContext(),
+                child: PostAvatar(
+                  _post!.nick,
+                  descriptionWidget: Row(
+                    children: [
+                      if (_post!.rating != null)
+                        Text('${Post.formatRating(_post!.rating!)} | ',
+                            style: TextStyle(
+                                fontSize: 10, color: _post!.rating! > 0 ? colors.success : (_post!.rating! < 0 ? colors.danger : colors.text))),
+                      Text(
+                        '${Helpers.absoluteTime(_post!.time)}',
+                        style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10),
+                      ),
+                      Text(
+                        ' ~${Helpers.relativeTime(_post!.time)}',
+                        style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10),
+                      ),
+                      if (_post!.replies.length > 0)
+                        Text(
+                          ' | ${_post!.replies.length} ${Intl.plural(_post!.replies.length, one: 'odpověď', few: 'odpovědi', other: 'odpovědí', locale: 'cs_CZ')}',
+                          style: TextStyle(color: colors.primary, fontSize: 10),
+                        ),
+                    ],
                   ),
-                  Text(
-                    ' ~${Helpers.relativeTime(_post!.time)}',
-                    style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10),
-                  ),
-                  if (_post!.replies.length > 0)
-                    Text(
-                      ' | ${_post!.replies.length} ${Intl.plural(_post!.replies.length, one: 'odpověď', few: 'odpovědi', other: 'odpovědí', locale: 'cs_CZ')}',
-                      style: TextStyle(color: colors.primary, fontSize: 10),
-                    ),
-                ],
+                ),
               ),
             ),
             topRightWidget: widget.disabled ? Container() : GestureFeedback(child: Icon(Icons.more_vert, color: colors.text.withOpacity(0.38)), onTap: showPostContext),
