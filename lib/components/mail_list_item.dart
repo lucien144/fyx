@@ -32,15 +32,14 @@ class MailListItem extends ConsumerStatefulWidget {
 }
 
 class _MailListItemState extends ConsumerState<MailListItem> {
-
   void showMailContext() {
     showCupertinoModalBottomSheet(
         context: context,
         builder: (BuildContext context) => PostContextMenu<Mail>(
-          parentContext: context,
-          item: widget.mail,
-          flagPostCallback: (mailId) => MainRepository().settings.blockMail(mailId),
-        ));
+              parentContext: context,
+              item: widget.mail,
+              flagPostCallback: (mailId) => MainRepository().settings.blockMail(mailId),
+            ));
   }
 
   @override
@@ -50,61 +49,64 @@ class _MailListItemState extends ConsumerState<MailListItem> {
 
     return Visibility(
       visible: !isDeleted,
-      child: GestureDetector(
-        onLongPress: showMailContext,
-        child: ContentBoxLayout(
-          isHighlighted: widget.mail.isNew,
-          isPreview: widget.isPreview == true,
-          content: widget.mail.content,
-          topLeftWidget: PostAvatar(widget.mail.direction == MailDirection.from ? widget.mail.participant : MainRepository().credentials!.nickname,
-              description:
-                  '→ ${widget.mail.direction == MailDirection.to ? widget.mail.participant : MainRepository().credentials!.nickname}, ${Helpers.absoluteTime(widget.mail.time)} ~${Helpers.relativeTime(widget.mail.time)}'),
-          topRightWidget: Row(
-            children: <Widget>[
-              Visibility(
-                visible: widget.mail.isOutgoing && widget.mail.isUnread,
-                child: Icon(
-                  MdiIcons.emailMarkAsUnread,
-                  color: colors.text.withOpacity(0.38),
-                ),
-              ),
-              SizedBox(
-                width: 4,
-              ),
-              GestureFeedback(
-                  child: Icon(Icons.more_vert, color: colors.text.withOpacity(0.38)),
-                  onTap: showMailContext,
-              ),
-            ],
+      child: ContentBoxLayout(
+        isHighlighted: widget.mail.isNew,
+        isPreview: widget.isPreview == true,
+        content: widget.mail.content,
+        topLeftWidget: Expanded(
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onLongPress: showMailContext,
+            child: PostAvatar(widget.mail.direction == MailDirection.from ? widget.mail.participant : MainRepository().credentials!.nickname,
+                description:
+                    '→ ${widget.mail.direction == MailDirection.to ? widget.mail.participant : MainRepository().credentials!.nickname}, ${Helpers.absoluteTime(widget.mail.time)} ~${Helpers.relativeTime(widget.mail.time)}'),
           ),
-          bottomWidget: widget.isPreview == true
-              ? null
-              : Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[IconReply(), Text('Odpovědět', style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 14))],
-                    ),
-                    onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
-                        arguments: NewMessageSettings(
-                            onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
-                              if (inputField == null) {
-                                return false;
-                              }
-                              var response = await ApiController().sendMail(inputField, message, attachments: attachments);
-                              return response.isOk;
-                            },
-                            onClose: this.widget.onUpdate!,
-                            inputFieldPlaceholder: widget.mail.participant,
-                            hasInputField: true,
-                            replyWidget: MailListItem(
-                              widget.mail,
-                              isPreview: true,
-                            ))),
-                  )
-                ]),
         ),
+        topRightWidget: Row(
+          children: <Widget>[
+            Visibility(
+              visible: widget.mail.isOutgoing && widget.mail.isUnread,
+              child: Icon(
+                MdiIcons.emailMarkAsUnread,
+                color: colors.text.withOpacity(0.38),
+              ),
+            ),
+            SizedBox(
+              width: 4,
+            ),
+            GestureFeedback(
+              child: Icon(Icons.more_vert, color: colors.text.withOpacity(0.38)),
+              onTap: showMailContext,
+            ),
+          ],
+        ),
+        bottomWidget: widget.isPreview == true
+            ? null
+            : Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[IconReply(), Text('Odpovědět', style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 14))],
+                  ),
+                  onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
+                      arguments: NewMessageSettings(
+                          onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                            if (inputField == null) {
+                              return false;
+                            }
+                            var response = await ApiController().sendMail(inputField, message, attachments: attachments);
+                            return response.isOk;
+                          },
+                          onClose: this.widget.onUpdate!,
+                          inputFieldPlaceholder: widget.mail.participant,
+                          hasInputField: true,
+                          replyWidget: MailListItem(
+                            widget.mail,
+                            isPreview: true,
+                          ))),
+                )
+              ]),
       ),
     );
   }
