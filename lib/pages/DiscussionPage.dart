@@ -12,6 +12,7 @@ import 'package:fyx/components/pull_to_refresh_list.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
+import 'package:fyx/controllers/drafts_service.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/Settings.dart';
@@ -344,7 +345,12 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                           child: Icon(discussionResponse.discussion.advertisement != null ? MdiIcons.reply : MdiIcons.plus),
                           onPressed: () => Navigator.of(context).pushNamed('/new-message',
                               arguments: NewMessageSettings(
+                                  draft: DraftsService().loadDiscussionMessage(pageArguments.discussionId),
+                                  onDraftRemove: () => DraftsService().removeDiscussionMessage(pageArguments.discussionId),
                                   onClose: this.refresh,
+                                  onCompose: (message) {
+                                    DraftsService().saveDiscussionMessage(id: pageArguments.discussionId, message: message);
+                                  },
                                   onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
                                     var result =
                                         await ApiController().postDiscussionMessage(pageArguments.discussionId, message, attachments: attachments);

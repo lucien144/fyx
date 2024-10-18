@@ -8,6 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
+import 'package:fyx/controllers/drafts_service.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Settings.dart';
 import 'package:fyx/theme/Helpers.dart';
@@ -21,16 +22,30 @@ import 'package:mime/mime.dart';
 import 'package:path/path.dart';
 
 typedef F = Future<bool> Function(String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachment);
+typedef C = void Function(String message);
 
 class NewMessageSettings {
   String inputFieldPlaceholder;
   String messageFieldPlaceholder;
+  String draft;
   bool hasInputField;
   Widget? replyWidget;
   Function? onClose;
+  Function? onDraftRemove;
+  C? onCompose;
   F onSubmit;
 
-  NewMessageSettings({this.replyWidget, this.onClose, required this.onSubmit, this.hasInputField = false, this.inputFieldPlaceholder = '', this.messageFieldPlaceholder = ''});
+  NewMessageSettings({
+    this.replyWidget,
+    this.onClose,
+    this.onCompose,
+    this.onDraftRemove,
+    required this.onSubmit,
+    this.hasInputField = false,
+    this.inputFieldPlaceholder = '',
+    this.messageFieldPlaceholder = '',
+    this.draft = '',
+  });
 }
 
 class NewMessagePage extends StatefulWidget {
@@ -44,6 +59,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
   List<Map<ATTACHMENT, dynamic>> _images = [];
   NewMessageSettings? _settings;
   String _message = '';
+  String _draft = '';
   String _recipient = '';
   bool _loadingImage = false;
   bool _sending = false;
@@ -91,7 +107,12 @@ class _NewMessagePageState extends State<NewMessagePage> {
   void initState() {
     _recipientFocusNode.addListener(_focusCallback);
     _messageFocusNode.addListener(_focusCallback);
-    _messageController.addListener(() => setState(() => _message = _messageController.text));
+    _messageController.addListener(() {
+      setState(() => _message = _messageController.text);
+      if (_settings?.onCompose != null) {
+        _settings!.onCompose!(_messageController.text);
+      }
+    });
     _recipientController.addListener(() => setState(() => _recipient = _recipientController.text));
     _useMarkdown = SettingsProvider().useMarkdown;
     AnalyticsProvider().setScreen('New Message', 'NewMessagePage');
@@ -135,6 +156,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
       _settings = ModalRoute.of(context)!.settings.arguments as NewMessageSettings;
       _recipientController.text = _settings!.inputFieldPlaceholder.toUpperCase();
       _messageController.text = _settings!.messageFieldPlaceholder;
+      _draft = _settings!.draft;
     }
 
     return CupertinoPageScaffold(
@@ -172,8 +194,8 @@ class _NewMessagePageState extends State<NewMessagePage> {
 
                                   var response = false;
                                   try {
-                                    response = await _settings!.onSubmit(_settings!.hasInputField == true ? _recipientController.text : null,
-                                        message, _images.length > 0 ? _images : []);
+                                    response = await _settings!.onSubmit(_settings!.hasInputField == true ? _recipientController.text : null, message,
+                                        _images.length > 0 ? _images : []);
                                   } finally {
                                     setState(() => _sending = false);
                                   }
@@ -274,39 +296,81 @@ class _NewMessagePageState extends State<NewMessagePage> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
+                      child: Column(
+                        children: [
+                          if (_draft.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(left: 12, right: 6),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        _messageController.text = _draft;
+                                        if (_settings!.onDraftRemove != null) _settings!.onDraftRemove!();
+                                        setState(() => _draft = '');
+                                      },
+                                      child: RichText(
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          text: TextSpan(
+                                            children: [
+                                              TextSpan(text: 'Draft: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                              TextSpan(text: _draft, style: TextStyle(fontStyle: FontStyle.italic)),
+                                            ],
+                                            style: TextStyle(
+                                              color: colors.primary,
+                                              fontSize: 14,
+                                            ),
+                                          )),
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    child: Icon(MdiIcons.deleteForever, color: colors.disabled),
+                                    onTap: () {
+                                      if (_settings!.onDraftRemove != null) _settings!.onDraftRemove!();
+                                      setState(() => _draft = '');
+                                    },
+                                  )
+                                ],
+                              ),
+                            ),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              CupertinoButton(
-                                padding: EdgeInsets.all(0),
-                                child: Icon(MdiIcons.camera),
-                                onPressed: () async {
-                                  FocusScope.of(context).unfocus();
-                                  await getImage(ImageSource.camera);
-                                  FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
-                                },
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  CupertinoButton(
+                                    padding: EdgeInsets.all(0),
+                                    child: Icon(MdiIcons.camera),
+                                    onPressed: () async {
+                                      FocusScope.of(context).unfocus();
+                                      await getImage(ImageSource.camera);
+                                      FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
+                                    },
+                                  ),
+                                  CupertinoButton(
+                                    padding: EdgeInsets.all(0),
+                                    child: Icon(MdiIcons.image),
+                                    onPressed: () async {
+                                      FocusScope.of(context).unfocus();
+                                      await getImage(ImageSource.gallery);
+                                      FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
+                                    },
+                                  ),
+                                ],
                               ),
                               CupertinoButton(
                                 padding: EdgeInsets.all(0),
-                                child: Icon(MdiIcons.image),
-                                onPressed: () async {
-                                  FocusScope.of(context).unfocus();
-                                  await getImage(ImageSource.gallery);
-                                  FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
-                                },
+                                child: Icon(
+                                  MdiIcons.languageMarkdown,
+                                  color: _useMarkdown ? colors.primary : colors.disabled,
+                                ),
+                                onPressed: () => setState(() => _useMarkdown = !_useMarkdown),
                               ),
                             ],
-                          ),
-                          CupertinoButton(
-                            padding: EdgeInsets.all(0),
-                            child: Icon(
-                              MdiIcons.languageMarkdown,
-                              color: _useMarkdown ? colors.primary : colors.disabled,
-                            ),
-                            onPressed: () => setState(() => _useMarkdown = !_useMarkdown),
                           ),
                         ],
                       ),

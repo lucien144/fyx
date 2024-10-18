@@ -10,6 +10,7 @@ import 'package:fyx/SkinnedApp.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
+import 'package:fyx/controllers/drafts_service.dart';
 import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/libs/DeviceInfo.dart';
 import 'package:fyx/model/Credentials.dart';
@@ -110,7 +111,13 @@ class FyxApp extends StatefulWidget {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
 
     // TODO: Move to build using FutureBuilder.
-    var results = await Future.wait([ApiController().getCredentials(), PackageInfo.fromPlatform(), DeviceInfo.init(), SettingsProvider().init()]);
+    var results = await Future.wait([
+      ApiController().getCredentials(),
+      PackageInfo.fromPlatform(),
+      DeviceInfo.init(),
+      SettingsProvider().init(),
+      DraftsService().init(),
+    ]);
     MainRepository().credentials = results[0] == null ? null : results[0] as Credentials;
     MainRepository().packageInfo = results[1] as PackageInfo;
     MainRepository().deviceInfo = results[2] as DeviceInfo;

@@ -4,10 +4,7 @@ import 'package:fyx/model/enums/FirstUnreadEnum.dart';
 import 'package:fyx/model/enums/LaunchModeEnum.dart';
 import 'package:fyx/model/enums/SkinEnum.dart';
 import 'package:fyx/model/enums/ThemeEnum.dart';
-import 'package:fyx/state/nsfw_provider.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class SettingsProvider {
   static final SettingsProvider _singleton = SettingsProvider._internal();
