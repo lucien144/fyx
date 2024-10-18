@@ -11,6 +11,7 @@ import 'package:fyx/components/text_icon.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
+import 'package:fyx/controllers/drafts_service.dart';
 import 'package:fyx/model/Discussion.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
@@ -44,6 +45,7 @@ class PostListItem extends ConsumerStatefulWidget {
 
 class _PostListItemState extends ConsumerState<PostListItem> {
   Post? _post;
+
   bool get makeDense => MediaQuery.of(context).textScaleFactor > 1 || MediaQuery.of(context).size.width <= 375;
 
   bool get adminTools => !(widget.discussion?.accessRights.canRights == false || // Do not have rights
@@ -145,47 +147,55 @@ class _PostListItemState extends ConsumerState<PostListItem> {
                 ),
               ),
             ),
-            topRightWidget: widget.disabled ? Container() : GestureFeedback(child: Icon(Icons.more_vert, color: colors.text.withOpacity(0.38)), onTap: showPostContext),
-            bottomWidget: widget.disabled ? null : Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    PostRating(_post!, onRatingChange: (post) => setState(() => _post = post)),
-                    Row(
-                      children: <Widget>[
-                        Visibility(
-                          visible: widget._isPreview != true && _post!.canReply,
-                          child: GestureDetector(
-                              behavior: HitTestBehavior.opaque,
-                              onTap: () => Navigator.of(context).pushNamed('/new-message',
-                                  arguments: NewMessageSettings(
-                                      replyWidget: PostListItem(
-                                        _post!,
-                                        isPreview: true,
-                                        discussion: widget.discussion,
-                                      ),
-                                      onClose: this.widget.onUpdate,
-                                      onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
-                                        var result = await ApiController()
-                                            .postDiscussionMessage(_post!.idKlub, message, attachments: attachments, replyPost: _post);
-                                        return result.isOk;
-                                      })),
-                              child: TextIcon(
-                                makeDense ? '' : 'Odpovědět',
-                                icon: MdiIcons.reply,
-                                iconColor: colors.text.withOpacity(0.38),
-                              )),
-                        )
-                      ],
-                    )
-                  ],
-                ),
-              ],
-            ),
+            topRightWidget: widget.disabled
+                ? Container()
+                : GestureFeedback(child: Icon(Icons.more_vert, color: colors.text.withOpacity(0.38)), onTap: showPostContext),
+            bottomWidget: widget.disabled
+                ? null
+                : Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          PostRating(_post!, onRatingChange: (post) => setState(() => _post = post)),
+                          Row(
+                            children: <Widget>[
+                              Visibility(
+                                visible: widget._isPreview != true && _post!.canReply,
+                                child: GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    onTap: () => Navigator.of(context).pushNamed('/new-message',
+                                        arguments: NewMessageSettings(
+                                            draft: DraftsService().loadPostMessage(_post!.id),
+                                            onDraftRemove: () => DraftsService().removePostMessage(_post!.id),
+                                            onCompose: (message) => DraftsService().savePostMessage(id: _post!.id, message: message),
+                                            replyWidget: PostListItem(
+                                              _post!,
+                                              isPreview: true,
+                                              discussion: widget.discussion,
+                                            ),
+                                            onClose: this.widget.onUpdate,
+                                            onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                                              var result = await ApiController()
+                                                  .postDiscussionMessage(_post!.idKlub, message, attachments: attachments, replyPost: _post);
+                                              DraftsService().removePostMessage(_post!.id);
+                                              return result.isOk;
+                                            })),
+                                    child: TextIcon(
+                                      makeDense ? '' : 'Odpovědět',
+                                      icon: MdiIcons.reply,
+                                      iconColor: colors.text.withOpacity(0.38),
+                                    )),
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
             content: _post!.content,
           ),
         ),

@@ -347,13 +347,12 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                               arguments: NewMessageSettings(
                                   draft: DraftsService().loadDiscussionMessage(pageArguments.discussionId),
                                   onDraftRemove: () => DraftsService().removeDiscussionMessage(pageArguments.discussionId),
+                                  onCompose: (message) => DraftsService().saveDiscussionMessage(id: pageArguments.discussionId, message: message),
                                   onClose: this.refresh,
-                                  onCompose: (message) {
-                                    DraftsService().saveDiscussionMessage(id: pageArguments.discussionId, message: message);
-                                  },
                                   onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
                                     var result =
                                         await ApiController().postDiscussionMessage(pageArguments.discussionId, message, attachments: attachments);
+                                    DraftsService().removeDiscussionMessage(pageArguments.discussionId);
                                     return result.isOk;
                                   })),
                         ),

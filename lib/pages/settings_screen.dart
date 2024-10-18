@@ -8,6 +8,7 @@ import 'package:fyx/FyxApp.dart';
 import 'package:fyx/components/WhatsNew.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/controllers/drafts_service.dart';
 import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
@@ -298,10 +299,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         }),
                   ),
                   SettingsTile(
+                    title: Text('Rozepsaných nových postů'),
+                    trailing: ValueListenableBuilder(
+                        valueListenable: DraftsService().box.listenable(),
+                        builder: (BuildContext context, value, Widget? child) {
+                          return Text(
+                            DraftsService().countDiscussions().toString(),
+                            style: TextStyle(color: colors.text, fontSize: Settings().fontSize),
+                          );
+                        }),
+                  ),
+                  SettingsTile(
+                    title: Text('Rozepsaných odpovědí'),
+                    trailing: ValueListenableBuilder(
+                        valueListenable: DraftsService().box.listenable(),
+                        builder: (BuildContext context, value, Widget? child) {
+                          return Text(
+                            DraftsService().countPosts().toString(),
+                            style: TextStyle(color: colors.text, fontSize: Settings().fontSize),
+                          );
+                        }),
+                  ),
+                  SettingsTile(
                       title: Text('Resetovat', style: TextStyle(color: colors.danger), textAlign: TextAlign.center),
                       onPressed: (_) {
                         MainRepository().settings.resetBlockedContent();
                         MainRepository().settings.resetNsfwDiscussion();
+                        DraftsService().flush();
                         T.success(L.SETTINGS_CACHE_RESET, bg: colors.success);
                         AnalyticsProvider().logEvent('resetBlockedContent');
                       },
