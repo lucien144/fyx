@@ -7,6 +7,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 class Settings {
   bool useCompactMode = false;
+  bool useMarkdown = false;
+  bool useBulkActions = true;
   bool useAutocorrect = true;
   bool quickRating = true;
   bool useFyxImageCache = false; // Wheter to use internal image case or not. May fix crashes on big images. #413
@@ -17,6 +19,7 @@ class Settings {
   List<int> blockedPosts = [];
   List<int> blockedMails = [];
   List<String> blockedUsers = [];
+  List<String> savedSearch = [];
   Map<int, String> nsfwDiscussionList = {};
   ThemeEnum theme = ThemeEnum.system;
   SkinEnum skin = SkinEnum.fyx;

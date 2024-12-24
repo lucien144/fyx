@@ -12,6 +12,7 @@ import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/ResponseContext.dart';
 import 'package:fyx/model/post/content/Dice.dart';
 import 'package:fyx/model/post/content/Poll.dart';
+import 'package:fyx/model/post/content/discussion_request.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/model/reponses/BookmarksAllResponse.dart';
 import 'package:fyx/model/reponses/BookmarksHistoryResponse.dart';
@@ -352,6 +353,12 @@ class ApiController {
     Response response = await provider.rollDice(discussionId, postId);
     Map<String, dynamic> json = response.data;
     return ContentDice.fromJson(json['content_raw']['data'], discussionId: json['discussion_id'] ?? 0, postId: json['post_id'] ?? 0);
+  }
+
+  Future<ContentDiscussionRequest> discussionCreateRequest(int discussionId, int postId, [bool against = false]) async {
+    Response response = await provider.discussionCreateRequest(discussionId, postId, against);
+    Map<String, dynamic> json = response.data['content_raw']['data'];
+    return ContentDiscussionRequest.fromJson(json, parentPostId: postId, parentDiscussionId: discussionId);
   }
 
   throwAuthException(LoginResponse loginResponse, {String message = ''}) {

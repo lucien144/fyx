@@ -31,6 +31,8 @@ class PullToRefreshList<TProvider> extends StatefulWidget {
   final Function(ScrollNotification info)? onPullDown;
   final Widget? pinnedWidget;
 
+  final Widget? searchBottomWidget;
+
   // false => display Vencent Vega
   Widget? emptyWidget;
 
@@ -48,6 +50,7 @@ class PullToRefreshList<TProvider> extends StatefulWidget {
       this.searchTerm, // TODO: move to SearchController
       this.searchLimit = 3, // TODO: move to SearchController
       this.searchFocus = false, // TODO: move to SearchController
+      this.searchBottomWidget, // TODO: move to SearchController
       this.onPullDown,
       isInfinite = false,
       int rebuild = 0,
@@ -154,6 +157,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
               searchTerm: _searchTerm,
               onSearch: widget.onSearch,
               onClear: widget.onSearchClear,
+              bottomWidget: widget.searchBottomWidget,
             ),
             Expanded(child: T.feedbackScreen(context, isLoading: _isLoading, onPress: loadData, label: L.GENERAL_REFRESH)),
           ]));
@@ -175,6 +179,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
               searchTerm: _searchTerm,
               onSearch: widget.onSearch,
               onClear: widget.onSearchClear,
+              bottomWidget: widget.searchBottomWidget,
             ),
             if (showTravolta && widget.emptyWidget == null) SearchNotFound(),
             if (showTravolta && widget.emptyWidget != null) widget.emptyWidget!,

@@ -3,11 +3,13 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fyx/FyxApp.dart';
 import 'package:fyx/components/WhatsNew.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/log_service.dart';
+import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Settings.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
@@ -36,6 +38,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Map cacheUsage = {CacheKeys.images: 0.0, CacheKeys.gifs: 0.0, CacheKeys.videos: 0.0, CacheKeys.other: 0.0};
 
   bool _compactMode = false;
+  bool _markdown = false;
+  bool _bulkActions = true;
   bool _autocorrect = false;
   bool _quickRating = true;
   bool _useFyxImageCache = false;
@@ -45,10 +49,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
   FirstUnreadEnum _firstUnread = FirstUnreadEnum.button;
   LaunchModeEnum _linksMode = LaunchModeEnum.externalApplication;
 
+  int $showDebug = 5;
+
   @override
   void initState() {
     super.initState();
     _compactMode = MainRepository().settings.useCompactMode;
+    _markdown = MainRepository().settings.useMarkdown;
+    _bulkActions = MainRepository().settings.useBulkActions;
     _autocorrect = MainRepository().settings.useAutocorrect;
     _defaultView = MainRepository().settings.defaultView;
     _firstUnread = MainRepository().settings.firstUnread;
@@ -143,6 +151,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       initialValue: _quickRating,
                       leading: Icon(MdiIcons.thumbsUpDown, color: colors.grey),
                       title: Text('Rychlé hodnocení')),
+                  SettingsTile.switchTile(
+                    onToggle: (bool value) {
+                      setState(() => _markdown = value);
+                      MainRepository().settings.useMarkdown = value;
+                    },
+                    initialValue: _markdown,
+                    leading: Icon(MdiIcons.languageMarkdown, color: colors.grey),
+                    title: Text('Markdown'),
+                  ),
+                  SettingsTile.switchTile(
+                    onToggle: (bool value) {
+                      setState(() => _bulkActions = value);
+                      MainRepository().settings.useBulkActions = value;
+                    },
+                    initialValue: _bulkActions,
+                    leading: Icon(MdiIcons.checkboxMultipleMarked, color: colors.grey),
+                    title: Text('Hromadné akce'),
+                  ),
                   SettingsTile.switchTile(
                     onToggle: (bool value) {
                       setState(() => _compactMode = value);
@@ -279,7 +305,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         T.success(L.SETTINGS_CACHE_RESET, bg: colors.success);
                         AnalyticsProvider().logEvent('resetBlockedContent');
                       },
-                  description: Text('Zmenšovat obrázky - zmenšuje obrázky před stažením a předchází tak pádům aplikavce. V určitých případech ale může snižovat FPS.')),
+                      description: Text(
+                          'Zmenšovat obrázky - zmenšuje obrázky před stažením a předchází tak pádům aplikavce. V určitých případech ale může snižovat FPS.')),
                 ],
               ),
               CustomSettingsSection(
@@ -378,7 +405,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   leading: Icon(MdiIcons.star, color: colors.grey),
                   title: Text('Co je nového v této verzi?'),
                   onPressed: (_) {
-                    showCupertinoModalBottomSheet(context: context, expand: false, builder: (context) => WhatsNew());
+                    showCupertinoModalBottomSheet(
+                      context: context,
+                      expand: false,
+                      builder: (context) => WhatsNew(),
+                      backgroundColor: colors.barBackground,
+                      barrierColor: colors.dark.withOpacity(0.5),
+                    );
                     AnalyticsProvider().logEvent('openWhatsNew');
                   },
                 )
@@ -412,15 +445,81 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ],
               ),
               CustomSettingsSection(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20),
-                  child: Text(
-                    'Verze: $version',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: colors.disabled, fontFamily: 'JetBrainsMono', fontSize: 13),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => setState(() => $showDebug--),
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: Text(
+                      'Verze: $version ${$showDebug <= 3 ? $showDebug : ''}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: colors.disabled, fontFamily: 'JetBrainsMono', fontSize: 13),
+                    ),
                   ),
                 ),
-              )
+              ),
+              if ($showDebug <= 0)
+                CustomSettingsSection(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        FutureBuilder(
+                            future: ApiController().getCredentials(),
+                            builder: (context, AsyncSnapshot<Credentials?> snapshot) {
+                              var token = 'Loading...';
+                              var fcmToken = 'Loading...';
+                              switch (snapshot.connectionState) {
+                                case ConnectionState.none:
+                                case ConnectionState.waiting:
+                                default:
+                                  if (snapshot.hasError) {
+                                    fcmToken = snapshot.error.toString();
+                                    token = snapshot.error.toString();
+                                  } else {
+                                    fcmToken = snapshot.data?.fcmToken ?? 'Invalid';
+                                    token = snapshot.data?.token ?? 'Invalid';
+                                  }
+                              }
+
+                              return Column(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      var data = ClipboardData(text: fcmToken);
+                                      Clipboard.setData(data).then((_) {
+                                        T.success(L.TOAST_COPIED, bg: colors.success);
+                                      });
+                                    },
+                                    child: Text(
+                                      'FCM token: ${fcmToken}...',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(color: colors.disabled, fontFamily: 'JetBrainsMono', fontSize: 13),
+                                    ),
+                                  ),
+                                  SizedBox(height: 8),
+                                  GestureDetector(
+                                    onTap: () {
+                                      var data = ClipboardData(text: token);
+                                      Clipboard.setData(data).then((_) {
+                                        T.success(L.TOAST_COPIED, bg: colors.success);
+                                      });
+                                    },
+                                    child: Text(
+                                      'Bearer: ${token}...',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(color: colors.disabled, fontFamily: 'JetBrainsMono', fontSize: 13),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }),
+                      ],
+                    ),
+                  ),
+                ),
             ],
           ),
         ));

@@ -1,5 +1,5 @@
 name: fyx
-description: A new Flutter project.
+description: Fyx for Nyx.cz
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -11,7 +11,7 @@ description: A new Flutter project.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 0.9.4+127
+version: 0.10.0+135
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -33,7 +33,7 @@ dependencies:
   flutter_dotenv: ^5.0.2
   flutter_highlight: ^0.7.0
   flutter_html: ^3.0.0-beta.2
-  flutter_markdown: ^0.6.9
+  flutter_markdown: ^0.7.3+1
   flutter_riverpod: ^2.0.0-dev.4
   flutter_sticky_header: ^0.6.0
   fluttertoast: ^8.0.9
@@ -75,7 +75,7 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.3
+  cupertino_icons: ^1.0.8
 
   modal_bottom_sheet:
     git:
@@ -86,11 +86,13 @@ dependencies:
   firebase_performance: ^0.9.0
   firebase_core: ^2.25.4
   quiver: ^3.2.1
+  markdown: ^7.2.2
 
 dependency_overrides:
 #  # https://github.com/flutter/flutter/issues/44435#issuecomment-817583694
   webview_flutter: ^3.0.4
   sqflite: ^2.3.2
+  intl: any
 
 dev_dependencies:
   hive_generator: ^2.0.1

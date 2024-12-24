@@ -10,4 +10,6 @@ enum SkinEnum {
   forest,
   @HiveField(2)
   greymatter,
+  @HiveField(3)
+  dark,
 }

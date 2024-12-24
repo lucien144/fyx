@@ -41,12 +41,19 @@ class Post extends IPost {
     this._canBeDeleted = json['can_be_deleted'] ?? false;
     this._canBeReminded = json['can_be_reminded'] ?? false;
 
-    if (json['content_raw'] != null && json['content_raw']['data'] != null && !json['content_raw']['data'].containsKey('DiscussionWelcome')) {
+    if (json['content_raw'] != null &&
+        json['content_raw']['data'] != null &&
+        !List.from(json['content_raw']['data'].keys).any((e) => [
+              'DiscussionCreated',
+              'DiscussionWelcome',
+            ].contains(e))) {
       try {
         content = ContentRaw.fromJson(json: json['content_raw'], discussionId: json['discussion_id'], postId: json['id']).content;
         this._canReply = !(content is ContentAdvertisement);
       } catch (error) {
-        content = ContentRegular('${json['content']}<br><br><small><em>Chyba: neošetřený druh příspěvku: "${this.type}"</em></small>',
+        print(error);
+        content = ContentRegular(
+            '${json['content']}<br><br><small><em>Chyba: neošetřený druh příspěvku: "${json['content_raw']['type']}"</em></small>',
             isCompact: this.isCompact);
       }
     } else {

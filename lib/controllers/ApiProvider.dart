@@ -242,4 +242,8 @@ class ApiProvider implements IApiProvider {
   Future<Response> rollDice(int discussionId, int postId) async {
     return await dio.post('$URL/discussion/$discussionId/dice/$postId/roll');
   }
+
+  Future<Response> discussionCreateRequest(int discussionId, int postId, [bool against = false]) async {
+    return await dio.post('$URL/discussion/$discussionId/discussion_create_request/$postId/${against ? 'vote_against' : 'vote_for'}');
+  }
 }

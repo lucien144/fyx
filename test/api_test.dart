@@ -234,6 +234,11 @@ class ApiMock implements IApiProvider {
     // TODO: implement fetchReminders
     throw UnimplementedError();
   }
+
+  @override
+  Future<Response> discussionCreateRequest(int discussionId, int postId, [bool against = false]) {
+    throw UnimplementedError();
+  }
 }
 
 void main() {

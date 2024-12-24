@@ -62,7 +62,7 @@ class _PollState extends State<Poll> {
                     color: _votes.contains(answer.id) ? colors.pollAnswerSelected : colors.pollAnswer,
                     border: _poll!.canVote ? Border.all(color: colors.primary) : null),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  PostHtml(ContentRegular(answer.answer)),
+                  PostHtml(ContentRegular(answer.answer), selectable: false,),
                   if (answer.result != null)
                     Row(
                       mainAxisSize: MainAxisSize.max,

@@ -64,6 +64,18 @@ class SettingsProvider {
     _settings.useCompactMode = mode;
   }
 
+  bool get useBulkActions => _settings.useBulkActions;
+  set useBulkActions(bool mode) {
+    _box.put('useBulkActions', mode);
+    _settings.useBulkActions = mode;
+  }
+
+  bool get useMarkdown => _settings.useMarkdown;
+  set useMarkdown(bool mode) {
+    _box.put('useMarkdown', mode);
+    _settings.useMarkdown = mode;
+  }
+
   bool get quickRating => _settings.quickRating;
   set quickRating(bool mode) {
     _box.put('quickRating', mode);
@@ -93,6 +105,8 @@ class SettingsProvider {
   List get blockedPosts => _box.get('blockedPosts', defaultValue: Settings().blockedPosts);
 
   List get blockedUsers => _box.get('blockedUsers', defaultValue: Settings().blockedUsers);
+
+  List<String> get savedSearch => _box.get('savedSearch', defaultValue: Settings().savedSearch);
 
   Map get nsfwDiscussionList => _box.get('nsfwDiscussionList', defaultValue: Settings().nsfwDiscussionList);
 
@@ -124,6 +138,7 @@ class SettingsProvider {
     _settings.skin = _box.get('skin', defaultValue: Settings().skin);
     _settings.linksMode = _box.get('linksMode', defaultValue: Settings().linksMode);
     _settings.whatsNew = _box.get('whatsNew', defaultValue: Settings().whatsNew);
+    _settings.savedSearch = _box.get('savedSearch', defaultValue: Settings().savedSearch);
 
     return _singleton;
   }
@@ -162,6 +177,21 @@ class SettingsProvider {
       blockedUsers.add(user);
     }
     _box.put('blockedUsers', blockedUsers);
+  }
+
+  void toggleSavedSearch(String term) {
+    List<String> savedSearch = _box.get('savedSearch', defaultValue: Settings().savedSearch);
+    if (savedSearch.contains(term)) {
+      savedSearch.remove(term);
+    } else {
+      savedSearch.add(term);
+    }
+    _box.put('savedSearch', savedSearch);
+  }
+
+  bool isSearchTermSaved(String term) {
+    List<String> savedSearch = _box.get('savedSearch', defaultValue: Settings().savedSearch);
+    return savedSearch.contains(term);
   }
 
   void addNsfwDiscussion(int id, String name) {

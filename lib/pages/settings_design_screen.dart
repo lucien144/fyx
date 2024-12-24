@@ -9,6 +9,7 @@ import 'package:fyx/model/provider/ThemeModel.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:fyx/theme/skin/skins/dark_skin.dart';
 import 'package:provider/provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 
@@ -42,14 +43,47 @@ class _SettingsDesignScreenState extends State<SettingsDesignScreen> {
     );
   }
 
-  SettingsTile _skinFactory(String label, SkinEnum skin, {String? description}) {
+  SettingsTile _skinFactory(String label, SkinEnum skinId, {String? description}) {
+    final SkinColors colors = Skin.of(context).theme.colors;
+
+    final skin = Skin.of(context).skins.firstWhere((skinData) => skinData.id == skinId);
+    final skinColors = skin.lightData.colors;
+    final skinDarkColors = skin.darkData.colors;
+
     return SettingsTile(
       title: Text(label),
-      trailing: MainRepository().settings.skin == skin ? Icon(CupertinoIcons.check_mark) : null,
+      leading: Row(
+        children: [
+          Container(
+            decoration: BoxDecoration(border: Border.all(color: colors.text, width: 1)),
+            child: Row(
+              children: [
+                Container(width: 10, height: 20, color: skinColors.primary),
+                Container(width: 10, height: 20, color: skinColors.background),
+              ],
+            ),
+          ),
+          if (skin.darkMode) ...[
+            const SizedBox(
+              width: 8,
+            ),
+            Container(
+              decoration: BoxDecoration(border: Border.all(color: colors.text, width: 1)),
+              child: Row(
+                children: [
+                  Container(width: 10, height: 20, color: skinDarkColors.primary),
+                  Container(width: 10, height: 20, color: skinDarkColors.background),
+                ],
+              ),
+            )
+          ]
+        ],
+      ),
+      trailing: MainRepository().settings.skin == skinId ? Icon(CupertinoIcons.check_mark) : null,
       description: description != null ? Text(description) : null,
       onPressed: (_) {
-        MainRepository().settings.skin = skin;
-        Provider.of<ThemeModel>(context, listen: false).setSkin(skin);
+        MainRepository().settings.skin = skinId;
+        Provider.of<ThemeModel>(context, listen: false).setSkin(skinId);
       },
     );
   }
@@ -89,7 +123,13 @@ class _SettingsDesignScreenState extends State<SettingsDesignScreen> {
             ),
             SettingsSection(
               title: Text('Skin'),
-              tiles: Skin.of(context).skins.map((skin) => _skinFactory('${skin.name}${skin.darkMode ? '' : '*'}', skin.id, description: skin.id == SkinEnum.greymatter ? '* nepodporuje 🌗 dark mode.' : null)).toList(),
+              tiles: Skin.of(context)
+                  .skins
+                  .map(
+                    (skin) => _skinFactory('${skin.name}${skin.darkMode ? '' : '*'}', skin.id,
+                        description: skin.id == SkinEnum.dark ? '* nepodporuje 🌗 light/dark mode.' : null),
+                  )
+                  .toList(),
             ),
             SettingsSection(
               title: Text('Velikost písma'),

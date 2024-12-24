@@ -77,19 +77,19 @@ class WhatsNew extends StatelessWidget {
       SizedBox(height: 24),
       item(
           context: context,
-          icon: MdiIcons.flashOutline,
-          title: 'Poslední příspěvky',
-          description: 'Oblíbená sekce s posledními příspěvky z Nyxu konečně ve Fyxu! Filtry brzy...'),
+          icon: MdiIcons.select,
+          title: 'Výběr textu',
+          description: 'Dlouho požadovaná funkce je zde: nyní je možné vybrat text příspěvku pouze označením jeho textu!'),
       item(
           context: context,
-          icon: MdiIcons.pinOutline,
-          title: 'Uložené příspěvky',
-          description: 'Seznam vašich uložených příspěvků (neboli upomínek).'),
+          icon: MdiIcons.magnifyPlus,
+          title: 'Uložená hledání',
+          description: 'Často hledaná slova si nově můžete pro rychlé hledání uložit. Typicky třeba svůj nick.'),
       item(
           context: context,
-          icon: MdiIcons.chiliHot,
-          title: 'Peprné posty',
-          description: 'Diskuze si můžete označit jako peprnou, což rozmaže náhledy obrázků. Obrázky se po rozkliku zobrazí normálně.'),
+          icon: MdiIcons.themeLightDark,
+          title: 'Nový skin: Dark',
+          description: 'Přidal jsem další klasický skin, který znáte z Nyxu - Dark.'),
       CupertinoButton(child: Text('Pokračovat', style: TextStyle(color: colors.background),), onPressed: () => Navigator.of(context).pop(), color: colors.primary)
     ]);
   }
