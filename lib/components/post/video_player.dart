@@ -38,6 +38,9 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
     if ([null, ''].contains(videoUrl) && urls.length > 0) {
       videoUrl = urls.firstWhere((url) => url is String && url.isNotEmpty);
+      if (videoUrl?.startsWith('/') == true) {
+        videoUrl = 'https://nyx.cz$videoUrl';
+      }
     }
 
     if (videoUrl != null && videoUrl!.isNotEmpty) {
