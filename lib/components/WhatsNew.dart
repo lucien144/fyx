@@ -77,19 +77,19 @@ class WhatsNew extends StatelessWidget {
       SizedBox(height: 24),
       item(
           context: context,
-          icon: MdiIcons.select,
-          title: 'Výběr textu',
-          description: 'Dlouho požadovaná funkce je zde: nyní je možné vybrat text příspěvku pouze označením jeho textu!'),
-      item(
-          context: context,
-          icon: MdiIcons.magnifyPlus,
-          title: 'Uložená hledání',
-          description: 'Často hledaná slova si nově můžete pro rychlé hledání uložit. Typicky třeba svůj nick.'),
-      item(
-          context: context,
-          icon: MdiIcons.themeLightDark,
-          title: 'Nový skin: Dark',
-          description: 'Přidal jsem další klasický skin, který znáte z Nyxu - Dark.'),
+          icon: MdiIcons.pen,
+          title: 'Rozepsané příspěvky',
+          description: 'Pokud neodešlete rozepsaný příspěvěk, uloží se a později ho můžete snadno vybrat.',),
+      // item(
+      //     context: context,
+      //     icon: MdiIcons.magnifyPlus,
+      //     title: 'Uložená hledání',
+      //     description: 'Často hledaná slova si nově můžete pro rychlé hledání uložit. Typicky třeba svůj nick.'),
+      // item(
+      //     context: context,
+      //     icon: MdiIcons.themeLightDark,
+      //     title: 'Nový skin: Dark',
+      //     description: 'Přidal jsem další klasický skin, který znáte z Nyxu - Dark.'),
       CupertinoButton(child: Text('Pokračovat', style: TextStyle(color: colors.background),), onPressed: () => Navigator.of(context).pop(), color: colors.primary)
     ]);
   }
