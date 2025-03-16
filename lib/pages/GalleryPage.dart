@@ -216,7 +216,7 @@ class _GalleryPageState extends State<GalleryPage> {
                             Uint8List headerBytes = file.readAsBytesSync();
                             var ext = extensionFromMime(lookupMimeType(savePath, headerBytes: headerBytes.getRange(0, 20).toList()) ?? '');
                             ext = ext == 'jpe' ? 'jpg' : ext; // https://github.com/dart-lang/mime/issues/55
-                            if (!['jpg', 'png', 'gif', 'heic'].contains(ext)) {
+                            if (!['jpg', 'png', 'gif', 'heic', 'webp'].contains(ext)) {
                               file.delete();
                               throw UnsupportedDownloadFormatException('Nelze uložit. Neznámý typ souboru ($ext).');
                             }
