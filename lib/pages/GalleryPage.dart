@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:device_info/device_info.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -164,17 +165,17 @@ class _GalleryPageState extends State<GalleryPage> {
                 child: Column(
                   children: [
                     CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      color: colors.primary,
-                      child: Icon(
-                              MdiIcons.openInNew,
-                              color: colors.background,
-                              size: 32,
-                            ),
-                      onPressed: () {
-                        String url = _arguments!.images[_page - 1].image;
-                        T.openLink(url, mode: SettingsProvider().linksMode);
-                      }),
+                        padding: EdgeInsets.zero,
+                        color: colors.primary,
+                        child: Icon(
+                          MdiIcons.openInNew,
+                          color: colors.background,
+                          size: 32,
+                        ),
+                        onPressed: () {
+                          String url = _arguments!.images[_page - 1].image;
+                          T.openLink(url, mode: SettingsProvider().linksMode);
+                        }),
                     const SizedBox(height: 16),
                     CupertinoButton(
                       padding: EdgeInsets.zero,
@@ -194,7 +195,16 @@ class _GalleryPageState extends State<GalleryPage> {
                         setState(() => _saving = true);
                         try {
                           PermissionStatus status = await Permission.storage.request();
-                          if (status.isGranted) {
+                          var isGranted = status.isGranted;
+
+                          if (Platform.isAndroid) {
+                            // https://pub.dev/packages/permission_handler#requesting-storage-permissions-always-returns-denied-on-android-13-what-can-i-do
+                            DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+                            final androidInfo = await deviceInfoPlugin.androidInfo;
+                            isGranted = androidInfo.version.sdkInt >= 33 || isGranted;
+                          }
+
+                          if (isGranted) {
                             // See https://github.com/lucien144/fyx/issues/304#issuecomment-1094851596
 
                             var appDocDir = await getTemporaryDirectory();
