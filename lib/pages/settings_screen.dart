@@ -340,11 +340,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   var tiles = [
                     SettingsTile(
                       title: Text('Obrázky'),
-                      trailing: Text('~${snapshot.data?[CacheKeys.images].round() ?? 0} MB'),
+                      trailing: Text('~${snapshot.data?[CacheKeys.images].round() ?? 0} MB', style: TextStyle(color: colors.text),),
                     ),
                     SettingsTile(
                       title: Text('Gify'),
-                      trailing: Text('~${snapshot.data?[CacheKeys.gifs].round() ?? 0} MB'),
+                      trailing: Text('~${snapshot.data?[CacheKeys.gifs].round() ?? 0} MB', style: TextStyle(color: colors.text)),
                     ),
                     // SettingsTile(
                     //   title: Text('Videa'),
@@ -352,7 +352,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     // ),
                     SettingsTile(
                       title: Text('Ostatní'),
-                      trailing: Text('~${snapshot.data?[CacheKeys.other].round() ?? 0} MB'),
+                      trailing: Text('~${snapshot.data?[CacheKeys.other].round() ?? 0} MB', style: TextStyle(color: colors.text)),
                     ),
                     SettingsTile(
                         title: Text(_emptyingCache ? 'Mažu...' : 'Smazat',
