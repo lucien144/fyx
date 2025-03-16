@@ -1,6 +1,7 @@
 import 'package:async/async.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -495,6 +496,32 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                                       child: Icon(!ref.watch(NsfwDiscussionList.provider).containsKey(pageArguments.discussionId)
                                           ? MdiIcons.chiliHot
                                           : MdiIcons.chiliOff)),
+                                ],
+                              ),
+                            ),
+                            Divider(
+                              color: colors.grey,
+                              height: 26,
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                final url = 'https://nyx.cz/discussion/${pageArguments.discussionId}';
+                                Clipboard.setData(ClipboardData(text: url)).then((_) {
+                                  T.success('Odkaz zkopírován do schránky. $url.');
+                                });
+                                setState(() => this._popupMenu = false);
+                              },
+                              child: Row(
+                                children: [
+                                  Text(
+                                      'Kopírovat odkaz',
+                                      style: textStyleContext),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Expanded(
+                                      child: Icon(MdiIcons.linkPlus)
+                                  ),
                                 ],
                               ),
                             ),
