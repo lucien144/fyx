@@ -1,12 +1,9 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:device_info/device_info.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:fyx/components/post/post_hero_attachment.dart';
 import 'package:fyx/components/throw_it_away.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
@@ -15,14 +12,12 @@ import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/exceptions/UnsupportedDownloadFormatException.dart';
 import 'package:fyx/libs/fyx_image_cache_manager.dart';
 import 'package:fyx/model/MainRepository.dart';
-import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:gallery_saver_plus/gallery_saver.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:mime/mime.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_view/photo_view.dart';
@@ -209,25 +204,12 @@ class _GalleryPageState extends State<GalleryPage> {
 
                             var appDocDir = await getTemporaryDirectory();
                             String url = _arguments!.images[_page - 1].image;
-                            String savePath = '${appDocDir.path}/${Helpers.uuid(6)}';
-                            await Dio().download(url, savePath);
 
-                            File file = new File(savePath);
-                            Uint8List headerBytes = file.readAsBytesSync();
-                            var ext = extensionFromMime(lookupMimeType(savePath, headerBytes: headerBytes.getRange(0, 20).toList()) ?? '');
-                            ext = ext == 'jpe' ? 'jpg' : ext; // https://github.com/dart-lang/mime/issues/55
-                            if (!['jpg', 'png', 'gif', 'heic', 'webp'].contains(ext)) {
-                              file.delete();
-                              throw UnsupportedDownloadFormatException('Nelze uložit. Neznámý typ souboru ($ext).');
-                            }
-
-                            file = await file.rename('$savePath.$ext');
-                            final result = await ImageGallerySaver.saveFile('$savePath.$ext', isReturnPathOfIOS: Platform.isIOS);
-                            if (!result['isSuccess']) {
+                            final result = await GallerySaver.saveImage(url, albumName: 'Fyx');
+                            if (!(result ?? false)) {
                               throw Error();
                             }
                             T.success(L.TOAST_IMAGE_SAVE_OK, bg: colors.success);
-                            file.delete();
                           } else {
                             T.error('Nelze uložit. Povolte ukládání, prosím.', bg: colors.danger);
                           }

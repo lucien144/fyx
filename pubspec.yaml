@@ -47,7 +47,6 @@ dependencies:
   html_unescape: ^2.0.0
   http: ^1.2.0
   image: ^4.1.7
-  image_gallery_saver: ^2.0.3
   image_picker: ^1.0.7
   material_design_icons_flutter: ^7.0.7296
   meta: ^1.7.0
@@ -87,6 +86,7 @@ dependencies:
       path: modal_bottom_sheet
   quiver: ^3.2.1
   markdown: ^7.2.2
+  gallery_saver_plus: ^3.2.8
 
 dependency_overrides:
 #  # https://github.com/flutter/flutter/issues/44435#issuecomment-817583694
