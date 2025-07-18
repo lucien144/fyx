@@ -51,7 +51,7 @@ class _SearchPageState extends State<SearchPage> {
       setState(() => _searchTerm = pageArguments!.searchTerm);
     }
 
-    Widget emptyWidget = SearchPostsHelp();
+    Widget emptyWidget = SearchPostsHelp(hasSavedSearch: true,);
 
     if (this._searchTerm != null) {
       emptyWidget = SearchHelpNotFound();

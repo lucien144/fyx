@@ -11,7 +11,9 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class SearchPostsHelp extends StatelessWidget {
-  const SearchPostsHelp({Key? key}) : super(key: key);
+  const SearchPostsHelp({Key? key, this.hasSavedSearch = false}) : super(key: key);
+
+  final bool hasSavedSearch;
 
   @override
   Widget build(BuildContext context) {
@@ -22,9 +24,9 @@ class SearchPostsHelp extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (SettingsProvider().savedSearch.isNotEmpty) ListHeader('️Uložená hledání'),
-            ...SettingsProvider().savedSearch.map((term) => _widgetSavedSearchItem(context, term)).toList(),
-            SizedBox(height: 10),
+            if (SettingsProvider().savedSearch.isNotEmpty && this.hasSavedSearch) ListHeader('️Uložená hledání'),
+            if (SettingsProvider().savedSearch.isNotEmpty && this.hasSavedSearch) ...SettingsProvider().savedSearch.map((term) => _widgetSavedSearchItem(context, term)).toList(),
+            if (SettingsProvider().savedSearch.isNotEmpty && this.hasSavedSearch) SizedBox(height: 10),
             _widgetHowTo(colors),
           ],
         ),
@@ -49,7 +51,7 @@ class SearchPostsHelp extends StatelessWidget {
                 Icon(MdiIcons.informationOutline, size: 16),
                 SizedBox(width: 8),
                 Text(
-                  'Příklady hledání v příspěvcích:',
+                  'Příklady hledání:',
                   style: TextStyle(color: colors.primary, fontSize: 14),
                 ),
               ],

@@ -123,7 +123,7 @@ class _BottomTabBarState extends State<BottomTabBar> {
                       children: [
                         Icon(MdiIcons.magnify, size: 34, color: colors.grey),
                         Text(
-                          'Hledání',
+                          'Příspěvky',
                           style: TextStyle(fontSize: 11, color: colors.grey),
                         )
                       ],
@@ -134,6 +134,20 @@ class _BottomTabBarState extends State<BottomTabBar> {
           const SizedBox(height: 30),
           Row(
             children: [
+              Expanded(
+                child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () => Navigator.of(context).pushNamed('/fulltext'),
+                    child: Column(
+                      children: [
+                        Icon(MdiIcons.magnify, size: 34, color: colors.grey),
+                        Text(
+                          'Vše',
+                          style: TextStyle(fontSize: 11, color: colors.grey),
+                        )
+                      ],
+                    )),
+              ),
               Expanded(
                   child: GestureDetector(
                       behavior: HitTestBehavior.opaque,
@@ -160,6 +174,11 @@ class _BottomTabBarState extends State<BottomTabBar> {
                           )
                         ],
                       ))),
+            ],
+          ),
+          const SizedBox(height: 30),
+          Row(
+            children: [
               Expanded(
                   child: GestureDetector(
                       behavior: HitTestBehavior.opaque,
@@ -176,6 +195,8 @@ class _BottomTabBarState extends State<BottomTabBar> {
                           )
                         ],
                       ))),
+              Expanded(child: Container()),
+              Expanded(child: Container()),
             ],
           )
         ],
