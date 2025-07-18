@@ -19,6 +19,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:mime/mime.dart';
+import 'package:pasteboard/pasteboard.dart';
 import 'package:path/path.dart';
 
 typedef F = Future<bool> Function(String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachment);
@@ -360,6 +361,47 @@ class _NewMessagePageState extends State<NewMessagePage> {
                                       FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
                                     },
                                   ),
+                                  FutureBuilder(
+                                      future: Pasteboard.image,
+                                      builder: (_, data) {
+                                        if (data.hasData) {
+                                          return CupertinoButton(
+                                            padding: EdgeInsets.all(0),
+                                            child: Icon(MdiIcons.contentPaste),
+                                            onPressed: () async {
+                                              FocusScope.of(context).unfocus();
+                                              final imageBytes = await Pasteboard.image;
+                                              if (imageBytes != null) {
+                                                setState(() => _images.add({
+                                                    ATTACHMENT.bytes: imageBytes,
+                                                    ATTACHMENT.filename: 'pasteboard_image.${DateTime.now().millisecondsSinceEpoch}.jpg',
+                                                    ATTACHMENT.mime: 'image/jpeg',
+                                                    ATTACHMENT.extension: 'jpg',
+                                                    ATTACHMENT.mediatype: MediaType('image', 'jpeg'),
+                                                    ATTACHMENT.previewWidget: Image.memory(
+                                                      imageBytes,
+                                                      width: 35,
+                                                      height: 35,
+                                                      fit: BoxFit.cover,
+                                                      frameBuilder: (BuildContext context, Widget child, int? frame, bool wasSynchronouslyLoaded) {
+                                                        if (frame == null) {
+                                                          return CupertinoActivityIndicator();
+                                                        }
+                                                        return child;
+                                                      },
+                                                    ),
+                                                  }));
+                                              }
+                                              FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
+                                            },
+                                          );
+                                        }
+                                        return CupertinoButton(
+                                            padding: EdgeInsets.all(0),
+                                            child: Icon(MdiIcons.contentPaste, color: colors.disabled),
+                                            onPressed: null,
+                                          );
+                                      }),
                                 ],
                               ),
                               CupertinoButton(
