@@ -130,6 +130,7 @@ class SettingsProvider {
     _settings.quickRating = _box.get('quickRating', defaultValue: Settings().quickRating);
     _settings.useFyxImageCache = _box.get('useFyxImageCache', defaultValue: Settings().useFyxImageCache);
     _settings.useCompactMode = _box.get('useCompactMode', defaultValue: Settings().useCompactMode);
+    _settings.useBulkActions = _box.get('useBulkActions', defaultValue: Settings().useBulkActions);
     _settings.useAutocorrect = _box.get('useAutocorrect', defaultValue: Settings().useAutocorrect);
     _settings.firstUnread = _box.get('firstUnread', defaultValue: Settings().firstUnread);
     _settings.skin = _box.get('skin', defaultValue: Settings().skin);
