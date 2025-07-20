@@ -166,29 +166,35 @@ class _PostListItemState extends ConsumerState<PostListItem> {
                               Visibility(
                                 visible: widget._isPreview != true && _post!.canReply,
                                 child: GestureDetector(
-                                    behavior: HitTestBehavior.opaque,
-                                    onTap: () => Navigator.of(context).pushNamed('/new-message',
-                                        arguments: NewMessageSettings(
-                                            draft: DraftsService().loadPostMessage(_post!.id),
-                                            onDraftRemove: () => DraftsService().removePostMessage(_post!.id),
-                                            onCompose: (message) => DraftsService().savePostMessage(id: _post!.id, message: message),
-                                            replyWidget: PostListItem(
-                                              _post!,
-                                              isPreview: true,
-                                              discussion: widget.discussion,
-                                            ),
-                                            onClose: this.widget.onUpdate,
-                                            onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
-                                              var result = await ApiController()
-                                                  .postDiscussionMessage(_post!.idKlub, message, attachments: attachments, replyPost: _post);
-                                              DraftsService().removePostMessage(_post!.id);
-                                              return result.isOk;
-                                            })),
-                                    child: TextIcon(
-                                      makeDense ? '' : 'Odpovědět',
-                                      icon: MdiIcons.reply,
-                                      iconColor: colors.text.withOpacity(0.38),
-                                    )),
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () => showCupertinoModalBottomSheet(
+                                      context: context,
+                                      enableDrag: true,
+                                      isDismissible: true,
+                                      settings: RouteSettings(
+                                          arguments: NewMessageSettings(
+                                              draft: DraftsService().loadPostMessage(_post!.id),
+                                              onDraftRemove: () => DraftsService().removePostMessage(_post!.id),
+                                              onCompose: (message) => DraftsService().savePostMessage(id: _post!.id, message: message),
+                                              replyWidget: PostListItem(
+                                                _post!,
+                                                isPreview: true,
+                                                discussion: widget.discussion,
+                                              ),
+                                              onClose: this.widget.onUpdate,
+                                              onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                                                var result = await ApiController()
+                                                    .postDiscussionMessage(_post!.idKlub, message, attachments: attachments, replyPost: _post);
+                                                DraftsService().removePostMessage(_post!.id);
+                                                return result.isOk;
+                                              })),
+                                      builder: (BuildContext context) => NewMessagePage()),
+                                  child: TextIcon(
+                                    makeDense ? '' : 'Odpovědět',
+                                    icon: MdiIcons.reply,
+                                    iconColor: colors.text.withOpacity(0.38),
+                                  ),
+                                ),
                               )
                             ],
                           )
