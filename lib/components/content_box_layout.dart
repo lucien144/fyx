@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/post/advertisement.dart';
@@ -19,6 +21,7 @@ import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/UnreadBadgeDecoration.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 enum LAYOUT_TYPES { textOnly, oneImageOnly, attachmentsOnly, attachmentsAndText }
 
@@ -155,7 +158,7 @@ class ContentBoxLayout extends StatelessWidget {
     SkinColors colors = Skin.of(context).theme.colors;
 
     return Container(
-      decoration: _isPreview ? colors.shadow : null,
+      decoration: _isPreview ? colors.textFieldDecoration.copyWith(color: colors.primary.withOpacity(0.2)) : null,
       child: Column(
         children: <Widget>[
           Visibility(
@@ -183,7 +186,7 @@ class ContentBoxLayout extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[topLeftWidget, SizedBox(), _isPreview ? Container() : (topRightWidget)],
+                    children: <Widget>[if(_isPreview) Container(child: Icon(MdiIcons.reply), padding: EdgeInsets.only(right: 8)), topLeftWidget, SizedBox(), _isPreview ? Container() : (topRightWidget)],
                   ),
                 ),
                 if (this.onTap == null)
@@ -228,17 +231,22 @@ class ContentBoxLayout extends StatelessWidget {
   }
 
   Widget getContentWidget() {
-    return MainRepository().settings.useCompactMode
-        ? (() {
-            for (final layout in LAYOUT_TYPES.values) {
-              var result = _layoutMap[layout]!();
-              if (result != null) {
-                return result;
-              }
-            }
-            return getWidgetByContentType(content);
-          })()
-        : getWidgetByContentType(content);
+    return Container(
+      constraints: BoxConstraints(maxHeight: _isPreview ? 60 : double.infinity),
+      child: ClipRect(
+        child: MainRepository().settings.useCompactMode
+            ? (() {
+                for (final layout in LAYOUT_TYPES.values) {
+                  var result = _layoutMap[layout]!();
+                  if (result != null) {
+                    return result;
+                  }
+                }
+                return getWidgetByContentType(content);
+              })()
+            : getWidgetByContentType(content),
+      ),
+    );
   }
 
   Widget getWidgetByContentType(Content content) {

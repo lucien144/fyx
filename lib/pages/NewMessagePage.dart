@@ -89,8 +89,8 @@ class _NewMessagePageState extends State<NewMessagePage> {
             ATTACHMENT.mediatype: MediaType(mime!.split('/')[0], mime.split('/')[1]),
             ATTACHMENT.previewWidget: Image.memory(
               Uint8List.fromList(list),
-              width: 35,
-              height: 35,
+              width: 80,
+              height: 80,
               fit: BoxFit.cover,
               frameBuilder: (BuildContext context, Widget child, int? frame, bool wasSynchronouslyLoaded) {
                 if (frame == null) {
@@ -169,103 +169,16 @@ class _NewMessagePageState extends State<NewMessagePage> {
               children: <Widget>[
                 Column(
                   children: <Widget>[
-                    Visibility(
-                        visible: _settings!.hasInputField == true,
-                        child: CupertinoTextField(
-                          decoration: colors.textFieldDecoration,
-                          controller: _recipientController,
-                          inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9_]'))],
-                          textCapitalization: TextCapitalization.characters,
-                          placeholder: 'Adresát',
-                          autofocus: _settings!.hasInputField == true && _settings!.inputFieldPlaceholder == null,
-                          autocorrect: MainRepository().settings.useAutocorrect,
-                          focusNode: _recipientFocusNode,
-                        )),
-                    SizedBox(
-                      height: 8,
-                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Scrollbar(
-                            child: CupertinoTextField(
-                              decoration: colors.textFieldDecoration,
-                              controller: _messageController,
-                              maxLines: 3,
-                              autofocus: _settings!.hasInputField != true || _settings!.inputFieldPlaceholder != null,
-                              textCapitalization: TextCapitalization.sentences,
-                              autocorrect: MainRepository().settings.useAutocorrect,
-                              focusNode: _messageFocusNode,
-                              contextMenuBuilder: (_, editableTextState) {
-                                final buttonsMatrix = {
-                                  'B': {
-                                    'htmlStart': '<b>',
-                                    'htmlEnd': '</b>',
-                                    'md': '**',
-                                  },
-                                  'I': {
-                                    'htmlStart': '<i>',
-                                    'htmlEnd': '</i>',
-                                    'md': '*',
-                                  },
-                                  'Spoiler': {
-                                    'htmlStart': '<span class="spoiler">',
-                                    'htmlEnd': '</span>',
-                                    'md': '§',
-                                  },
-                                  'Code': {
-                                    'htmlStart': '<code>',
-                                    'htmlEnd': '</code>',
-                                    'md': '```',
-                                  },
-                                };
-                                final TextEditingValue value = editableTextState.textEditingValue;
-                                final List<ContextMenuButtonItem> buttonItems = editableTextState.contextMenuButtonItems;
-                                buttonsMatrix.entries.forEach((element) {
-                                  buttonItems.add(
-                                    ContextMenuButtonItem(
-                                      label: element.key,
-                                      onPressed: () {
-                                        String replacement = '';
-                                        final selected = value.selection.textInside(value.text);
-                            
-                                        if (_useMarkdown) {
-                                          replacement = '${element.value['md']}${selected}${element.value['md']}';
-                                        } else {
-                                          replacement = '${element.value['htmlStart']}${selected}${element.value['htmlEnd']}';
-                                        }
-                            
-                                        // Update the message
-                                        _messageController.text = value.text.replaceRange(value.selection.start, value.selection.end, replacement);
-                            
-                                        // Move the cursor
-                                        final isSelected = value.selection.start != value.selection.end;
-                                        int offset = value.selection.extentOffset + (replacement.length - selected.length);
-                                        if (!isSelected) {
-                                          offset -= _useMarkdown ? element.value['md']!.length : element.value['htmlEnd']!.length;
-                                        }
-                                        _messageController.selection = TextSelection(baseOffset: offset, extentOffset: offset);
-                                        ContextMenuController.removeAny();
-                                      },
-                                    ),
-                                  );
-                                });
-                            
-                                return AdaptiveTextSelectionToolbar.buttonItems(
-                                  anchors: editableTextState.contextMenuAnchors,
-                                  buttonItems: buttonItems,
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
+                      children: <Widget>[
+                        CupertinoButton(
+                            padding: EdgeInsets.all(0),
+                            child: Text('Zavřít', style: TextStyle(fontSize: Settings().fontSize)),
+                            onPressed: () => Navigator.of(context).pop()),
                         CupertinoButton(
                           padding: EdgeInsets.all(0),
-                          color: colors.primary,
-                          child: _sending ? CupertinoActivityIndicator() : Icon(MdiIcons.send, color: colors.background),
+                          child: _sending ? CupertinoActivityIndicator() : Icon(MdiIcons.send),
                           onPressed: _isSendDisabled()
                               ? null
                               : () async {
@@ -297,6 +210,94 @@ class _NewMessagePageState extends State<NewMessagePage> {
                                 },
                         )
                       ],
+                    ),
+                    if (_settings!.replyWidget != null) _settings!.replyWidget!,
+                    if (_settings!.replyWidget != null && _settings!.hasInputField == true) SizedBox(height: 8),
+                    Visibility(
+                        visible: _settings!.hasInputField == true,
+                        child: CupertinoTextField(
+                          decoration: colors.textFieldDecoration,
+                          controller: _recipientController,
+                          inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9_]'))],
+                          textCapitalization: TextCapitalization.characters,
+                          placeholder: 'Adresát',
+                          autofocus: _settings!.hasInputField == true && _settings!.inputFieldPlaceholder == null,
+                          autocorrect: MainRepository().settings.useAutocorrect,
+                          focusNode: _recipientFocusNode,
+                        )),
+                    SizedBox(
+                      height: 8,
+                    ),
+                    CupertinoTextField(
+                      decoration: colors.textFieldDecoration,
+                      controller: _messageController,
+                      minLines: 2,
+                      maxLines: null,
+                      scribbleEnabled: true,
+                      autofocus: _settings!.hasInputField != true || _settings!.inputFieldPlaceholder != null,
+                      textCapitalization: TextCapitalization.sentences,
+                      autocorrect: MainRepository().settings.useAutocorrect,
+                      focusNode: _messageFocusNode,
+                      contextMenuBuilder: (_, editableTextState) {
+                        final buttonsMatrix = {
+                          'B': {
+                            'htmlStart': '<b>',
+                            'htmlEnd': '</b>',
+                            'md': '**',
+                          },
+                          'I': {
+                            'htmlStart': '<i>',
+                            'htmlEnd': '</i>',
+                            'md': '*',
+                          },
+                          'Spoiler': {
+                            'htmlStart': '<span class="spoiler">',
+                            'htmlEnd': '</span>',
+                            'md': '§',
+                          },
+                          'Code': {
+                            'htmlStart': '<code>',
+                            'htmlEnd': '</code>',
+                            'md': '```',
+                          },
+                        };
+                        final TextEditingValue value = editableTextState.textEditingValue;
+                        final List<ContextMenuButtonItem> buttonItems = editableTextState.contextMenuButtonItems;
+                        buttonsMatrix.entries.forEach((element) {
+                          buttonItems.add(
+                            ContextMenuButtonItem(
+                              label: element.key,
+                              onPressed: () {
+                                String replacement = '';
+                                final selected = value.selection.textInside(value.text);
+
+                                if (_useMarkdown) {
+                                  replacement = '${element.value['md']}${selected}${element.value['md']}';
+                                } else {
+                                  replacement = '${element.value['htmlStart']}${selected}${element.value['htmlEnd']}';
+                                }
+
+                                // Update the message
+                                _messageController.text = value.text.replaceRange(value.selection.start, value.selection.end, replacement);
+
+                                // Move the cursor
+                                final isSelected = value.selection.start != value.selection.end;
+                                int offset = value.selection.extentOffset + (replacement.length - selected.length);
+                                if (!isSelected) {
+                                  offset -= _useMarkdown ? element.value['md']!.length : element.value['htmlEnd']!.length;
+                                }
+                                _messageController.selection = TextSelection(baseOffset: offset, extentOffset: offset);
+                                ContextMenuController.removeAny();
+                              },
+                            ),
+                          );
+                        });
+
+                        return AdaptiveTextSelectionToolbar.buttonItems(
+                          anchors: editableTextState.contextMenuAnchors,
+                          buttonItems: buttonItems,
+                        );
+                      },
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0),
@@ -383,8 +384,8 @@ class _NewMessagePageState extends State<NewMessagePage> {
                                                     ATTACHMENT.mediatype: MediaType('image', 'jpeg'),
                                                     ATTACHMENT.previewWidget: Image.memory(
                                                       imageBytes,
-                                                      width: 35,
-                                                      height: 35,
+                                                      width: 80,
+                                                      height: 80,
                                                       fit: BoxFit.cover,
                                                       frameBuilder: (BuildContext context, Widget child, int? frame, bool wasSynchronouslyLoaded) {
                                                         if (frame == null) {
@@ -436,8 +437,6 @@ class _NewMessagePageState extends State<NewMessagePage> {
                       ),
                   ],
                 ),
-                SizedBox(height: 16),
-                if (_settings!.replyWidget != null) _settings!.replyWidget!
               ].toList(),
             ),
           ),

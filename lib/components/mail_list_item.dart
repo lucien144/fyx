@@ -89,22 +89,27 @@ class _MailListItemState extends ConsumerState<MailListItem> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[IconReply(), Text('Odpovědět', style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 14))],
                   ),
-                  onTap: () => Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
-                      arguments: NewMessageSettings(
-                          onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
-                            if (inputField == null) {
-                              return false;
-                            }
-                            var response = await ApiController().sendMail(inputField, message, attachments: attachments);
-                            return response.isOk;
-                          },
-                          onClose: this.widget.onUpdate!,
-                          inputFieldPlaceholder: widget.mail.participant,
-                          hasInputField: true,
-                          replyWidget: MailListItem(
-                            widget.mail,
-                            isPreview: true,
-                          ))),
+                  onTap: () => showCupertinoModalBottomSheet(
+                      context: context,
+                      backgroundColor: colors.barBackground,
+                      barrierColor: colors.dark.withOpacity(0.5),
+                      settings: RouteSettings(
+                          arguments: NewMessageSettings(
+                              onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                                if (inputField == null) {
+                                  return false;
+                                }
+                                var response = await ApiController().sendMail(inputField, message, attachments: attachments);
+                                return response.isOk;
+                              },
+                              onClose: this.widget.onUpdate!,
+                              inputFieldPlaceholder: widget.mail.participant,
+                              hasInputField: true,
+                              replyWidget: MailListItem(
+                                widget.mail,
+                                isPreview: true,
+                              ))),
+                      builder: (BuildContext context) => NewMessagePage()),
                 )
               ]),
       ),

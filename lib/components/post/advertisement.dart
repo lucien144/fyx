@@ -111,18 +111,23 @@ class Advertisement extends StatelessWidget {
                     icon: MdiIcons.replyOutline,
                     onTap: () {
                       Navigator.pop(context); // Close the sheet first.
-                      Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
-                          arguments: NewMessageSettings(
-                              hasInputField: true,
-                              inputFieldPlaceholder: this.username,
-                              messageFieldPlaceholder: '${content.link}\n',
-                              onClose: () => T.success('👍 Zpráva poslána.', bg: colors.success),
-                              onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
-                                if (inputField == null) return false;
+                      showCupertinoModalBottomSheet(
+                          context: context,
+                          backgroundColor: colors.barBackground,
+                          barrierColor: colors.dark.withOpacity(0.5),
+                          settings: RouteSettings(
+                              arguments: NewMessageSettings(
+                                  hasInputField: true,
+                                  inputFieldPlaceholder: this.username,
+                                  messageFieldPlaceholder: '${content.link}\n',
+                                  onClose: () => T.success('👍 Zpráva poslána.', bg: colors.success),
+                                  onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                                    if (inputField == null) return false;
 
-                                var response = await ApiController().sendMail(inputField, message, attachments: attachments);
-                                return response.isOk;
-                              }));
+                                    var response = await ApiController().sendMail(inputField, message, attachments: attachments);
+                                    return response.isOk;
+                                  })),
+                          builder: (BuildContext context) => NewMessagePage());
                     }),
                 ContextMenuItem(
                     label: 'Filtrovat\n@${this.username}',

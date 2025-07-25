@@ -347,8 +347,8 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                           child: Icon(discussionResponse.discussion.advertisement != null ? MdiIcons.reply : MdiIcons.plus),
                           onPressed: () => showCupertinoModalBottomSheet(
                               context: context,
-                              enableDrag: false,
-                              isDismissible: true,
+                              backgroundColor: colors.barBackground,
+                              barrierColor: colors.dark.withOpacity(0.5),
                               settings: RouteSettings(
                                   arguments: NewMessageSettings(
                                       draft: DraftsService().loadDiscussionMessage(pageArguments.discussionId),
