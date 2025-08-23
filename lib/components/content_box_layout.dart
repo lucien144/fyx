@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fyx/components/expandable_fade_widget.dart';
 import 'package:fyx/components/post/advertisement.dart';
 import 'package:fyx/components/post/dice.dart';
 import 'package:fyx/components/post/discussion_request.dart';
@@ -27,15 +28,15 @@ enum LAYOUT_TYPES { textOnly, oneImageOnly, attachmentsOnly, attachmentsAndText 
 
 typedef Widget? TLayout();
 
-class ContentBoxLayout extends StatelessWidget {
+class ContentBoxLayout extends StatefulWidget {
   final Widget topLeftWidget;
   final Widget topRightWidget;
   final Widget? bottomWidget;
   final Content content;
   final bool _isPreview;
   final bool _isHighlighted;
-  final bool isSelected;
   final Map<LAYOUT_TYPES, TLayout> _layoutMap = {};
+  final bool isSelected;
   final VoidCallback? onTap;
   final bool blur;
 
@@ -154,15 +155,42 @@ class ContentBoxLayout extends StatelessWidget {
   }
 
   @override
+  State<ContentBoxLayout> createState() => _ContentBoxLayoutState();
+}
+
+class _ContentBoxLayoutState extends State<ContentBoxLayout> {
+  bool _expanded = false;
+
+  @override
   Widget build(BuildContext context) {
     SkinColors colors = Skin.of(context).theme.colors;
 
+    return ExpandableFadeWidget(
+        enabled: widget._isPreview,
+        expanded: _expanded,
+        child: GestureDetector(
+          onTap: () => setState(() => _expanded = !_expanded),
+          child: AbsorbPointer(
+            absorbing: widget._isPreview,
+            child: widget._isPreview
+                ? ColorFiltered(
+                    colorFilter: const ColorFilter.matrix(
+                        <double>[0.2126, 0.7152, 0.0722, 0, 0, 0.2126, 0.7152, 0.0722, 0, 0, 0.2126, 0.7152, 0.0722, 0, 0, 0, 0, 0, 1, 0]),
+                    child: getEntireBox())
+                : getEntireBox(),
+          ),
+        ));
+  }
+
+  Widget getEntireBox() {
+    SkinColors colors = Skin.of(context).theme.colors;
+
     return Container(
-      decoration: _isPreview ? colors.textFieldDecoration.copyWith(color: colors.primary.withOpacity(0.2)) : null,
+      decoration: widget._isPreview ? colors.textFieldDecoration.copyWith(color: colors.primary.withOpacity(0.2)) : null,
       child: Column(
         children: <Widget>[
           Visibility(
-            visible: _isPreview != true,
+            visible: widget._isPreview != true,
             child: Divider(
               height: 8,
               thickness: 8,
@@ -171,12 +199,12 @@ class ContentBoxLayout extends StatelessWidget {
           ),
           Container(
             color: (() {
-              if (this.isSelected) {
+              if (this.widget.isSelected) {
                 return colors.highlightedText.withOpacity(.3);
               }
-              return _isHighlighted ? colors.primary.withOpacity(0.1) : null;
+              return widget._isHighlighted ? colors.primary.withOpacity(0.1) : null;
             })(),
-            foregroundDecoration: _isHighlighted ? UnreadBadgeDecoration(badgeColor: colors.primary, badgeSize: 16) : null,
+            foregroundDecoration: widget._isHighlighted ? UnreadBadgeDecoration(badgeColor: colors.primary, badgeSize: 16) : null,
             child: Column(
               children: <Widget>[
                 SizedBox(
@@ -186,17 +214,22 @@ class ContentBoxLayout extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[if(_isPreview) Container(child: Icon(MdiIcons.reply), padding: EdgeInsets.only(right: 8)), topLeftWidget, SizedBox(), _isPreview ? Container() : (topRightWidget)],
+                    children: <Widget>[
+                      if (widget._isPreview) Container(child: Icon(MdiIcons.reply), padding: EdgeInsets.only(right: 8)),
+                      widget.topLeftWidget,
+                      SizedBox(),
+                      widget._isPreview ? Container() : (widget.topRightWidget)
+                    ],
                   ),
                 ),
-                if (this.onTap == null)
+                if (this.widget.onTap == null)
                   Container(
                     padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
                     child: getContentWidget(),
                   )
                 else
                   GestureDetector(
-                    onTap: this.onTap,
+                    onTap: this.widget.onTap,
                     child: AbsorbPointer(
                       child: Container(
                         padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
@@ -205,19 +238,19 @@ class ContentBoxLayout extends StatelessWidget {
                     ),
                   ),
                 Visibility(
-                  visible: content.emptyLinks.length > 0,
+                  visible: widget.content.emptyLinks.length > 0,
                   child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16),
                       child: Column(
-                        children: content.emptyLinks.map((link) => PostFooterLink(link)).toList(),
+                        children: widget.content.emptyLinks.map((link) => PostFooterLink(link)).toList(),
                       )),
                 ),
                 SizedBox(
                   height: 8,
                 ),
-                this.bottomWidget != null ? Divider(color: colors.grey) : Container(),
-                this.bottomWidget != null
-                    ? Container(child: this.bottomWidget, padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16))
+                this.widget.bottomWidget != null ? Divider(color: colors.grey) : Container(),
+                this.widget.bottomWidget != null
+                    ? Container(child: this.widget.bottomWidget, padding: EdgeInsets.symmetric(vertical: 0, horizontal: 16))
                     : Container(),
                 SizedBox(
                   height: 8,
@@ -232,31 +265,31 @@ class ContentBoxLayout extends StatelessWidget {
 
   Widget getContentWidget() {
     return Container(
-      constraints: BoxConstraints(maxHeight: _isPreview ? 60 : double.infinity),
+      constraints: BoxConstraints(maxHeight: widget._isPreview && !_expanded ? 40 : double.infinity),
       child: ClipRect(
         child: MainRepository().settings.useCompactMode
             ? (() {
                 for (final layout in LAYOUT_TYPES.values) {
-                  var result = _layoutMap[layout]!();
+                  var result = widget._layoutMap[layout]!();
                   if (result != null) {
                     return result;
                   }
                 }
-                return getWidgetByContentType(content);
+                return getWidgetByContentType(widget.content);
               })()
-            : getWidgetByContentType(content),
+            : getWidgetByContentType(widget.content),
       ),
     );
   }
 
   Widget getWidgetByContentType(Content content) {
-    switch (this.content.contentType) {
+    switch (this.widget.content.contentType) {
       case PostTypeEnum.poll:
         return Poll(content as ContentPoll);
       case PostTypeEnum.dice:
         return Dice(content as ContentDice);
       case PostTypeEnum.text:
-        return PostHtml(content, blur: blur);
+        return PostHtml(content, blur: widget.blur);
       case PostTypeEnum.advertisement:
         return Advertisement(content as ContentAdvertisement);
       case PostTypeEnum.discussion_request:
