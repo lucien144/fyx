@@ -27,6 +27,8 @@ class DraftsService {
   saveDiscussionMessage({required int id, required String message}) {
     if (message.isNotEmpty) {
       _box.put('$_discussionKey-${id.toString()}', message);
+    } else {
+      removeDiscussionMessage(id);
     }
   }
 
@@ -41,6 +43,8 @@ class DraftsService {
   savePostMessage({required int id, required String message}) {
     if (message.isNotEmpty) {
       _box.put('$_postKey-${id.toString()}', message);
+    } else {
+      removePostMessage(id);
     }
   }
 
