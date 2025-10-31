@@ -30,6 +30,7 @@ import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:tap_canvas/tap_canvas.dart';
 
@@ -344,18 +345,23 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                           backgroundColor: colors.primary,
                           foregroundColor: colors.background,
                           child: Icon(discussionResponse.discussion.advertisement != null ? MdiIcons.reply : MdiIcons.plus),
-                          onPressed: () => Navigator.of(context).pushNamed('/new-message',
-                              arguments: NewMessageSettings(
-                                  draft: DraftsService().loadDiscussionMessage(pageArguments.discussionId),
-                                  onDraftRemove: () => DraftsService().removeDiscussionMessage(pageArguments.discussionId),
-                                  onCompose: (message) => DraftsService().saveDiscussionMessage(id: pageArguments.discussionId, message: message),
-                                  onClose: this.refresh,
-                                  onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
-                                    var result =
-                                        await ApiController().postDiscussionMessage(pageArguments.discussionId, message, attachments: attachments);
-                                    DraftsService().removeDiscussionMessage(pageArguments.discussionId);
-                                    return result.isOk;
-                                  })),
+                          onPressed: () => showCupertinoModalBottomSheet(
+                              context: context,
+                              backgroundColor: colors.barBackground,
+                              barrierColor: colors.dark.withOpacity(0.5),
+                              settings: RouteSettings(
+                                  arguments: NewMessageSettings(
+                                      draft: DraftsService().loadDiscussionMessage(pageArguments.discussionId),
+                                      onDraftRemove: () => DraftsService().removeDiscussionMessage(pageArguments.discussionId),
+                                      onCompose: (message) => DraftsService().saveDiscussionMessage(id: pageArguments.discussionId, message: message),
+                                      onClose: this.refresh,
+                                      onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                                        var result = await ApiController()
+                                            .postDiscussionMessage(pageArguments.discussionId, message, attachments: attachments);
+                                        DraftsService().removeDiscussionMessage(pageArguments.discussionId);
+                                        return result.isOk;
+                                      })),
+                              builder: (BuildContext context) => NewMessagePage()),
                         ),
                     ],
                   ),
@@ -513,15 +519,11 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                               },
                               child: Row(
                                 children: [
-                                  Text(
-                                      'Kopírovat odkaz',
-                                      style: textStyleContext),
+                                  Text('Kopírovat odkaz', style: textStyleContext),
                                   SizedBox(
                                     width: 10,
                                   ),
-                                  Expanded(
-                                      child: Icon(MdiIcons.linkPlus)
-                                  ),
+                                  Expanded(child: Icon(MdiIcons.linkPlus)),
                                 ],
                               ),
                             ),

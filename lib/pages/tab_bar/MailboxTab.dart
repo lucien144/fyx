@@ -13,6 +13,7 @@ import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class MailboxTabArguments {
   final int? mailId;
@@ -123,18 +124,23 @@ class _MailboxTabState extends State<MailboxTab> {
                 backgroundColor: colors.primary,
                 foregroundColor: colors.background,
                 child: Icon(Icons.add),
-                onPressed: () => Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
-                    arguments: NewMessageSettings(
-                        onClose: this.refreshData,
-                        hasInputField: true,
-                        onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
-                          if (inputField == null) {
-                            return false;
-                          }
+                onPressed: () => showCupertinoModalBottomSheet(
+                    context: context,
+                    backgroundColor: colors.barBackground,
+                    barrierColor: colors.dark.withOpacity(0.5),
+                    settings: RouteSettings(
+                        arguments: NewMessageSettings(
+                            onClose: this.refreshData,
+                            hasInputField: true,
+                            onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                              if (inputField == null) {
+                                return false;
+                              }
 
-                          var response = await ApiController().sendMail(inputField, message, attachments: attachments);
-                          return response.isOk;
-                        })),
+                              var response = await ApiController().sendMail(inputField, message, attachments: attachments);
+                              return response.isOk;
+                            })),
+                    builder: (BuildContext context) => NewMessagePage()),
               ),
             ),
           )
