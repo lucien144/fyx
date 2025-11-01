@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fyx/components/bottom_sheets/context_menu/grid.dart';
 import 'package:fyx/components/bottom_sheets/context_menu/item.dart';
+import 'package:fyx/components/premium_feature.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/enums/premium_feature_enum.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
@@ -67,7 +69,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
   FocusNode _recipientFocusNode = FocusNode();
   FocusNode _messageFocusNode = FocusNode();
   bool recipientHasFocus = true;
-  bool _useMarkdown = SettingsProvider().useMarkdown;
+  bool _useMarkdown = MainRepository().credentials!.isPremiumUser && SettingsProvider().useMarkdown;
 
   Future getImage(ImageSource source) async {
     final picker = ImagePicker();
@@ -115,7 +117,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
       }
     });
     _recipientController.addListener(() => setState(() => _recipient = _recipientController.text));
-    _useMarkdown = SettingsProvider().useMarkdown;
+    _useMarkdown = MainRepository().credentials!.isPremiumUser && SettingsProvider().useMarkdown;
     AnalyticsProvider().setScreen('New Message', 'NewMessagePage');
     super.initState();
   }
@@ -382,10 +384,10 @@ class _NewMessagePageState extends State<NewMessagePage> {
                                                         },
                                                       );
                                                     }
-                                                    return CupertinoButton(
-                                                      padding: EdgeInsets.all(0),
-                                                      child: Icon(MdiIcons.contentPaste, color: colors.disabled),
-                                                      onPressed: null,
+                                                    return ContextMenuItem(
+                                                      icon: MdiIcons.contentPaste,
+                                                      label: 'Schránka',
+                                                      disabled: true,
                                                     );
                                                   }),
                                             ],
@@ -394,14 +396,17 @@ class _NewMessagePageState extends State<NewMessagePage> {
                                       );
                                     },
                                   ),
-                                  CupertinoButton(
-                                    padding: EdgeInsets.all(0),
-                                    child: Icon(
-                                      MdiIcons.languageMarkdown,
-                                      color: _useMarkdown ? colors.primary : colors.disabled,
-                                      size: 32,
+                                  PremiumFeature(
+                                    feature: PremiumFeatureEnum.markdown,
+                                    child: CupertinoButton(
+                                      padding: EdgeInsets.all(0),
+                                      child: Icon(
+                                        MdiIcons.languageMarkdown,
+                                        color: _useMarkdown ? colors.primary : colors.disabled,
+                                        size: 32,
+                                      ),
+                                      onPressed: () => setState(() => _useMarkdown = !_useMarkdown),
                                     ),
-                                    onPressed: () => setState(() => _useMarkdown = !_useMarkdown),
                                   ),
                                 ],
                               ),

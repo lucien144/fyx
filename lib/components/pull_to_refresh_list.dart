@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'package:fyx/components/premium_feature.dart';
 import 'package:fyx/components/search/search_notfound.dart';
 import 'package:fyx/components/search_box.dart';
 import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/FirstUnreadEnum.dart';
+import 'package:fyx/model/enums/premium_feature_enum.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -247,9 +249,13 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
                             blurRadius: 20.0,
                             offset: Offset(0, 0))
                       ], color: colors.primary, borderRadius: BorderRadius.vertical(top: Radius.circular(6))),
-                      child: Text(
-                        '↓ První nepřečtený',
-                        style: TextStyle(color: colors.background),
+                      child: PremiumFeature(
+                        feature: PremiumFeatureEnum.jumpToFirstUnread,
+                        color: colors.background,
+                        child: Text(
+                          '↓ První nepřečtený',
+                          style: TextStyle(color: colors.background),
+                        ),
                       ),
                       padding: const EdgeInsets.only(top: 16, left: 20, right: 20, bottom: 40),
                     ),

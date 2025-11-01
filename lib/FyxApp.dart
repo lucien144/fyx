@@ -15,6 +15,7 @@ import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/libs/DeviceInfo.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/enums/SkinEnum.dart';
 import 'package:fyx/model/enums/ThemeEnum.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/model/provider/ThemeModel.dart';
@@ -42,6 +43,7 @@ import 'package:fyx/theme/skin/skins/GreyMatterSkin.dart';
 import 'package:fyx/theme/skin/skins/dark_skin.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tap_canvas/tap_canvas.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -123,6 +125,23 @@ class FyxApp extends StatefulWidget {
     MainRepository().packageInfo = results[1] as PackageInfo;
     MainRepository().deviceInfo = results[2] as DeviceInfo;
     MainRepository().settings = results[3] as SettingsProvider;
+
+    if (MainRepository().credentials?.isValid == true) {
+      await Supabase.initialize(
+        url: dotenv.get('SUPABASE_URL'),
+        anonKey: dotenv.get('SUPABASE_ANON_KEY'),
+      );
+
+      final result = await Supabase.instance.client
+          .from('subscribers')
+          .select()
+          .eq('nickname', MainRepository().credentials!.nickname.toLowerCase())
+          .or('valid_to.gte.${DateTime.now()},is_god.eq.true')
+          .maybeSingle();
+      if (result != null) {
+        MainRepository().credentials!.isPremiumUser = true;
+      }
+    }
 
     LogService.init(provider: FirebaseCrashlyticsProvider());
     LogService.setUser(MainRepository().credentials?.nickname ?? 'unknown');
@@ -250,7 +269,7 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
                   GreyMatterSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
                   DarkSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
                 ],
-                skin: ctx.watch<ThemeModel>().skin,
+                skin: MainRepository().credentials!.isPremiumUser ? ctx.watch<ThemeModel>().skin : SkinEnum.fyx,
                 brightness: (() {
                   if (ctx.watch<ThemeModel>().theme == ThemeEnum.system && _platformBrightness != null) {
                     return _platformBrightness!;

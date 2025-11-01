@@ -9,6 +9,7 @@ import 'package:fyx/components/discussion_page_scaffold.dart';
 import 'package:fyx/components/post/advertisement.dart';
 import 'package:fyx/components/post/post_list_item.dart';
 import 'package:fyx/components/post/syntax_highlighter.dart';
+import 'package:fyx/components/premium_feature.dart';
 import 'package:fyx/components/pull_to_refresh_list.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
@@ -18,6 +19,7 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/Settings.dart';
 import 'package:fyx/model/enums/DiscussionTypeEnum.dart';
+import 'package:fyx/model/enums/premium_feature_enum.dart';
 import 'package:fyx/model/post/content/Advertisement.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/pages/NewMessagePage.dart';
@@ -484,25 +486,28 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                               color: colors.grey,
                               height: 26,
                             ),
-                            GestureDetector(
-                              onTap: () => ref
-                                  .read(NsfwDiscussionList.provider.notifier)
-                                  .toggle(pageArguments.discussionId, discussionResponse.discussion.nameMain),
-                              child: Row(
-                                children: [
-                                  Text(
-                                      !ref.watch(NsfwDiscussionList.provider).containsKey(pageArguments.discussionId)
-                                          ? 'Označit za peprné'
-                                          : 'Označit za ne-peprné',
-                                      style: textStyleContext),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Expanded(
-                                      child: Icon(!ref.watch(NsfwDiscussionList.provider).containsKey(pageArguments.discussionId)
-                                          ? MdiIcons.chiliHot
-                                          : MdiIcons.chiliOff)),
-                                ],
+                            PremiumFeature(
+                              feature: PremiumFeatureEnum.nsfw,
+                              child: GestureDetector(
+                                onTap: () => ref
+                                    .read(NsfwDiscussionList.provider.notifier)
+                                    .toggle(pageArguments.discussionId, discussionResponse.discussion.nameMain),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                        !ref.watch(NsfwDiscussionList.provider).containsKey(pageArguments.discussionId)
+                                            ? 'Označit za peprné'
+                                            : 'Označit za ne-peprné',
+                                        style: textStyleContext),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Expanded(
+                                        child: Icon(!ref.watch(NsfwDiscussionList.provider).containsKey(pageArguments.discussionId)
+                                            ? MdiIcons.chiliHot
+                                            : MdiIcons.chiliOff)),
+                                  ],
+                                ),
                               ),
                             ),
                             Divider(

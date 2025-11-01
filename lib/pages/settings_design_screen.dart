@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fyx/components/premium_feature.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Settings.dart';
 import 'package:fyx/model/enums/SkinEnum.dart';
 import 'package:fyx/model/enums/ThemeEnum.dart';
+import 'package:fyx/model/enums/premium_feature_enum.dart';
 import 'package:fyx/model/provider/ThemeModel.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -43,48 +45,53 @@ class _SettingsDesignScreenState extends State<SettingsDesignScreen> {
     );
   }
 
-  SettingsTile _skinFactory(String label, SkinEnum skinId, {String? description}) {
+  AbstractSettingsTile _skinFactory(String label, SkinEnum skinId, {String? description}) {
     final SkinColors colors = Skin.of(context).theme.colors;
 
     final skin = Skin.of(context).skins.firstWhere((skinData) => skinData.id == skinId);
     final skinColors = skin.lightData.colors;
     final skinDarkColors = skin.darkData.colors;
-
-    return SettingsTile(
-      title: Text(label),
-      leading: Row(
-        children: [
-          Container(
-            decoration: BoxDecoration(border: Border.all(color: colors.text, width: 1)),
-            child: Row(
-              children: [
-                Container(width: 10, height: 20, color: skinColors.primary),
-                Container(width: 10, height: 20, color: skinColors.background),
-              ],
-            ),
-          ),
-          if (skin.darkMode) ...[
-            const SizedBox(
-              width: 8,
-            ),
-            Container(
-              decoration: BoxDecoration(border: Border.all(color: colors.text, width: 1)),
-              child: Row(
-                children: [
-                  Container(width: 10, height: 20, color: skinDarkColors.primary),
-                  Container(width: 10, height: 20, color: skinDarkColors.background),
-                ],
+    
+    return CustomSettingsTile(
+      child: PremiumFeature(
+        feature: PremiumFeatureEnum.skins,
+        child: SettingsTile(
+          title: Text(label),
+          leading: Row(
+            children: [
+              Container(
+                decoration: BoxDecoration(border: Border.all(color: colors.text, width: 1)),
+                child: Row(
+                  children: [
+                    Container(width: 10, height: 20, color: skinColors.primary),
+                    Container(width: 10, height: 20, color: skinColors.background),
+                  ],
+                ),
               ),
-            )
-          ]
-        ],
+              if (skin.darkMode) ...[
+                const SizedBox(
+                  width: 8,
+                ),
+                Container(
+                  decoration: BoxDecoration(border: Border.all(color: colors.text, width: 1)),
+                  child: Row(
+                    children: [
+                      Container(width: 10, height: 20, color: skinDarkColors.primary),
+                      Container(width: 10, height: 20, color: skinDarkColors.background),
+                    ],
+                  ),
+                )
+              ]
+            ],
+          ),
+          trailing: MainRepository().settings.skin == skinId ? Icon(CupertinoIcons.check_mark) : null,
+          description: description != null ? Text(description) : null,
+          onPressed: (_) {
+            MainRepository().settings.skin = skinId;
+            Provider.of<ThemeModel>(context, listen: false).setSkin(skinId);
+          },
+        ),
       ),
-      trailing: MainRepository().settings.skin == skinId ? Icon(CupertinoIcons.check_mark) : null,
-      description: description != null ? Text(description) : null,
-      onPressed: (_) {
-        MainRepository().settings.skin = skinId;
-        Provider.of<ThemeModel>(context, listen: false).setSkin(skinId);
-      },
     );
   }
 
