@@ -126,23 +126,6 @@ class FyxApp extends StatefulWidget {
     MainRepository().deviceInfo = results[2] as DeviceInfo;
     MainRepository().settings = results[3] as SettingsProvider;
 
-    if (MainRepository().credentials?.isValid == true) {
-      await Supabase.initialize(
-        url: dotenv.get('SUPABASE_URL'),
-        anonKey: dotenv.get('SUPABASE_ANON_KEY'),
-      );
-
-      final result = await Supabase.instance.client
-          .from('subscribers')
-          .select()
-          .eq('nickname', MainRepository().credentials!.nickname.toLowerCase())
-          .or('valid_to.gte.${DateTime.now()},is_god.eq.true')
-          .maybeSingle();
-      if (result != null) {
-        MainRepository().credentials!.isPremiumUser = true;
-      }
-    }
-
     LogService.init(provider: FirebaseCrashlyticsProvider());
     LogService.setUser(MainRepository().credentials?.nickname ?? 'unknown');
 
@@ -168,6 +151,27 @@ class FyxApp extends StatefulWidget {
       FirebaseCrashlytics.instance.recordError(error, null);
     };
     MainRepository().notifications = _notificationsService;
+
+    try {
+      if (MainRepository().credentials?.isValid == true) {
+        await Supabase.initialize(
+          url: dotenv.env['SUPABASE_URL'] ?? '',
+          anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
+        );
+
+        final result = await Supabase.instance.client
+            .from('subscribers')
+            .select()
+            .eq('nickname', MainRepository().credentials!.nickname.toLowerCase())
+            .or('valid_to.gte.${DateTime.now()},is_god.eq.true')
+            .maybeSingle();
+        if (result != null) {
+          MainRepository().credentials!.isPremiumUser = true;
+        }
+      }
+    } catch (e) {
+      FirebaseCrashlytics.instance.recordError(e, null);
+    }
 
     AnalyticsProvider.provider = analytics;
   }
