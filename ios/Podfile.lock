@@ -1,5 +1,5 @@
 PODS:
-  - app_links (6.4.1):
+  - app_links (0.0.2):
     - Flutter
   - device_info (0.0.1):
     - Flutter
@@ -312,7 +312,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/webview_flutter_wkwebview/ios"
 
 SPEC CHECKSUMS:
-  app_links: 585674be3c6661708e6cd794ab4f39fb9d8356f9
+  app_links: e7a6750a915a9e161c58d91bc610e8cd1d4d0ad0
   device_info: d7d233b645a32c40dfdc212de5cf646ca482f175
   Firebase: 1fe1c0a7d9aaea32efe01fbea5f0ebd8d70e53a2
   firebase_analytics: 4b8609ce8d2e0c8928472bec8d9753a8f1835eb6

@@ -41,7 +41,7 @@ import 'package:fyx/theme/skin/skins/ForestSkin.dart';
 import 'package:fyx/theme/skin/skins/FyxSkin.dart';
 import 'package:fyx/theme/skin/skins/GreyMatterSkin.dart';
 import 'package:fyx/theme/skin/skins/dark_skin.dart';
-import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tap_canvas/tap_canvas.dart';
