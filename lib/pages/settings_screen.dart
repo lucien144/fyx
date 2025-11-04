@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fyx/FyxApp.dart';
 import 'package:fyx/components/WhatsNew.dart';
+import 'package:fyx/components/premium_feature.dart';
+import 'package:fyx/components/premium_feature_bottom_sheet.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/drafts_service.dart';
@@ -17,6 +19,7 @@ import 'package:fyx/model/enums/DefaultView.dart';
 import 'package:fyx/model/enums/FirstUnreadEnum.dart';
 import 'package:fyx/model/enums/LaunchModeEnum.dart';
 import 'package:fyx/model/enums/ThemeEnum.dart';
+import 'package:fyx/model/enums/premium_feature_enum.dart';
 import 'package:fyx/pages/InfoPage.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
@@ -134,7 +137,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             sections: [
               SettingsSection(
                 title: Text('Obecné'),
-                tiles: <SettingsTile>[
+                tiles: <AbstractSettingsTile>[
                   SettingsTile.switchTile(
                     onToggle: (bool value) {
                       setState(() => _autocorrect = value);
@@ -152,14 +155,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       initialValue: _quickRating,
                       leading: Icon(MdiIcons.thumbsUpDown, color: colors.grey),
                       title: Text('Rychlé hodnocení')),
-                  SettingsTile.switchTile(
-                    onToggle: (bool value) {
-                      setState(() => _markdown = value);
-                      MainRepository().settings.useMarkdown = value;
-                    },
-                    initialValue: _markdown,
-                    leading: Icon(MdiIcons.languageMarkdown, color: colors.grey),
-                    title: Text('Markdown'),
+                  CustomSettingsTile(
+                    child: PremiumFeature(
+                      feature: PremiumFeatureEnum.markdown,
+                      child: SettingsTile.switchTile(
+                        onToggle: (bool value) {
+                          setState(() => _markdown = value);
+                          MainRepository().settings.useMarkdown = value;
+                        },
+                        initialValue: _markdown,
+                        leading: Icon(MdiIcons.languageMarkdown, color: colors.grey),
+                        title: Text('Markdown'),
+                      ),
+                    ),
                   ),
                   SettingsTile.switchTile(
                     onToggle: (bool value) {
@@ -340,7 +348,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   var tiles = [
                     SettingsTile(
                       title: Text('Obrázky'),
-                      trailing: Text('~${snapshot.data?[CacheKeys.images].round() ?? 0} MB', style: TextStyle(color: colors.text),),
+                      trailing: Text(
+                        '~${snapshot.data?[CacheKeys.images].round() ?? 0} MB',
+                        style: TextStyle(color: colors.text),
+                      ),
                     ),
                     SettingsTile(
                       title: Text('Gify'),
@@ -397,6 +408,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
               )),
               SettingsSection(title: Text('Informace'), tiles: <SettingsTile>[
+                SettingsTile.navigation(
+                  leading: Icon(Icons.lock, color: colors.grey),
+                  title: Text('Funkce pro podporovatele'),
+                  onPressed: (_) => showCupertinoModalBottomSheet(
+                      context: context,
+                      backgroundColor: colors.barBackground,
+                      barrierColor: colors.dark.withOpacity(0.5),
+                      builder: (BuildContext context) => PremiumFeatureBottomSheet(preview: true,)),
+                ),
                 SettingsTile.navigation(
                   leading: Icon(Icons.volunteer_activism, color: colors.grey),
                   title: Text(L.BACKERS),

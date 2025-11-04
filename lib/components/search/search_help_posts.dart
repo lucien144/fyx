@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/list_header.dart';
+import 'package:fyx/components/premium_feature.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/enums/premium_feature_enum.dart';
 import 'package:fyx/pages/search_page.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
@@ -165,39 +167,42 @@ class SearchPostsHelp extends StatelessWidget {
 
   _widgetSavedSearchItem(context, String term) {
     final SkinColors colors = Skin.of(context).theme.colors;
-    return Container(
-      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.grey.withOpacity(.12)))),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: GestureDetector(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                  child: Text(term),
-                ),
-                onTap: () {
-                  final arguments = SearchPageArguments(searchTerm: term, focus: false);
-                  Navigator.of(context, rootNavigator: true).pushNamed('/search', arguments: arguments);
-                  AnalyticsProvider().logEvent('filter_saved_search');
-                }),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            child: GestureDetector(
-              onTap: () => SettingsProvider().toggleSavedSearch(term),
+    return PremiumFeature(
+      feature: PremiumFeatureEnum.savedSearch,
+      child: Container(
+        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.grey.withOpacity(.12)))),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
               child: GestureDetector(
-                child: ValueListenableBuilder(
-                  valueListenable: MainRepository().settings.box.listenable(keys: ['savedSearch']),
-                  builder: (BuildContext context, value, Widget? child) {
-                  return Icon(
-                    SettingsProvider().isSearchTermSaved(term) ? MdiIcons.heart : MdiIcons.heartOutline,
-                  );}
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    child: Text(term),
+                  ),
+                  onTap: () {
+                    final arguments = SearchPageArguments(searchTerm: term, focus: false);
+                    Navigator.of(context, rootNavigator: true).pushNamed('/search', arguments: arguments);
+                    AnalyticsProvider().logEvent('filter_saved_search');
+                  }),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              child: GestureDetector(
+                onTap: () => SettingsProvider().toggleSavedSearch(term),
+                child: GestureDetector(
+                  child: ValueListenableBuilder(
+                    valueListenable: MainRepository().settings.box.listenable(keys: ['savedSearch']),
+                    builder: (BuildContext context, value, Widget? child) {
+                    return Icon(
+                      SettingsProvider().isSearchTermSaved(term) ? MdiIcons.heart : MdiIcons.heartOutline,
+                    );}
+                  ),
                 ),
               ),
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }

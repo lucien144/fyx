@@ -56,7 +56,8 @@ class _BottomTabBarState extends State<BottomTabBar> {
                 Text(
                   MainRepository().credentials!.nickname.toUpperCase(),
                   style: TextStyle(fontSize: 14),
-                )
+                ),
+                if(MainRepository().credentials!.isPremiumUser) Icon(MdiIcons.starFourPoints, size: 10,),
               ],
             ),
             GestureDetector(
@@ -142,7 +143,7 @@ class _BottomTabBarState extends State<BottomTabBar> {
                       children: [
                         Icon(MdiIcons.magnify, size: 34, color: colors.grey),
                         Text(
-                          'Vše',
+                          'Kluby, ...',
                           style: TextStyle(fontSize: 11, color: colors.grey),
                         )
                       ],

@@ -80,11 +80,16 @@ class WhatsNew extends StatelessWidget {
           icon: MdiIcons.pen,
           title: 'Rozepsané příspěvky',
           description: 'Pokud neodešlete rozepsaný příspěvěk, uloží se a později ho můžete snadno vybrat.',),
-      // item(
-      //     context: context,
-      //     icon: MdiIcons.magnifyPlus,
-      //     title: 'Uložená hledání',
-      //     description: 'Často hledaná slova si nově můžete pro rychlé hledání uložit. Typicky třeba svůj nick.'),
+      item(
+          context: context,
+          icon: MdiIcons.typewriter,
+          title: 'Redesign editoru',
+          description: 'Editor příspěvků má nově lepší vzhled a je přehlednější. Zároveň lze vkládat obrázky přímo ze schránky.',),
+      item(
+          context: context,
+          icon: MdiIcons.lock,
+          title: 'Fuknce pro podporovatele',
+          description: 'Některé funkce jsou nově pouze pro podporovatele.',),
       // item(
       //     context: context,
       //     icon: MdiIcons.themeLightDark,

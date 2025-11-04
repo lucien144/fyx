@@ -3,6 +3,7 @@ import 'package:fyx/theme/Helpers.dart';
 class Credentials {
   late String _nickname;
   late String _token;
+  bool isPremiumUser = false;
   String? _fcmToken;
 
   Credentials(this._nickname, this._token, {fcmToken}) : this._fcmToken = fcmToken;
