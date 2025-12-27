@@ -1,18 +1,17 @@
-import 'dart:ui';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:fyx/components/bottom_sheets/context_menu/item.dart';
 import 'package:fyx/components/post/post_hero_attachment_box.dart';
+import 'package:fyx/components/post/post_hero_attachment_image.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
-import 'package:fyx/controllers/log_service.dart';
-import 'package:fyx/libs/fyx_image_cache_manager.dart';
-import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/model/post/Link.dart';
 import 'package:fyx/model/post/Video.dart';
 import 'package:fyx/theme/T.dart';
+import 'package:fyx/theme/skin/Skin.dart';
+import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class GalleryArguments {
   final String imageUrl;
@@ -21,87 +20,118 @@ class GalleryArguments {
   GalleryArguments(this.imageUrl, {this.images = const []});
 }
 
-class PostHeroAttachment extends StatelessWidget {
+class PostHeroAttachment extends StatefulWidget {
   final dynamic attachment;
-  final List<model.Image> _images;
-  final bool _crop;
-  final Function? _onTap;
-  final bool _openGallery;
+  final List<model.Image> images;
+  final bool crop;
+  final Function? onTap;
+  final bool openGallery;
   final bool blur;
-  Size size;
-  bool showStrip;
+  final Size size;
+  final bool showStrip;
 
-  PostHeroAttachment(this.attachment,
-      {images = const <model.Image>[],
-      crop = true,
-      this.showStrip = true,
-      this.size = const Size(100, 100),
-      onTap,
-      openGallery = true,
-      this.blur = false})
-      : this._crop = crop,
-        this._onTap = onTap,
-        this._openGallery = openGallery,
-        this._images = images;
+  PostHeroAttachment(
+    this.attachment, {
+    this.images = const <model.Image>[],
+    this.crop = true,
+    this.showStrip = true,
+    this.size = const Size(100, 100),
+    this.onTap,
+    this.openGallery = true,
+    this.blur = false,
+  });
+
+  @override
+  State<PostHeroAttachment> createState() => _PostHeroAttachmentState();
+}
+
+class _PostHeroAttachmentState extends State<PostHeroAttachment> {
+  String? _cacheKey;
+
+  @override
+  void initState() {
+    _cacheKey = widget.attachment.thumb;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (attachment is model.Image) {
+    final SkinColors colors = Skin.of(context).theme.colors;
+
+    if (widget.attachment is model.Image) {
       return GestureDetector(
         onTap: () {
-          if (_onTap != null) {
-            _onTap!();
+          if (widget.onTap != null) {
+            widget.onTap!();
           }
-          if (_openGallery) {
+          if (widget.openGallery) {
             Navigator.of(context, rootNavigator: true)
-                .pushNamed('/gallery', arguments: GalleryArguments((attachment as model.Image).image, images: _images));
+                .pushNamed('/gallery', arguments: GalleryArguments((widget.attachment as model.Image).image, images: widget.images));
           }
         },
+        onLongPress: () => showCupertinoModalBottomSheet(
+            context: context,
+            barrierColor: colors.dark.withOpacity(0.5),
+            builder: (BuildContext context) => ListView.separated(
+                  padding: const EdgeInsets.only(left: 16, top: 16, right: 16, bottom: 48),
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  separatorBuilder: (_, __) => SizedBox(height: 12),
+                  itemCount: 2,
+                  itemBuilder: (_, i) => [
+                    ContextMenuItem(
+                        label: 'Náhled v novém okně',
+                        isColumn: false,
+                        icon: MdiIcons.openInNew,
+                        onTap: () {
+                          T.openLink(widget.attachment.thumb, mode: SettingsProvider().linksMode);
+                          Navigator.of(context).pop();
+                        }),
+                    ContextMenuItem(
+                        label: 'Reload obrázku',
+                        isColumn: false,
+                        icon: Icons.refresh,
+                        onTap: () {
+                          setState(() => _cacheKey = widget.attachment.thumb);
+                          Navigator.of(context).pop();
+                        }),
+                  ][i],
+                )),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: Stack(
             children: [
-              CachedNetworkImage(
-                fadeInDuration: Duration.zero,
-                fadeOutDuration: Duration.zero,
-                alignment: Alignment.topLeft,
-                imageUrl: attachment.thumb,
-                placeholder: (context, url) => CupertinoActivityIndicator(),
-                errorWidget: (context, url, error) {
-                  LogService.captureError(error);
-                  return Icon(Icons.error);
-                },
-                fit: BoxFit.cover,
-                width: _crop ? size.width : null,
-                height: _crop ? size.height : null,
-                memCacheWidth: (MediaQuery.of(context).size.width * 0.5 * MediaQuery.of(context).devicePixelRatio).toInt(),
-                cacheManager: MainRepository().settings.useFyxImageCache ? FyxImageCacheManager() : null,
+              PostHeroAttachmentImage(
+                crop: widget.crop,
+                size: widget.size,
+                url: widget.attachment.thumb,
+                cacheKey: _cacheKey,
               ),
-              if (blur) Positioned.fill(child: T.nsfwMask())
+              if (widget.blur) Positioned.fill(child: T.nsfwMask())
             ],
           ),
         ),
       );
     }
 
-    if (attachment is Link) {
+    if (widget.attachment is Link) {
       return PostHeroAttachmentBox(
-        showStrip: this.showStrip,
-        title: (attachment as Link).title,
+        showStrip: widget.showStrip,
+        title: (widget.attachment as Link).title,
         icon: Icons.link,
-        size: size,
-        onTap: () => T.openLink((attachment as Link).url, mode: SettingsProvider().linksMode),
+        size: widget.size,
+        onTap: () => T.openLink((widget.attachment as Link).url, mode: SettingsProvider().linksMode),
       );
     }
 
-    if (attachment is Video) {
-      var link = (attachment as Video).link;
+    if (widget.attachment is Video) {
+      var link = (widget.attachment as Video).link;
       return PostHeroAttachmentBox(
         title: link == null ? '' : link.title,
-        showStrip: this.showStrip,
+        showStrip: widget.showStrip,
         icon: Icons.play_circle_filled,
-        image: (attachment as Video).thumb,
-        size: size,
+        image: (widget.attachment as Video).thumb,
+        size: widget.size,
         onTap: link == null ? null : () => T.openLink(link.url, mode: SettingsProvider().linksMode),
       );
     }
