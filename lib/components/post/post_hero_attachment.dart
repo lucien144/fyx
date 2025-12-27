@@ -92,7 +92,7 @@ class _PostHeroAttachmentState extends State<PostHeroAttachment> {
                         isColumn: false,
                         icon: Icons.refresh,
                         onTap: () {
-                          setState(() => _cacheKey = widget.attachment.thumb);
+                          setState(() => _cacheKey = '${widget.attachment.thumb}?t=${DateTime.now().millisecondsSinceEpoch}');
                           Navigator.of(context).pop();
                         }),
                   ][i],
