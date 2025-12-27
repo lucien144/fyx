@@ -23,8 +23,6 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:pasteboard/pasteboard.dart';
 import 'package:path/path.dart';
 
-import '../components/WhatsNew.dart';
-
 typedef F = Future<bool> Function(String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachment);
 typedef C = void Function(String message);
 
@@ -62,8 +60,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
   TextEditingController _messageController = TextEditingController();
   List<Map<ATTACHMENT, dynamic>> _images = [];
   NewMessageSettings? _settings;
-  String _message = '';
-  String _recipient = '';
+  String s_recipient = '';
   bool _loadingImage = false;
   bool _sending = false;
   FocusNode _recipientFocusNode = FocusNode();
@@ -111,12 +108,10 @@ class _NewMessagePageState extends State<NewMessagePage> {
     _recipientFocusNode.addListener(_focusCallback);
     _messageFocusNode.addListener(_focusCallback);
     _messageController.addListener(() {
-      setState(() => _message = _messageController.text);
       if (_settings?.onCompose != null) {
         _settings!.onCompose!(_messageController.text);
       }
     });
-    _recipientController.addListener(() => setState(() => _recipient = _recipientController.text));
     _useMarkdown = MainRepository().credentials!.isPremiumUser && SettingsProvider().useMarkdown;
     AnalyticsProvider().setScreen('New Message', 'NewMessagePage');
     super.initState();
@@ -148,7 +143,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
       return true;
     }
 
-    return ((_settings!.hasInputField == true ? _recipient.length : 1) * (_message.length + _images.length)) == 0;
+    return ((_settings!.hasInputField == true ? _recipientController.text.length : 1) * (_messageController.text.length + _images.length)) == 0;
   }
 
   @override
@@ -175,6 +170,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                     Visibility(
                         visible: _settings!.hasInputField == true,
                         child: CupertinoTextField(
+                          key: ValueKey('recipient_field'),
                           decoration: colors.textFieldDecoration,
                           controller: _recipientController,
                           inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9_]'))],
@@ -192,6 +188,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
                       children: [
                         Expanded(
                           child: CupertinoTextField(
+                            key: ValueKey('message_field'),
                             decoration: colors.textFieldDecoration,
                             controller: _messageController,
                             minLines: 2,
@@ -264,45 +261,54 @@ class _NewMessagePageState extends State<NewMessagePage> {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        CupertinoButton(
-                          padding: EdgeInsets.all(0),
-                          child: _sending
-                              ? CupertinoActivityIndicator()
-                              : Icon(
-                                  MdiIcons.send,
-                                  color: colors.background,
-                                ),
-                          color: colors.primary,
-                          disabledColor: colors.grey,
-                          onPressed: _isSendDisabled()
-                              ? null
-                              : () async {
-                                  setState(() => _sending = true);
-                                  String message = _useMarkdown
-                                      ? md.markdownToHtml(
-                                          _messageController.text,
-                                          inlineSyntaxes: [
-                                            md.DelimiterSyntax('§+', tags: [md.DelimiterTag('span class="spoiler"', 1)], requiresDelimiterRun: true),
-                                            md.AutolinkExtensionSyntax()
-                                          ],
-                                        ).replaceAll('</span class="spoiler">', '</span>')
-                                      : _messageController.text;
+                        AnimatedBuilder(
+                          animation: Listenable.merge([
+                            _messageController,
+                            _recipientController,
+                          ]),
+                          builder: (context, child) {
+                            return CupertinoButton(
+                              padding: EdgeInsets.all(0),
+                              child: _sending
+                                  ? CupertinoActivityIndicator()
+                                  : Icon(
+                                      MdiIcons.send,
+                                      color: colors.background,
+                                    ),
+                              color: colors.primary,
+                              disabledColor: colors.grey,
+                              onPressed: _isSendDisabled()
+                                  ? null
+                                  : () async {
+                                      setState(() => _sending = true);
+                                      String message = _useMarkdown
+                                          ? md.markdownToHtml(
+                                              _messageController.text,
+                                              inlineSyntaxes: [
+                                                md.DelimiterSyntax('§+',
+                                                    tags: [md.DelimiterTag('span class="spoiler"', 1)], requiresDelimiterRun: true),
+                                                md.AutolinkExtensionSyntax()
+                                              ],
+                                            ).replaceAll('</span class="spoiler">', '</span>')
+                                          : _messageController.text;
 
-                                  var response = false;
-                                  try {
-                                    response = await _settings!.onSubmit(_settings!.hasInputField == true ? _recipientController.text : null, message,
-                                        _images.length > 0 ? _images : []);
-                                  } finally {
-                                    setState(() => _sending = false);
-                                  }
+                                      var response = false;
+                                      try {
+                                        response = await _settings!.onSubmit(_settings!.hasInputField == true ? _recipientController.text : null,
+                                            message, _images.length > 0 ? _images : []);
+                                      } finally {
+                                        setState(() => _sending = false);
+                                      }
 
-                                  if (response) {
-                                    if (_settings!.onClose != null) {
-                                      _settings!.onClose!();
-                                    }
-                                    Navigator.of(context).pop();
-                                  }
-                                },
+                                      if (response) {
+                                        if (_settings!.onClose != null) {
+                                          _settings!.onClose!();
+                                        }
+                                        Navigator.of(context).pop();
+                                      }
+                                    },
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -458,17 +464,17 @@ class _NewMessagePageState extends State<NewMessagePage> {
           ),
         ),
         Positioned(
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              child: Container(
-                child: Icon(MdiIcons.closeCircle, size: 32, color: colors.grey),
-                width: 24,
-                height: 24,
-              ),
-              onTap: () => setState(() => _images.removeWhere((image) => image[ATTACHMENT.bytes] == bytes)),
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              child: Icon(MdiIcons.closeCircle, size: 32, color: colors.grey),
+              width: 24,
+              height: 24,
             ),
-            right: 4,
-            top: 0,
+            onTap: () => setState(() => _images.removeWhere((image) => image[ATTACHMENT.bytes] == bytes)),
+          ),
+          right: 4,
+          top: 0,
         ),
       ],
     );
