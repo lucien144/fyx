@@ -1,9 +1,13 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:fyx/components/bottom_sheets/context_menu/item.dart';
 import 'package:fyx/components/post/post_hero_attachment_box.dart';
 import 'package:fyx/components/post/post_hero_attachment_image.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
+import 'package:fyx/libs/fyx_image_cache_manager.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/model/post/Link.dart';
 import 'package:fyx/model/post/Video.dart';
@@ -54,6 +58,25 @@ class _PostHeroAttachmentState extends State<PostHeroAttachment> {
     super.initState();
   }
 
+  Future<void> _reloadImage() async {
+    final url = widget.attachment.thumb;
+
+    // Remove from cache managers
+    if (MainRepository().settings.useFyxImageCache) {
+      await FyxImageCacheManager().removeFile(url);
+    } else {
+      await DefaultCacheManager().removeFile(url);
+    }
+
+    // Also evict from image cache
+    await CachedNetworkImageProvider(url).evict();
+
+    // Update cache key to force reload
+    if (mounted) {
+      setState(() => _cacheKey = '$url?t=${DateTime.now().millisecondsSinceEpoch}');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final SkinColors colors = Skin.of(context).theme.colors;
@@ -92,8 +115,8 @@ class _PostHeroAttachmentState extends State<PostHeroAttachment> {
                         isColumn: false,
                         icon: Icons.refresh,
                         onTap: () {
-                          setState(() => _cacheKey = '${widget.attachment.thumb}?t=${DateTime.now().millisecondsSinceEpoch}');
                           Navigator.of(context).pop();
+                          _reloadImage();
                         }),
                   ][i],
                 )),
