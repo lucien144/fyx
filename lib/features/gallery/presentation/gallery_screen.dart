@@ -1,37 +1,35 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/post/post_hero_attachment.dart';
-import 'package:fyx/components/throw_it_away.dart';
+import 'package:fyx/features/gallery/presentation/gallery_viewmodel.dart';
+import 'package:fyx/features/gallery/presentation/widgets/context_menu_button.dart';
+import 'package:fyx/features/gallery/presentation/widgets/download_button.dart';
+import 'package:fyx/features/gallery/presentation/widgets/open_button.dart';
+import 'package:fyx/features/gallery/presentation/widgets/throw_it_away.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/controllers/log_service.dart';
-import 'package:fyx/exceptions/UnsupportedDownloadFormatException.dart';
 import 'package:fyx/libs/fyx_image_cache_manager.dart';
 import 'package:fyx/model/MainRepository.dart';
-import 'package:fyx/theme/L.dart';
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
-import 'package:gallery_saver_plus/gallery_saver.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
-class GalleryPage extends StatefulWidget {
+class GalleryScreen extends StatefulWidget {
   @override
-  _GalleryPageState createState() => _GalleryPageState();
+  _GalleryScreenState createState() => _GalleryScreenState();
 }
 
-class _GalleryPageState extends State<GalleryPage> {
+class _GalleryScreenState extends State<GalleryScreen> {
   GalleryArguments? _arguments;
   int _page = 1;
-  bool _saving = false;
   bool _throwAway = true;
   bool _hideUI = false;
 
@@ -41,19 +39,47 @@ class _GalleryPageState extends State<GalleryPage> {
   @override
   void dispose() {
     pageController.dispose();
+
+    // Dispose and unregister ViewModel singleton when screen closes
+    final viewModel = getIt<GalleryViewModel>();
+    viewModel.removeListener(_onViewModelChanged);
+    viewModel.dispose();
+    getIt.unregister<GalleryViewModel>();
+
     super.dispose();
+  }
+
+  void _onViewModelChanged() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
   void initState() {
     super.initState();
+
+    // Register ViewModel as singleton for this gallery session
+    getIt.registerSingleton<GalleryViewModel>(GalleryViewModel());
+
+    // Add listener to ViewModel
+    final viewModel = getIt<GalleryViewModel>();
+    viewModel.addListener(_onViewModelChanged);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_arguments != null && _arguments!.images.length > 1) {
-        _arguments!.images.asMap().forEach((key, image) {
-          if (image.image == _arguments!.imageUrl) {
-            pageController.jumpToPage(key);
-          }
-        });
+      if (_arguments != null) {
+        // Initialize ViewModel with image URLs
+        final viewModel = getIt<GalleryViewModel>();
+        final imageUrls = _arguments!.images.map((img) => img.image).toList();
+        viewModel.initialize(imageUrls);
+
+        if (_arguments!.images.length > 1) {
+          _arguments!.images.asMap().forEach((key, image) {
+            if (image.image == _arguments!.imageUrl) {
+              pageController.jumpToPage(key);
+            }
+          });
+        }
       }
     });
 
@@ -101,6 +127,7 @@ class _GalleryPageState extends State<GalleryPage> {
                       close(context);
                     },
                     child: CachedNetworkImage(
+                        key: ValueKey(getIt<GalleryViewModel>().getCacheKey(_arguments!.images[index].image)),
                         fadeInDuration: Duration.zero,
                         fadeOutDuration: Duration.zero,
                         progressIndicatorBuilder: (context, url, progress) => Center(
@@ -111,6 +138,15 @@ class _GalleryPageState extends State<GalleryPage> {
                               ),
                             ),
                         imageUrl: _arguments!.images[index].image,
+                        cacheKey: getIt<GalleryViewModel>().getCacheKey(_arguments!.images[index].image),
+                        errorWidget: (context, url, error) {
+                          LogService.captureError(error);
+                          return Icon(
+                            MdiIcons.imageBroken,
+                            size: 64,
+                            color: colors.light.withOpacity(0.5),
+                          );
+                        },
                         memCacheWidth: (MediaQuery.of(context).size.width * MediaQuery.of(context).devicePixelRatio).toInt(),
                         cacheManager: MainRepository().settings.useFyxImageCache ? FyxImageCacheManager() : null),
                   ));
@@ -156,76 +192,9 @@ class _GalleryPageState extends State<GalleryPage> {
             bottom: 30,
             right: 30,
             child: Visibility(
-                visible: !_hideUI,
-                child: Column(
-                  children: [
-                    CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        color: colors.primary,
-                        child: Icon(
-                          MdiIcons.openInNew,
-                          color: colors.background,
-                          size: 32,
-                        ),
-                        onPressed: () {
-                          String url = _arguments!.images[_page - 1].image;
-                          T.openLink(url, mode: SettingsProvider().linksMode);
-                        }),
-                    const SizedBox(height: 16),
-                    CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      color: colors.primary,
-                      child: _saving
-                          ? CupertinoActivityIndicator()
-                          : Icon(
-                              MdiIcons.download,
-                              color: colors.background,
-                              size: 32,
-                            ),
-                      onPressed: () async {
-                        if (_saving) {
-                          return;
-                        }
-
-                        setState(() => _saving = true);
-                        try {
-                          PermissionStatus status = await Permission.storage.request();
-                          var isGranted = status.isGranted;
-
-                          if (Platform.isAndroid) {
-                            // https://pub.dev/packages/permission_handler#requesting-storage-permissions-always-returns-denied-on-android-13-what-can-i-do
-                            DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-                            final androidInfo = await deviceInfoPlugin.androidInfo;
-                            isGranted = androidInfo.version.sdkInt >= 33 || isGranted;
-                          }
-
-                          if (isGranted) {
-                            // See https://github.com/lucien144/fyx/issues/304#issuecomment-1094851596
-
-                            var appDocDir = await getTemporaryDirectory();
-                            String url = _arguments!.images[_page - 1].image;
-
-                            final result = await GallerySaver.saveImage(url, albumName: 'Fyx');
-                            if (!(result ?? false)) {
-                              throw Error();
-                            }
-                            T.success(L.TOAST_IMAGE_SAVE_OK, bg: colors.success);
-                          } else {
-                            T.error('Nelze uložit. Povolte ukládání, prosím.', bg: colors.danger);
-                          }
-                        } on UnsupportedDownloadFormatException catch (exception) {
-                          T.error(exception.message, bg: colors.danger);
-                        } catch (error) {
-                          T.error(L.TOAST_IMAGE_SAVE_ERROR, bg: colors.danger);
-                          print((error as Error).stackTrace);
-                          LogService.captureError(error, stack: (error as Error).stackTrace);
-                        } finally {
-                          setState(() => _saving = false);
-                        }
-                      },
-                    ),
-                  ],
-                )))
+              visible: !_hideUI,
+              child: ContextMenuButton(attachment: _arguments!.images[_page - 1]),
+            ))
       ],
     );
   }
