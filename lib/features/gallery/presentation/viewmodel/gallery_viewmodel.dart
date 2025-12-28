@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:fyx/features/gallery/presentation/gallery_state.dart';
+import 'package:fyx/features/gallery/presentation/viewmodel/gallery_state.dart';
 import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/shared/services/image_cache_service.dart';
 

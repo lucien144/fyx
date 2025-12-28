@@ -54,14 +54,13 @@ class _DownloadButtonState extends State<DownloadButton> {
 
           if (isGranted) {
             // See https://github.com/lucien144/fyx/issues/304#issuecomment-1094851596
-
             var appDocDir = await getTemporaryDirectory();
-
             final result = await GallerySaver.saveImage(widget.url, albumName: 'Fyx');
             if (!(result ?? false)) {
               throw Error();
             }
             T.success(L.TOAST_IMAGE_SAVE_OK, bg: colors.success);
+            Navigator.of(context).pop();
           } else {
             T.error('Nelze uložit. Povolte ukládání, prosím.', bg: colors.danger);
           }

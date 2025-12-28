@@ -16,7 +16,10 @@ class OpenButton extends StatelessWidget {
     return ContextMenuItem(
       isColumn: false,
       icon: MdiIcons.openInNew,
-      onTap: () => T.openLink(url, mode: SettingsProvider().linksMode),
+      onTap: () {
+        T.openLink(url, mode: SettingsProvider().linksMode);
+        Navigator.of(context).pop();
+      },
       label: 'Otevřít v prohlížeči',
     );
   }

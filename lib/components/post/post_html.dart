@@ -9,7 +9,7 @@ import 'package:fyx/components/post/spoiler.dart';
 import 'package:fyx/components/post/syntax_highlighter.dart';
 import 'package:fyx/components/post/video_player.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
-import 'package:fyx/features/gallery/presentation/gallery_viewmodel.dart';
+import 'package:fyx/features/gallery/presentation/viewmodel/gallery_viewmodel.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/post/Content.dart' as fyx;
 import 'package:fyx/model/post/Image.dart' as post;

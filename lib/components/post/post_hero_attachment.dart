@@ -1,11 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/bottom_sheets/context_menu/item.dart';
 import 'package:fyx/components/post/post_hero_attachment_box.dart';
 import 'package:fyx/components/post/post_hero_attachment_image.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
-import 'package:fyx/features/gallery/presentation/gallery_screen.dart';
-import 'package:fyx/features/gallery/presentation/gallery_viewmodel.dart';
+import 'package:fyx/features/gallery/presentation/viewmodel/gallery_viewmodel.dart';
 import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/model/post/Link.dart';
 import 'package:fyx/model/post/Video.dart';

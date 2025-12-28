@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fyx/components/bottom_sheets/context_menu/item.dart';
-import 'package:fyx/features/gallery/presentation/gallery_viewmodel.dart';
+import 'package:fyx/features/gallery/presentation/viewmodel/gallery_viewmodel.dart';
 import 'package:fyx/shared/services/service_locator.dart';
 
 class ReloadButton extends StatelessWidget {
