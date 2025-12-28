@@ -25,7 +25,6 @@ class GalleryScreen extends WatchingStatefulWidget {
 }
 
 class _GalleryScreenState extends State<GalleryScreen> {
-  GalleryArguments? _arguments;
   int _page = 1;
   bool _throwAway = true;
   bool _hideUI = false;
@@ -36,7 +35,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
   @override
   void dispose() {
     pageController.dispose();
-    getIt.unregister<GalleryViewModel>();
     super.dispose();
   }
 
@@ -44,23 +42,14 @@ class _GalleryScreenState extends State<GalleryScreen> {
   void initState() {
     super.initState();
 
-    // Register ViewModel as singleton for this gallery session
-    getIt.registerSingleton<GalleryViewModel>(GalleryViewModel());
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_arguments != null) {
-        // Initialize ViewModel with image URLs
-        final viewModel = getIt<GalleryViewModel>();
-        final imageUrls = _arguments!.images.map((img) => img.image).toList();
-        viewModel.initialize(imageUrls);
-
-        if (_arguments!.images.length > 1) {
-          _arguments!.images.asMap().forEach((key, image) {
-            if (image.image == _arguments!.imageUrl) {
-              pageController.jumpToPage(key);
-            }
-          });
-        }
+      final viewModel = getIt<GalleryViewModel>();
+      if (viewModel.state.images.length > 1) {
+        viewModel.state.images.asMap().forEach((key, image) {
+          if (image.image == viewModel.state.currentImageUrl) {
+            pageController.jumpToPage(key);
+          }
+        });
       }
     });
 
@@ -69,12 +58,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_arguments == null) {
-      _arguments = ModalRoute.of(context)!.settings.arguments as GalleryArguments;
-    }
-
-    SkinColors colors = Skin.of(context).theme.colors;
     final viewModel = watchIt<GalleryViewModel>();
+    final SkinColors colors = Skin.of(context).theme.colors;
+
     return Stack(
       children: [
         Container(
@@ -109,7 +95,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                       close(context);
                     },
                     child: CachedNetworkImage(
-                        key: ValueKey(viewModel.getCacheKey(_arguments!.images[index].image)),
+                        key: ValueKey(viewModel.getCacheKey(viewModel.state.images[index].image)),
                         fadeInDuration: Duration.zero,
                         fadeOutDuration: Duration.zero,
                         progressIndicatorBuilder: (context, url, progress) => Center(
@@ -119,8 +105,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
                                 child: CircularProgressIndicator(value: progress.progress, color: colors.primary),
                               ),
                             ),
-                        imageUrl: _arguments!.images[index].image,
-                        cacheKey: viewModel.getCacheKey(_arguments!.images[index].image),
+                        imageUrl: viewModel.state.images[index].image,
+                        cacheKey: viewModel.getCacheKey(viewModel.state.images[index].image),
                         errorWidget: (context, url, error) {
                           LogService.captureError(error);
                           return Icon(
@@ -133,7 +119,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                         cacheManager: MainRepository().settings.useFyxImageCache ? FyxImageCacheManager() : null),
                   ));
             },
-            itemCount: _arguments!.images.length,
+            itemCount: viewModel.state.images.length,
             onPageChanged: (i) => setState(() => _page = i + 1),
           ),
         ),
@@ -165,7 +151,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   padding: EdgeInsets.zero,
                   onPressed: () => close(context),
                   child: Text(
-                    '$_page / ${_arguments!.images.length}',
+                    '$_page / ${viewModel.state.images.length}',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: colors.background),
                   ),
@@ -175,7 +161,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
             right: 30,
             child: Visibility(
               visible: !_hideUI,
-              child: ContextMenuButton(attachment: _arguments!.images[_page - 1]),
+              child: ContextMenuButton(attachment: viewModel.state.images[_page - 1]),
             ))
       ],
     );

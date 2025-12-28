@@ -1,16 +1,23 @@
 import 'package:flutter/foundation.dart';
 import 'package:fyx/features/gallery/presentation/gallery_state.dart';
+import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/shared/services/image_cache_service.dart';
 
-/// ViewModel for gallery screen managing image cache keys
+/// ViewModel for gallery screen managing images and cache keys
 class GalleryViewModel extends ChangeNotifier {
-  GalleryState _state = GalleryState();
+  GalleryState _state = const GalleryState();
 
   GalleryState get state => _state;
 
-  /// Initialize gallery with list of image URLs
-  void initialize(List<String> imageUrls) {
-    _state = GalleryState.fromImageUrls(imageUrls);
+  /// Fill gallery with images and current image URL
+  void loadImages({
+    required List<model.Image> images,
+    required String currentImageUrl,
+  }) {
+    _state = GalleryState.initial(
+      images: images,
+      currentImageUrl: currentImageUrl,
+    );
     notifyListeners();
   }
 

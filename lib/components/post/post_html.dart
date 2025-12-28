@@ -9,6 +9,7 @@ import 'package:fyx/components/post/spoiler.dart';
 import 'package:fyx/components/post/syntax_highlighter.dart';
 import 'package:fyx/components/post/video_player.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
+import 'package:fyx/features/gallery/presentation/gallery_viewmodel.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/post/Content.dart' as fyx;
 import 'package:fyx/model/post/Image.dart' as post;
@@ -16,6 +17,7 @@ import 'package:fyx/model/post/Video.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/pages/search_page.dart';
 import 'package:fyx/pages/tab_bar/MailboxTab.dart';
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -248,7 +250,8 @@ class PostHtml extends StatelessWidget {
           OnImageTapExtension(
             onImageTap: (src, imgAttributes, element) {
               _isImageTap = true;
-              Navigator.of(context).pushNamed('/gallery', arguments: GalleryArguments(src!, images: content!.images));
+              getIt<GalleryViewModel>().loadImages(images: content!.images, currentImageUrl: src!);
+              Navigator.of(context).pushNamed('/gallery');
             },
           ),
         ],

@@ -4,22 +4,18 @@ import 'package:fyx/components/bottom_sheets/context_menu/item.dart';
 import 'package:fyx/components/post/post_hero_attachment_box.dart';
 import 'package:fyx/components/post/post_hero_attachment_image.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
+import 'package:fyx/features/gallery/presentation/gallery_screen.dart';
+import 'package:fyx/features/gallery/presentation/gallery_viewmodel.dart';
 import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/model/post/Link.dart';
 import 'package:fyx/model/post/Video.dart';
 import 'package:fyx/shared/services/image_cache_service.dart';
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-
-class GalleryArguments {
-  final String imageUrl;
-  final List<model.Image> images;
-
-  GalleryArguments(this.imageUrl, {this.images = const []});
-}
 
 class PostHeroAttachment extends StatefulWidget {
   final dynamic attachment;
@@ -75,8 +71,9 @@ class _PostHeroAttachmentState extends State<PostHeroAttachment> {
             widget.onTap!();
           }
           if (widget.openGallery) {
-            Navigator.of(context, rootNavigator: true)
-                .pushNamed('/gallery', arguments: GalleryArguments((widget.attachment as model.Image).image, images: widget.images));
+            // Load images into GalleryViewModel and open gallery screen
+            getIt<GalleryViewModel>().loadImages(images: widget.images, currentImageUrl: (widget.attachment as model.Image).image);
+            Navigator.of(context, rootNavigator: true).pushNamed('/gallery');
           }
         },
         onLongPress: () => showCupertinoModalBottomSheet(
