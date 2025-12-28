@@ -20,7 +20,7 @@ import 'package:fyx/model/enums/ThemeEnum.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/model/provider/ThemeModel.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
-import 'package:fyx/pages/GalleryPage.dart';
+import 'package:fyx/features/gallery/presentation/gallery_screen.dart';
 import 'package:fyx/pages/HomePage.dart';
 import 'package:fyx/pages/InfoPage.dart';
 import 'package:fyx/pages/LoginPage.dart';
@@ -207,7 +207,7 @@ class FyxApp extends StatefulWidget {
         return PageRouteBuilder(
             transitionDuration: const Duration(milliseconds: 0),
             opaque: false,
-            pageBuilder: (_, __, ___) => GalleryPage(),
+            pageBuilder: (_, __, ___) => GalleryScreen(),
             settings: settings,
             fullscreenDialog: true);
       case '/settings':

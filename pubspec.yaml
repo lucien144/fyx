@@ -89,6 +89,7 @@ dependencies:
   gallery_saver_plus: ^3.2.8
   pasteboard: ^0.4.0
   supabase_flutter: ^2.10.3
+  flutter_it: ^2.1.1
 
 dependency_overrides:
   intl: any

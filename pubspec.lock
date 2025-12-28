@@ -254,6 +254,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.18.0"
+  command_it:
+    dependency: transitive
+    description:
+      name: command_it
+      sha256: abed370e80744bca13aacfcdeaa9051b399fc7e6020133cea4840cc516b67613
+      url: "https://pub.dev"
+    source: hosted
+    version: "9.5.0"
   convert:
     dependency: transitive
     description:
@@ -563,6 +571,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0-beta.2"
+  flutter_it:
+    dependency: "direct main"
+    description:
+      name: flutter_it
+      sha256: b425c790294f31941adeeb6fd9184ea37f0a9cd384ce644d1f726db39f7bf442
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.1"
   flutter_launcher_icons:
     dependency: "direct dev"
     description:
@@ -658,6 +674,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.9"
+  get_it:
+    dependency: transitive
+    description:
+      name: get_it
+      sha256: "1d648d2dd2047d7f7450d5727ca24ee435f240385753d90b49650e3cdff32e56"
+      url: "https://pub.dev"
+    source: hosted
+    version: "9.2.0"
   glob:
     dependency: transitive
     description:
@@ -922,6 +946,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.2"
+  listen_it:
+    dependency: transitive
+    description:
+      name: listen_it
+      sha256: "461f46cc86e9c3be0d679f1ee4d94c8893c0a9ce42d0aad4474fe7e154e62c4a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.3.4"
   logging:
     dependency: transitive
     description:
@@ -1684,10 +1716,10 @@ packages:
     dependency: transitive
     description:
       name: vm_service
-      sha256: f652077d0bdf60abe4c1f6377448e8655008eef28f128bc023f7b5e8dfeb48fc
+      sha256: "5c5f338a667b4c644744b661f309fb8080bb94b18a7e91ef1dbd343bed00ed6d"
       url: "https://pub.dev"
     source: hosted
-    version: "14.2.4"
+    version: "14.2.5"
   wakelock_plus:
     dependency: transitive
     description:
@@ -1704,6 +1736,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.0"
+  watch_it:
+    dependency: transitive
+    description:
+      name: watch_it
+      sha256: f5dee042b876212f6201a4e92604ba5826ff11062e72ec70799abec163bea336
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.4.1"
   watcher:
     dependency: transitive
     description:

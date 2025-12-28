@@ -1,28 +1,19 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:fyx/components/bottom_sheets/context_menu/item.dart';
 import 'package:fyx/components/post/post_hero_attachment_box.dart';
 import 'package:fyx/components/post/post_hero_attachment_image.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
-import 'package:fyx/libs/fyx_image_cache_manager.dart';
-import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/features/gallery/presentation/viewmodel/gallery_viewmodel.dart';
 import 'package:fyx/model/post/Image.dart' as model;
 import 'package:fyx/model/post/Link.dart';
 import 'package:fyx/model/post/Video.dart';
+import 'package:fyx/shared/services/image_cache_service.dart';
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-
-class GalleryArguments {
-  final String imageUrl;
-  final List<model.Image> images;
-
-  GalleryArguments(this.imageUrl, {this.images = const []});
-}
 
 class PostHeroAttachment extends StatefulWidget {
   final dynamic attachment;
@@ -60,20 +51,10 @@ class _PostHeroAttachmentState extends State<PostHeroAttachment> {
 
   Future<void> _reloadImage() async {
     final url = widget.attachment.thumb;
+    final newCacheKey = await ImageCacheService.invalidateAndReload(url);
 
-    // Remove from cache managers
-    if (MainRepository().settings.useFyxImageCache) {
-      await FyxImageCacheManager().removeFile(url);
-    } else {
-      await DefaultCacheManager().removeFile(url);
-    }
-
-    // Also evict from image cache
-    await CachedNetworkImageProvider(url).evict();
-
-    // Update cache key to force reload
     if (mounted) {
-      setState(() => _cacheKey = '$url?t=${DateTime.now().millisecondsSinceEpoch}');
+      setState(() => _cacheKey = newCacheKey);
     }
   }
 
@@ -88,8 +69,9 @@ class _PostHeroAttachmentState extends State<PostHeroAttachment> {
             widget.onTap!();
           }
           if (widget.openGallery) {
-            Navigator.of(context, rootNavigator: true)
-                .pushNamed('/gallery', arguments: GalleryArguments((widget.attachment as model.Image).image, images: widget.images));
+            // Load images into GalleryViewModel and open gallery screen
+            getIt<GalleryViewModel>().loadImages(images: widget.images, currentImageUrl: (widget.attachment as model.Image).image);
+            Navigator.of(context, rootNavigator: true).pushNamed('/gallery');
           }
         },
         onLongPress: () => showCupertinoModalBottomSheet(
