@@ -20,7 +20,7 @@ import 'package:fyx/model/enums/ThemeEnum.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/model/provider/ThemeModel.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
-import 'package:fyx/pages/GalleryPage.dart';
+import 'package:fyx/pages/gallery_page.dart';
 import 'package:fyx/pages/HomePage.dart';
 import 'package:fyx/pages/InfoPage.dart';
 import 'package:fyx/pages/LoginPage.dart';
