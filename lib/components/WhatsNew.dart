@@ -77,19 +77,19 @@ class WhatsNew extends StatelessWidget {
       SizedBox(height: 24),
       item(
           context: context,
-          icon: MdiIcons.pen,
-          title: 'Rozepsané příspěvky',
-          description: 'Pokud neodešlete rozepsaný příspěvěk, uloží se a později ho můžete snadno vybrat.',),
-      item(
-          context: context,
-          icon: MdiIcons.typewriter,
-          title: 'Redesign editoru',
-          description: 'Editor příspěvků má nově lepší vzhled a je přehlednější. Zároveň lze vkládat obrázky přímo ze schránky.',),
-      item(
-          context: context,
-          icon: MdiIcons.lock,
-          title: 'Fuknce pro podporovatele',
-          description: 'Některé funkce jsou nově pouze pro podporovatele.',),
+          icon: MdiIcons.bugCheck,
+          title: 'Drobné opravy chyb',
+          description: '- oprava mizející klávesnice 🤞\n- možnost refresh obrázku\n- nové kontextové menu v galerii',),
+      // item(
+      //     context: context,
+      //     icon: MdiIcons.typewriter,
+      //     title: 'Redesign editoru',
+      //     description: 'Editor příspěvků má nově lepší vzhled a je přehlednější. Zároveň lze vkládat obrázky přímo ze schránky.',),
+      // item(
+      //     context: context,
+      //     icon: MdiIcons.lock,
+      //     title: 'Fuknce pro podporovatele',
+      //     description: 'Některé funkce jsou nově pouze pro podporovatele.',),
       // item(
       //     context: context,
       //     icon: MdiIcons.themeLightDark,
