@@ -21,6 +21,22 @@ class GalleryViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Get the index of the current image in the images list
+  /// Returns 0 if not found or if there's only one image
+  int getInitialPageIndex() {
+    if (_state.images.length <= 1) {
+      return 0;
+    }
+
+    for (int i = 0; i < _state.images.length; i++) {
+      if (_state.images[i].image == _state.currentImageUrl) {
+        return i;
+      }
+    }
+
+    return 0; // Fallback to first image if current URL not found
+  }
+
   /// Get cache key for a specific image URL
   String getCacheKey(String imageUrl) {
     return _state.getCacheKey(imageUrl);

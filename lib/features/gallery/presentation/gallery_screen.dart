@@ -44,12 +44,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final viewModel = getIt<GalleryViewModel>();
-      if (viewModel.state.images.length > 1) {
-        viewModel.state.images.asMap().forEach((key, image) {
-          if (image.image == viewModel.state.currentImageUrl) {
-            pageController.jumpToPage(key);
-          }
-        });
+      final initialPage = viewModel.getInitialPageIndex();
+      if (initialPage > 0) {
+        pageController.jumpToPage(initialPage);
       }
     });
 
