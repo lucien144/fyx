@@ -3,28 +3,25 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_it/flutter_it.dart';
 import 'package:fyx/components/post/post_hero_attachment.dart';
 import 'package:fyx/features/gallery/presentation/gallery_viewmodel.dart';
 import 'package:fyx/features/gallery/presentation/widgets/context_menu_button.dart';
-import 'package:fyx/features/gallery/presentation/widgets/download_button.dart';
-import 'package:fyx/features/gallery/presentation/widgets/open_button.dart';
 import 'package:fyx/features/gallery/presentation/widgets/throw_it_away.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
-import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/libs/fyx_image_cache_manager.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/shared/services/service_locator.dart';
-import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
-class GalleryScreen extends StatefulWidget {
+class GalleryScreen extends WatchingStatefulWidget {
   @override
-  _GalleryScreenState createState() => _GalleryScreenState();
+  State createState() => _GalleryScreenState();
 }
 
 class _GalleryScreenState extends State<GalleryScreen> {
@@ -39,20 +36,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
   @override
   void dispose() {
     pageController.dispose();
-
-    // Dispose and unregister ViewModel singleton when screen closes
-    final viewModel = getIt<GalleryViewModel>();
-    viewModel.removeListener(_onViewModelChanged);
-    viewModel.dispose();
     getIt.unregister<GalleryViewModel>();
-
     super.dispose();
-  }
-
-  void _onViewModelChanged() {
-    if (mounted) {
-      setState(() {});
-    }
   }
 
   @override
@@ -61,10 +46,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
     // Register ViewModel as singleton for this gallery session
     getIt.registerSingleton<GalleryViewModel>(GalleryViewModel());
-
-    // Add listener to ViewModel
-    final viewModel = getIt<GalleryViewModel>();
-    viewModel.addListener(_onViewModelChanged);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_arguments != null) {
@@ -93,6 +74,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
     }
 
     SkinColors colors = Skin.of(context).theme.colors;
+    final viewModel = watchIt<GalleryViewModel>();
     return Stack(
       children: [
         Container(
@@ -127,7 +109,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                       close(context);
                     },
                     child: CachedNetworkImage(
-                        key: ValueKey(getIt<GalleryViewModel>().getCacheKey(_arguments!.images[index].image)),
+                        key: ValueKey(viewModel.getCacheKey(_arguments!.images[index].image)),
                         fadeInDuration: Duration.zero,
                         fadeOutDuration: Duration.zero,
                         progressIndicatorBuilder: (context, url, progress) => Center(
@@ -138,7 +120,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                               ),
                             ),
                         imageUrl: _arguments!.images[index].image,
-                        cacheKey: getIt<GalleryViewModel>().getCacheKey(_arguments!.images[index].image),
+                        cacheKey: viewModel.getCacheKey(_arguments!.images[index].image),
                         errorWidget: (context, url, error) {
                           LogService.captureError(error);
                           return Icon(
