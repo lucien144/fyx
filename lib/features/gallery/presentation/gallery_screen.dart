@@ -139,7 +139,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
         ),
         Positioned(
             width: 100,
-            bottom: 30,
+            bottom: 30 + (Platform.isAndroid ? MediaQuery.of(context).viewPadding.bottom : 0), // Android nav bar overlap bottom buttons
             left: (MediaQuery.of(context).size.width - 100) / 2,
             child: Visibility(
                 visible: !_hideUI,
@@ -154,8 +154,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   ),
                 ))),
         Positioned(
-            bottom: 30,
             right: 30,
+            bottom: 30 + (Platform.isAndroid ? MediaQuery.of(context).viewPadding.bottom : 0), // Android nav bar overlap bottom buttons
             child: Visibility(
               visible: !_hideUI,
               child: ContextMenuButton(attachment: viewModel.state.images[_page - 1]),
