@@ -67,6 +67,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
   FocusNode _messageFocusNode = FocusNode();
   bool recipientHasFocus = true;
   bool _useMarkdown = MainRepository().credentials!.isPremiumUser && SettingsProvider().useMarkdown;
+  bool _hasRequestedInitialFocus = false;
 
   Future getImage(ImageSource source) async {
     final picker = ImagePicker();
@@ -117,6 +118,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
     super.initState();
   }
 
+
   @override
   void dispose() {
     _recipientController.dispose();
@@ -146,14 +148,38 @@ class _NewMessagePageState extends State<NewMessagePage> {
     return ((_settings!.hasInputField == true ? _recipientController.text.length : 1) * (_messageController.text.length + _images.length)) == 0;
   }
 
+  void _requestInitialFocus() {
+    if (_hasRequestedInitialFocus || _settings == null) return;
+    _hasRequestedInitialFocus = true;
+
+    // Delay focus request to avoid keyboard flicker
+    Future.delayed(Duration(milliseconds: 100), () {
+      if (!mounted) return;
+
+      // Determine which field should get focus based on settings
+      final shouldFocusRecipient = _settings!.hasInputField == true && _settings!.inputFieldPlaceholder.isEmpty;
+      final shouldFocusMessage = _settings!.hasInputField != true || _settings!.inputFieldPlaceholder.isNotEmpty;
+
+      if (shouldFocusRecipient) {
+        _recipientFocusNode.requestFocus();
+      } else if (shouldFocusMessage) {
+        _messageFocusNode.requestFocus();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     SkinColors colors = Skin.of(context).theme.colors;
 
+    // Initialize settings from route arguments
     if (_settings == null) {
       _settings = ModalRoute.of(context)!.settings.arguments as NewMessageSettings;
       _recipientController.text = _settings!.inputFieldPlaceholder.toUpperCase();
       _messageController.text = _settings!.draft.isNotEmpty ? _settings!.draft : _settings!.messageFieldPlaceholder;
+
+      // Schedule initial focus request
+      WidgetsBinding.instance.addPostFrameCallback((_) => _requestInitialFocus());
     }
 
     return CupertinoPageScaffold(
@@ -176,7 +202,6 @@ class _NewMessagePageState extends State<NewMessagePage> {
                           inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9_]'))],
                           textCapitalization: TextCapitalization.characters,
                           placeholder: 'Adresát',
-                          autofocus: _settings!.hasInputField == true && _settings!.inputFieldPlaceholder == null,
                           autocorrect: MainRepository().settings.useAutocorrect,
                           focusNode: _recipientFocusNode,
                         )),
@@ -194,7 +219,6 @@ class _NewMessagePageState extends State<NewMessagePage> {
                             minLines: 2,
                             maxLines: null,
                             scribbleEnabled: true,
-                            autofocus: _settings!.hasInputField != true || _settings!.inputFieldPlaceholder != null,
                             textCapitalization: TextCapitalization.sentences,
                             autocorrect: MainRepository().settings.useAutocorrect,
                             focusNode: _messageFocusNode,
