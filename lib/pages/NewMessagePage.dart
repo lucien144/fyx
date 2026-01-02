@@ -9,6 +9,7 @@ import 'package:fyx/components/premium_feature.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
+import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/premium_feature_enum.dart';
 import 'package:fyx/theme/Helpers.dart';
@@ -21,7 +22,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:mime/mime.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:pasteboard/pasteboard.dart';
-import 'package:path/path.dart';
+import 'package:path/path.dart' as p;
 
 typedef F = Future<bool> Function(String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachment);
 typedef C = void Function(String message);
@@ -83,7 +84,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
       final mime = lookupMimeType(file.path);
       setState(() => _images.add({
             ATTACHMENT.bytes: list,
-            ATTACHMENT.filename: '${basename(file.path)}.$ext',
+            ATTACHMENT.filename: '${p.basename(file.path)}.$ext',
             ATTACHMENT.mime: mime,
             ATTACHMENT.extension: ext,
             ATTACHMENT.mediatype: MediaType(mime!.split('/')[0], mime.split('/')[1]),
@@ -108,6 +109,15 @@ class _NewMessagePageState extends State<NewMessagePage> {
   void initState() {
     _recipientFocusNode.addListener(_focusCallback);
     _messageFocusNode.addListener(_focusCallback);
+
+    // Debug listeners to track focus changes
+    _recipientFocusNode.addListener(() {
+      debugPrint('[NewMessagePage] Recipient focus changed: ${_recipientFocusNode.hasFocus}');
+    });
+    _messageFocusNode.addListener(() {
+      debugPrint('[NewMessagePage] Message focus changed: ${_messageFocusNode.hasFocus}');
+    });
+
     _messageController.addListener(() {
       if (_settings?.onCompose != null) {
         _settings!.onCompose!(_messageController.text);
@@ -118,6 +128,20 @@ class _NewMessagePageState extends State<NewMessagePage> {
     super.initState();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_settings != null) return;
+
+    // Initialize settings from route arguments
+    _settings = ModalRoute.of(context)!.settings.arguments as NewMessageSettings;
+    _recipientController.text = _settings!.inputFieldPlaceholder.toUpperCase();
+    _messageController.text = _settings!.draft.isNotEmpty ? _settings!.draft : _settings!.messageFieldPlaceholder;
+
+    // Schedule initial focus request
+    WidgetsBinding.instance.addPostFrameCallback((_) => _requestInitialFocus());
+  }
 
   @override
   void dispose() {
@@ -125,6 +149,8 @@ class _NewMessagePageState extends State<NewMessagePage> {
     _messageController.dispose();
     _recipientFocusNode.removeListener(_focusCallback);
     _messageFocusNode.removeListener(_focusCallback);
+    _recipientFocusNode.dispose();
+    _messageFocusNode.dispose();
     super.dispose();
   }
 
@@ -152,18 +178,34 @@ class _NewMessagePageState extends State<NewMessagePage> {
     if (_hasRequestedInitialFocus || _settings == null) return;
     _hasRequestedInitialFocus = true;
 
+    debugPrint('[NewMessagePage] Scheduling initial focus request');
+
     // Delay focus request to avoid keyboard flicker
-    Future.delayed(Duration(milliseconds: 100), () {
-      if (!mounted) return;
+    Future.delayed(Duration(milliseconds: 300), () {
+      if (!mounted) {
+        debugPrint('[NewMessagePage] Widget not mounted, skipping focus request');
+        return;
+      }
 
-      // Determine which field should get focus based on settings
-      final shouldFocusRecipient = _settings!.hasInputField == true && _settings!.inputFieldPlaceholder.isEmpty;
-      final shouldFocusMessage = _settings!.hasInputField != true || _settings!.inputFieldPlaceholder.isNotEmpty;
+      try {
+        // Determine which field should get focus based on settings
+        final shouldFocusRecipient = _settings!.hasInputField == true && _settings!.inputFieldPlaceholder.isEmpty;
+        final shouldFocusMessage = _settings!.hasInputField != true || _settings!.inputFieldPlaceholder.isNotEmpty;
 
-      if (shouldFocusRecipient) {
-        _recipientFocusNode.requestFocus();
-      } else if (shouldFocusMessage) {
-        _messageFocusNode.requestFocus();
+        debugPrint('[NewMessagePage] Requesting focus - recipient: $shouldFocusRecipient, message: $shouldFocusMessage, '
+            'recipientNode.canRequestFocus: ${_recipientFocusNode.canRequestFocus}, '
+            'messageNode.canRequestFocus: ${_messageFocusNode.canRequestFocus}');
+
+        if (shouldFocusRecipient) {
+          _recipientFocusNode.requestFocus();
+          debugPrint('[NewMessagePage] Focus requested for recipient field');
+        } else if (shouldFocusMessage) {
+          _messageFocusNode.requestFocus();
+          debugPrint('[NewMessagePage] Focus requested for message field');
+        }
+      } catch (e, stackTrace) {
+        debugPrint('[NewMessagePage] Error requesting focus: $e');
+        LogService.captureError(e, stack: stackTrace);
       }
     });
   }
@@ -171,17 +213,6 @@ class _NewMessagePageState extends State<NewMessagePage> {
   @override
   Widget build(BuildContext context) {
     SkinColors colors = Skin.of(context).theme.colors;
-
-    // Initialize settings from route arguments
-    if (_settings == null) {
-      _settings = ModalRoute.of(context)!.settings.arguments as NewMessageSettings;
-      _recipientController.text = _settings!.inputFieldPlaceholder.toUpperCase();
-      _messageController.text = _settings!.draft.isNotEmpty ? _settings!.draft : _settings!.messageFieldPlaceholder;
-
-      // Schedule initial focus request
-      WidgetsBinding.instance.addPostFrameCallback((_) => _requestInitialFocus());
-    }
-
     return CupertinoPageScaffold(
       child: SafeArea(
         child: CupertinoScrollbar(
@@ -216,8 +247,9 @@ class _NewMessagePageState extends State<NewMessagePage> {
                             key: ValueKey('message_field'),
                             decoration: colors.textFieldDecoration,
                             controller: _messageController,
-                            minLines: 2,
+                            minLines: null,
                             maxLines: null,
+                            expands: true,
                             scribbleEnabled: true,
                             textCapitalization: TextCapitalization.sentences,
                             autocorrect: MainRepository().settings.useAutocorrect,
