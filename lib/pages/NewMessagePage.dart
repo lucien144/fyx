@@ -9,6 +9,7 @@ import 'package:fyx/components/premium_feature.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
+import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/premium_feature_enum.dart';
 import 'package:fyx/theme/Helpers.dart';
@@ -21,7 +22,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:mime/mime.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:pasteboard/pasteboard.dart';
-import 'package:path/path.dart';
+import 'package:path/path.dart' as p;
 
 typedef F = Future<bool> Function(String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachment);
 typedef C = void Function(String message);
@@ -83,7 +84,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
       final mime = lookupMimeType(file.path);
       setState(() => _images.add({
             ATTACHMENT.bytes: list,
-            ATTACHMENT.filename: '${basename(file.path)}.$ext',
+            ATTACHMENT.filename: '${p.basename(file.path)}.$ext',
             ATTACHMENT.mime: mime,
             ATTACHMENT.extension: ext,
             ATTACHMENT.mediatype: MediaType(mime!.split('/')[0], mime.split('/')[1]),
@@ -108,6 +109,15 @@ class _NewMessagePageState extends State<NewMessagePage> {
   void initState() {
     _recipientFocusNode.addListener(_focusCallback);
     _messageFocusNode.addListener(_focusCallback);
+
+    // Debug listeners to track focus changes
+    _recipientFocusNode.addListener(() {
+      debugPrint('[NewMessagePage] Recipient focus changed: ${_recipientFocusNode.hasFocus}');
+    });
+    _messageFocusNode.addListener(() {
+      debugPrint('[NewMessagePage] Message focus changed: ${_messageFocusNode.hasFocus}');
+    });
+
     _messageController.addListener(() {
       if (_settings?.onCompose != null) {
         _settings!.onCompose!(_messageController.text);
@@ -118,6 +128,20 @@ class _NewMessagePageState extends State<NewMessagePage> {
     super.initState();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_settings != null) return;
+
+    // Initialize settings from route arguments
+    _settings = ModalRoute.of(context)!.settings.arguments as NewMessageSettings;
+    _recipientController.text = _settings!.inputFieldPlaceholder.toUpperCase();
+    _messageController.text = _settings!.draft.isNotEmpty ? _settings!.draft : _settings!.messageFieldPlaceholder;
+
+    // Schedule initial focus request
+    WidgetsBinding.instance.addPostFrameCallback((_) => _requestInitialFocus());
+  }
 
   @override
   void dispose() {
@@ -125,6 +149,8 @@ class _NewMessagePageState extends State<NewMessagePage> {
     _messageController.dispose();
     _recipientFocusNode.removeListener(_focusCallback);
     _messageFocusNode.removeListener(_focusCallback);
+    _recipientFocusNode.dispose();
+    _messageFocusNode.dispose();
     super.dispose();
   }
 
@@ -152,18 +178,34 @@ class _NewMessagePageState extends State<NewMessagePage> {
     if (_hasRequestedInitialFocus || _settings == null) return;
     _hasRequestedInitialFocus = true;
 
+    debugPrint('[NewMessagePage] Scheduling initial focus request');
+
     // Delay focus request to avoid keyboard flicker
-    Future.delayed(Duration(milliseconds: 100), () {
-      if (!mounted) return;
+    Future.delayed(Duration(milliseconds: 300), () {
+      if (!mounted) {
+        debugPrint('[NewMessagePage] Widget not mounted, skipping focus request');
+        return;
+      }
 
-      // Determine which field should get focus based on settings
-      final shouldFocusRecipient = _settings!.hasInputField == true && _settings!.inputFieldPlaceholder.isEmpty;
-      final shouldFocusMessage = _settings!.hasInputField != true || _settings!.inputFieldPlaceholder.isNotEmpty;
+      try {
+        // Determine which field should get focus based on settings
+        final shouldFocusRecipient = _settings!.hasInputField == true && _settings!.inputFieldPlaceholder.isEmpty;
+        final shouldFocusMessage = _settings!.hasInputField != true || _settings!.inputFieldPlaceholder.isNotEmpty;
 
-      if (shouldFocusRecipient) {
-        _recipientFocusNode.requestFocus();
-      } else if (shouldFocusMessage) {
-        _messageFocusNode.requestFocus();
+        debugPrint('[NewMessagePage] Requesting focus - recipient: $shouldFocusRecipient, message: $shouldFocusMessage, '
+            'recipientNode.canRequestFocus: ${_recipientFocusNode.canRequestFocus}, '
+            'messageNode.canRequestFocus: ${_messageFocusNode.canRequestFocus}');
+
+        if (shouldFocusRecipient) {
+          _recipientFocusNode.requestFocus();
+          debugPrint('[NewMessagePage] Focus requested for recipient field');
+        } else if (shouldFocusMessage) {
+          _messageFocusNode.requestFocus();
+          debugPrint('[NewMessagePage] Focus requested for message field');
+        }
+      } catch (e, stackTrace) {
+        debugPrint('[NewMessagePage] Error requesting focus: $e');
+        LogService.captureError(e, stack: stackTrace);
       }
     });
   }
@@ -171,305 +213,303 @@ class _NewMessagePageState extends State<NewMessagePage> {
   @override
   Widget build(BuildContext context) {
     SkinColors colors = Skin.of(context).theme.colors;
-
-    // Initialize settings from route arguments
-    if (_settings == null) {
-      _settings = ModalRoute.of(context)!.settings.arguments as NewMessageSettings;
-      _recipientController.text = _settings!.inputFieldPlaceholder.toUpperCase();
-      _messageController.text = _settings!.draft.isNotEmpty ? _settings!.draft : _settings!.messageFieldPlaceholder;
-
-      // Schedule initial focus request
-      WidgetsBinding.instance.addPostFrameCallback((_) => _requestInitialFocus());
-    }
-
     return CupertinoPageScaffold(
       child: SafeArea(
-        child: CupertinoScrollbar(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: <Widget>[
-                Column(
-                  children: <Widget>[
-                    if (_settings!.replyWidget != null) _settings!.replyWidget!,
-                    if (_settings!.replyWidget != null && _settings!.hasInputField == true) SizedBox(height: 8),
-                    Visibility(
-                        visible: _settings!.hasInputField == true,
-                        child: CupertinoTextField(
-                          key: ValueKey('recipient_field'),
-                          decoration: colors.textFieldDecoration,
-                          controller: _recipientController,
-                          inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9_]'))],
-                          textCapitalization: TextCapitalization.characters,
-                          placeholder: 'Adresát',
-                          autocorrect: MainRepository().settings.useAutocorrect,
-                          focusNode: _recipientFocusNode,
-                        )),
-                    SizedBox(
-                      height: 8,
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Expanded(
-                          child: CupertinoTextField(
-                            key: ValueKey('message_field'),
-                            decoration: colors.textFieldDecoration,
-                            controller: _messageController,
-                            minLines: 2,
-                            maxLines: null,
-                            scribbleEnabled: true,
-                            textCapitalization: TextCapitalization.sentences,
-                            autocorrect: MainRepository().settings.useAutocorrect,
-                            focusNode: _messageFocusNode,
-                            contextMenuBuilder: (_, editableTextState) {
-                              final buttonsMatrix = {
-                                'B': {
-                                  'htmlStart': '<b>',
-                                  'htmlEnd': '</b>',
-                                  'md': '**',
-                                },
-                                'I': {
-                                  'htmlStart': '<i>',
-                                  'htmlEnd': '</i>',
-                                  'md': '*',
-                                },
-                                'Spoiler': {
-                                  'htmlStart': '<span class="spoiler">',
-                                  'htmlEnd': '</span>',
-                                  'md': '§',
-                                },
-                                'Code': {
-                                  'htmlStart': '<code>',
-                                  'htmlEnd': '</code>',
-                                  'md': '```',
-                                },
-                              };
-                              final TextEditingValue value = editableTextState.textEditingValue;
-                              final List<ContextMenuButtonItem> buttonItems = editableTextState.contextMenuButtonItems;
-                              buttonsMatrix.entries.forEach((element) {
-                                buttonItems.add(
-                                  ContextMenuButtonItem(
-                                    label: element.key,
-                                    onPressed: () {
-                                      String replacement = '';
-                                      final selected = value.selection.textInside(value.text);
-
-                                      if (_useMarkdown) {
-                                        replacement = '${element.value['md']}${selected}${element.value['md']}';
-                                      } else {
-                                        replacement = '${element.value['htmlStart']}${selected}${element.value['htmlEnd']}';
-                                      }
-
-                                      // Update the message
-                                      _messageController.text = value.text.replaceRange(value.selection.start, value.selection.end, replacement);
-
-                                      // Move the cursor
-                                      final isSelected = value.selection.start != value.selection.end;
-                                      int offset = value.selection.extentOffset + (replacement.length - selected.length);
-                                      if (!isSelected) {
-                                        offset -= _useMarkdown ? element.value['md']!.length : element.value['htmlEnd']!.length;
-                                      }
-                                      _messageController.selection = TextSelection(baseOffset: offset, extentOffset: offset);
-                                      ContextMenuController.removeAny();
-                                    },
-                                  ),
-                                );
-                              });
-
-                              return AdaptiveTextSelectionToolbar.buttonItems(
-                                anchors: editableTextState.contextMenuAnchors,
-                                buttonItems: buttonItems,
-                              );
+        child: CustomScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.manual,
+          shrinkWrap: true,
+          slivers: [
+            if (_settings!.replyWidget != null)
+              SliverPadding(padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0), sliver: SliverToBoxAdapter(child: _settings!.replyWidget!)),
+            if (_settings!.replyWidget != null && _settings!.hasInputField == true) const SliverToBoxAdapter(child: const SizedBox(height: 8)),
+            if (_settings!.hasInputField == true)
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                sliver: SliverToBoxAdapter(
+                  child: CupertinoTextField(
+                    key: ValueKey('recipient_field'),
+                    decoration: colors.textFieldDecoration,
+                    controller: _recipientController,
+                    inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9_]'))],
+                    textCapitalization: TextCapitalization.characters,
+                    placeholder: 'Adresát',
+                    autocorrect: MainRepository().settings.useAutocorrect,
+                    focusNode: _recipientFocusNode,
+                  ),
+                ),
+              ),
+            const SliverToBoxAdapter(child: const SizedBox(height: 8)),
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              sliver: SliverToBoxAdapter(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: CupertinoTextField(
+                        key: ValueKey('message_field'),
+                        decoration: colors.textFieldDecoration,
+                        controller: _messageController,
+                        expands: false,
+                        minLines: 2,
+                        maxLines: null,
+                        scribbleEnabled: true,
+                        textCapitalization: TextCapitalization.sentences,
+                        autocorrect: MainRepository().settings.useAutocorrect,
+                        focusNode: _messageFocusNode,
+                        contextMenuBuilder: (_, editableTextState) {
+                          final buttonsMatrix = {
+                            'B': {
+                              'htmlStart': '<b>',
+                              'htmlEnd': '</b>',
+                              'md': '**',
                             },
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        AnimatedBuilder(
-                          animation: Listenable.merge([
-                            _messageController,
-                            _recipientController,
-                          ]),
-                          builder: (context, child) {
-                            return CupertinoButton(
-                              padding: EdgeInsets.all(0),
-                              child: _sending
-                                  ? CupertinoActivityIndicator()
-                                  : Icon(
-                                      MdiIcons.send,
-                                      color: colors.background,
-                                    ),
-                              color: colors.primary,
-                              disabledColor: colors.grey,
-                              onPressed: _isSendDisabled()
-                                  ? null
-                                  : () async {
-                                      setState(() => _sending = true);
-                                      String message = _useMarkdown
-                                          ? md.markdownToHtml(
-                                              _messageController.text,
-                                              inlineSyntaxes: [
-                                                md.DelimiterSyntax('§+',
-                                                    tags: [md.DelimiterTag('span class="spoiler"', 1)], requiresDelimiterRun: true),
-                                                md.AutolinkExtensionSyntax()
-                                              ],
-                                            ).replaceAll('</span class="spoiler">', '</span>')
-                                          : _messageController.text;
+                            'I': {
+                              'htmlStart': '<i>',
+                              'htmlEnd': '</i>',
+                              'md': '*',
+                            },
+                            'Spoiler': {
+                              'htmlStart': '<span class="spoiler">',
+                              'htmlEnd': '</span>',
+                              'md': '§',
+                            },
+                            'Code': {
+                              'htmlStart': '<code>',
+                              'htmlEnd': '</code>',
+                              'md': '```',
+                            },
+                          };
+                          final TextEditingValue value = editableTextState.textEditingValue;
+                          final List<ContextMenuButtonItem> buttonItems = editableTextState.contextMenuButtonItems;
+                          buttonsMatrix.entries.forEach((element) {
+                            buttonItems.add(
+                              ContextMenuButtonItem(
+                                label: element.key,
+                                onPressed: () {
+                                  String replacement = '';
+                                  final selected = value.selection.textInside(value.text);
 
-                                      var response = false;
-                                      try {
-                                        response = await _settings!.onSubmit(_settings!.hasInputField == true ? _recipientController.text : null,
-                                            message, _images.length > 0 ? _images : []);
-                                      } finally {
-                                        setState(() => _sending = false);
-                                      }
+                                  if (_useMarkdown) {
+                                    replacement = '${element.value['md']}${selected}${element.value['md']}';
+                                  } else {
+                                    replacement = '${element.value['htmlStart']}${selected}${element.value['htmlEnd']}';
+                                  }
 
-                                      if (response) {
-                                        if (_settings!.onClose != null) {
-                                          _settings!.onClose!();
-                                        }
-                                        Navigator.of(context).pop();
-                                      }
-                                    },
+                                  // Update the message
+                                  _messageController.text = value.text.replaceRange(value.selection.start, value.selection.end, replacement);
+
+                                  // Move the cursor
+                                  final isSelected = value.selection.start != value.selection.end;
+                                  int offset = value.selection.extentOffset + (replacement.length - selected.length);
+                                  if (!isSelected) {
+                                    offset -= _useMarkdown ? element.value['md']!.length : element.value['htmlEnd']!.length;
+                                  }
+                                  _messageController.selection = TextSelection(baseOffset: offset, extentOffset: offset);
+                                  ContextMenuController.removeAny();
+                                },
+                              ),
                             );
-                          },
-                        ),
-                      ],
+                          });
+
+                          return AdaptiveTextSelectionToolbar.buttonItems(
+                            anchors: editableTextState.contextMenuAnchors,
+                            buttonItems: buttonItems,
+                          );
+                        },
+                      ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Column(
-                        children: [
+                    const SizedBox(width: 8),
+                    AnimatedBuilder(
+                      animation: Listenable.merge([
+                        _messageController,
+                        _recipientController,
+                      ]),
+                      builder: (context, child) {
+                        return CupertinoButton(
+                          padding: EdgeInsets.all(0),
+                          child: _sending
+                              ? CupertinoActivityIndicator()
+                              : Icon(
+                                  MdiIcons.send,
+                                  color: colors.background,
+                                ),
+                          color: colors.primary,
+                          disabledColor: colors.grey,
+                          onPressed: _isSendDisabled()
+                              ? null
+                              : () async {
+                                  setState(() => _sending = true);
+                                  String message = _useMarkdown
+                                      ? md.markdownToHtml(
+                                          _messageController.text,
+                                          inlineSyntaxes: [
+                                            md.DelimiterSyntax('§+', tags: [md.DelimiterTag('span class="spoiler"', 1)], requiresDelimiterRun: true),
+                                            md.AutolinkExtensionSyntax()
+                                          ],
+                                        ).replaceAll('</span class="spoiler">', '</span>')
+                                      : _messageController.text;
+
+                                  var response = false;
+                                  try {
+                                    response = await _settings!.onSubmit(_settings!.hasInputField == true ? _recipientController.text : null, message,
+                                        _images.length > 0 ? _images : []);
+                                  } finally {
+                                    setState(() => _sending = false);
+                                  }
+
+                                  if (response) {
+                                    if (_settings!.onClose != null) {
+                                      _settings!.onClose!();
+                                    }
+                                    Navigator.of(context).pop();
+                                  }
+                                },
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0),
+              sliver: SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  CupertinoButton(
-                                    padding: EdgeInsets.all(0),
-                                    child: Icon(MdiIcons.plusCircle),
-                                    onPressed: () {
-                                      showCupertinoModalBottomSheet(
-                                        context: context,
-                                        builder: (context) {
-                                          return ContextMenuGrid(
-                                            children: [
-                                              ContextMenuItem(
-                                                label: 'Kamera',
-                                                icon: MdiIcons.camera,
-                                                onTap: () async {
-                                                  Navigator.of(context).pop();
-                                                  FocusScope.of(context).unfocus();
-                                                  await getImage(ImageSource.camera);
-                                                  //FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
-                                                },
-                                              ),
-                                              ContextMenuItem(
-                                                label: 'Galerie',
-                                                icon: MdiIcons.image,
-                                                onTap: () async {
-                                                  Navigator.of(context).pop();
-                                                  FocusScope.of(context).unfocus();
-                                                  await getImage(ImageSource.gallery);
-                                                  //FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
-                                                },
-                                              ),
-                                              FutureBuilder(
-                                                  future: Pasteboard.image,
-                                                  builder: (_, data) {
-                                                    if (data.hasData) {
-                                                      return ContextMenuItem(
-                                                        label: 'Schránka',
-                                                        icon: MdiIcons.contentPaste,
-                                                        onTap: () async {
-                                                          Navigator.of(context).pop();
-                                                          FocusScope.of(context).unfocus();
-                                                          final imageBytes = await Pasteboard.image;
-                                                          if (imageBytes != null) {
-                                                            setState(() => _images.add({
-                                                                  ATTACHMENT.bytes: imageBytes,
-                                                                  ATTACHMENT.filename:
-                                                                      'pasteboard_image.${DateTime.now().millisecondsSinceEpoch}.jpg',
-                                                                  ATTACHMENT.mime: 'image/jpeg',
-                                                                  ATTACHMENT.extension: 'jpg',
-                                                                  ATTACHMENT.mediatype: MediaType('image', 'jpeg'),
-                                                                  ATTACHMENT.previewWidget: Image.memory(
-                                                                    imageBytes,
-                                                                    width: 80,
-                                                                    height: 80,
-                                                                    fit: BoxFit.cover,
-                                                                    frameBuilder: (BuildContext context, Widget child, int? frame,
-                                                                        bool wasSynchronouslyLoaded) {
-                                                                      if (frame == null) {
-                                                                        return CupertinoActivityIndicator();
-                                                                      }
-                                                                      return child;
-                                                                      //FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
-                                                                    },
-                                                                  ),
-                                                                }));
-                                                          }
-                                                          //FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
-                                                        },
-                                                      );
-                                                    }
-                                                    return ContextMenuItem(
-                                                      icon: MdiIcons.contentPaste,
-                                                      label: 'Schránka',
-                                                      disabled: true,
-                                                    );
-                                                  }),
-                                            ],
-                                          );
-                                        },
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              CupertinoButton(
+                                padding: EdgeInsets.all(0),
+                                child: Icon(MdiIcons.plusCircle),
+                                onPressed: () {
+                                  showCupertinoModalBottomSheet(
+                                    context: context,
+                                    expand: false,
+                                    builder: (context) {
+                                      return ContextMenuGrid(
+                                        children: [
+                                          ContextMenuItem(
+                                            label: 'Kamera',
+                                            icon: MdiIcons.camera,
+                                            onTap: () async {
+                                              Navigator.of(context).pop();
+                                              FocusScope.of(context).unfocus();
+                                              await getImage(ImageSource.camera);
+                                              //FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
+                                            },
+                                          ),
+                                          ContextMenuItem(
+                                            label: 'Galerie',
+                                            icon: MdiIcons.image,
+                                            onTap: () async {
+                                              Navigator.of(context).pop();
+                                              FocusScope.of(context).unfocus();
+                                              await getImage(ImageSource.gallery);
+                                              //FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
+                                            },
+                                          ),
+                                          FutureBuilder(
+                                              future: Pasteboard.image,
+                                              builder: (_, data) {
+                                                if (data.hasData) {
+                                                  return ContextMenuItem(
+                                                    label: 'Schránka',
+                                                    icon: MdiIcons.contentPaste,
+                                                    onTap: () async {
+                                                      Navigator.of(context).pop();
+                                                      FocusScope.of(context).unfocus();
+                                                      final imageBytes = await Pasteboard.image;
+                                                      if (imageBytes != null) {
+                                                        setState(() => _images.add({
+                                                              ATTACHMENT.bytes: imageBytes,
+                                                              ATTACHMENT.filename: 'pasteboard_image.${DateTime.now().millisecondsSinceEpoch}.jpg',
+                                                              ATTACHMENT.mime: 'image/jpeg',
+                                                              ATTACHMENT.extension: 'jpg',
+                                                              ATTACHMENT.mediatype: MediaType('image', 'jpeg'),
+                                                              ATTACHMENT.previewWidget: Image.memory(
+                                                                imageBytes,
+                                                                width: 80,
+                                                                height: 80,
+                                                                fit: BoxFit.cover,
+                                                                frameBuilder:
+                                                                    (BuildContext context, Widget child, int? frame, bool wasSynchronouslyLoaded) {
+                                                                  if (frame == null) {
+                                                                    return CupertinoActivityIndicator();
+                                                                  }
+                                                                  return child;
+                                                                  //FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
+                                                                },
+                                                              ),
+                                                            }));
+                                                      }
+                                                      //FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
+                                                    },
+                                                  );
+                                                }
+                                                return ContextMenuItem(
+                                                  icon: MdiIcons.contentPaste,
+                                                  label: 'Schránka',
+                                                  disabled: true,
+                                                );
+                                              }),
+                                        ],
                                       );
                                     },
+                                  );
+                                },
+                              ),
+                              PremiumFeature(
+                                feature: PremiumFeatureEnum.markdown,
+                                child: CupertinoButton(
+                                  padding: EdgeInsets.all(0),
+                                  child: Icon(
+                                    MdiIcons.languageMarkdown,
+                                    color: _useMarkdown ? colors.primary : colors.disabled,
+                                    size: 32,
                                   ),
-                                  PremiumFeature(
-                                    feature: PremiumFeatureEnum.markdown,
-                                    child: CupertinoButton(
-                                      padding: EdgeInsets.all(0),
-                                      child: Icon(
-                                        MdiIcons.languageMarkdown,
-                                        color: _useMarkdown ? colors.primary : colors.disabled,
-                                        size: 32,
-                                      ),
-                                      onPressed: () => setState(() => _useMarkdown = !_useMarkdown),
-                                    ),
-                                  ),
-                                ],
+                                  onPressed: () => setState(() => _useMarkdown = !_useMarkdown),
+                                ),
                               ),
                             ],
                           ),
                         ],
                       ),
-                    ),
-                    if (_loadingImage)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0, left: 10),
-                        child: Align(child: CupertinoActivityIndicator(), alignment: Alignment.centerLeft),
-                      )
-                    else
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.only(bottom: 16.0),
-                        child: Wrap(
-                          runAlignment: WrapAlignment.start,
-                          children: _images
-                              .map((Map<ATTACHMENT, dynamic> image) => _buildPreviewWidget(
-                                    image[ATTACHMENT.bytes],
-                                    image[ATTACHMENT.previewWidget],
-                                    context,
-                                  ))
-                              .toList(),
-                        ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
-              ].toList(),
+              ),
             ),
-          ),
+            if (_loadingImage)
+              SliverPadding(
+                padding: const EdgeInsets.only(bottom: 16.0, left: 10 + 8.0, top: 8.0),
+                sliver: SliverToBoxAdapter(
+                  child: Align(child: CupertinoActivityIndicator(), alignment: Alignment.centerLeft),
+                ),
+              )
+            else
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 16.0),
+                sliver: SliverToBoxAdapter(
+                  child: Wrap(
+                    runAlignment: WrapAlignment.start,
+                    children: _images
+                        .map((Map<ATTACHMENT, dynamic> image) => _buildPreviewWidget(
+                              image[ATTACHMENT.bytes],
+                              image[ATTACHMENT.previewWidget],
+                              context,
+                            ))
+                        .toList(),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );
