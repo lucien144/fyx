@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fyx/components/bottom_sheets/post_context_menu.dart';
 import 'package:fyx/components/content_box_layout.dart';
@@ -12,10 +10,13 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/controllers/drafts_service.dart';
+import 'package:fyx/features/message/domain/message_settings.dart';
+import 'package:fyx/features/message/presentation/message_screen.dart';
+import 'package:fyx/features/message/presentation/viewmodel/message_viewmodel.dart';
 import 'package:fyx/model/Discussion.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
-import 'package:fyx/pages/NewMessagePage.dart';
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/state/batch_actions_provider.dart';
 import 'package:fyx/state/nsfw_provider.dart';
 import 'package:fyx/theme/Helpers.dart';
@@ -51,6 +52,8 @@ class _PostListItemState extends ConsumerState<PostListItem> {
   bool get adminTools => !(widget.discussion?.accessRights.canRights == false || // Do not have rights
       widget.post.nick == MainRepository().credentials?.nickname || // ... or is post owner
       widget.post.nick == widget.discussion?.owner?.username); // ... or the post owner is discussion owner
+
+  final _newMessage = MessageScreen(key: UniqueKey());
 
   @override
   void initState() {
@@ -167,12 +170,9 @@ class _PostListItemState extends ConsumerState<PostListItem> {
                                 visible: widget._isPreview != true && _post!.canReply,
                                 child: GestureDetector(
                                   behavior: HitTestBehavior.opaque,
-                                  onTap: () => showCupertinoModalBottomSheet(
-                                      context: context,
-                                      backgroundColor: colors.barBackground,
-                                      barrierColor: colors.dark.withOpacity(0.5),
-                                      settings: RouteSettings(
-                                          arguments: NewMessageSettings(
+                                  onTap: () {
+                                    final viewModel = getIt<MessageViewModel>();
+                                    viewModel.initializeFromSettings(MessageSettings(
                                               draft: DraftsService().loadPostMessage(_post!.id),
                                               onDraftRemove: () => DraftsService().removePostMessage(_post!.id),
                                               onCompose: (message) => DraftsService().savePostMessage(id: _post!.id, message: message),
@@ -187,8 +187,14 @@ class _PostListItemState extends ConsumerState<PostListItem> {
                                                     .postDiscussionMessage(_post!.idKlub, message, attachments: attachments, replyPost: _post);
                                                 DraftsService().removePostMessage(_post!.id);
                                                 return result.isOk;
-                                              })),
-                                      builder: (BuildContext context) => NewMessagePage()),
+                                              }));
+                                    showCupertinoModalBottomSheet(
+                                      context: context,
+                                      backgroundColor: colors.barBackground,
+                                      barrierColor: colors.dark.withOpacity(0.5),
+                                      useRootNavigator: true,
+                                      builder: (_) => _newMessage);
+                                  },
                                   child: TextIcon(
                                     makeDense ? '' : 'Odpovědět',
                                     icon: MdiIcons.reply,
