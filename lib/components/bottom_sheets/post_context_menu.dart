@@ -9,6 +9,9 @@ import 'package:fyx/components/post/post_list_item.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
+import 'package:fyx/features/message/domain/message_settings.dart';
+import 'package:fyx/features/message/presentation/message_screen.dart';
+import 'package:fyx/features/message/presentation/viewmodel/message_viewmodel.dart';
 import 'package:fyx/model/Mail.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
@@ -16,8 +19,8 @@ import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/ipost.dart';
 import 'package:fyx/model/reponses/OkResponse.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
-import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/pages/search_page.dart';
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/state/batch_actions_provider.dart';
 import 'package:fyx/state/mail_provider.dart';
 import 'package:fyx/theme/L.dart';
@@ -56,6 +59,7 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
   bool _deleteIndicator = false;
   bool _bananaIndicator = false;
   SkinColors? colors;
+  final _newMessage = MessageScreen(key: UniqueKey());
 
   bool get isMail => widget.item is Mail;
 
@@ -142,44 +146,48 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
         }),
         if (isPost)
           gridItem('Poslat zprávu', MdiIcons.emailFastOutline, onTap: () {
+            final viewModel = getIt<MessageViewModel>();
+            viewModel.initializeFromSettings(MessageSettings(
+                hasInputField: true,
+                inputFieldPlaceholder: post.nick,
+                onClose: () => T.success('👍 Zpráva poslána.', bg: colors!.success),
+                onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                  if (inputField == null) return false;
+
+                  var response = await ApiController().sendMail(inputField, message, attachments: attachments);
+                  return response.isOk;
+                }));
+
             Navigator.pop(context); // Close the sheet first.
             showCupertinoModalBottomSheet(
                 context: context,
                 backgroundColor: colors?.barBackground,
                 barrierColor: colors?.dark.withOpacity(0.5),
-                settings: RouteSettings(
-                    arguments: NewMessageSettings(
-                        hasInputField: true,
-                        inputFieldPlaceholder: post.nick,
-                        onClose: () => T.success('👍 Zpráva poslána.', bg: colors!.success),
-                        onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
-                          if (inputField == null) return false;
-
-                          var response = await ApiController().sendMail(inputField, message, attachments: attachments);
-                          return response.isOk;
-                        })),
-                builder: (BuildContext context) => NewMessagePage());
+                useRootNavigator: true,
+                builder: (_) => _newMessage);
           }),
         if (isPost)
           gridItem('Odpovědět soukromě', MdiIcons.replyOutline, onTap: () {
+            final viewModel = getIt<MessageViewModel>();
+            viewModel.initializeFromSettings(MessageSettings(
+                hasInputField: true,
+                inputFieldPlaceholder: post.nick,
+                messageFieldPlaceholder: '${post.link}\n',
+                onClose: () => T.success('👍 Zpráva poslána.', bg: colors!.success),
+                onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                  if (inputField == null) return false;
+
+                  var response = await ApiController().sendMail(inputField, message, attachments: attachments);
+                  return response.isOk;
+                }));
+
             Navigator.pop(context); // Close the sheet first.
             showCupertinoModalBottomSheet(
                 context: context,
                 backgroundColor: colors?.barBackground,
                 barrierColor: colors?.dark.withOpacity(0.5),
-                settings: RouteSettings(
-                    arguments: NewMessageSettings(
-                        hasInputField: true,
-                        inputFieldPlaceholder: post.nick,
-                        messageFieldPlaceholder: '${post.link}\n',
-                        onClose: () => T.success('👍 Zpráva poslána.', bg: colors!.success),
-                        onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
-                          if (inputField == null) return false;
-
-                          var response = await ApiController().sendMail(inputField, message, attachments: attachments);
-                          return response.isOk;
-                        })),
-                builder: (BuildContext context) => NewMessagePage());
+                useRootNavigator: true,
+                builder: (BuildContext context) => _newMessage);
           }),
         if (isPost && post.canBeReminded)
           FeedbackIndicator(
