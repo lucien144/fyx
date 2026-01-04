@@ -73,6 +73,9 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
   // Progress indicator if some posts are being deleted...
   bool _deleting = false;
 
+  // Missing keyboard workaround fix attempt
+  final _newMessage = NewMessagePage();
+
   Future<DiscussionResponse> _fetchData(discussionId, postId, user, {String? search, bool filterReplies = false}) {
     return this._memoizer.runOnce(() {
       return Future.delayed(Duration(milliseconds: 300),
@@ -363,7 +366,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                                         DraftsService().removeDiscussionMessage(pageArguments.discussionId);
                                         return result.isOk;
                                       })),
-                              builder: (BuildContext context) => NewMessagePage()),
+                              builder: (BuildContext context) => _newMessage),
                         ),
                     ],
                   ),

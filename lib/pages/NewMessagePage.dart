@@ -52,6 +52,8 @@ class NewMessageSettings {
 }
 
 class NewMessagePage extends StatefulWidget {
+  const NewMessagePage({super.key});
+
   @override
   _NewMessagePageState createState() => _NewMessagePageState();
 }
@@ -69,6 +71,7 @@ class _NewMessagePageState extends State<NewMessagePage> {
   bool recipientHasFocus = true;
   bool _useMarkdown = MainRepository().credentials!.isPremiumUser && SettingsProvider().useMarkdown;
   bool _hasRequestedInitialFocus = false;
+  final _uniqueKey = UniqueKey();
 
   Future getImage(ImageSource source) async {
     final picker = ImagePicker();
@@ -213,7 +216,9 @@ class _NewMessagePageState extends State<NewMessagePage> {
   @override
   Widget build(BuildContext context) {
     SkinColors colors = Skin.of(context).theme.colors;
+    print("reload");
     return CupertinoPageScaffold(
+      key: _uniqueKey,
       child: SafeArea(
         child: CustomScrollView(
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.manual,
