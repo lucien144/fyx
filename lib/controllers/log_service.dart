@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 class LogService {
@@ -16,6 +18,10 @@ class LogService {
   }
 
   static captureError(error, {stack}) {
+    if (error is HttpException && error.message.contains('404')) {
+      // Don't log 404 network errors
+      return;
+    }
     provider.captureError(error, stack: stack);
   }
 

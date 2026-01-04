@@ -1,37 +1,31 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_it/flutter_it.dart';
 import 'package:fyx/components/post/post_hero_attachment.dart';
-import 'package:fyx/components/throw_it_away.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
-import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/controllers/log_service.dart';
-import 'package:fyx/exceptions/UnsupportedDownloadFormatException.dart';
+import 'package:fyx/features/gallery/presentation/viewmodel/gallery_viewmodel.dart';
+import 'package:fyx/features/gallery/presentation/widgets/context_menu_button.dart';
+import 'package:fyx/features/gallery/presentation/widgets/throw_it_away.dart';
 import 'package:fyx/libs/fyx_image_cache_manager.dart';
 import 'package:fyx/model/MainRepository.dart';
-import 'package:fyx/theme/L.dart';
-import 'package:fyx/theme/T.dart';
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
-import 'package:gallery_saver_plus/gallery_saver.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
-class GalleryPage extends StatefulWidget {
+class GalleryScreen extends WatchingStatefulWidget {
   @override
-  _GalleryPageState createState() => _GalleryPageState();
+  State createState() => _GalleryScreenState();
 }
 
-class _GalleryPageState extends State<GalleryPage> {
-  GalleryArguments? _arguments;
+class _GalleryScreenState extends State<GalleryScreen> {
   int _page = 1;
-  bool _saving = false;
   bool _throwAway = true;
   bool _hideUI = false;
 
@@ -47,13 +41,12 @@ class _GalleryPageState extends State<GalleryPage> {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_arguments != null && _arguments!.images.length > 1) {
-        _arguments!.images.asMap().forEach((key, image) {
-          if (image.image == _arguments!.imageUrl) {
-            pageController.jumpToPage(key);
-          }
-        });
+      final viewModel = getIt<GalleryViewModel>();
+      final initialPage = viewModel.getInitialPageIndex();
+      if (initialPage > 0) {
+        pageController.jumpToPage(initialPage);
       }
     });
 
@@ -62,11 +55,9 @@ class _GalleryPageState extends State<GalleryPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_arguments == null) {
-      _arguments = ModalRoute.of(context)!.settings.arguments as GalleryArguments;
-    }
+    final viewModel = watchIt<GalleryViewModel>();
+    final SkinColors colors = Skin.of(context).theme.colors;
 
-    SkinColors colors = Skin.of(context).theme.colors;
     return Stack(
       children: [
         Container(
@@ -101,6 +92,7 @@ class _GalleryPageState extends State<GalleryPage> {
                       close(context);
                     },
                     child: CachedNetworkImage(
+                        key: ValueKey(viewModel.getCacheKey(viewModel.state.images[index].image)),
                         fadeInDuration: Duration.zero,
                         fadeOutDuration: Duration.zero,
                         progressIndicatorBuilder: (context, url, progress) => Center(
@@ -110,12 +102,21 @@ class _GalleryPageState extends State<GalleryPage> {
                                 child: CircularProgressIndicator(value: progress.progress, color: colors.primary),
                               ),
                             ),
-                        imageUrl: _arguments!.images[index].image,
+                        imageUrl: viewModel.state.images[index].image,
+                        cacheKey: viewModel.getCacheKey(viewModel.state.images[index].image),
+                        errorWidget: (context, url, error) {
+                          LogService.captureError(error);
+                          return Icon(
+                            MdiIcons.imageBroken,
+                            size: 64,
+                            color: colors.light.withOpacity(0.5),
+                          );
+                        },
                         memCacheWidth: (MediaQuery.of(context).size.width * MediaQuery.of(context).devicePixelRatio).toInt(),
                         cacheManager: MainRepository().settings.useFyxImageCache ? FyxImageCacheManager() : null),
                   ));
             },
-            itemCount: _arguments!.images.length,
+            itemCount: viewModel.state.images.length,
             onPageChanged: (i) => setState(() => _page = i + 1),
           ),
         ),
@@ -138,7 +139,7 @@ class _GalleryPageState extends State<GalleryPage> {
         ),
         Positioned(
             width: 100,
-            bottom: 30,
+            bottom: 30 + (Platform.isAndroid ? MediaQuery.of(context).viewPadding.bottom : 0), // Android nav bar overlap bottom buttons
             left: (MediaQuery.of(context).size.width - 100) / 2,
             child: Visibility(
                 visible: !_hideUI,
@@ -147,85 +148,18 @@ class _GalleryPageState extends State<GalleryPage> {
                   padding: EdgeInsets.zero,
                   onPressed: () => close(context),
                   child: Text(
-                    '$_page / ${_arguments!.images.length}',
+                    '$_page / ${viewModel.state.images.length}',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: colors.background),
                   ),
                 ))),
         Positioned(
-            bottom: 30,
             right: 30,
+            bottom: 30 + (Platform.isAndroid ? MediaQuery.of(context).viewPadding.bottom : 0), // Android nav bar overlap bottom buttons
             child: Visibility(
-                visible: !_hideUI,
-                child: Column(
-                  children: [
-                    CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        color: colors.primary,
-                        child: Icon(
-                          MdiIcons.openInNew,
-                          color: colors.background,
-                          size: 32,
-                        ),
-                        onPressed: () {
-                          String url = _arguments!.images[_page - 1].image;
-                          T.openLink(url, mode: SettingsProvider().linksMode);
-                        }),
-                    const SizedBox(height: 16),
-                    CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      color: colors.primary,
-                      child: _saving
-                          ? CupertinoActivityIndicator()
-                          : Icon(
-                              MdiIcons.download,
-                              color: colors.background,
-                              size: 32,
-                            ),
-                      onPressed: () async {
-                        if (_saving) {
-                          return;
-                        }
-
-                        setState(() => _saving = true);
-                        try {
-                          PermissionStatus status = await Permission.storage.request();
-                          var isGranted = status.isGranted;
-
-                          if (Platform.isAndroid) {
-                            // https://pub.dev/packages/permission_handler#requesting-storage-permissions-always-returns-denied-on-android-13-what-can-i-do
-                            DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-                            final androidInfo = await deviceInfoPlugin.androidInfo;
-                            isGranted = androidInfo.version.sdkInt >= 33 || isGranted;
-                          }
-
-                          if (isGranted) {
-                            // See https://github.com/lucien144/fyx/issues/304#issuecomment-1094851596
-
-                            var appDocDir = await getTemporaryDirectory();
-                            String url = _arguments!.images[_page - 1].image;
-
-                            final result = await GallerySaver.saveImage(url, albumName: 'Fyx');
-                            if (!(result ?? false)) {
-                              throw Error();
-                            }
-                            T.success(L.TOAST_IMAGE_SAVE_OK, bg: colors.success);
-                          } else {
-                            T.error('Nelze uložit. Povolte ukládání, prosím.', bg: colors.danger);
-                          }
-                        } on UnsupportedDownloadFormatException catch (exception) {
-                          T.error(exception.message, bg: colors.danger);
-                        } catch (error) {
-                          T.error(L.TOAST_IMAGE_SAVE_ERROR, bg: colors.danger);
-                          print((error as Error).stackTrace);
-                          LogService.captureError(error, stack: (error as Error).stackTrace);
-                        } finally {
-                          setState(() => _saving = false);
-                        }
-                      },
-                    ),
-                  ],
-                )))
+              visible: !_hideUI,
+              child: ContextMenuButton(attachment: viewModel.state.images[_page - 1]),
+            ))
       ],
     );
   }
