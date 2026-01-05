@@ -71,8 +71,9 @@ class _LoginPageState extends State<LoginPage> {
   Widget formFactory() {
     final textfieldDecoration =
         BoxDecoration(borderRadius: BorderRadius.circular(4), color: colors.background, border: Border.all(color: colors.background));
+    final bottom = MediaQuery.viewInsetsOf(context).bottom;
 
-    var offset = 128 - (MediaQuery.of(context).viewInsets.bottom / 3);
+    var offset = 128 - (bottom / 3);
     offset = offset > 0 ? offset : 20;
 
     return Column(
@@ -123,7 +124,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
         AnimatedPadding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom, top: 8),
+          padding: EdgeInsets.only(bottom: bottom, top: 8),
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
           child: Container(

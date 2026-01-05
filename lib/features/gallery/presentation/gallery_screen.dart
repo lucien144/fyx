@@ -57,13 +57,18 @@ class _GalleryScreenState extends State<GalleryScreen> {
   Widget build(BuildContext context) {
     final viewModel = watchIt<GalleryViewModel>();
     final SkinColors colors = Skin.of(context).theme.colors;
+    final bottomPadding = MediaQuery.viewPaddingOf(context).bottom;
+    final devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
+    final size = MediaQuery.sizeOf(context);
+    final width = size.width;
+    final height = size.height;
 
     return Stack(
       children: [
         Container(
           decoration: BoxDecoration(color: colors.dark.withOpacity(0.90)),
           constraints: BoxConstraints.expand(
-            height: MediaQuery.of(context).size.height,
+            height: height,
           ),
           child: PhotoViewGallery.builder(
             scaleStateChangedCallback: (_) => setState(() => _throwAway = !_.isScaleStateZooming),
@@ -78,8 +83,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
                     enabled: _throwAway,
                     onTap: () => setState(() => _hideUI = !_hideUI),
                     onDoubleTap: (details) {
-                      var x = (details.globalPosition.dx - MediaQuery.of(context).size.width / 2);
-                      var y = (details.globalPosition.dy - MediaQuery.of(context).size.height / 2);
+                      var x = (details.globalPosition.dx - width / 2);
+                      var y = (details.globalPosition.dy - height / 2);
                       if (photoController.scale == 1) {
                         photoController.scale = 2;
                         photoController.position = Offset(-x * 2, -y * 2);
@@ -112,7 +117,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                             color: colors.light.withOpacity(0.5),
                           );
                         },
-                        memCacheWidth: (MediaQuery.of(context).size.width * MediaQuery.of(context).devicePixelRatio).toInt(),
+                        memCacheWidth: (width * devicePixelRatio).toInt(),
                         cacheManager: MainRepository().settings.useFyxImageCache ? FyxImageCacheManager() : null),
                   ));
             },
@@ -139,8 +144,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
         ),
         Positioned(
             width: 100,
-            bottom: 30 + (Platform.isAndroid ? MediaQuery.of(context).viewPadding.bottom : 0), // Android nav bar overlap bottom buttons
-            left: (MediaQuery.of(context).size.width - 100) / 2,
+            bottom: 30 + (Platform.isAndroid ? bottomPadding : 0), // Android nav bar overlap bottom buttons
+            left: (width - 100) / 2,
             child: Visibility(
                 visible: !_hideUI,
                 child: CupertinoButton(
@@ -155,7 +160,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 ))),
         Positioned(
             right: 30,
-            bottom: 30 + (Platform.isAndroid ? MediaQuery.of(context).viewPadding.bottom : 0), // Android nav bar overlap bottom buttons
+            bottom: 30 + (Platform.isAndroid ? bottomPadding : 0), // Android nav bar overlap bottom buttons
             child: Visibility(
               visible: !_hideUI,
               child: ContextMenuButton(attachment: viewModel.state.images[_page - 1]),

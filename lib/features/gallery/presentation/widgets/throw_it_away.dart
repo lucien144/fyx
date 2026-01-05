@@ -41,6 +41,8 @@ class _ThrowItAwayState extends State<ThrowItAway> {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.sizeOf(context).height;
+    
     return Stack(children: [
       AnimatedPositioned(
           curve: Curves.fastOutSlowIn,
@@ -80,7 +82,7 @@ class _ThrowItAwayState extends State<ThrowItAway> {
                         setState(() {
                           var speed = 100;
                           _duration = Duration(milliseconds: speed);
-                          _y = _y > 0 ? MediaQuery.of(context).size.height : -MediaQuery.of(context).size.height;
+                          _y = _y > 0 ? height : -height;
                         });
                         widget.onDismiss!();
                       } else {
