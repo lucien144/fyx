@@ -42,7 +42,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    colors = Skin.of(context).theme.colors;
+    final colors = Skin.of(context).theme.colors;
+    final size = MediaQuery.sizeOf(context);
 
     return WillPopScope(
         onWillPop: () async => false,
@@ -50,8 +51,8 @@ class _LoginPageState extends State<LoginPage> {
             physics: NeverScrollableScrollPhysics(),
             child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  minWidth: MediaQuery.of(context).size.width,
-                  minHeight: MediaQuery.of(context).size.height,
+                  minWidth: size.width,
+                  minHeight: size.height,
                 ),
                 child: Container(
                   padding: EdgeInsets.all(16),

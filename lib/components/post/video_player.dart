@@ -54,7 +54,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
   ChewieController initChewie(BuildContext context) {
     SkinColors colors = Skin.of(context).theme.colors;
-    final size = MediaQuery.of(context).size;
+    final size = MediaQuery.sizeOf(context);
     final width = size.width;
     final height = size.height;
     final aspectRatio =

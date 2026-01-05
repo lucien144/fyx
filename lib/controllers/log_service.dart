@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/cupertino.dart';
 
 class LogService {
   static ILogProvider? _provider;
@@ -28,6 +29,11 @@ class LogService {
   static setUser(String userId) {
     provider.setUser(userId);
   }
+
+  static log(String message) {
+    debugPrint(message);
+    provider.log(message);
+  }
 }
 
 class FirebaseCrashlyticsProvider implements ILogProvider {
@@ -40,9 +46,15 @@ class FirebaseCrashlyticsProvider implements ILogProvider {
   setUser(userId) {
     FirebaseCrashlytics.instance.setUserIdentifier(userId);
   }
+
+  @override
+  log(String message) {
+    FirebaseCrashlytics.instance.log(message);
+  }
 }
 
 abstract class ILogProvider {
   captureError(dynamic error, {dynamic stack});
+  log(String message);
   setUser(String userId);
 }

@@ -47,7 +47,7 @@ class PostListItem extends ConsumerStatefulWidget {
 class _PostListItemState extends ConsumerState<PostListItem> {
   Post? _post;
 
-  bool get makeDense => MediaQuery.of(context).textScaleFactor > 1 || MediaQuery.of(context).size.width <= 375;
+  bool get makeDense => MediaQuery.textScaleFactorOf(context) > 1 || MediaQuery.sizeOf(context).width <= 375;
 
   bool get adminTools => !(widget.discussion?.accessRights.canRights == false || // Do not have rights
       widget.post.nick == MainRepository().credentials?.nickname || // ... or is post owner

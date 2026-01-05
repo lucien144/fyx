@@ -151,7 +151,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
       ApiController().buildContext = context;
     }
 
-    final double bottomPadding = MediaQuery.of(context).padding.bottom;
+    final double bottomPadding = MediaQuery.paddingOf(context).bottom;
     final colors = Skin.of(context).theme.colors;
     final tabs = [
       BookmarksTab(filterUnread: _filterUnread, refreshTimestamp: _refreshData[RefreshDataEnum.bookmarks] ?? 0),

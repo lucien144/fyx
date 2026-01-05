@@ -15,6 +15,8 @@ class PostHeroAttachmentImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final devicePixelRatio = MediaQuery.devicePixelRatioOf(context);
     return CachedNetworkImage(
       fadeInDuration: Duration.zero,
       fadeOutDuration: Duration.zero,
@@ -28,7 +30,7 @@ class PostHeroAttachmentImage extends StatelessWidget {
       fit: BoxFit.cover,
       width: crop ? size.width : null,
       height: crop ? size.height : null,
-      memCacheWidth: (MediaQuery.of(context).size.width * 0.5 * MediaQuery.of(context).devicePixelRatio).toInt(),
+      memCacheWidth: (width * 0.5 * devicePixelRatio).toInt(),
       cacheManager: MainRepository().settings.useFyxImageCache ? FyxImageCacheManager() : null,
       cacheKey: cacheKey,
     );

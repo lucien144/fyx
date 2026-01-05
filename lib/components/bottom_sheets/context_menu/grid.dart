@@ -6,10 +6,12 @@ class ContextMenuGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+
     return GridView.count(
         physics: NeverScrollableScrollPhysics(),
         padding: const EdgeInsets.only(left: 16, top: 16, right: 16, bottom: 48),
-        crossAxisCount: MediaQuery.of(context).size.width < 600 ? 3 : (MediaQuery.of(context).size.width / 140).round(),
+        crossAxisCount: width < 600 ? 3 : (width / 140).round(),
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
         shrinkWrap: true,
