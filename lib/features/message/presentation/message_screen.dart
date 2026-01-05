@@ -88,10 +88,10 @@ class _MessageScreenState extends State<MessageScreen> {
 
     // Debug listeners to track focus changes
     _recipientFocusNode.addListener(() {
-      debugPrint('[NewMessagePage] Recipient focus changed: ${_recipientFocusNode.hasFocus}');
+      LogService.log('[MessageScreen] Recipient focus changed: ${_recipientFocusNode.hasFocus}');
     });
     _messageFocusNode.addListener(() {
-      debugPrint('[NewMessagePage] Message focus changed: ${_messageFocusNode.hasFocus}');
+      LogService.log('[MessageScreen] Message focus changed: ${_messageFocusNode.hasFocus}');
     });
 
     _messageController.addListener(() {
@@ -150,12 +150,12 @@ class _MessageScreenState extends State<MessageScreen> {
     _hasRequestedInitialFocus = true;
     final viewModel = getIt<MessageViewModel>();
 
-    debugPrint('[NewMessagePage] Scheduling initial focus request');
+    LogService.log('[MessageScreen] Scheduling initial focus request');
 
     // Delay focus request to avoid keyboard flicker
     Future.delayed(Duration(milliseconds: 200), () {
       if (!mounted) {
-        debugPrint('[NewMessagePage] Widget not mounted, skipping focus request');
+        LogService.log('[MessageScreen] Widget not mounted, skipping focus request');
         return;
       }
 
@@ -164,19 +164,19 @@ class _MessageScreenState extends State<MessageScreen> {
         final shouldFocusRecipient = viewModel.state.hasInputField == true && viewModel.state.inputFieldPlaceholder.isEmpty;
         final shouldFocusMessage = viewModel.state.hasInputField != true || viewModel.state.inputFieldPlaceholder.isNotEmpty;
 
-        debugPrint('[NewMessagePage] Requesting focus - recipient: $shouldFocusRecipient, message: $shouldFocusMessage, '
+        LogService.log('[MessageScreen] Requesting focus - recipient: $shouldFocusRecipient, message: $shouldFocusMessage, '
             'recipientNode.canRequestFocus: ${_recipientFocusNode.canRequestFocus}, '
             'messageNode.canRequestFocus: ${_messageFocusNode.canRequestFocus}');
 
         if (shouldFocusRecipient) {
           _recipientFocusNode.requestFocus();
-          debugPrint('[NewMessagePage] Focus requested for recipient field');
+          LogService.log('[MessageScreen] Focus requested for recipient field');
         } else if (shouldFocusMessage) {
           _messageFocusNode.requestFocus();
-          debugPrint('[NewMessagePage] Focus requested for message field');
+          LogService.log('[MessageScreen] Focus requested for message field');
         }
       } catch (e, stackTrace) {
-        debugPrint('[NewMessagePage] Error requesting focus: $e');
+        LogService.log('[MessageScreen] Error requesting focus: $e');
         LogService.captureError(e, stack: stackTrace);
       }
     });
@@ -184,10 +184,12 @@ class _MessageScreenState extends State<MessageScreen> {
 
   @override
   Widget build(BuildContext context) {
+    LogService.log('[MessageScreen] -> widget rebuild');
+
     final viewModel = watchIt<MessageViewModel>();
     final state = viewModel.state;
     SkinColors colors = Skin.of(context).theme.colors;
-    debugPrint('[MessageScree] -> widget rebuild');
+
     return CupertinoPageScaffold(
       key: _scaffoldKey,
       child: CustomScrollView(

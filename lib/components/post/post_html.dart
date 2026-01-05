@@ -38,6 +38,7 @@ class PostHtml extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final SkinColors colors = Skin.of(context).theme.colors;
+    final width = MediaQuery.sizeOf(context).width;
 
     final html = Html(
         data: MainRepository().settings.useCompactMode && content!.consecutiveImages ? content!.body : content!.rawBody,
@@ -204,7 +205,7 @@ class PostHtml extends StatelessWidget {
                           type: Video.findVideoType(element.attributes['data-embed-type']!),
                           image: img.attributes['src']!,
                           thumb: img.attributes['src']!),
-                      size: Size(double.infinity, MediaQuery.of(context).size.width * (0.5)),
+                      size: Size(double.infinity, width * (0.5)),
                       showStrip: false,
                       blur: blur,
                     ),

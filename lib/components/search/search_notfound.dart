@@ -6,9 +6,10 @@ class SearchNotFound extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bottom = MediaQuery.viewInsetsOf(context).bottom;
     return Expanded(
       child: Container(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom * .8),
+        padding: EdgeInsets.only(bottom: bottom * .8),
         child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[

@@ -112,6 +112,7 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
   Widget build(BuildContext context) {
     return CupertinoTabView(builder: (context) {
       final SkinColors colors = Skin.of(context).theme.colors;
+      final width = MediaQuery.sizeOf(context).width;
 
       return CupertinoPageScaffold(
         resizeToAvoidBottomInset: false,
@@ -138,11 +139,11 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
               children: {
                 TabsEnum.history: Padding(
                   child: Text('Historie', softWrap: false),
-                  padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width < 375 ? 2 : 16),
+                  padding: EdgeInsets.symmetric(horizontal: width < 375 ? 2 : 16),
                 ),
                 TabsEnum.bookmarks: Padding(
                   child: Text('Sledované', softWrap: false),
-                  padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width < 375 ? 2 : 16),
+                  padding: EdgeInsets.symmetric(horizontal: width < 375 ? 2 : 16),
                 ),
               },
             )),

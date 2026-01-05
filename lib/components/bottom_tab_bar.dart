@@ -23,7 +23,6 @@ class BottomTabBar extends StatefulWidget {
 
 class _BottomTabBarState extends State<BottomTabBar> {
   final submenuKey = GlobalKey();
-  late SkinColors colors;
   bool _activeSubmenu = false;
 
   @override
@@ -33,6 +32,9 @@ class _BottomTabBarState extends State<BottomTabBar> {
   }
 
   Widget submenu() {
+    final width = MediaQuery.sizeOf(context).width;
+    final colors = Skin.of(context).theme.colors;
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
@@ -45,7 +47,7 @@ class _BottomTabBarState extends State<BottomTabBar> {
         ],
       ),
       key: submenuKey,
-      padding: EdgeInsets.all(MediaQuery.of(context).size.width < 375 ? 20 : 40),
+      padding: EdgeInsets.all(width < 375 ? 20 : 40),
       child: Column(
         children: [
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -215,9 +217,8 @@ class _BottomTabBarState extends State<BottomTabBar> {
 
   @override
   Widget build(BuildContext context) {
-    final double bottomPadding = MediaQuery.of(context).padding.bottom;
-    colors = Skin.of(context).theme.colors;
-    double submenuHeight = MediaQuery.of(context).size.height / 2;
+    final double bottomPadding = MediaQuery.paddingOf(context).bottom;
+    double submenuHeight = MediaQuery.sizeOf(context).height / 2;
 
     final box = submenuKey.currentContext?.findRenderObject();
     submenuHeight = box is RenderBox ? box.size.height : submenuHeight;

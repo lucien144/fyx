@@ -138,7 +138,9 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
 
   @override
   Widget build(BuildContext context) {
-    SkinColors colors = Skin.of(context).theme.colors;
+    final colors = Skin.of(context).theme.colors;
+    final width = MediaQuery.sizeOf(context).width;
+    final height = MediaQuery.sizeOf(context).height;
 
     if (widget._rebuild > _lastRebuild && !_isLoading) {
       setState(() => _lastRebuild = widget._rebuild);
@@ -194,7 +196,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
                       FocusManager.instance.primaryFocus?.unfocus();
 
                       // Hide the jump to first unread button if user scrolls twice the height of the screen height
-                      if (scrollInfo.metrics.pixels > 2 * MediaQuery.of(context).size.height) {
+                      if (scrollInfo.metrics.pixels > 2 * height) {
                         slideController.reverse();
                       }
 
@@ -229,7 +231,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
             _result!.jumpIndex >= kJumpButtonThreshold &&
             MainRepository().settings.firstUnread == FirstUnreadEnum.button)
           Positioned(
-              width: MediaQuery.of(context).size.width,
+              width: width,
               bottom: 0,
               left: 0,
               child: SlideTransition(
@@ -268,7 +270,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
             top: 0,
             left: 0,
             child: Container(
-              width: MediaQuery.of(context).size.width,
+              width: width,
               height: 1,
               child: LinearProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(colors.background),
