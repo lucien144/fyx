@@ -39,6 +39,7 @@ class _MessageScreenState extends State<MessageScreen> {
   FocusNode _recipientFocusNode = FocusNode();
   FocusNode _messageFocusNode = FocusNode();
   bool _hasRequestedInitialFocus = false;
+  bool _hasInitializedControllers = false;
 
   final _scaffoldKey = UniqueKey();
   final _scrollKey = UniqueKey();
@@ -108,15 +109,23 @@ class _MessageScreenState extends State<MessageScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    // Initialize ViewModel from settings
-    final viewModel = getIt<MessageViewModel>();
+    // Initialize controllers only once to prevent resetting text when MediaQuery changes (keyboard open/close)
+    if (!_hasInitializedControllers) {
+      _hasInitializedControllers = true;
 
-    // Initialize settings from route arguments
-    _recipientController.text = viewModel.state.inputFieldPlaceholder.toUpperCase();
-    _messageController.text = viewModel.state.draft.isNotEmpty ? viewModel.state.draft : viewModel.state.messageFieldPlaceholder;
+      final viewModel = getIt<MessageViewModel>();
 
-    // Schedule initial focus request
-    WidgetsBinding.instance.addPostFrameCallback((_) => _requestInitialFocus());
+      // Initialize settings from route arguments
+      _recipientController.text = viewModel.state.inputFieldPlaceholder.toUpperCase();
+      _messageController.text = viewModel.state.draft.isNotEmpty ? viewModel.state.draft : viewModel.state.messageFieldPlaceholder;
+
+      // Schedule initial focus request
+      WidgetsBinding.instance.addPostFrameCallback((_) => _requestInitialFocus());
+
+      LogService.log('[MessageScreen] Controllers initialized in didChangeDependencies');
+    } else {
+      LogService.log('[MessageScreen] didChangeDependencies called again, skipping controller initialization');
+    }
   }
 
   @override
