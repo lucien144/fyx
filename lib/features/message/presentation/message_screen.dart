@@ -162,33 +162,32 @@ class _MessageScreenState extends State<MessageScreen> {
     LogService.log('[MessageScreen] Scheduling initial focus request');
 
     // Delay focus request to avoid keyboard flicker
-    Future.delayed(Duration(milliseconds: 200), () {
-      if (!mounted) {
-        LogService.log('[MessageScreen] Widget not mounted, skipping focus request');
-        return;
+
+    if (!mounted) {
+      LogService.log('[MessageScreen] Widget not mounted, skipping focus request');
+      return;
+    }
+
+    try {
+      // Determine which field should get focus based on settings
+      final shouldFocusRecipient = viewModel.state.hasInputField == true && viewModel.state.inputFieldPlaceholder.isEmpty;
+      final shouldFocusMessage = viewModel.state.hasInputField != true || viewModel.state.inputFieldPlaceholder.isNotEmpty;
+
+      LogService.log('[MessageScreen] Requesting focus - recipient: $shouldFocusRecipient, message: $shouldFocusMessage, '
+          'recipientNode.canRequestFocus: ${_recipientFocusNode.canRequestFocus}, '
+          'messageNode.canRequestFocus: ${_messageFocusNode.canRequestFocus}');
+
+      if (shouldFocusRecipient) {
+        _recipientFocusNode.requestFocus();
+        LogService.log('[MessageScreen] Focus requested for recipient field');
+      } else if (shouldFocusMessage) {
+        _messageFocusNode.requestFocus();
+        LogService.log('[MessageScreen] Focus requested for message field');
       }
-
-      try {
-        // Determine which field should get focus based on settings
-        final shouldFocusRecipient = viewModel.state.hasInputField == true && viewModel.state.inputFieldPlaceholder.isEmpty;
-        final shouldFocusMessage = viewModel.state.hasInputField != true || viewModel.state.inputFieldPlaceholder.isNotEmpty;
-
-        LogService.log('[MessageScreen] Requesting focus - recipient: $shouldFocusRecipient, message: $shouldFocusMessage, '
-            'recipientNode.canRequestFocus: ${_recipientFocusNode.canRequestFocus}, '
-            'messageNode.canRequestFocus: ${_messageFocusNode.canRequestFocus}');
-
-        if (shouldFocusRecipient) {
-          _recipientFocusNode.requestFocus();
-          LogService.log('[MessageScreen] Focus requested for recipient field');
-        } else if (shouldFocusMessage) {
-          _messageFocusNode.requestFocus();
-          LogService.log('[MessageScreen] Focus requested for message field');
-        }
-      } catch (e, stackTrace) {
-        LogService.log('[MessageScreen] Error requesting focus: $e');
-        LogService.captureError(e, stack: stackTrace);
-      }
-    });
+    } catch (e, stackTrace) {
+      LogService.log('[MessageScreen] Error requesting focus: $e');
+      LogService.captureError(e, stack: stackTrace);
+    }
   }
 
   @override
@@ -201,304 +200,306 @@ class _MessageScreenState extends State<MessageScreen> {
 
     return CupertinoPageScaffold(
       key: _scaffoldKey,
-      child: CustomScrollView(
-        key: _scrollKey,
-        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.manual,
-        shrinkWrap: true,
-        slivers: [
-          if (state.replyWidget != null)
-            SliverPadding(padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0), sliver: SliverToBoxAdapter(child: state.replyWidget!)),
-          if (state.replyWidget != null && state.hasInputField == true) const SliverToBoxAdapter(child: const SizedBox(height: 8)),
-          if (state.hasInputField == true)
+      child: SafeArea(
+        child: CustomScrollView(
+          key: _scrollKey,
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.manual,
+          shrinkWrap: true,
+          slivers: [
+            if (state.replyWidget != null)
+              SliverPadding(padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0), sliver: SliverToBoxAdapter(child: state.replyWidget!)),
+            if (state.hasInputField == true) const SliverToBoxAdapter(child: const SizedBox(height: 8)),
+            if (state.hasInputField == true)
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                sliver: SliverToBoxAdapter(
+                  child: CupertinoTextField(
+                    key: ValueKey('recipient_field'),
+                    decoration: colors.textFieldDecoration,
+                    controller: _recipientController,
+                    inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9_]'))],
+                    textCapitalization: TextCapitalization.characters,
+                    placeholder: 'Adresát',
+                    autocorrect: MainRepository().settings.useAutocorrect,
+                    focusNode: _recipientFocusNode,
+                  ),
+                ),
+              ),
+            const SliverToBoxAdapter(child: const SizedBox(height: 8)),
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               sliver: SliverToBoxAdapter(
-                child: CupertinoTextField(
-                  key: ValueKey('recipient_field'),
-                  decoration: colors.textFieldDecoration,
-                  controller: _recipientController,
-                  inputFormatters: [FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9_]'))],
-                  textCapitalization: TextCapitalization.characters,
-                  placeholder: 'Adresát',
-                  autocorrect: MainRepository().settings.useAutocorrect,
-                  focusNode: _recipientFocusNode,
-                ),
-              ),
-            ),
-          const SliverToBoxAdapter(child: const SizedBox(height: 8)),
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            sliver: SliverToBoxAdapter(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Expanded(
-                    child: CupertinoTextField(
-                      key: ValueKey('message_field'),
-                      decoration: colors.textFieldDecoration,
-                      controller: _messageController,
-                      expands: false,
-                      minLines: 2,
-                      maxLines: null,
-                      scribbleEnabled: true,
-                      textCapitalization: TextCapitalization.sentences,
-                      autocorrect: MainRepository().settings.useAutocorrect,
-                      focusNode: _messageFocusNode,
-                      contextMenuBuilder: (_, editableTextState) {
-                        final buttonsMatrix = {
-                          'B': {
-                            'htmlStart': '<b>',
-                            'htmlEnd': '</b>',
-                            'md': '**',
-                          },
-                          'I': {
-                            'htmlStart': '<i>',
-                            'htmlEnd': '</i>',
-                            'md': '*',
-                          },
-                          'Spoiler': {
-                            'htmlStart': '<span class="spoiler">',
-                            'htmlEnd': '</span>',
-                            'md': '§',
-                          },
-                          'Code': {
-                            'htmlStart': '<code>',
-                            'htmlEnd': '</code>',
-                            'md': '```',
-                          },
-                        };
-                        final TextEditingValue value = editableTextState.textEditingValue;
-                        final List<ContextMenuButtonItem> buttonItems = editableTextState.contextMenuButtonItems;
-                        buttonsMatrix.entries.forEach((element) {
-                          buttonItems.add(
-                            ContextMenuButtonItem(
-                              label: element.key,
-                              onPressed: () {
-                                String replacement = '';
-                                final selected = value.selection.textInside(value.text);
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: CupertinoTextField(
+                        key: ValueKey('message_field'),
+                        decoration: colors.textFieldDecoration,
+                        controller: _messageController,
+                        expands: false,
+                        minLines: 2,
+                        maxLines: null,
+                        scribbleEnabled: true,
+                        textCapitalization: TextCapitalization.sentences,
+                        autocorrect: MainRepository().settings.useAutocorrect,
+                        focusNode: _messageFocusNode,
+                        contextMenuBuilder: (_, editableTextState) {
+                          final buttonsMatrix = {
+                            'B': {
+                              'htmlStart': '<b>',
+                              'htmlEnd': '</b>',
+                              'md': '**',
+                            },
+                            'I': {
+                              'htmlStart': '<i>',
+                              'htmlEnd': '</i>',
+                              'md': '*',
+                            },
+                            'Spoiler': {
+                              'htmlStart': '<span class="spoiler">',
+                              'htmlEnd': '</span>',
+                              'md': '§',
+                            },
+                            'Code': {
+                              'htmlStart': '<code>',
+                              'htmlEnd': '</code>',
+                              'md': '```',
+                            },
+                          };
+                          final TextEditingValue value = editableTextState.textEditingValue;
+                          final List<ContextMenuButtonItem> buttonItems = editableTextState.contextMenuButtonItems;
+                          buttonsMatrix.entries.forEach((element) {
+                            buttonItems.add(
+                              ContextMenuButtonItem(
+                                label: element.key,
+                                onPressed: () {
+                                  String replacement = '';
+                                  final selected = value.selection.textInside(value.text);
 
-                                if (state.useMarkdown) {
-                                  replacement = '${element.value['md']}${selected}${element.value['md']}';
-                                } else {
-                                  replacement = '${element.value['htmlStart']}${selected}${element.value['htmlEnd']}';
-                                }
+                                  if (state.useMarkdown) {
+                                    replacement = '${element.value['md']}${selected}${element.value['md']}';
+                                  } else {
+                                    replacement = '${element.value['htmlStart']}${selected}${element.value['htmlEnd']}';
+                                  }
 
-                                // Update the message
-                                _messageController.text = value.text.replaceRange(value.selection.start, value.selection.end, replacement);
+                                  // Update the message
+                                  _messageController.text = value.text.replaceRange(value.selection.start, value.selection.end, replacement);
 
-                                // Move the cursor
-                                final isSelected = value.selection.start != value.selection.end;
-                                int offset = value.selection.extentOffset + (replacement.length - selected.length);
-                                if (!isSelected) {
-                                  offset -= state.useMarkdown ? element.value['md']!.length : element.value['htmlEnd']!.length;
-                                }
-                                _messageController.selection = TextSelection(baseOffset: offset, extentOffset: offset);
-                                ContextMenuController.removeAny();
-                              },
-                            ),
+                                  // Move the cursor
+                                  final isSelected = value.selection.start != value.selection.end;
+                                  int offset = value.selection.extentOffset + (replacement.length - selected.length);
+                                  if (!isSelected) {
+                                    offset -= state.useMarkdown ? element.value['md']!.length : element.value['htmlEnd']!.length;
+                                  }
+                                  _messageController.selection = TextSelection(baseOffset: offset, extentOffset: offset);
+                                  ContextMenuController.removeAny();
+                                },
+                              ),
+                            );
+                          });
+
+                          return AdaptiveTextSelectionToolbar.buttonItems(
+                            anchors: editableTextState.contextMenuAnchors,
+                            buttonItems: buttonItems,
                           );
-                        });
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    AnimatedBuilder(
+                      animation: Listenable.merge([
+                        _messageController,
+                        _recipientController,
+                      ]),
+                      builder: (context, child) {
+                        final isSendDisabled = viewModel.isSendDisabled(
+                          _recipientController.text,
+                          _messageController.text,
+                        );
 
-                        return AdaptiveTextSelectionToolbar.buttonItems(
-                          anchors: editableTextState.contextMenuAnchors,
-                          buttonItems: buttonItems,
+                        return CupertinoButton(
+                          padding: EdgeInsets.all(0),
+                          child: state.sending
+                              ? CupertinoActivityIndicator()
+                              : Icon(
+                                  MdiIcons.send,
+                                  color: colors.background,
+                                ),
+                          color: colors.primary,
+                          disabledColor: colors.grey,
+                          onPressed: isSendDisabled
+                              ? null
+                              : () async {
+                                  String message = state.useMarkdown
+                                      ? md.markdownToHtml(
+                                          _messageController.text,
+                                          inlineSyntaxes: [
+                                            md.DelimiterSyntax('§+', tags: [md.DelimiterTag('span class="spoiler"', 1)], requiresDelimiterRun: true),
+                                            md.AutolinkExtensionSyntax()
+                                          ],
+                                        ).replaceAll('</span class="spoiler">', '</span>')
+                                      : _messageController.text;
+
+                                  final response = await viewModel.submit(
+                                    state.hasInputField == true ? _recipientController.text : null,
+                                    message,
+                                  );
+
+                                  if (response) {
+                                    if (state.onClose != null) {
+                                      state.onClose!();
+                                    }
+                                    Navigator.of(context).pop();
+                                  }
+                                },
                         );
                       },
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  AnimatedBuilder(
-                    animation: Listenable.merge([
-                      _messageController,
-                      _recipientController,
-                    ]),
-                    builder: (context, child) {
-                      final isSendDisabled = viewModel.isSendDisabled(
-                        _recipientController.text,
-                        _messageController.text,
-                      );
-
-                      return CupertinoButton(
-                        padding: EdgeInsets.all(0),
-                        child: state.sending
-                            ? CupertinoActivityIndicator()
-                            : Icon(
-                                MdiIcons.send,
-                                color: colors.background,
-                              ),
-                        color: colors.primary,
-                        disabledColor: colors.grey,
-                        onPressed: isSendDisabled
-                            ? null
-                            : () async {
-                                String message = state.useMarkdown
-                                    ? md.markdownToHtml(
-                                        _messageController.text,
-                                        inlineSyntaxes: [
-                                          md.DelimiterSyntax('§+', tags: [md.DelimiterTag('span class="spoiler"', 1)], requiresDelimiterRun: true),
-                                          md.AutolinkExtensionSyntax()
-                                        ],
-                                      ).replaceAll('</span class="spoiler">', '</span>')
-                                    : _messageController.text;
-
-                                final response = await viewModel.submit(
-                                  state.hasInputField == true ? _recipientController.text : null,
-                                  message,
-                                );
-
-                                if (response) {
-                                  if (state.onClose != null) {
-                                    state.onClose!();
-                                  }
-                                  Navigator.of(context).pop();
-                                }
-                              },
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0),
-            sliver: SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            CupertinoButton(
-                              padding: EdgeInsets.all(0),
-                              child: Icon(MdiIcons.plusCircle),
-                              onPressed: () {
-                                showCupertinoModalBottomSheet(
-                                  context: context,
-                                  expand: false,
-                                  builder: (context) {
-                                    return ContextMenuGrid(
-                                      children: [
-                                        ContextMenuItem(
-                                          label: 'Kamera',
-                                          icon: MdiIcons.camera,
-                                          onTap: () async {
-                                            Navigator.of(context).pop();
-                                            FocusScope.of(context).unfocus();
-                                            await getImage(ImageSource.camera);
-                                            //FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
-                                          },
-                                        ),
-                                        ContextMenuItem(
-                                          label: 'Galerie',
-                                          icon: MdiIcons.image,
-                                          onTap: () async {
-                                            Navigator.of(context).pop();
-                                            FocusScope.of(context).unfocus();
-                                            await getImage(ImageSource.gallery);
-                                            //FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
-                                          },
-                                        ),
-                                        FutureBuilder(
-                                            future: Pasteboard.image,
-                                            builder: (_, data) {
-                                              if (data.hasData) {
-                                                return ContextMenuItem(
-                                                  label: 'Schránka',
-                                                  icon: MdiIcons.contentPaste,
-                                                  onTap: () async {
-                                                    Navigator.of(context).pop();
-                                                    FocusScope.of(context).unfocus();
-                                                    final imageBytes = await Pasteboard.image;
-                                                    if (imageBytes != null) {
-                                                      viewModel.addImage({
-                                                        ATTACHMENT.bytes: imageBytes,
-                                                        ATTACHMENT.filename: 'pasteboard_image.${DateTime.now().millisecondsSinceEpoch}.jpg',
-                                                        ATTACHMENT.mime: 'image/jpeg',
-                                                        ATTACHMENT.extension: 'jpg',
-                                                        ATTACHMENT.mediatype: MediaType('image', 'jpeg'),
-                                                        ATTACHMENT.previewWidget: Image.memory(
-                                                          imageBytes,
-                                                          width: 80,
-                                                          height: 80,
-                                                          fit: BoxFit.cover,
-                                                          frameBuilder:
-                                                              (BuildContext context, Widget child, int? frame, bool wasSynchronouslyLoaded) {
-                                                            if (frame == null) {
-                                                              return CupertinoActivityIndicator();
-                                                            }
-                                                            return child;
-                                                            //FocusScope.of(context).requestFocus(state.recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
-                                                          },
-                                                        ),
-                                                      });
-                                                    }
-                                                    //FocusScope.of(context).requestFocus(state.recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
-                                                  },
-                                                );
-                                              }
-                                              return ContextMenuItem(
-                                                icon: MdiIcons.contentPaste,
-                                                label: 'Schránka',
-                                                disabled: true,
-                                              );
-                                            }),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
-                            ),
-                            PremiumFeature(
-                              feature: PremiumFeatureEnum.markdown,
-                              child: CupertinoButton(
-                                padding: EdgeInsets.all(0),
-                                child: Icon(
-                                  MdiIcons.languageMarkdown,
-                                  color: state.useMarkdown ? colors.primary : colors.disabled,
-                                  size: 32,
-                                ),
-                                onPressed: () => viewModel.toggleMarkdown(),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
                     ),
                   ],
                 ),
               ),
             ),
-          ),
-          if (state.loadingImage)
             SliverPadding(
-              padding: const EdgeInsets.only(bottom: 16.0, left: 10 + 8.0, top: 8.0),
+              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0),
               sliver: SliverToBoxAdapter(
-                child: Align(child: CupertinoActivityIndicator(), alignment: Alignment.centerLeft),
-              ),
-            )
-          else
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 16.0),
-              sliver: SliverToBoxAdapter(
-                child: Wrap(
-                  runAlignment: WrapAlignment.start,
-                  children: state.images
-                      .map((Map<ATTACHMENT, dynamic> image) => _buildPreviewWidget(
-                            image[ATTACHMENT.bytes],
-                            image[ATTACHMENT.previewWidget],
-                            colors,
-                            viewModel,
-                          ))
-                      .toList(),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              CupertinoButton(
+                                padding: EdgeInsets.all(0),
+                                child: Icon(MdiIcons.plusCircle),
+                                onPressed: () {
+                                  showCupertinoModalBottomSheet(
+                                    context: context,
+                                    expand: false,
+                                    builder: (context) {
+                                      return ContextMenuGrid(
+                                        children: [
+                                          ContextMenuItem(
+                                            label: 'Kamera',
+                                            icon: MdiIcons.camera,
+                                            onTap: () async {
+                                              Navigator.of(context).pop();
+                                              FocusScope.of(context).unfocus();
+                                              await getImage(ImageSource.camera);
+                                              //FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
+                                            },
+                                          ),
+                                          ContextMenuItem(
+                                            label: 'Galerie',
+                                            icon: MdiIcons.image,
+                                            onTap: () async {
+                                              Navigator.of(context).pop();
+                                              FocusScope.of(context).unfocus();
+                                              await getImage(ImageSource.gallery);
+                                              //FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
+                                            },
+                                          ),
+                                          FutureBuilder(
+                                              future: Pasteboard.image,
+                                              builder: (_, data) {
+                                                if (data.hasData) {
+                                                  return ContextMenuItem(
+                                                    label: 'Schránka',
+                                                    icon: MdiIcons.contentPaste,
+                                                    onTap: () async {
+                                                      Navigator.of(context).pop();
+                                                      FocusScope.of(context).unfocus();
+                                                      final imageBytes = await Pasteboard.image;
+                                                      if (imageBytes != null) {
+                                                        viewModel.addImage({
+                                                          ATTACHMENT.bytes: imageBytes,
+                                                          ATTACHMENT.filename: 'pasteboard_image.${DateTime.now().millisecondsSinceEpoch}.jpg',
+                                                          ATTACHMENT.mime: 'image/jpeg',
+                                                          ATTACHMENT.extension: 'jpg',
+                                                          ATTACHMENT.mediatype: MediaType('image', 'jpeg'),
+                                                          ATTACHMENT.previewWidget: Image.memory(
+                                                            imageBytes,
+                                                            width: 80,
+                                                            height: 80,
+                                                            fit: BoxFit.cover,
+                                                            frameBuilder:
+                                                                (BuildContext context, Widget child, int? frame, bool wasSynchronouslyLoaded) {
+                                                              if (frame == null) {
+                                                                return CupertinoActivityIndicator();
+                                                              }
+                                                              return child;
+                                                              //FocusScope.of(context).requestFocus(state.recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
+                                                            },
+                                                          ),
+                                                        });
+                                                      }
+                                                      //FocusScope.of(context).requestFocus(state.recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
+                                                    },
+                                                  );
+                                                }
+                                                return ContextMenuItem(
+                                                  icon: MdiIcons.contentPaste,
+                                                  label: 'Schránka',
+                                                  disabled: true,
+                                                );
+                                              }),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                              PremiumFeature(
+                                feature: PremiumFeatureEnum.markdown,
+                                child: CupertinoButton(
+                                  padding: EdgeInsets.all(0),
+                                  child: Icon(
+                                    MdiIcons.languageMarkdown,
+                                    color: state.useMarkdown ? colors.primary : colors.disabled,
+                                    size: 32,
+                                  ),
+                                  onPressed: () => viewModel.toggleMarkdown(),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-        ],
+            if (state.loadingImage)
+              SliverPadding(
+                padding: const EdgeInsets.only(bottom: 16.0, left: 10 + 8.0, top: 8.0),
+                sliver: SliverToBoxAdapter(
+                  child: Align(child: CupertinoActivityIndicator(), alignment: Alignment.centerLeft),
+                ),
+              )
+            else
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 16.0),
+                sliver: SliverToBoxAdapter(
+                  child: Wrap(
+                    runAlignment: WrapAlignment.start,
+                    children: state.images
+                        .map((Map<ATTACHMENT, dynamic> image) => _buildPreviewWidget(
+                              image[ATTACHMENT.bytes],
+                              image[ATTACHMENT.previewWidget],
+                              colors,
+                              viewModel,
+                            ))
+                        .toList(),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
