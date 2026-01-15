@@ -162,33 +162,32 @@ class _MessageScreenState extends State<MessageScreen> {
     LogService.log('[MessageScreen] Scheduling initial focus request');
 
     // Delay focus request to avoid keyboard flicker
-    Future.delayed(Duration(milliseconds: 600), () {
-      if (!mounted) {
-        LogService.log('[MessageScreen] Widget not mounted, skipping focus request');
-        return;
+
+    if (!mounted) {
+      LogService.log('[MessageScreen] Widget not mounted, skipping focus request');
+      return;
+    }
+
+    try {
+      // Determine which field should get focus based on settings
+      final shouldFocusRecipient = viewModel.state.hasInputField == true && viewModel.state.inputFieldPlaceholder.isEmpty;
+      final shouldFocusMessage = viewModel.state.hasInputField != true || viewModel.state.inputFieldPlaceholder.isNotEmpty;
+
+      LogService.log('[MessageScreen] Requesting focus - recipient: $shouldFocusRecipient, message: $shouldFocusMessage, '
+          'recipientNode.canRequestFocus: ${_recipientFocusNode.canRequestFocus}, '
+          'messageNode.canRequestFocus: ${_messageFocusNode.canRequestFocus}');
+
+      if (shouldFocusRecipient) {
+        _recipientFocusNode.requestFocus();
+        LogService.log('[MessageScreen] Focus requested for recipient field');
+      } else if (shouldFocusMessage) {
+        _messageFocusNode.requestFocus();
+        LogService.log('[MessageScreen] Focus requested for message field');
       }
-
-      try {
-        // Determine which field should get focus based on settings
-        final shouldFocusRecipient = viewModel.state.hasInputField == true && viewModel.state.inputFieldPlaceholder.isEmpty;
-        final shouldFocusMessage = viewModel.state.hasInputField != true || viewModel.state.inputFieldPlaceholder.isNotEmpty;
-
-        LogService.log('[MessageScreen] Requesting focus - recipient: $shouldFocusRecipient, message: $shouldFocusMessage, '
-            'recipientNode.canRequestFocus: ${_recipientFocusNode.canRequestFocus}, '
-            'messageNode.canRequestFocus: ${_messageFocusNode.canRequestFocus}');
-
-        if (shouldFocusRecipient) {
-          _recipientFocusNode.requestFocus();
-          LogService.log('[MessageScreen] Focus requested for recipient field');
-        } else if (shouldFocusMessage) {
-          _messageFocusNode.requestFocus();
-          LogService.log('[MessageScreen] Focus requested for message field');
-        }
-      } catch (e, stackTrace) {
-        LogService.log('[MessageScreen] Error requesting focus: $e');
-        LogService.captureError(e, stack: stackTrace);
-      }
-    });
+    } catch (e, stackTrace) {
+      LogService.log('[MessageScreen] Error requesting focus: $e');
+      LogService.captureError(e, stack: stackTrace);
+    }
   }
 
   @override
@@ -277,16 +276,16 @@ class _MessageScreenState extends State<MessageScreen> {
                                 onPressed: () {
                                   String replacement = '';
                                   final selected = value.selection.textInside(value.text);
-        
+
                                   if (state.useMarkdown) {
                                     replacement = '${element.value['md']}${selected}${element.value['md']}';
                                   } else {
                                     replacement = '${element.value['htmlStart']}${selected}${element.value['htmlEnd']}';
                                   }
-        
+
                                   // Update the message
                                   _messageController.text = value.text.replaceRange(value.selection.start, value.selection.end, replacement);
-        
+
                                   // Move the cursor
                                   final isSelected = value.selection.start != value.selection.end;
                                   int offset = value.selection.extentOffset + (replacement.length - selected.length);
@@ -299,7 +298,7 @@ class _MessageScreenState extends State<MessageScreen> {
                               ),
                             );
                           });
-        
+
                           return AdaptiveTextSelectionToolbar.buttonItems(
                             anchors: editableTextState.contextMenuAnchors,
                             buttonItems: buttonItems,
@@ -318,7 +317,7 @@ class _MessageScreenState extends State<MessageScreen> {
                           _recipientController.text,
                           _messageController.text,
                         );
-        
+
                         return CupertinoButton(
                           padding: EdgeInsets.all(0),
                           child: state.sending
@@ -341,12 +340,12 @@ class _MessageScreenState extends State<MessageScreen> {
                                           ],
                                         ).replaceAll('</span class="spoiler">', '</span>')
                                       : _messageController.text;
-        
+
                                   final response = await viewModel.submit(
                                     state.hasInputField == true ? _recipientController.text : null,
                                     message,
                                   );
-        
+
                                   if (response) {
                                     if (state.onClose != null) {
                                       state.onClose!();
