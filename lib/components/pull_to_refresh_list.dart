@@ -80,6 +80,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
   int _lastRebuild = 0;
   String? _searchTerm;
   bool _search = false;
+  final _scrollKey = UniqueKey();
   late AnimationController slideController;
   late Animation<Offset> slideOffset;
 
@@ -193,7 +194,15 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
                   onNotification: (scrollInfo) {
                     if (scrollInfo is ScrollNotification) {
                       // Hide keyboard -> https://github.com/lucien144/fyx/issues/343
-                      FocusManager.instance.primaryFocus?.unfocus();
+                      // Only unfocus when user is actively dragging (not during layout changes from navigation)
+                      if (scrollInfo is ScrollUpdateNotification &&
+                          scrollInfo.dragDetails != null &&
+                          widget.searchEnabled &&
+                          (widget.searchTerm?.length ?? 0) > 2 &&
+                          MediaQuery.viewInsetsOf(context).bottom > 0) {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                        debugPrint('Unfocus');
+                      }
 
                       // Hide the jump to first unread button if user scrolls twice the height of the screen height
                       if (scrollInfo.metrics.pixels > 2 * height) {
@@ -215,6 +224,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
                     return false;
                   },
                   child: CupertinoScrollbar(
+                    key: _scrollKey,
                     controller: _controller,
                     child: CustomScrollView(
                       physics: Platform.isIOS ? const AlwaysScrollableScrollPhysics() : const RefreshScrollPhysics(),
