@@ -23,10 +23,20 @@ class PremiumFeatureBottomSheet extends StatelessWidget {
           if(!preview) Icon(MdiIcons.lock),
           if(!preview) SizedBox(height: 4),
           Text(
-            preview ? 'Tyto funkce jsou dostupné pouze podporovatelům.' : 'Tato funkce je dostupná pouze podporovatelům.',
+            preview ? 'Tyto funkce jsou dostupné pouze podporovatelům Fyxu.' : 'Funkce je dostupná pouze podporovatelům Fyxu.',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w800,
+              color: colors.primary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 24),
+          Text(
+            'Nepleťte si s Nyx prémiovkou.\nVíce u ID LUCIEN nebo ve Fyx klubu.',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w400,
               color: colors.primary,
             ),
             textAlign: TextAlign.center,

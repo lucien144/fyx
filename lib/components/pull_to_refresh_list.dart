@@ -389,7 +389,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
 
       // Add the pinned widget only if the list is active
       if (widget.pinnedWidget is Widget && !makeInactive) {
-        _slivers.insert(0, SliverToBoxAdapter(child: widget.pinnedWidget));
+        _slivers.insert(1, SliverToBoxAdapter(child: widget.pinnedWidget));
       }
 
       if (MainRepository().settings.firstUnread == FirstUnreadEnum.autoscroll &&

@@ -25,6 +25,7 @@ import 'package:fyx/model/Settings.dart';
 import 'package:fyx/model/enums/DiscussionTypeEnum.dart';
 import 'package:fyx/model/enums/premium_feature_enum.dart';
 import 'package:fyx/model/post/content/Advertisement.dart';
+import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/pages/discussion_home_page.dart';
 import 'package:fyx/shared/services/service_locator.dart';
@@ -556,14 +557,36 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
   }
 
   Widget? getPinnedWidget(DiscussionResponse discussionResponse) {
-    switch (discussionResponse.discussion.advertisement.runtimeType) {
-      case ContentAdvertisement:
+    switch (true) {
+      case true when discussionResponse.discussion.advertisement.runtimeType == ContentAdvertisement:
         return Padding(
           padding: const EdgeInsets.all(16),
           child: Advertisement(
             discussionResponse.discussion.advertisement!,
             title: discussionResponse.discussion.name,
             username: discussionResponse.discussion.owner != null ? discussionResponse.discussion.owner!.username : '',
+          ),
+        );
+      case true when discussionResponse.discussion.idKlub == 24237 && !MainRepository().credentials!.isPremiumUser:
+        return GestureDetector(
+          onTap: () => T.openLink('https://fyx.144.wtf/#premium', mode: SettingsProvider().linksMode),
+          child: Container(
+            child: Row(
+              children: [
+                Icon(MdiIcons.pinOutline, color: colors.text, size: 18),
+                const SizedBox(width: 4),
+                RichText(
+                    text: TextSpan(
+                  style: Skin.of(context).theme.data.textTheme.textStyle.copyWith(fontSize: 12),
+                  children: [
+                    TextSpan(text: 'Informace o podpoře Fyxu na '),
+                    TextSpan(text: 'https://fyx.144.wtf', style: TextStyle(decoration: TextDecoration.underline)),
+                  ],
+                )),
+              ],
+            ),
+            color: colors.barBackground,
+            padding: const EdgeInsets.all(16),
           ),
         );
       default:
