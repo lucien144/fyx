@@ -11,6 +11,7 @@ class DiscussionPageScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Skin.of(context).theme.colors;
+    final width = MediaQuery.sizeOf(context).width;
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
@@ -22,7 +23,7 @@ class DiscussionPageScaffold extends StatelessWidget {
           ),
           middle: Container(
               alignment: Alignment.center,
-              width: MediaQuery.of(context).size.width - 120,
+              width: width - 120,
               child: Tooltip(
                 message: title,
                 child: Text(

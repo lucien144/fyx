@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fyx/components/bottom_sheets/context_menu/grid.dart';
@@ -6,17 +5,19 @@ import 'package:fyx/components/bottom_sheets/context_menu/item.dart';
 import 'package:fyx/components/post/post_avatar.dart';
 import 'package:fyx/components/post/post_hero_attachment.dart';
 import 'package:fyx/components/post/post_html.dart';
-import 'package:fyx/components/post/post_list_item.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
+import 'package:fyx/features/message/domain/message_settings.dart';
+import 'package:fyx/features/message/presentation/message_screen.dart';
+import 'package:fyx/features/message/presentation/viewmodel/message_viewmodel.dart';
 import 'package:fyx/model/UserReferences.dart';
 import 'package:fyx/model/enums/AdEnums.dart';
 import 'package:fyx/model/post/Image.dart' as i;
 import 'package:fyx/model/post/content/Advertisement.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
-import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/pages/search_page.dart';
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
@@ -115,19 +116,21 @@ class Advertisement extends StatelessWidget {
                           context: context,
                           backgroundColor: colors.barBackground,
                           barrierColor: colors.dark.withOpacity(0.5),
-                          settings: RouteSettings(
-                              arguments: NewMessageSettings(
-                                  hasInputField: true,
-                                  inputFieldPlaceholder: this.username,
-                                  messageFieldPlaceholder: '${content.link}\n',
-                                  onClose: () => T.success('👍 Zpráva poslána.', bg: colors.success),
-                                  onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
-                                    if (inputField == null) return false;
+                          builder: (BuildContext context) {
+                            final viewModel = getIt<MessageViewModel>();
+                            viewModel.initializeFromSettings(MessageSettings(
+                                hasInputField: true,
+                                inputFieldPlaceholder: this.username,
+                                messageFieldPlaceholder: '${content.link}\n',
+                                onClose: () => T.success('👍 Zpráva poslána.', bg: colors.success),
+                                onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                                  if (inputField == null) return false;
 
-                                    var response = await ApiController().sendMail(inputField, message, attachments: attachments);
-                                    return response.isOk;
-                                  })),
-                          builder: (BuildContext context) => NewMessagePage());
+                                  var response = await ApiController().sendMail(inputField, message, attachments: attachments);
+                                  return response.isOk;
+                                }));
+                            return MessageScreen(key: UniqueKey());
+                          });
                     }),
                 ContextMenuItem(
                     label: 'Filtrovat\n@${this.username}',

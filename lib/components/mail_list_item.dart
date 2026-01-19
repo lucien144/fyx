@@ -8,10 +8,14 @@ import 'package:fyx/components/gesture_feedback.dart';
 import 'package:fyx/components/post/post_avatar.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
+import 'package:fyx/features/message/domain/message_settings.dart';
+import 'package:fyx/features/message/presentation/message_screen.dart';
+import 'package:fyx/features/message/presentation/viewmodel/message_viewmodel.dart';
 import 'package:fyx/model/Mail.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/post/content/Regular.dart';
-import 'package:fyx/pages/NewMessagePage.dart';
+
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/state/mail_provider.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/IconReply.dart';
@@ -46,6 +50,7 @@ class _MailListItemState extends ConsumerState<MailListItem> {
   Widget build(BuildContext context) {
     SkinColors colors = Skin.of(context).theme.colors;
     final isDeleted = ref.watch(MailsToDelete.provider).contains(widget.mail);
+    final _newMessage = MessageScreen(key: UniqueKey());
 
     return Visibility(
       visible: !isDeleted,
@@ -89,27 +94,30 @@ class _MailListItemState extends ConsumerState<MailListItem> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[IconReply(), Text('Odpovědět', style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 14))],
                   ),
-                  onTap: () => showCupertinoModalBottomSheet(
-                      context: context,
-                      backgroundColor: colors.barBackground,
-                      barrierColor: colors.dark.withOpacity(0.5),
-                      settings: RouteSettings(
-                          arguments: NewMessageSettings(
-                              onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
-                                if (inputField == null) {
-                                  return false;
-                                }
-                                var response = await ApiController().sendMail(inputField, message, attachments: attachments);
-                                return response.isOk;
-                              },
-                              onClose: this.widget.onUpdate!,
-                              inputFieldPlaceholder: widget.mail.participant,
-                              hasInputField: true,
-                              replyWidget: MailListItem(
-                                widget.mail,
-                                isPreview: true,
-                              ))),
-                      builder: (BuildContext context) => NewMessagePage()),
+                  onTap: () {
+                    final viewModel = getIt<MessageViewModel>();
+                    viewModel.initializeFromSettings(MessageSettings(
+                        onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                          if (inputField == null) {
+                            return false;
+                          }
+                          var response = await ApiController().sendMail(inputField, message, attachments: attachments);
+                          return response.isOk;
+                        },
+                        onClose: this.widget.onUpdate!,
+                        inputFieldPlaceholder: widget.mail.participant,
+                        hasInputField: true,
+                        replyWidget: MailListItem(
+                          widget.mail,
+                          isPreview: true,
+                        )));
+
+                    showCupertinoModalBottomSheet(
+                        context: context,
+                        backgroundColor: colors.barBackground,
+                        barrierColor: colors.dark.withOpacity(0.5),
+                        builder: (_) => _newMessage);
+                  },
                 )
               ]),
       ),
