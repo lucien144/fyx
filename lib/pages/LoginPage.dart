@@ -20,7 +20,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _loginController = TextEditingController();
   final TextEditingController _tokenController = TextEditingController();
-  late SkinColors colors;
   bool _isRunning = false;
   bool _useTokenToLogin = false;
   bool _terms = false;
@@ -69,6 +68,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget formFactory() {
+    final colors = Skin.of(context).theme.colors;
     final textfieldDecoration =
         BoxDecoration(borderRadius: BorderRadius.circular(4), color: colors.background, border: Border.all(color: colors.background));
     final bottom = MediaQuery.viewInsetsOf(context).bottom;

@@ -58,7 +58,6 @@ class DiscussionPage extends ConsumerStatefulWidget {
 
 class _DiscussionPageState extends ConsumerState<DiscussionPage> {
   final AsyncMemoizer<DiscussionResponse> _memoizer = AsyncMemoizer<DiscussionResponse>();
-  late SkinColors colors;
   int _refreshList = 0;
   bool _hasInitData = false;
 
@@ -105,7 +104,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
 
   @override
   Widget build(BuildContext context) {
-    colors = Skin.of(context).theme.colors;
+    final colors = Skin.of(context).theme.colors;
     DiscussionPageArguments? pageArguments = ModalRoute.of(context)?.settings.arguments as DiscussionPageArguments?;
 
     if (pageArguments == null) {
@@ -162,6 +161,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
     // TODO: Not ideal, probably better to use Provider. Or not?
     SyntaxHighlighter.languageContext = discussionResponse.discussion.name;
 
+    final colors = Skin.of(context).theme.colors;
     final textStyleContext = TextStyle(fontSize: Settings().fontSize);
 
     return _pageScaffold(
@@ -557,6 +557,8 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
   }
 
   Widget? getPinnedWidget(DiscussionResponse discussionResponse) {
+    final colors = Skin.of(context).theme.colors;
+
     switch (true) {
       case true when discussionResponse.discussion.advertisement.runtimeType == ContentAdvertisement:
         return Padding(
@@ -595,6 +597,8 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
   }
 
   Widget unseenPill(Widget postItem, unseenCount) {
+    final colors = Skin.of(context).theme.colors;
+
     return Column(
       mainAxisSize: MainAxisSize.max,
       crossAxisAlignment: CrossAxisAlignment.stretch,
