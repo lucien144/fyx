@@ -270,6 +270,11 @@ class ApiController {
     return OkResponse.fromJson(result.data);
   }
 
+  Future<OkResponse> deleteMail(int mailId) async {
+    var result = await provider.deleteMail(mailId);
+    return OkResponse.fromJson(result.data);
+  }
+
   Future<Response> setPostReminder(int discussionId, int postId, bool setReminder) {
     return provider.setPostReminder(discussionId, postId, setReminder);
   }

@@ -6,13 +6,17 @@ import 'package:fyx/components/pull_to_refresh_list.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
+import 'package:fyx/features/message/domain/message_settings.dart';
+import 'package:fyx/features/message/presentation/message_screen.dart';
+import 'package:fyx/features/message/presentation/viewmodel/message_viewmodel.dart';
 import 'package:fyx/model/Mail.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/post/content/Regular.dart';
-import 'package:fyx/pages/NewMessagePage.dart';
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class MailboxTabArguments {
   final int? mailId;
@@ -31,6 +35,7 @@ class MailboxTab extends StatefulWidget {
 
 class _MailboxTabState extends State<MailboxTab> {
   int _refreshData = 0;
+  final _newMessage = MessageScreen(key: UniqueKey());
 
   refreshData() {
     setState(() => _refreshData = DateTime.now().millisecondsSinceEpoch);
@@ -123,18 +128,27 @@ class _MailboxTabState extends State<MailboxTab> {
                 backgroundColor: colors.primary,
                 foregroundColor: colors.background,
                 child: Icon(Icons.add),
-                onPressed: () => Navigator.of(context, rootNavigator: true).pushNamed('/new-message',
-                    arguments: NewMessageSettings(
-                        onClose: this.refreshData,
-                        hasInputField: true,
-                        onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
-                          if (inputField == null) {
-                            return false;
-                          }
+                onPressed: () {
+                  final viewModel = getIt<MessageViewModel>();
+                  viewModel.initializeFromSettings(MessageSettings(
+                      onClose: this.refreshData,
+                      hasInputField: true,
+                      onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                        if (inputField == null) {
+                          return false;
+                        }
 
-                          var response = await ApiController().sendMail(inputField, message, attachments: attachments);
-                          return response.isOk;
-                        })),
+                        var response = await ApiController().sendMail(inputField, message, attachments: attachments);
+                        return response.isOk;
+                      }));
+
+                  showCupertinoModalBottomSheet(
+                      context: context,
+                      backgroundColor: colors.barBackground,
+                      barrierColor: colors.dark.withOpacity(0.5),
+                      useRootNavigator: true,
+                      builder: (BuildContext context) => _newMessage);
+                },
               ),
             ),
           )

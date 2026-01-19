@@ -23,6 +23,7 @@ class VideoPlayer extends StatefulWidget {
 }
 
 class _VideoPlayerState extends State<VideoPlayer> {
+  bool? $isVideoPlayerLoaded = false;
   VideoPlayerController? videoPlayerController;
   ChewieController? chewieController;
   late SkinColors colors;
@@ -44,27 +45,27 @@ class _VideoPlayerState extends State<VideoPlayer> {
     }
 
     if (videoUrl != null && videoUrl!.isNotEmpty) {
-      videoPlayerController = VideoPlayerController.network(videoUrl!);
+      videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(videoUrl!))
+        ..initialize()
+            .then((_) => setState(() => $isVideoPlayerLoaded = true))
+            .timeout(Duration(seconds: 3), onTimeout: () => setState(() => $isVideoPlayerLoaded = null));
     }
   }
 
-  Future<bool> initVideo(BuildContext context) async {
-    if (videoPlayerController == null) {
-      return false;
-    }
-
+  ChewieController initChewie(BuildContext context) {
     SkinColors colors = Skin.of(context).theme.colors;
-    await videoPlayerController!.initialize();
-
-    final size = MediaQuery.of(context).size;
+    final size = MediaQuery.sizeOf(context);
     final width = size.width;
     final height = size.height;
     final aspectRatio =
         videoPlayerController!.value.isInitialized ? videoPlayerController!.value.aspectRatio : (width > height ? width / height : height / width);
 
-    chewieController = ChewieController(
+    return ChewieController(
         videoPlayerController: videoPlayerController!,
         aspectRatio: aspectRatio,
+        errorBuilder: (_, error) => Container(
+              child: T.somethingsWrongButton(widget.element.outerHtml, icon: Icons.play_disabled, title: 'Video se nepodařilo spustit.\n$error', stack: error),
+            ),
         placeholder: Container(
           color: colors.primary,
           child: Icon(
@@ -74,7 +75,6 @@ class _VideoPlayerState extends State<VideoPlayer> {
           ),
           alignment: Alignment.center,
         ));
-    return true;
   }
 
   @override
@@ -98,42 +98,23 @@ class _VideoPlayerState extends State<VideoPlayer> {
     return Stack(
       children: [
         Card(
-          elevation: 0,
-          color: colors.background,
-          child: FutureBuilder(
-              future: initVideo(context),
-              builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-                if (snapshot.hasData && snapshot.data == true) {
-                  return Column(
-                    children: <Widget>[
-                      AspectRatio(aspectRatio: videoPlayerController!.value.aspectRatio, child: Chewie(controller: chewieController!)),
-                      SizedBox(
-                        height: 8,
-                      ),
-                      _sourceButton(),
-                      SizedBox(
-                        height: 8,
-                      )
-                    ],
-                  );
-                } else if (snapshot.hasError) {
-                  if (snapshot.error is PlatformException) {
-                    final error = (snapshot.error as PlatformException);
-                    return Column(children: [
-                      T.somethingsWrongButton(widget.element.outerHtml,
-                          icon: Icons.play_disabled, title: 'Video se nepodařilo nahrát.\n${error.message}', stack: error.stacktrace ?? ''),
-                      _sourceButton()
-                    ]);
-                  }
-                  return Column(children: [
-                    T.somethingsWrongButton(widget.element.outerHtml,
-                        icon: Icons.play_disabled, title: 'Video se nepodařilo nahrát.', stack: snapshot.error.toString()),
-                    _sourceButton()
-                  ]);
-                }
-                return Center(child: CupertinoActivityIndicator());
-              }),
-        ),
+            elevation: 0,
+            color: colors.background,
+            child: Column(
+              children: <Widget>[
+                if ($isVideoPlayerLoaded == true)
+                  AspectRatio(aspectRatio: videoPlayerController!.value.aspectRatio, child: Chewie(controller: initChewie(context))),
+                if ($isVideoPlayerLoaded == false) CupertinoActivityIndicator(),
+                if ($isVideoPlayerLoaded == null) T.somethingsWrongButton(widget.element.outerHtml, icon: Icons.play_disabled, title: 'Video se nepodařilo načíst.'),
+                SizedBox(
+                  height: 8,
+                ),
+                _sourceButton(),
+                SizedBox(
+                  height: 8,
+                )
+              ],
+            )),
         if (_blur)
           Positioned.fill(
             child: GestureDetector(

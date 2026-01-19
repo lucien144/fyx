@@ -19,9 +19,8 @@ class DiscussionHomePageArguments {
 
 class DiscussionHomePage extends StatelessWidget {
   final bool header;
-  DiscussionHomePage({Key? key, this.header = false}) : super(key: key) {
-    if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
-  }
+
+  DiscussionHomePage({Key? key, this.header = false}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -50,9 +49,11 @@ class DiscussionHomePage extends StatelessWidget {
               </body>
               </html>
 ''';
-                final String contentBase64 = base64Encode(const Utf8Encoder().convert(html));
-                return WebView(
-                  initialUrl: 'data:text/html;base64,$contentBase64',
+                final controller = WebViewController()
+                  ..setJavaScriptMode(JavaScriptMode.unrestricted)
+                  ..loadHtmlString(html);
+                return WebViewWidget(
+                  controller: controller,
                 );
               }
               return T.feedbackScreen(context, isLoading: true);

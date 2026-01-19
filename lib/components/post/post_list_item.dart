@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fyx/components/bottom_sheets/post_context_menu.dart';
 import 'package:fyx/components/content_box_layout.dart';
@@ -11,10 +9,14 @@ import 'package:fyx/components/text_icon.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
+import 'package:fyx/controllers/drafts_service.dart';
+import 'package:fyx/features/message/domain/message_settings.dart';
+import 'package:fyx/features/message/presentation/message_screen.dart';
+import 'package:fyx/features/message/presentation/viewmodel/message_viewmodel.dart';
 import 'package:fyx/model/Discussion.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
-import 'package:fyx/pages/NewMessagePage.dart';
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/state/batch_actions_provider.dart';
 import 'package:fyx/state/nsfw_provider.dart';
 import 'package:fyx/theme/Helpers.dart';
@@ -44,11 +46,14 @@ class PostListItem extends ConsumerStatefulWidget {
 
 class _PostListItemState extends ConsumerState<PostListItem> {
   Post? _post;
-  bool get makeDense => MediaQuery.of(context).textScaleFactor > 1 || MediaQuery.of(context).size.width <= 375;
+
+  bool get makeDense => MediaQuery.textScaleFactorOf(context) > 1 || MediaQuery.sizeOf(context).width <= 375;
 
   bool get adminTools => !(widget.discussion?.accessRights.canRights == false || // Do not have rights
       widget.post.nick == MainRepository().credentials?.nickname || // ... or is post owner
       widget.post.nick == widget.discussion?.owner?.username); // ... or the post owner is discussion owner
+
+  final _newMessage = MessageScreen(key: UniqueKey());
 
   @override
   void initState() {
@@ -114,72 +119,95 @@ class _PostListItemState extends ConsumerState<PostListItem> {
             isPreview: widget._isPreview,
             isHighlighted: widget._isHighlighted,
             isSelected: isSelected,
-            blur: ref.watch(NsfwDiscussionList.provider).containsKey(_post!.idKlub),
-            topLeftWidget: PostAvatar(
-              _post!.nick,
-              descriptionWidget: Row(
-                children: [
-                  if (_post!.rating != null)
-                    Text('${Post.formatRating(_post!.rating!)} | ',
-                        style: TextStyle(
-                            fontSize: 10, color: _post!.rating! > 0 ? colors.success : (_post!.rating! < 0 ? colors.danger : colors.text))),
-                  Text(
-                    '${Helpers.absoluteTime(_post!.time)}',
-                    style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10),
+            blur: MainRepository().credentials!.isPremiumUser && ref.watch(NsfwDiscussionList.provider).containsKey(_post!.idKlub),
+            topLeftWidget: Expanded(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onLongPress: () => widget._isPreview ? null : showPostContext(),
+                child: PostAvatar(
+                  _post!.nick,
+                  descriptionWidget: Row(
+                    children: [
+                      if (_post!.rating != null)
+                        Text('${Post.formatRating(_post!.rating!)} | ',
+                            style: TextStyle(
+                                fontSize: 10, color: _post!.rating! > 0 ? colors.success : (_post!.rating! < 0 ? colors.danger : colors.text))),
+                      Text(
+                        '${Helpers.absoluteTime(_post!.time)}',
+                        style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10),
+                      ),
+                      Text(
+                        ' ~${Helpers.relativeTime(_post!.time)}',
+                        style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10),
+                      ),
+                      if (_post!.replies.length > 0)
+                        Text(
+                          ' | ${_post!.replies.length} ${Intl.plural(_post!.replies.length, one: 'odpověď', few: 'odpovědi', other: 'odpovědí', locale: 'cs_CZ')}',
+                          style: TextStyle(color: colors.primary, fontSize: 10),
+                        ),
+                    ],
                   ),
-                  Text(
-                    ' ~${Helpers.relativeTime(_post!.time)}',
-                    style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10),
-                  ),
-                  if (_post!.replies.length > 0)
-                    Text(
-                      ' | ${_post!.replies.length} ${Intl.plural(_post!.replies.length, one: 'odpověď', few: 'odpovědi', other: 'odpovědí', locale: 'cs_CZ')}',
-                      style: TextStyle(color: colors.primary, fontSize: 10),
-                    ),
-                ],
+                ),
               ),
             ),
-            topRightWidget: widget.disabled ? Container() : GestureFeedback(child: Icon(Icons.more_vert, color: colors.text.withOpacity(0.38)), onTap: showPostContext),
-            bottomWidget: widget.disabled ? null : Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    PostRating(_post!, onRatingChange: (post) => setState(() => _post = post)),
-                    Row(
-                      children: <Widget>[
-                        Visibility(
-                          visible: widget._isPreview != true && _post!.canReply,
-                          child: GestureDetector(
-                              behavior: HitTestBehavior.opaque,
-                              onTap: () => Navigator.of(context).pushNamed('/new-message',
-                                  arguments: NewMessageSettings(
-                                      replyWidget: PostListItem(
-                                        _post!,
-                                        isPreview: true,
-                                        discussion: widget.discussion,
-                                      ),
-                                      onClose: this.widget.onUpdate,
-                                      onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
-                                        var result = await ApiController()
-                                            .postDiscussionMessage(_post!.idKlub, message, attachments: attachments, replyPost: _post);
-                                        return result.isOk;
-                                      })),
-                              child: TextIcon(
-                                makeDense ? '' : 'Odpovědět',
-                                icon: MdiIcons.reply,
-                                iconColor: colors.text.withOpacity(0.38),
-                              )),
-                        )
-                      ],
-                    )
-                  ],
-                ),
-              ],
-            ),
+            topRightWidget: widget.disabled
+                ? Container()
+                : GestureFeedback(child: Icon(Icons.more_vert, color: colors.text.withOpacity(0.38)), onTap: showPostContext),
+            bottomWidget: widget.disabled || widget._isPreview
+                ? null
+                : Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          PostRating(_post!, onRatingChange: (post) => setState(() => _post = post)),
+                          Row(
+                            children: <Widget>[
+                              Visibility(
+                                visible: widget._isPreview != true && _post!.canReply,
+                                child: GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () {
+                                    final viewModel = getIt<MessageViewModel>();
+                                    viewModel.initializeFromSettings(MessageSettings(
+                                              draft: DraftsService().loadPostMessage(_post!.id),
+                                              onDraftRemove: () => DraftsService().removePostMessage(_post!.id),
+                                              onCompose: (message) => DraftsService().savePostMessage(id: _post!.id, message: message),
+                                              replyWidget: PostListItem(
+                                                _post!,
+                                                isPreview: true,
+                                                discussion: widget.discussion,
+                                              ),
+                                              onClose: this.widget.onUpdate,
+                                              onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                                                var result = await ApiController()
+                                                    .postDiscussionMessage(_post!.idKlub, message, attachments: attachments, replyPost: _post);
+                                                DraftsService().removePostMessage(_post!.id);
+                                                return result.isOk;
+                                              }));
+                                    showCupertinoModalBottomSheet(
+                                      context: context,
+                                      backgroundColor: colors.barBackground,
+                                      barrierColor: colors.dark.withOpacity(0.5),
+                                      useRootNavigator: true,
+                                      builder: (_) => _newMessage);
+                                  },
+                                  child: TextIcon(
+                                    makeDense ? '' : 'Odpovědět',
+                                    icon: MdiIcons.reply,
+                                    iconColor: colors.text.withOpacity(0.38),
+                                  ),
+                                ),
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
             content: _post!.content,
           ),
         ),

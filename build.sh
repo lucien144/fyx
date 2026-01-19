@@ -55,10 +55,10 @@ fi
 if [ $ios == true ]; then
   # shellcheck disable=SC2059
   printf "$GREEN Building iOS: ${version}$NC\n"
-  flutter clean
-  flutter pub get
+  fvm flutter clean
+  fvm flutter pub get
   (cd ios && pod cache clean --all && pod update)
-  flutter build ios -t lib/main_production.dart
+  fvm flutter build ios -t lib/main_production.dart
   open ios/Runner.xcworkspace
   /usr/bin/osascript -e "display notification \"iOS built.\""
 fi
@@ -67,14 +67,14 @@ if [ $android == true ]; then
   # shellcheck disable=SC2059
   printf "$GREEN Building Android: ${version}$NC\n"
 
-  (cd android && ./gradlew clean)
-
   if [ $ios == false ]; then
-    flutter clean
-    flutter pub get
+    fvm flutter clean
+    fvm flutter pub get
   fi
 
-  flutter build appbundle -t lib/main_production.dart
+  (cd android && ./gradlew clean)
+
+  fvm flutter build appbundle -t lib/main_production.dart
   mv build/app/outputs/bundle/release/app-release.aab "build/app/outputs/bundle/release/fyx-release-${version}.aab"
   open build/app/outputs/bundle/release/
   /usr/bin/osascript -e "display notification \"Android built.\""

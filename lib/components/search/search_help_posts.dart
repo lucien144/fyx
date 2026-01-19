@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/list_header.dart';
+import 'package:fyx/components/premium_feature.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/enums/premium_feature_enum.dart';
 import 'package:fyx/pages/search_page.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
@@ -11,7 +13,9 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class SearchPostsHelp extends StatelessWidget {
-  const SearchPostsHelp({Key? key}) : super(key: key);
+  const SearchPostsHelp({Key? key, this.hasSavedSearch = false}) : super(key: key);
+
+  final bool hasSavedSearch;
 
   @override
   Widget build(BuildContext context) {
@@ -22,9 +26,9 @@ class SearchPostsHelp extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (SettingsProvider().savedSearch.isNotEmpty) ListHeader('️Uložená hledání'),
-            ...SettingsProvider().savedSearch.map((term) => _widgetSavedSearchItem(context, term)).toList(),
-            SizedBox(height: 10),
+            if (SettingsProvider().savedSearch.isNotEmpty && this.hasSavedSearch) ListHeader('️Uložená hledání'),
+            if (SettingsProvider().savedSearch.isNotEmpty && this.hasSavedSearch) ...SettingsProvider().savedSearch.map((term) => _widgetSavedSearchItem(context, term)).toList(),
+            if (SettingsProvider().savedSearch.isNotEmpty && this.hasSavedSearch) SizedBox(height: 10),
             _widgetHowTo(colors),
           ],
         ),
@@ -49,7 +53,7 @@ class SearchPostsHelp extends StatelessWidget {
                 Icon(MdiIcons.informationOutline, size: 16),
                 SizedBox(width: 8),
                 Text(
-                  'Příklady hledání v příspěvcích:',
+                  'Příklady hledání:',
                   style: TextStyle(color: colors.primary, fontSize: 14),
                 ),
               ],
@@ -163,39 +167,42 @@ class SearchPostsHelp extends StatelessWidget {
 
   _widgetSavedSearchItem(context, String term) {
     final SkinColors colors = Skin.of(context).theme.colors;
-    return Container(
-      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.grey.withOpacity(.12)))),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: GestureDetector(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                  child: Text(term),
-                ),
-                onTap: () {
-                  final arguments = SearchPageArguments(searchTerm: term, focus: false);
-                  Navigator.of(context, rootNavigator: true).pushNamed('/search', arguments: arguments);
-                  AnalyticsProvider().logEvent('filter_saved_search');
-                }),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            child: GestureDetector(
-              onTap: () => SettingsProvider().toggleSavedSearch(term),
+    return PremiumFeature(
+      feature: PremiumFeatureEnum.savedSearch,
+      child: Container(
+        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.grey.withOpacity(.12)))),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
               child: GestureDetector(
-                child: ValueListenableBuilder(
-                  valueListenable: MainRepository().settings.box.listenable(keys: ['savedSearch']),
-                  builder: (BuildContext context, value, Widget? child) {
-                  return Icon(
-                    SettingsProvider().isSearchTermSaved(term) ? MdiIcons.heart : MdiIcons.heartOutline,
-                  );}
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    child: Text(term),
+                  ),
+                  onTap: () {
+                    final arguments = SearchPageArguments(searchTerm: term, focus: false);
+                    Navigator.of(context, rootNavigator: true).pushNamed('/search', arguments: arguments);
+                    AnalyticsProvider().logEvent('filter_saved_search');
+                  }),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              child: GestureDetector(
+                onTap: () => SettingsProvider().toggleSavedSearch(term),
+                child: GestureDetector(
+                  child: ValueListenableBuilder(
+                    valueListenable: MainRepository().settings.box.listenable(keys: ['savedSearch']),
+                    builder: (BuildContext context, value, Widget? child) {
+                    return Icon(
+                      SettingsProvider().isSearchTermSaved(term) ? MdiIcons.heart : MdiIcons.heartOutline,
+                    );}
+                  ),
                 ),
               ),
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }

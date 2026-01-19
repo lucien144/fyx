@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/discussion_page_scaffold.dart';
 import 'package:fyx/components/post/post_list_item.dart';
+import 'package:fyx/components/premium_feature.dart';
 import 'package:fyx/components/pull_to_refresh_list.dart';
 import 'package:fyx/components/search/search_help_notfound.dart';
 import 'package:fyx/components/search/search_help_posts.dart';
@@ -12,6 +13,7 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
+import 'package:fyx/model/enums/premium_feature_enum.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -51,7 +53,9 @@ class _SearchPageState extends State<SearchPage> {
       setState(() => _searchTerm = pageArguments!.searchTerm);
     }
 
-    Widget emptyWidget = SearchPostsHelp();
+    Widget emptyWidget = SearchPostsHelp(
+      hasSavedSearch: true,
+    );
 
     if (this._searchTerm != null) {
       emptyWidget = SearchHelpNotFound();
@@ -61,13 +65,16 @@ class _SearchPageState extends State<SearchPage> {
         title: 'Hledání',
         trailing: this._searchTerm == null
             ? null
-            : GestureDetector(
-                onTap: () => SettingsProvider().toggleSavedSearch(this._searchTerm!),
-                child: ValueListenableBuilder(
-                    valueListenable: SettingsProvider().box.listenable(keys: ['savedSearch']),
-                    builder: (BuildContext context, value, Widget? child) => Icon(
-                          SettingsProvider().isSearchTermSaved(this._searchTerm!) ? MdiIcons.heart : MdiIcons.heartOutline,
-                        )),
+            : PremiumFeature(
+                feature: PremiumFeatureEnum.savedSearch,
+                child: GestureDetector(
+                  onTap: () => SettingsProvider().toggleSavedSearch(this._searchTerm!),
+                  child: ValueListenableBuilder(
+                      valueListenable: SettingsProvider().box.listenable(keys: ['savedSearch']),
+                      builder: (BuildContext context, value, Widget? child) => Icon(
+                            SettingsProvider().isSearchTermSaved(this._searchTerm!) ? MdiIcons.heart : MdiIcons.heartOutline,
+                          )),
+                ),
               ),
         child: PullToRefreshList(
             emptyWidget: emptyWidget,

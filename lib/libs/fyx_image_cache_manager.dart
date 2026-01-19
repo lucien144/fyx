@@ -3,7 +3,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 class FyxImageCacheManager extends CacheManager with ImageCacheManager {
   static const String key = 'fyx_image_cache_manager';
 
-  static Config config = Config(
+  static Config instance = Config(
     key,
     stalePeriod: const Duration(days: 7),
     maxNrOfCacheObjects: 200,
@@ -12,5 +12,5 @@ class FyxImageCacheManager extends CacheManager with ImageCacheManager {
     fileService: HttpFileService(),
   );
 
-  FyxImageCacheManager() : super(config);
+  FyxImageCacheManager() : super(instance);
 }

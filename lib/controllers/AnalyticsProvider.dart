@@ -36,7 +36,7 @@ class AnalyticsProvider {
     await provider!.logTutorialComplete();
   }
 
-  Future<void> logEvent(String name, {Map<String, dynamic>? parameters}) async {
+  Future<void> logEvent(String name, {Map<String, Object>? parameters}) async {
     await provider!.logEvent(
       name: name,
       parameters: parameters

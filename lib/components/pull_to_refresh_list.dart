@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'package:fyx/components/premium_feature.dart';
 import 'package:fyx/components/search/search_notfound.dart';
 import 'package:fyx/components/search_box.dart';
 import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/FirstUnreadEnum.dart';
+import 'package:fyx/model/enums/premium_feature_enum.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -78,6 +80,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
   int _lastRebuild = 0;
   String? _searchTerm;
   bool _search = false;
+  final _scrollKey = UniqueKey();
   late AnimationController slideController;
   late Animation<Offset> slideOffset;
 
@@ -136,7 +139,9 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
 
   @override
   Widget build(BuildContext context) {
-    SkinColors colors = Skin.of(context).theme.colors;
+    final colors = Skin.of(context).theme.colors;
+    final width = MediaQuery.sizeOf(context).width;
+    final height = MediaQuery.sizeOf(context).height;
 
     if (widget._rebuild > _lastRebuild && !_isLoading) {
       setState(() => _lastRebuild = widget._rebuild);
@@ -189,10 +194,18 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
                   onNotification: (scrollInfo) {
                     if (scrollInfo is ScrollNotification) {
                       // Hide keyboard -> https://github.com/lucien144/fyx/issues/343
-                      FocusManager.instance.primaryFocus?.unfocus();
+                      // Only unfocus when user is actively dragging (not during layout changes from navigation)
+                      if (scrollInfo is ScrollUpdateNotification &&
+                          scrollInfo.dragDetails != null &&
+                          widget.searchEnabled &&
+                          (widget.searchTerm?.length ?? 0) > 2 &&
+                          MediaQuery.viewInsetsOf(context).bottom > 0) {
+                        FocusManager.instance.primaryFocus?.unfocus();
+                        debugPrint('Unfocus');
+                      }
 
                       // Hide the jump to first unread button if user scrolls twice the height of the screen height
-                      if (scrollInfo.metrics.pixels > 2 * MediaQuery.of(context).size.height) {
+                      if (scrollInfo.metrics.pixels > 2 * height) {
                         slideController.reverse();
                       }
 
@@ -211,6 +224,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
                     return false;
                   },
                   child: CupertinoScrollbar(
+                    key: _scrollKey,
                     controller: _controller,
                     child: CustomScrollView(
                       physics: Platform.isIOS ? const AlwaysScrollableScrollPhysics() : const RefreshScrollPhysics(),
@@ -227,7 +241,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
             _result!.jumpIndex >= kJumpButtonThreshold &&
             MainRepository().settings.firstUnread == FirstUnreadEnum.button)
           Positioned(
-              width: MediaQuery.of(context).size.width,
+              width: width,
               bottom: 0,
               left: 0,
               child: SlideTransition(
@@ -247,9 +261,13 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
                             blurRadius: 20.0,
                             offset: Offset(0, 0))
                       ], color: colors.primary, borderRadius: BorderRadius.vertical(top: Radius.circular(6))),
-                      child: Text(
-                        '↓ První nepřečtený',
-                        style: TextStyle(color: colors.background),
+                      child: PremiumFeature(
+                        feature: PremiumFeatureEnum.jumpToFirstUnread,
+                        color: colors.background,
+                        child: Text(
+                          '↓ První nepřečtený',
+                          style: TextStyle(color: colors.background),
+                        ),
                       ),
                       padding: const EdgeInsets.only(top: 16, left: 20, right: 20, bottom: 40),
                     ),
@@ -262,7 +280,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
             top: 0,
             left: 0,
             child: Container(
-              width: MediaQuery.of(context).size.width,
+              width: width,
               height: 1,
               child: LinearProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(colors.background),
@@ -371,7 +389,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
 
       // Add the pinned widget only if the list is active
       if (widget.pinnedWidget is Widget && !makeInactive) {
-        _slivers.insert(0, SliverToBoxAdapter(child: widget.pinnedWidget));
+        _slivers.insert(1, SliverToBoxAdapter(child: widget.pinnedWidget));
       }
 
       if (MainRepository().settings.firstUnread == FirstUnreadEnum.autoscroll &&

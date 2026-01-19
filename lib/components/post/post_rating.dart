@@ -28,7 +28,7 @@ class _PostRatingState extends State<PostRating> {
   Post? _post;
   bool _givingRating = false;
 
-  bool get makeDense => MediaQuery.of(context).textScaleFactor > 1 || MediaQuery.of(context).size.width <= 375;
+  bool get makeDense => MediaQuery.textScaleFactorOf(context) > 1 || MediaQuery.sizeOf(context).width <= 375;
   bool get isVelvetTime => DateTime.now().day == 17 && DateTime.now().month == 11;
 
   @override

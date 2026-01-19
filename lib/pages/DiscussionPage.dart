@@ -1,6 +1,7 @@
 import 'package:async/async.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,18 +9,26 @@ import 'package:fyx/components/discussion_page_scaffold.dart';
 import 'package:fyx/components/post/advertisement.dart';
 import 'package:fyx/components/post/post_list_item.dart';
 import 'package:fyx/components/post/syntax_highlighter.dart';
+import 'package:fyx/components/premium_feature.dart';
 import 'package:fyx/components/pull_to_refresh_list.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
+import 'package:fyx/controllers/SettingsProvider.dart';
+import 'package:fyx/controllers/drafts_service.dart';
+import 'package:fyx/features/message/domain/message_settings.dart';
+import 'package:fyx/features/message/presentation/message_screen.dart';
+import 'package:fyx/features/message/presentation/viewmodel/message_viewmodel.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/Settings.dart';
 import 'package:fyx/model/enums/DiscussionTypeEnum.dart';
+import 'package:fyx/model/enums/premium_feature_enum.dart';
 import 'package:fyx/model/post/content/Advertisement.dart';
+import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
-import 'package:fyx/pages/NewMessagePage.dart';
 import 'package:fyx/pages/discussion_home_page.dart';
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/state/batch_actions_provider.dart';
 import 'package:fyx/state/nsfw_provider.dart';
 import 'package:fyx/theme/L.dart';
@@ -28,6 +37,7 @@ import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:tap_canvas/tap_canvas.dart';
 
@@ -67,6 +77,9 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
 
   // Progress indicator if some posts are being deleted...
   bool _deleting = false;
+
+  // Missing keyboard workaround fix attempt
+  final _newMessage = MessageScreen(key: UniqueKey());
 
   Future<DiscussionResponse> _fetchData(discussionId, postId, user, {String? search, bool filterReplies = false}) {
     return this._memoizer.runOnce(() {
@@ -342,14 +355,27 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                           backgroundColor: colors.primary,
                           foregroundColor: colors.background,
                           child: Icon(discussionResponse.discussion.advertisement != null ? MdiIcons.reply : MdiIcons.plus),
-                          onPressed: () => Navigator.of(context).pushNamed('/new-message',
-                              arguments: NewMessageSettings(
-                                  onClose: this.refresh,
-                                  onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
-                                    var result =
-                                        await ApiController().postDiscussionMessage(pageArguments.discussionId, message, attachments: attachments);
-                                    return result.isOk;
-                                  })),
+                          onPressed: () {
+                            final viewModel = getIt<MessageViewModel>();
+                            viewModel.initializeFromSettings(MessageSettings(
+                                useMarkdown: MainRepository().credentials!.isPremiumUser && SettingsProvider().useMarkdown,
+                                draft: DraftsService().loadDiscussionMessage(pageArguments.discussionId),
+                                onDraftRemove: () => DraftsService().removeDiscussionMessage(pageArguments.discussionId),
+                                onCompose: (message) => DraftsService().saveDiscussionMessage(id: pageArguments.discussionId, message: message),
+                                onClose: this.refresh,
+                                onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                                  var result =
+                                      await ApiController().postDiscussionMessage(pageArguments.discussionId, message, attachments: attachments);
+                                  DraftsService().removeDiscussionMessage(pageArguments.discussionId);
+                                  return result.isOk;
+                                }));
+                            showCupertinoModalBottomSheet(
+                                context: context,
+                                backgroundColor: colors.barBackground,
+                                barrierColor: colors.dark.withOpacity(0.5),
+                                useRootNavigator: true,
+                                builder: (_) => _newMessage);
+                          },
                         ),
                     ],
                   ),
@@ -472,24 +498,49 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                               color: colors.grey,
                               height: 26,
                             ),
+                            PremiumFeature(
+                              feature: PremiumFeatureEnum.nsfw,
+                              child: GestureDetector(
+                                onTap: () => ref
+                                    .read(NsfwDiscussionList.provider.notifier)
+                                    .toggle(pageArguments.discussionId, discussionResponse.discussion.nameMain),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                        !ref.watch(NsfwDiscussionList.provider).containsKey(pageArguments.discussionId)
+                                            ? 'Označit za peprné'
+                                            : 'Označit za ne-peprné',
+                                        style: textStyleContext),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
+                                    Expanded(
+                                        child: Icon(!ref.watch(NsfwDiscussionList.provider).containsKey(pageArguments.discussionId)
+                                            ? MdiIcons.chiliHot
+                                            : MdiIcons.chiliOff)),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Divider(
+                              color: colors.grey,
+                              height: 26,
+                            ),
                             GestureDetector(
-                              onTap: () => ref
-                                  .read(NsfwDiscussionList.provider.notifier)
-                                  .toggle(pageArguments.discussionId, discussionResponse.discussion.nameMain),
+                              onTap: () {
+                                final url = 'https://nyx.cz/discussion/${pageArguments.discussionId}';
+                                Clipboard.setData(ClipboardData(text: url)).then((_) {
+                                  T.success('Odkaz zkopírován do schránky. $url.');
+                                });
+                                setState(() => this._popupMenu = false);
+                              },
                               child: Row(
                                 children: [
-                                  Text(
-                                      !ref.watch(NsfwDiscussionList.provider).containsKey(pageArguments.discussionId)
-                                          ? 'Označit za peprné'
-                                          : 'Označit za ne-peprné',
-                                      style: textStyleContext),
+                                  Text('Kopírovat odkaz', style: textStyleContext),
                                   SizedBox(
                                     width: 10,
                                   ),
-                                  Expanded(
-                                      child: Icon(!ref.watch(NsfwDiscussionList.provider).containsKey(pageArguments.discussionId)
-                                          ? MdiIcons.chiliHot
-                                          : MdiIcons.chiliOff)),
+                                  Expanded(child: Icon(MdiIcons.linkPlus)),
                                 ],
                               ),
                             ),
@@ -506,14 +557,36 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
   }
 
   Widget? getPinnedWidget(DiscussionResponse discussionResponse) {
-    switch (discussionResponse.discussion.advertisement.runtimeType) {
-      case ContentAdvertisement:
+    switch (true) {
+      case true when discussionResponse.discussion.advertisement.runtimeType == ContentAdvertisement:
         return Padding(
           padding: const EdgeInsets.all(16),
           child: Advertisement(
             discussionResponse.discussion.advertisement!,
             title: discussionResponse.discussion.name,
             username: discussionResponse.discussion.owner != null ? discussionResponse.discussion.owner!.username : '',
+          ),
+        );
+      case true when discussionResponse.discussion.idKlub == 24237 && !MainRepository().credentials!.isPremiumUser:
+        return GestureDetector(
+          onTap: () => T.openLink('https://fyx.144.wtf/#premium', mode: SettingsProvider().linksMode),
+          child: Container(
+            child: Row(
+              children: [
+                Icon(MdiIcons.pinOutline, color: colors.text, size: 18),
+                const SizedBox(width: 4),
+                RichText(
+                    text: TextSpan(
+                  style: Skin.of(context).theme.data.textTheme.textStyle.copyWith(fontSize: 12),
+                  children: [
+                    TextSpan(text: 'Informace o podpoře Fyxu na '),
+                    TextSpan(text: 'https://fyx.144.wtf', style: TextStyle(decoration: TextDecoration.underline)),
+                  ],
+                )),
+              ],
+            ),
+            color: colors.barBackground,
+            padding: const EdgeInsets.all(16),
           ),
         );
       default:
