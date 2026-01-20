@@ -26,7 +26,6 @@ class _VideoPlayerState extends State<VideoPlayer> {
   bool? $isVideoPlayerLoaded = false;
   VideoPlayerController? videoPlayerController;
   ChewieController? chewieController;
-  late SkinColors colors;
   late String? videoUrl;
   bool _blur = false;
 
@@ -90,7 +89,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    colors = Skin.of(context).theme.colors;
+    final colors = Skin.of(context).theme.colors;
     if (videoUrl?.isEmpty ?? true) {
       return T.somethingsWrongButton(widget.element.outerHtml);
     }
@@ -140,6 +139,8 @@ class _VideoPlayerState extends State<VideoPlayer> {
   }
 
   Widget _sourceButton() {
+    final colors = Skin.of(context).theme.colors;
+
     return GestureDetector(
       onTap: () => T.openLink(videoUrl!, mode: SettingsProvider().linksMode),
       child: Padding(

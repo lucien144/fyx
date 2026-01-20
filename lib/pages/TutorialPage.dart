@@ -25,7 +25,6 @@ class TutorialPage extends StatefulWidget {
 
 class _TutorialPageState extends State<TutorialPage> {
   final CarouselSliderController _carouselController = CarouselSliderController();
-  late SkinColors colors;
   List<Widget> _slides = [];
 
   bool _loggingIn = false;
@@ -40,6 +39,8 @@ class _TutorialPageState extends State<TutorialPage> {
   }
 
   void buildSlider() {
+    final colors = Skin.of(context).theme.colors;
+
     setState(() {
       _slides = [
         this.slide(
@@ -94,7 +95,7 @@ class _TutorialPageState extends State<TutorialPage> {
 
   @override
   Widget build(BuildContext context) {
-    colors = Skin.of(context).theme.colors;
+    final colors = Skin.of(context).theme.colors;
 
     if (_arguments == null) {
       _arguments = ModalRoute.of(context)!.settings.arguments as TutorialPageArguments?;
@@ -152,6 +153,8 @@ class _TutorialPageState extends State<TutorialPage> {
   }
 
   Widget slideButton(String label, {Widget? icon, Function? onTap}) {
+    final colors = Skin.of(context).theme.colors;
+
     Widget? body;
     Text text = Text(
       label,
@@ -181,6 +184,8 @@ class _TutorialPageState extends State<TutorialPage> {
   }
 
   Widget slide(String title, String copy, Widget footer) {
+    final colors = Skin.of(context).theme.colors;
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -199,10 +204,13 @@ class _TutorialPageState extends State<TutorialPage> {
   }
 
   Widget slideCard(Widget child) {
+    final colors = Skin.of(context).theme.colors;
     return Container(height: 250, padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16), decoration: colors.shadow, child: child);
   }
 
   Widget slideToken(String title) {
+    final colors = Skin.of(context).theme.colors;
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -252,6 +260,8 @@ class _TutorialPageState extends State<TutorialPage> {
   }
 
   Widget slideTutorial(String title, int step, String copy) {
+    final colors = Skin.of(context).theme.colors;
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.stretch,
