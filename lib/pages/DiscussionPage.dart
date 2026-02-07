@@ -2,7 +2,6 @@ import 'package:async/async.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fyx/components/discussion_page_scaffold.dart';
@@ -25,16 +24,14 @@ import 'package:fyx/model/Settings.dart';
 import 'package:fyx/model/enums/DiscussionTypeEnum.dart';
 import 'package:fyx/model/enums/premium_feature_enum.dart';
 import 'package:fyx/model/post/content/Advertisement.dart';
-import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/pages/discussion_home_page.dart';
-import 'package:fyx/shared/services/service_locator.dart';
+import 'package:fyx/shared/services/service_locator.dart' as DI;
 import 'package:fyx/state/batch_actions_provider.dart';
 import 'package:fyx/state/nsfw_provider.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
-import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -82,8 +79,12 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
 
   Future<DiscussionResponse> _fetchData(discussionId, postId, user, {String? search, bool filterReplies = false}) {
     return this._memoizer.runOnce(() {
-      return Future.delayed(Duration(milliseconds: 300),
-          () => ApiController().loadDiscussion(discussionId, lastId: postId, user: user, search: search, filterReplies: filterReplies));
+      return Future.delayed(Duration(milliseconds: 300), () {
+        var response = ApiController().loadDiscussion(discussionId, lastId: postId, user: user, search: search, filterReplies: filterReplies);
+        response.then(
+            (discussion) => DI.userstatsRepo.trackDiscussionVisit(DateTime.now().year, discussion.discussion.idKlub, discussion.discussion.name));
+        return response;
+      });
     });
   }
 
@@ -356,7 +357,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                           foregroundColor: colors.background,
                           child: Icon(discussionResponse.discussion.advertisement != null ? MdiIcons.reply : MdiIcons.plus),
                           onPressed: () {
-                            final viewModel = getIt<MessageViewModel>();
+                            final viewModel = DI.getIt<MessageViewModel>();
                             viewModel.initializeFromSettings(MessageSettings(
                                 useMarkdown: MainRepository().credentials!.isPremiumUser && SettingsProvider().useMarkdown,
                                 draft: DraftsService().loadDiscussionMessage(pageArguments.discussionId),
