@@ -1,6 +1,8 @@
 /// Enum representing types of global statistics
 enum GlobalStatType {
-  totalScrollPx('total_scroll_px');
+  totalScrollPx('total_scroll_px'),
+  likes('likes'),
+  dislikes('dislikes');
 
   final String value;
 

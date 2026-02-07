@@ -6,7 +6,10 @@ import 'package:fyx/components/gesture_feedback.dart';
 import 'package:fyx/components/post/rating_value.dart';
 import 'package:fyx/components/text_icon.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/features/userstats/domain/entities/global_stat.dart';
+import 'package:fyx/features/userstats/domain/enums/global_stat_type.dart';
 import 'package:fyx/model/Post.dart';
+import 'package:fyx/shared/services/service_locator.dart' as DI;
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -62,6 +65,15 @@ class _PostRatingState extends State<PostRating> {
     );
   }
 
+
+  _saveLikingStats(bool like, bool remove) {
+    if (like) {
+      DI.userstatsRepo.upsertGlobalStat(GlobalStat(year: DateTime.now().year, statType: GlobalStatType.likes.value, number: remove ? -1 : 1));
+    } else {
+      DI.userstatsRepo.upsertGlobalStat(GlobalStat(year: DateTime.now().year, statType: GlobalStatType.dislikes.value, number: remove ? -1 : 1));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     SkinColors colors = Skin.of(context).theme.colors;
@@ -91,13 +103,15 @@ class _PostRatingState extends State<PostRating> {
                     ? null
                     : () {
                         setState(() => _givingRating = true);
-                        ApiController().giveRating(_post!.idKlub, _post!.id, remove: _post!.myRating == 'positive').then((response) {
+                        var removing = _post!.myRating == 'positive';
+                        ApiController().giveRating(_post!.idKlub, _post!.id, remove: removing).then((response) {
                           setState(() {
                             _post!.rating = response.currentRating;
                             _post!.myRating = response.myRating;
                           });
                           if (widget.onRatingChange != null) {
                             widget.onRatingChange!(_post);
+                            _saveLikingStats(true, removing);
                           }
                         }).catchError((error) {
                           print(error);
@@ -117,7 +131,8 @@ class _PostRatingState extends State<PostRating> {
                     ? null
                     : () {
                         setState(() => _givingRating = true);
-                        ApiController().giveRating(_post!.idKlub, _post!.id, positive: false, remove: _post!.myRating.startsWith('negative')).then((response) {
+                        var removing = _post!.myRating.startsWith('negative');
+                        ApiController().giveRating(_post!.idKlub, _post!.id, positive: false, remove: removing).then((response) {
                           if (response.needsConfirmation) {
                             showCupertinoDialog(
                               context: context,
@@ -146,6 +161,7 @@ class _PostRatingState extends State<PostRating> {
                                           });
                                           if (widget.onRatingChange != null) {
                                             widget.onRatingChange!(_post);
+                                            _saveLikingStats(false, removing);
                                           }
                                         }).catchError((error) {
                                           print(error);
@@ -166,6 +182,7 @@ class _PostRatingState extends State<PostRating> {
                             });
                             if (widget.onRatingChange != null) {
                               widget.onRatingChange!(_post);
+                              _saveLikingStats(false, removing);
                             }
                           }
                         }).catchError((error) {

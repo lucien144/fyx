@@ -205,7 +205,7 @@ class _BottomTabBarState extends State<BottomTabBar> {
                         ],
                       ))),
               Expanded(
-                  child: GestureDetector(
+                  child: (MainRepository().credentials?.isBetaTester ?? false) ? GestureDetector(
                       behavior: HitTestBehavior.opaque,
                       onTap: () {
                         showCupertinoModalBottomSheet(
@@ -225,7 +225,7 @@ class _BottomTabBarState extends State<BottomTabBar> {
                             style: TextStyle(fontSize: 11, color: colors.grey),
                           )
                         ],
-                      ))),
+                      )) : Container()),
               Expanded(child: Container()),
             ],
           )

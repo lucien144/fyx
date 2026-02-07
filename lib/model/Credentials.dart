@@ -28,6 +28,8 @@ class Credentials {
 
   String get nickname => _nickname.toUpperCase();
 
+  bool get isBetaTester => RegExp(r"FYXBOT|LUCIEN|LOJZA|KEJML|S2FI|MR_PREWEET|PULKA", caseSensitive: false).hasMatch(_nickname);
+
   String get avatar => Helpers.avatarUrl(nickname);
 
   bool get isValid => _token.isNotEmpty && _nickname.length >= 3;

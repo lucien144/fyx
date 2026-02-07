@@ -26,10 +26,12 @@ class UserStatsModal extends StatelessWidget {
       builder: (_, data) {
         if (data.hasData && data.data != null) {
           var stats = data.data!;
-
           var km = _pxToKm(stats.valueOf(GlobalStatType.totalScrollPx), MediaQuery.devicePixelRatioOf(context));
+
           return ListView(shrinkWrap: true, padding: const EdgeInsets.only(left: 32, top: 32, right: 32, bottom: 48), children: [
             Text('Kilometráž: ${km * 1000 < 1 ? [(km * 1000).toStringAsFixed(4), 'm'].join() : [km.toStringAsFixed(2), 'km'].join()}'),
+            Text('Lajků: ${stats.valueOf(GlobalStatType.likes)}'),
+            Text('Disslajků: ${stats.valueOf(GlobalStatType.dislikes)}'),
           ]);
         }
 
