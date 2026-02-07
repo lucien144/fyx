@@ -8,7 +8,7 @@ Fyx is an unofficial mobile client (Android & iOS) for the Czech discussion serv
 
 - **Flutter Version**: ^3.3.0
 - **Dart SDK**: >=3.0.0 <4.0.0
-- **Current Version**: 11.1.2+180
+- **Current Version**: 12.0.0+181
 - **Target Platforms**: iOS 15.0+, Android API 21+, Android SDK 35
 - **NDK Version**: 27.0.12077973
 
@@ -119,6 +119,13 @@ fvm flutter pub run build_runner watch
 - Enums in `lib/model/enums/`
 - Hive is used for local storage (see generated `.g.dart` files)
 
+**Features (Clean Architecture)**:
+- `lib/features/` - Feature modules following Clean Architecture
+- Each feature has `domain/` (entities, repositories interfaces), `data/` (models, repository implementations, datasources), and `presentation/` layers
+- Uses `freezed` for immutable entities/models with code generation
+- Uses `sqflite` for SQLite database storage
+- Example: `lib/features/userstats/` - User statistics tracking (scroll distance, likes, discussion visits, daily usage streaks)
+
 **Pages (Screens)**:
 - `lib/pages/HomePage.dart` - Main tabbed interface
 - `lib/pages/DiscussionPage.dart` - Discussion/thread view
@@ -160,6 +167,11 @@ fvm flutter pub run build_runner watch
 - `lib/controllers/drafts_service.dart` - Draft post persistence
 - `lib/controllers/log_service.dart` - Logging abstraction with Firebase provider
 - `lib/controllers/AnalyticsProvider.dart` - Analytics wrapper
+
+### Dependency Injection
+
+- `lib/shared/services/service_locator.dart` - GetIt DI container setup
+- Global accessor: `userstatsRepo` for UserstatsRepository
 
 ### Repository Pattern
 
