@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/avatar.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/features/userstats/presentation/user_stats_modal.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/theme/L.dart';
@@ -9,6 +10,7 @@ import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class BottomTabBar extends StatefulWidget {
   final List items;
@@ -59,7 +61,11 @@ class _BottomTabBarState extends State<BottomTabBar> {
                   MainRepository().credentials!.nickname.toUpperCase(),
                   style: TextStyle(fontSize: 14),
                 ),
-                if(MainRepository().credentials!.isPremiumUser) Icon(MdiIcons.starFourPoints, size: 10,),
+                if (MainRepository().credentials!.isPremiumUser)
+                  Icon(
+                    MdiIcons.starFourPoints,
+                    size: 10,
+                  ),
               ],
             ),
             GestureDetector(
@@ -198,7 +204,28 @@ class _BottomTabBarState extends State<BottomTabBar> {
                           )
                         ],
                       ))),
-              Expanded(child: Container()),
+              Expanded(
+                  child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        showCupertinoModalBottomSheet(
+                          context: context,
+                          expand: false,
+                          builder: (context) => UserStatsModal(),
+                          backgroundColor: colors.barBackground,
+                          barrierColor: colors.dark.withOpacity(0.5),
+                        );
+                        AnalyticsProvider().logEvent('userStats');
+                      },
+                      child: Column(
+                        children: [
+                          Icon(MdiIcons.chartDonut, size: 34, color: colors.grey),
+                          Text(
+                            'Statistiky',
+                            style: TextStyle(fontSize: 11, color: colors.grey),
+                          )
+                        ],
+                      ))),
               Expanded(child: Container()),
             ],
           )

@@ -85,6 +85,8 @@ dependencies:
   supabase_flutter: ^2.10.3
   flutter_it: ^2.1.1
   modal_bottom_sheet: ^3.0.0
+  sqflite: ^2.4.2
+  freezed: ^2.5.7
 
 dependency_overrides:
   intl: any
