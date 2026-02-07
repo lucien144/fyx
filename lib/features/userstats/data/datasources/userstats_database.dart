@@ -4,11 +4,12 @@ import 'package:sqflite/sqflite.dart';
 /// SQLite database helper for user statistics
 class UserstatsDatabase {
   static const String _databaseName = 'userstats.db';
-  static const int _databaseVersion = 2;
+  static const int _databaseVersion = 4;
 
   // Table names
   static const String tableGlobals = 'globals';
   static const String tableDiscussionVisits = 'discussion_visits';
+  static const String tableDailyUsage = 'daily_usage';
 
   // Column names for globals table
   static const String columnYear = 'year';
@@ -19,6 +20,9 @@ class UserstatsDatabase {
   static const String columnDiscussionId = 'discussion_id';
   static const String columnDiscussionName = 'discussion_name';
   static const String columnVisits = 'visits';
+
+  // Column names for daily_usage table
+  static const String columnDate = 'date';
 
   Database? _database;
 
@@ -45,12 +49,19 @@ class UserstatsDatabase {
   Future<void> _onCreate(Database db, int version) async {
     await _createGlobalsTable(db);
     await _createDiscussionVisitsTable(db);
+    await _createDailyUsageTable(db);
   }
 
   /// Handle database migrations
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await _createDiscussionVisitsTable(db);
+    }
+    if (oldVersion < 3) {
+      await _createDailyUsageTable(db);
+    }
+    if (oldVersion < 4) {
+      await _migrateDailyUsageAddYear(db);
     }
   }
 
@@ -77,6 +88,42 @@ class UserstatsDatabase {
         PRIMARY KEY ($columnYear, $columnDiscussionId)
       )
     ''');
+  }
+
+  /// Create daily_usage table
+  Future<void> _createDailyUsageTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE $tableDailyUsage (
+        $columnYear INTEGER NOT NULL,
+        $columnDate TEXT NOT NULL,
+        PRIMARY KEY ($columnYear, $columnDate)
+      )
+    ''');
+  }
+
+  /// Migration: Add year column to daily_usage table
+  Future<void> _migrateDailyUsageAddYear(Database db) async {
+    // Create new table with year column
+    await db.execute('''
+      CREATE TABLE ${tableDailyUsage}_new (
+        $columnYear INTEGER NOT NULL,
+        $columnDate TEXT NOT NULL,
+        PRIMARY KEY ($columnYear, $columnDate)
+      )
+    ''');
+
+    // Copy data from old table, extracting year from date (YYYY-MM-DD)
+    await db.execute('''
+      INSERT INTO ${tableDailyUsage}_new ($columnYear, $columnDate)
+      SELECT CAST(substr($columnDate, 1, 4) AS INTEGER), $columnDate
+      FROM $tableDailyUsage
+    ''');
+
+    // Drop old table
+    await db.execute('DROP TABLE $tableDailyUsage');
+
+    // Rename new table
+    await db.execute('ALTER TABLE ${tableDailyUsage}_new RENAME TO $tableDailyUsage');
   }
 
   /// Close database connection

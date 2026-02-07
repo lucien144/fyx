@@ -1,9 +1,12 @@
 import 'package:fyx/features/userstats/data/datasources/userstats_database.dart';
+import 'package:fyx/features/userstats/data/models/daily_usage_model.dart';
 import 'package:fyx/features/userstats/data/models/discussion_visit_model.dart';
 import 'package:fyx/features/userstats/data/models/global_stat_model.dart';
+import 'package:fyx/features/userstats/domain/entities/daily_usage.dart';
 import 'package:fyx/features/userstats/domain/entities/discussion_visit.dart';
 import 'package:fyx/features/userstats/domain/entities/global_stat.dart';
 import 'package:fyx/features/userstats/domain/repositories/userstats_repository.dart';
+import 'package:sqflite/sqflite.dart';
 
 /// Implementation of UserstatsRepository using SQLite
 class UserstatsRepositoryImpl implements UserstatsRepository {
@@ -121,5 +124,49 @@ class UserstatsRepositoryImpl implements UserstatsRepository {
   Future<void> clearAllDiscussionVisits() async {
     final db = await _database.database;
     await db.delete(UserstatsDatabase.tableDiscussionVisits);
+  }
+
+  // ==================== Daily Usage ====================
+
+  @override
+  Future<List<DailyUsage>> getAllDailyUsage() async {
+    final db = await _database.database;
+    final maps = await db.query(
+      UserstatsDatabase.tableDailyUsage,
+      orderBy: '${UserstatsDatabase.columnYear} ASC, ${UserstatsDatabase.columnDate} ASC',
+    );
+    return maps.map((map) => DailyUsageModel.fromMap(map).toEntity()).toList();
+  }
+
+  @override
+  Future<List<DailyUsage>> getDailyUsageByYear(int year) async {
+    final db = await _database.database;
+    final maps = await db.query(
+      UserstatsDatabase.tableDailyUsage,
+      where: '${UserstatsDatabase.columnYear} = ?',
+      whereArgs: [year],
+      orderBy: '${UserstatsDatabase.columnDate} ASC',
+    );
+    return maps.map((map) => DailyUsageModel.fromMap(map).toEntity()).toList();
+  }
+
+  @override
+  Future<void> trackDailyUsage() async {
+    final db = await _database.database;
+    final now = DateTime.now();
+    await db.insert(
+      UserstatsDatabase.tableDailyUsage,
+      {
+        UserstatsDatabase.columnYear: now.year,
+        UserstatsDatabase.columnDate: DailyUsageModel.todayFormatted(),
+      },
+      conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
+  }
+
+  @override
+  Future<void> clearAllDailyUsage() async {
+    final db = await _database.database;
+    await db.delete(UserstatsDatabase.tableDailyUsage);
   }
 }

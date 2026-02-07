@@ -1,3 +1,4 @@
+import 'package:fyx/features/userstats/domain/entities/daily_usage.dart';
 import 'package:fyx/features/userstats/domain/entities/discussion_visit.dart';
 import 'package:fyx/features/userstats/domain/entities/global_stat.dart';
 
@@ -39,4 +40,18 @@ abstract class UserstatsRepository {
 
   /// Clear all discussion visits
   Future<void> clearAllDiscussionVisits();
+
+  // ==================== Daily Usage ====================
+
+  /// Get all daily usage records
+  Future<List<DailyUsage>> getAllDailyUsage();
+
+  /// Get daily usage records by year
+  Future<List<DailyUsage>> getDailyUsageByYear(int year);
+
+  /// Track usage for today (idempotent - safe to call multiple times per day)
+  Future<void> trackDailyUsage();
+
+  /// Clear all daily usage records
+  Future<void> clearAllDailyUsage();
 }

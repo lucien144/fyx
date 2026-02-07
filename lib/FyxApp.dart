@@ -36,6 +36,7 @@ import 'package:fyx/pages/search_page.dart';
 import 'package:fyx/pages/settings_design_screen.dart';
 import 'package:fyx/pages/settings_screen.dart';
 import 'package:fyx/pages/tab_bar/MailboxTab.dart';
+import 'package:fyx/shared/services/service_locator.dart' as DI;
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/skins/ForestSkin.dart';
@@ -174,6 +175,7 @@ class FyxApp extends StatefulWidget {
     }
 
     AnalyticsProvider.provider = analytics;
+    DI.userstatsRepo.trackDailyUsage();
   }
 
   static Route routes(RouteSettings settings) {
