@@ -4,12 +4,13 @@ import 'package:sqflite/sqflite.dart';
 /// SQLite database helper for user statistics
 class UserstatsDatabase {
   static const String _databaseName = 'userstats.db';
-  static const int _databaseVersion = 4;
+  static const int _databaseVersion = 5;
 
   // Table names
   static const String tableGlobals = 'globals';
   static const String tableDiscussionVisits = 'discussion_visits';
   static const String tableDailyUsage = 'daily_usage';
+  static const String tableHourlyUsage = 'hourly_usage';
 
   // Column names for globals table
   static const String columnYear = 'year';
@@ -23,6 +24,10 @@ class UserstatsDatabase {
 
   // Column names for daily_usage table
   static const String columnDate = 'date';
+
+  // Column names for hourly_usage table
+  static const String columnHour = 'hour';
+  static const String columnCount = 'count';
 
   Database? _database;
 
@@ -50,6 +55,7 @@ class UserstatsDatabase {
     await _createGlobalsTable(db);
     await _createDiscussionVisitsTable(db);
     await _createDailyUsageTable(db);
+    await _createHourlyUsageTable(db);
   }
 
   /// Handle database migrations
@@ -62,6 +68,9 @@ class UserstatsDatabase {
     }
     if (oldVersion < 4) {
       await _migrateDailyUsageAddYear(db);
+    }
+    if (oldVersion < 5) {
+      await _createHourlyUsageTable(db);
     }
   }
 
@@ -97,6 +106,18 @@ class UserstatsDatabase {
         $columnYear INTEGER NOT NULL,
         $columnDate TEXT NOT NULL,
         PRIMARY KEY ($columnYear, $columnDate)
+      )
+    ''');
+  }
+
+  /// Create hourly_usage table
+  Future<void> _createHourlyUsageTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE $tableHourlyUsage (
+        $columnYear INTEGER NOT NULL,
+        $columnHour INTEGER NOT NULL,
+        $columnCount INTEGER NOT NULL,
+        PRIMARY KEY ($columnYear, $columnHour)
       )
     ''');
   }

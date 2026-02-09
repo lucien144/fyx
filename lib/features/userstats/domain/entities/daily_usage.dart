@@ -76,4 +76,21 @@ extension DailyUsageListExtension on List<DailyUsage> {
 
   /// Total number of active days
   int get totalDays => length;
+
+  /// Convert to a map of weekday (1=Monday, 7=Sunday) → number of active days
+  Map<int, int> toWeekdayMap() {
+    final map = {for (var i = 1; i <= 7; i++) i: 0};
+    for (final usage in this) {
+      final weekday = usage.date.weekday;
+      map[weekday] = map[weekday]! + 1;
+    }
+    return map;
+  }
+
+  /// Get the most active weekday (1=Monday, 7=Sunday), returns -1 if empty
+  int get peakWeekday {
+    if (isEmpty) return -1;
+    final weekdayMap = toWeekdayMap();
+    return weekdayMap.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
+  }
 }

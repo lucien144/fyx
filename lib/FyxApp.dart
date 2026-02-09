@@ -176,6 +176,7 @@ class FyxApp extends StatefulWidget {
 
     AnalyticsProvider.provider = analytics;
     DI.userstatsRepo.trackDailyUsage();
+    DI.userstatsRepo.trackHourlyUsage();
   }
 
   static Route routes(RouteSettings settings) {
@@ -298,5 +299,14 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
   void didChangePlatformBrightness() {
     setState(() => _platformBrightness = WidgetsBinding.instance.window.platformBrightness);
     super.didChangePlatformBrightness(); // make sure you call this
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      DI.userstatsRepo.trackHourlyUsage();
+      DI.userstatsRepo.trackDailyUsage();
+    }
+    super.didChangeAppLifecycleState(state);
   }
 }
