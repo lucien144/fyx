@@ -58,10 +58,22 @@ class UserStatsModal extends StatelessWidget {
 
           return ListView(shrinkWrap: true, padding: const EdgeInsets.only(left: 32, top: 32, right: 32, bottom: 48), children: [
             Text('Doomscrolling: ${km < 1 ? [(km * 1000).toStringAsFixed(4), 'm'].join() : [km.toStringAsFixed(4), 'km'].join()}'),
+            const SizedBox(height: 8),
             Text('Lajků: ${globalStats.valueOf(GlobalStatType.likes)}'),
             Text('Disslajků: ${globalStats.valueOf(GlobalStatType.dislikes)}'),
+            const SizedBox(height: 8),
+            Text('Přispěvky - nové: ${globalStats.valueOf(GlobalStatType.postsCreated)}'),
+            Text('Přispěvky - odpovědi: ${globalStats.valueOf(GlobalStatType.postReplies)}'),
+            Text('Přispěvky - příloh: ${globalStats.valueOf(GlobalStatType.postAttachments)}'),
+            Text('Přispěvky - délka: ${globalStats.valueOf(GlobalStatType.postsLength)}'),
+            const SizedBox(height: 8),
+            Text('Pošta - nové: ${globalStats.valueOf(GlobalStatType.mailsCreated)}'),
+            Text('Pošta - příloh: ${globalStats.valueOf(GlobalStatType.mailAttachments)}'),
+            Text('Pošta - délka: ${globalStats.valueOf(GlobalStatType.mailsLength)}'),
+            const SizedBox(height: 8),
             Text('Longest streak: ${dailyUsage.longestStreak}'),
             Text('Current streak: ${dailyUsage.currentStreak}'),
+            const SizedBox(height: 8),
             if (peakHour >= 0) Text('Nejaktivnější hodina: $peakHour:00'),
             if (peakWeekday >= 0) Text('Nejaktivnější den: ${_weekdayNames[peakWeekday]}'),
             Column(

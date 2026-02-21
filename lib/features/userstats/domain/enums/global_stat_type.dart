@@ -2,7 +2,14 @@
 enum GlobalStatType {
   totalScrollPx('total_scroll_px'),
   likes('likes'),
-  dislikes('dislikes');
+  dislikes('dislikes'),
+  postsCreated('posts_created'),
+  postReplies('post_replies'),
+  postsLength('posts_length'),
+  postAttachments('post_attachments'),
+  mailsCreated('mails_created'),
+  mailsLength('mails_length'),
+  mailAttachments('mail_attachments');
 
   final String value;
 
