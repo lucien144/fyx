@@ -37,6 +37,14 @@ class UserStatsModal extends StatelessWidget {
     12: 'Prosinec',
   };
 
+  /// Format seconds into human-readable duration (e.g. "3h 25m")
+  String _formatDuration(int seconds) {
+    final h = seconds ~/ 3600;
+    final m = (seconds % 3600) ~/ 60;
+    if (h > 0) return '${h}h ${m}m';
+    return '${m}m';
+  }
+
   /// Convert logical pixels to kilometers
   /// devicePixelRatio - from MediaQuery.devicePixelRatioOf
   double _pxToKm(int pixels, double devicePixelRatio) {
@@ -76,6 +84,7 @@ class UserStatsModal extends StatelessWidget {
             Text('Doomscrolling: ${km < 1 ? [(km * 1000).toStringAsFixed(4), 'm'].join() : [km.toStringAsFixed(4), 'km'].join()}'),
             Text('Spuštění aplikace: ${globalStats.valueOf(GlobalStatType.appLaunches)}'),
             Text('Otevření galerie: ${globalStats.valueOf(GlobalStatType.galleryOpens)}'),
+            Text('Čas v aplikaci: ${_formatDuration(globalStats.valueOf(GlobalStatType.sessionDurationSeconds))}'),
             const SizedBox(height: 8),
             Text('Lajků: ${globalStats.valueOf(GlobalStatType.likes)}'),
             Text('Disslajků: ${globalStats.valueOf(GlobalStatType.dislikes)}'),

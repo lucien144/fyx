@@ -11,7 +11,8 @@ enum GlobalStatType {
   mailsLength('mails_length'),
   mailAttachments('mail_attachments'),
   appLaunches('app_launches'),
-  galleryOpens('gallery_opens');
+  galleryOpens('gallery_opens'),
+  sessionDurationSeconds('session_duration_seconds');
 
   final String value;
 

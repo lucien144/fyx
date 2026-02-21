@@ -252,12 +252,14 @@ class FyxApp extends StatefulWidget {
 
 class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
   Brightness? _platformBrightness;
+  DateTime? _resumedAt;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _platformBrightness ??= WidgetsBinding.instance.window.platformBrightness;
+    _resumedAt = DateTime.now();
   }
 
   @override
@@ -307,8 +309,14 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      _resumedAt = DateTime.now();
       DI.userstatsRepo.trackHourlyUsage();
       DI.userstatsRepo.trackDailyUsage();
+    }
+    if (state == AppLifecycleState.paused && _resumedAt != null) {
+      final seconds = DateTime.now().difference(_resumedAt!).inSeconds;
+      DI.userstatsRepo.upsertGlobalStat(GlobalStat(year: DateTime.now().year, statType: GlobalStatType.sessionDurationSeconds.value, number: seconds));
+      _resumedAt = null;
     }
     super.didChangeAppLifecycleState(state);
   }
