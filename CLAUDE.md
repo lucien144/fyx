@@ -124,7 +124,7 @@ fvm flutter pub run build_runner watch
 - Each feature has `domain/` (entities, repositories interfaces), `data/` (models, repository implementations, datasources), and `presentation/` layers
 - Uses `freezed` for immutable entities/models with code generation
 - Uses `sqflite` for SQLite database storage
-- Example: `lib/features/userstats/` - User statistics tracking (scroll distance, likes, discussion visits, daily usage streaks)
+- Example: `lib/features/userstats/` - User statistics tracking (scroll distance, likes, discussion visits, daily usage streaks, hourly usage, weekday activity, posts/mails counts)
 
 **Pages (Screens)**:
 - `lib/pages/HomePage.dart` - Main tabbed interface
@@ -189,6 +189,31 @@ This repository uses **Gitflow**:
 - Submit PRs to `develop` (not `master`)
 - PRs are squash-merged by admins only
 - CI/CD builds trigger on tags matching `vX.Y.Z+XXX` format
+
+### Userstats Feature
+
+- **Database**: `lib/features/userstats/data/datasources/userstats_database.dart` - SQLite with versioned migrations (currently v5)
+- **Adding new simple stats**: Add a value to `GlobalStatType` enum in `lib/features/userstats/domain/enums/global_stat_type.dart`, then call `userstatsRepo.upsertGlobalStat()` — no DB migration needed (uses existing `globals` table)
+- **Adding new tables**: Requires DB version bump and migration in `_onUpgrade`, plus new entity, model, repository methods
+- **Tracking locations**:
+  - `FyxApp.init()` — cold start: `trackDailyUsage()`, `trackHourlyUsage()`, `appLaunches`
+  - `_FyxAppState.didChangeAppLifecycleState(resumed)` — resume from background: `trackHourlyUsage()`, `trackDailyUsage()`
+  - `GalleryScreen.initState()` — `galleryOpens`
+  - `post_list_item.dart` — `likes` / `dislikes` (rating toggle)
+  - Posts/mails tracking (`postsCreated`, `postReplies`, `postsLength`, `postAttachments`, `mailsCreated`, `mailsLength`, `mailAttachments`) — integrate manually at send points
+
+- **Implemented `GlobalStatType` values**:
+  - `totalScrollPx` — scroll distance in pixels
+  - `likes` / `dislikes` — rating toggles
+  - `postsCreated` / `postReplies` / `postsLength` / `postAttachments` — post statistics
+  - `mailsCreated` / `mailsLength` / `mailAttachments` — mail statistics
+  - `appLaunches` — cold starts
+  - `galleryOpens` — gallery/image opens
+
+- **Derived statistics** (no DB, computed from existing tables):
+  - `DailyUsageListExtension.peakWeekday` — most active weekday (1–7), from `daily_usage`
+  - `DailyUsageListExtension.peakMonth` — most active month (1–12), from `daily_usage`
+  - `HourlyUsageListExtension.peakHour` — most active hour (0–23), from `hourly_usage`
 
 ## Common Gotchas
 
