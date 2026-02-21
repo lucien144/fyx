@@ -9,7 +9,9 @@ enum GlobalStatType {
   postAttachments('post_attachments'),
   mailsCreated('mails_created'),
   mailsLength('mails_length'),
-  mailAttachments('mail_attachments');
+  mailAttachments('mail_attachments'),
+  appLaunches('app_launches'),
+  galleryOpens('gallery_opens');
 
   final String value;
 

@@ -22,6 +22,21 @@ class UserStatsModal extends StatelessWidget {
     7: 'Neděle',
   };
 
+  static const _monthNames = {
+    1: 'Leden',
+    2: 'Únor',
+    3: 'Březen',
+    4: 'Duben',
+    5: 'Květen',
+    6: 'Červen',
+    7: 'Červenec',
+    8: 'Srpen',
+    9: 'Září',
+    10: 'Říjen',
+    11: 'Listopad',
+    12: 'Prosinec',
+  };
+
   /// Convert logical pixels to kilometers
   /// devicePixelRatio - from MediaQuery.devicePixelRatioOf
   double _pxToKm(int pixels, double devicePixelRatio) {
@@ -55,9 +70,12 @@ class UserStatsModal extends StatelessWidget {
 
           final peakHour = hourlyUsage.peakHour;
           final peakWeekday = dailyUsage.peakWeekday;
+          final peakMonth = dailyUsage.peakMonth;
 
           return ListView(shrinkWrap: true, padding: const EdgeInsets.only(left: 32, top: 32, right: 32, bottom: 48), children: [
             Text('Doomscrolling: ${km < 1 ? [(km * 1000).toStringAsFixed(4), 'm'].join() : [km.toStringAsFixed(4), 'km'].join()}'),
+            Text('Spuštění aplikace: ${globalStats.valueOf(GlobalStatType.appLaunches)}'),
+            Text('Otevření galerie: ${globalStats.valueOf(GlobalStatType.galleryOpens)}'),
             const SizedBox(height: 8),
             Text('Lajků: ${globalStats.valueOf(GlobalStatType.likes)}'),
             Text('Disslajků: ${globalStats.valueOf(GlobalStatType.dislikes)}'),
@@ -76,6 +94,7 @@ class UserStatsModal extends StatelessWidget {
             const SizedBox(height: 8),
             if (peakHour >= 0) Text('Nejaktivnější hodina: $peakHour:00'),
             if (peakWeekday >= 0) Text('Nejaktivnější den: ${_weekdayNames[peakWeekday]}'),
+            if (peakMonth >= 0) Text('Nejaktivnější měsíc: ${_monthNames[peakMonth]}'),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

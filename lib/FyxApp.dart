@@ -15,6 +15,8 @@ import 'package:fyx/controllers/drafts_service.dart';
 import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/features/gallery/presentation/gallery_screen.dart';
 import 'package:fyx/features/message/presentation/message_screen.dart';
+import 'package:fyx/features/userstats/domain/entities/global_stat.dart';
+import 'package:fyx/features/userstats/domain/enums/global_stat_type.dart';
 import 'package:fyx/libs/DeviceInfo.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
@@ -177,6 +179,7 @@ class FyxApp extends StatefulWidget {
     AnalyticsProvider.provider = analytics;
     DI.userstatsRepo.trackDailyUsage();
     DI.userstatsRepo.trackHourlyUsage();
+    DI.userstatsRepo.upsertGlobalStat(GlobalStat(year: DateTime.now().year, statType: GlobalStatType.appLaunches.value, number: 1));
   }
 
   static Route routes(RouteSettings settings) {

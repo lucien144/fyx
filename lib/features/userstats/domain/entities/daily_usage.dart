@@ -93,4 +93,21 @@ extension DailyUsageListExtension on List<DailyUsage> {
     final weekdayMap = toWeekdayMap();
     return weekdayMap.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
   }
+
+  /// Convert to a map of month (1-12) → number of active days
+  Map<int, int> toMonthMap() {
+    final map = {for (var i = 1; i <= 12; i++) i: 0};
+    for (final usage in this) {
+      final month = usage.date.month;
+      map[month] = map[month]! + 1;
+    }
+    return map;
+  }
+
+  /// Get the most active month (1-12), returns -1 if empty
+  int get peakMonth {
+    if (isEmpty) return -1;
+    final monthMap = toMonthMap();
+    return monthMap.entries.reduce((a, b) => a.value >= b.value ? a : b).key;
+  }
 }
