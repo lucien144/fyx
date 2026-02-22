@@ -15,6 +15,7 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/controllers/drafts_service.dart';
+import 'package:fyx/features/message/domain/entities/attachment.dart';
 import 'package:fyx/features/message/domain/message_settings.dart';
 import 'package:fyx/features/message/presentation/message_screen.dart';
 import 'package:fyx/features/message/presentation/viewmodel/message_viewmodel.dart';
@@ -364,7 +365,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                                 onDraftRemove: () => DraftsService().removeDiscussionMessage(pageArguments.discussionId),
                                 onCompose: (message) => DraftsService().saveDiscussionMessage(id: pageArguments.discussionId, message: message),
                                 onClose: this.refresh,
-                                onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                                onSubmit: (String? inputField, String message, List<Attachment> attachments) async {
                                   var result =
                                       await ApiController().postDiscussionMessage(pageArguments.discussionId, message, attachments: attachments);
                                   DraftsService().removeDiscussionMessage(pageArguments.discussionId);

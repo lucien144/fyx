@@ -1,8 +1,19 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
+import 'package:fyx/features/message/domain/entities/attachment.dart';
+import 'package:fyx/features/message/domain/enums/image_quality.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
+import 'package:image/image.dart' as img;
+
+Uint8List _resizeIsolate(({Uint8List bytes, int maxWidth}) params) {
+  final decoded = img.decodeImage(params.bytes);
+  if (decoded == null || decoded.width <= params.maxWidth) return params.bytes;
+  final resized = img.copyResize(decoded, width: params.maxWidth);
+  return Uint8List.fromList(img.encodeJpg(resized));
+}
 
 class ApiProvider implements IApiProvider {
   final Dio dio = Dio();
@@ -221,14 +232,18 @@ class ApiProvider implements IApiProvider {
     return await dio.get('$URL/discussion/$id/waiting_files');
   }
 
-  Future<List> uploadFile(List<Map<ATTACHMENT, dynamic>> attachments, {int id = 0}) async {
+  Future<List> uploadFile(List<Attachment> attachments, {int id = 0}) async {
     List<Future> uploads = [];
-    for (Map<ATTACHMENT, dynamic> attachment in attachments) {
-      FormData fileData = new FormData.fromMap({
-        'file': MultipartFile.fromBytes(attachment[ATTACHMENT.bytes],
-            filename: attachment[ATTACHMENT.filename], contentType: attachment[ATTACHMENT.mediatype]),
+    List<Future> embeds = [];
+    for (Attachment attachment in attachments) {
+      final needResize = attachment.mediaType.type == 'image' && attachment.quality != ImageQuality.fd;
+      final bytes = needResize
+          ? await compute(_resizeIsolate, (bytes: attachment.bytes, maxWidth: attachment.width))
+          : attachment.bytes;
+      FormData fileData = FormData.fromMap({
+        'file': MultipartFile.fromBytes(bytes, filename: attachment.filename, contentType: attachment.mediaType),
         'file_type': id == 0 ? 'mail_attachment' : 'discussion_attachment',
-        'id_specific': id
+        'id_specific': id,
       });
       uploads.add(dio.put('$URL/file/upload', data: fileData));
     }
