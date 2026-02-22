@@ -85,6 +85,7 @@ dependencies:
   supabase_flutter: ^2.10.3
   flutter_it: ^2.1.1
   modal_bottom_sheet: ^3.0.0
+  file_picker: ^10.3.10
 
 dependency_overrides:
   intl: any

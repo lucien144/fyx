@@ -1,11 +1,10 @@
 import 'package:dio/dio.dart';
+import 'package:fyx/features/message/domain/entities/attachment.dart';
 import 'package:fyx/model/Credentials.dart';
 
 typedef TOnError = void Function(String);
 typedef TOnAuthError = void Function(String);
 typedef TOnContextData = void Function(Map<String, dynamic>);
-
-enum ATTACHMENT { bytes, filename, mime, extension, mediatype, previewWidget }
 
 abstract class IApiProvider {
   TOnError? onError;
@@ -34,7 +33,7 @@ abstract class IApiProvider {
   Future<Response> deleteFile(int id);
   Future<Response> fetchMailWaitingFiles();
   Future<Response> fetchDiscussionWaitingFiles(int id);
-  Future<List> uploadFile(List<Map<ATTACHMENT, dynamic>> attachments, {int id});
+  Future<List> uploadFile(List<Attachment> attachments, {int id});
   Future<Response> sendMail(String recipient, String message);
   Future<Response> postDiscussionMessage(int id, String message);
   Future<Response> deleteDiscussionMessage(int discussionId, int postId);

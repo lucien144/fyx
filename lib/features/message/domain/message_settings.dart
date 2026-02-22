@@ -1,7 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
+import 'package:fyx/features/message/domain/entities/attachment.dart';
 
-typedef F = Future<bool> Function(String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachment);
+typedef F = Future<bool> Function(String? inputField, String message, List<Attachment> attachment);
 typedef C = void Function(String message);
 
 class MessageSettings {

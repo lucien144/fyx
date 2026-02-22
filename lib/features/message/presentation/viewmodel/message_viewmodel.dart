@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
+import 'package:fyx/features/message/domain/entities/attachment.dart';
+import 'package:fyx/features/message/domain/enums/image_quality.dart';
 import 'package:fyx/features/message/domain/message_settings.dart';
 import 'package:fyx/features/message/presentation/viewmodel/message_state.dart';
 
@@ -30,17 +32,28 @@ class MessageViewModel extends ChangeNotifier {
   }
 
   /// Add image to the list
-  void addImage(Map<ATTACHMENT, dynamic> image) {
-    final updatedImages = List<Map<ATTACHMENT, dynamic>>.from(_state.images)..add(image);
-    _state = _state.copyWith(images: updatedImages);
+  void addAttachment(Attachment attachment) {
+    final attachments = List<Attachment>.from(_state.attachments)..add(attachment);
+    _state = _state.copyWith(attachments: attachments);
     notifyListeners();
   }
 
+  /// Update quality for a specific attachment
+  void updateAttachmentQuality(Attachment attachment, ImageQuality quality) {
+    final attachments = List<Attachment>.from(_state.attachments);
+    final index = attachments.indexWhere((a) => a.bytes == attachment.bytes);
+    if (index >= 0) {
+      attachments[index] = attachment.copyWith(quality: quality);
+      _state = _state.copyWith(attachments: attachments);
+      notifyListeners();
+    }
+  }
+
   /// Remove image from the list by bytes
-  void removeImage(List<int> bytes) {
-    final updatedImages = List<Map<ATTACHMENT, dynamic>>.from(_state.images)
-      ..removeWhere((image) => image[ATTACHMENT.bytes] == bytes);
-    _state = _state.copyWith(images: updatedImages);
+  void removeAttachment(List<int> bytes) {
+    final attachments = List<Attachment>.from(_state.attachments)
+      ..removeWhere((attachment) => attachment.bytes == bytes);
+    _state = _state.copyWith(attachments: attachments);
     notifyListeners();
   }
 
@@ -81,7 +94,7 @@ class MessageViewModel extends ChangeNotifier {
       final result = await _state.onSubmit(
         recipient,
         message,
-        _state.images.isNotEmpty ? _state.images : [],
+        _state.attachments.isNotEmpty ? _state.attachments : [],
       );
       return result;
     } finally {
@@ -96,7 +109,7 @@ class MessageViewModel extends ChangeNotifier {
     }
 
     final recipientLength = _state.hasInputField ? recipientText.length : 1;
-    final contentLength = messageText.length + _state.images.length;
+    final contentLength = messageText.length + _state.attachments.length;
 
     return (recipientLength * contentLength) == 0;
   }

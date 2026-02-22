@@ -7,6 +7,7 @@ import 'package:fyx/controllers/ApiProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/exceptions/AuthException.dart';
+import 'package:fyx/features/message/domain/entities/attachment.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/ResponseContext.dart';
@@ -237,7 +238,7 @@ class ApiController {
     return FeedNoticesResponse.fromJson(response.data);
   }
 
-  Future<OkResponse> postDiscussionMessage(int id, String message, {List<Map<ATTACHMENT, dynamic>>? attachments, Post? replyPost}) async {
+  Future<OkResponse> postDiscussionMessage(int id, String message, {List<Attachment>? attachments, Post? replyPost}) async {
     if (attachments != null) {
       try {
         WaitingFilesResponse waitingFilesResponse = await this.fetchDiscussionWaitingFiles(id);
@@ -314,7 +315,7 @@ class ApiController {
     return await Future.wait(deletes);
   }
 
-  Future<OkResponse> sendMail(String recipient, String message, {List<Map<ATTACHMENT, dynamic>>? attachments}) async {
+  Future<OkResponse> sendMail(String recipient, String message, {List<Attachment>? attachments}) async {
     // Upload image
     if (attachments != null) {
       try {
