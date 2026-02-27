@@ -232,22 +232,19 @@ class ApiProvider implements IApiProvider {
     return await dio.get('$URL/discussion/$id/waiting_files');
   }
 
-  Future<List> uploadFile(List<Attachment> attachments, {int id = 0}) async {
-    List<Future> uploads = [];
-    List<Future> embeds = [];
-    for (Attachment attachment in attachments) {
-      final needResize = attachment.mediaType.type == 'image' && attachment.quality != ImageQuality.fd;
-      final bytes = needResize
-          ? await compute(_resizeIsolate, (bytes: attachment.bytes, maxWidth: attachment.width))
-          : attachment.bytes;
-      FormData fileData = FormData.fromMap({
-        'file': MultipartFile.fromBytes(bytes, filename: attachment.filename, contentType: attachment.mediaType),
-        'file_type': id == 0 ? 'mail_attachment' : 'discussion_attachment',
-        'id_specific': id,
-      });
-      uploads.add(dio.put('$URL/file/upload', data: fileData));
-    }
-    return Future.wait(uploads);
+  Future<Response> uploadFile(Attachment attachment, {int id = 0}) async {
+    final needResize = attachment.mediaType.type == 'image' && [ImageQuality.sd, ImageQuality.md].contains(attachment.quality);
+    final bytes = needResize ? await compute(_resizeIsolate, (bytes: attachment.bytes, maxWidth: attachment.width)) : attachment.bytes;
+    FormData fileData = FormData.fromMap({
+      'file': MultipartFile.fromBytes(bytes, filename: attachment.filename, contentType: attachment.mediaType),
+      'file_type': id == 0 ? 'mail_attachment' : 'discussion_attachment',
+      'id_specific': id,
+    });
+    return await dio.put('$URL/file/upload', data: fileData);
+  }
+
+  Future<Response> embedFile(id) async {
+    return await dio.post('$URL/file/embed/$id/false');
   }
 
   Future<Response> votePoll(int discussionId, int postId, List<int> votes) async {

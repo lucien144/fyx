@@ -38,6 +38,15 @@ class MessageViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void reorder(int oldIndex, int newIndex) {
+    if (newIndex > oldIndex) newIndex -= 1;
+    final attachments = List<Attachment>.from(_state.attachments);
+    final item = attachments.removeAt(oldIndex);
+    attachments.insert(newIndex, item);
+    _state = _state.copyWith(attachments: attachments);
+    notifyListeners();
+  }
+
   /// Update quality for a specific attachment
   void updateAttachmentQuality(Attachment attachment, ImageQuality quality) {
     final attachments = List<Attachment>.from(_state.attachments);

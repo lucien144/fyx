@@ -1,8 +1,8 @@
 enum ImageQuality {
-  //url(0), TODO
+  url(0),
   sd(600),
-  hd(1200),
-  fd(1600);
+  md(1200),
+  hd(1600);
 
   final int width;
   const ImageQuality(this.width);

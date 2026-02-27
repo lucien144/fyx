@@ -1,3 +1,5 @@
+import 'package:fyx/features/message/domain/entities/uploaded_file.dart';
+
 class FileUploadResponse {
   int id = 0;
   String fileType = '';
@@ -33,6 +35,25 @@ class FileUploadResponse {
     url = json['url'] ?? '';
     thumbUrl = json['thumb_url'] ?? '';
     _isImage = thumbUrl.isNotEmpty;
+  }
+
+  UploadedFile toEntity() {
+    return UploadedFile(
+      id: id,
+      fileType: fileType,
+      idSpecific: idSpecific,
+      idSpecific2: idSpecific2,
+      filename: filename,
+      size: size,
+      uploadedAt: DateTime.fromMillisecondsSinceEpoch(uploadedAt),
+      mimetype: mimetype,
+      imageWidth: imageWidth,
+      imageHeight: imageHeight,
+      imageAvgColorHex: imageAvgColorHex,
+      imageEmbed: imageEmbed,
+      url: url,
+      thumbUrl: thumbUrl,
+    );
   }
 
   Map<String, dynamic> toJson() {
