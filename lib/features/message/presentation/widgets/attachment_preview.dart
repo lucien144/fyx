@@ -35,6 +35,8 @@ class _AttachmentPreviewState extends State<AttachmentPreview> {
     final viewModel = getIt<MessageViewModel>();
     final attachment = widget.attachment;
     final isImage = attachment.mediaType.type == 'image';
+    final isVideo = ['video'].contains(attachment.mediaType.type);
+    final isFile = !['image', 'video'].contains(attachment.mediaType.type);
 
     return Container(
       decoration: BoxDecoration(color: colors.barBackground, borderRadius: BorderRadius.circular(8)),
@@ -67,7 +69,7 @@ class _AttachmentPreviewState extends State<AttachmentPreview> {
           ),
           Expanded(
               child: Text(
-            attachment.filename,
+            (isFile || isVideo) ? attachment.filename : '',
             overflow: TextOverflow.ellipsis,
             style: TextStyle(fontSize: 12),
           )),
@@ -76,7 +78,12 @@ class _AttachmentPreviewState extends State<AttachmentPreview> {
             Container(
               height: 30,
               child: ToggleButtons(
-                children: ImageQuality.values.map((iq) => Text(iq.name.toUpperCase(), style: TextStyle(fontSize: 11))).toList(),
+                children: ImageQuality.values.map((iq) {
+                  if (iq == ImageQuality.url) {
+                    return Icon(MdiIcons.linkVariant, size: 14,);
+                  }
+                  return Text(iq.name.toUpperCase(), style: TextStyle(fontSize: 11));
+                }).toList(),
                 isSelected: ImageQuality.values.map((q) => q == attachment.quality).toList(),
                 borderRadius: BorderRadius.circular(8),
                 onPressed: (index) {

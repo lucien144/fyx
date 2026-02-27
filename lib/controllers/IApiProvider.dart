@@ -33,7 +33,8 @@ abstract class IApiProvider {
   Future<Response> deleteFile(int id);
   Future<Response> fetchMailWaitingFiles();
   Future<Response> fetchDiscussionWaitingFiles(int id);
-  Future<List> uploadFile(List<Attachment> attachments, {int id});
+  Future<Response> uploadFile(Attachment attachments, {int id});
+  Future embedFile(int id);
   Future<Response> sendMail(String recipient, String message);
   Future<Response> postDiscussionMessage(int id, String message);
   Future<Response> deleteDiscussionMessage(int discussionId, int postId);

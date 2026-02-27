@@ -161,8 +161,14 @@ class ApiMock implements IApiProvider {
   }
 
   @override
-  Future<List> uploadFile(List<Attachment> attachments, {int? id}) {
+  Future<Response> uploadFile(Attachment attachments, {int? id}) {
     // TODO: implement uploadFile
+    throw UnimplementedError();
+  }
+
+  @override
+  Future embedFile(int id) {
+    // TODO: implement embedFile
     throw UnimplementedError();
   }
 

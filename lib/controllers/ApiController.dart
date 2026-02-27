@@ -10,6 +10,7 @@ import 'package:fyx/exceptions/AuthException.dart';
 import 'package:fyx/features/userstats/domain/entities/global_stat.dart';
 import 'package:fyx/features/message/domain/entities/attachment.dart';
 import 'package:fyx/features/userstats/domain/enums/global_stat_type.dart';
+import 'package:fyx/features/message/domain/enums/image_quality.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/ResponseContext.dart';
@@ -253,10 +254,19 @@ class ApiController {
       }
 
       try {
-        await provider.uploadFile(attachments, id: id);
+        for (Attachment attachment in attachments) {
+          final result = await provider.uploadFile(attachment, id: id);
+          final response = FileUploadResponse.fromJson(result.data);
+
+          // Embed image if requested
+          if (attachment.quality == ImageQuality.url) {
+            await provider.embedFile(response.id);
+          }
+        }
       } catch (error) {
         if (provider.onError != null) {
-          provider.onError!('👎 Nějakteré z obrázků se nepodařilo nahrát.');
+          debugPrint(error.toString());
+          provider.onError!('👎 Nějakteré z obrázků se nepodařilo správně uložit.');
         }
       }
     }
@@ -350,11 +360,21 @@ class ApiController {
         LogService.captureError(error);
         // TODO: Notify user?
       }
+
       try {
-        await provider.uploadFile(attachments);
+        for (Attachment attachment in attachments) {
+          final result = await provider.uploadFile(attachment);
+          final response = FileUploadResponse.fromJson(result.data);
+
+          // Embed image if requested
+          if (attachment.quality == ImageQuality.url) {
+            await provider.embedFile(response.id);
+          }
+        }
       } catch (error) {
         if (provider.onError != null) {
-          provider.onError!('👎 Nějakteré z obrázků se nepodařilo nahrát.');
+          debugPrint(error.toString());
+          provider.onError!('👎 Nějakteré z obrázků se nepodařilo správně uložit.');
         }
       }
     }

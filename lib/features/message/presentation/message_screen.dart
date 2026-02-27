@@ -11,8 +11,6 @@ import 'package:fyx/components/premium_feature.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/features/message/domain/entities/attachment.dart';
-import 'package:fyx/features/message/domain/enums/image_quality.dart';
-import 'package:fyx/features/message/domain/enums/image_quality.dart';
 import 'package:fyx/features/message/presentation/viewmodel/message_viewmodel.dart';
 import 'package:fyx/features/message/presentation/widgets/attachment_preview.dart';
 import 'package:fyx/model/MainRepository.dart';
@@ -489,10 +487,17 @@ class _MessageScreenState extends State<MessageScreen> {
             else
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 16.0),
-                sliver: SliverToBoxAdapter(
-                  child: Column(
-                    children: state.attachments.map((Attachment attachment) => AttachmentPreview(attachment: attachment)).toList(),
-                  ),
+                sliver: SliverReorderableList(
+                  itemCount: state.attachments.length,
+                  onReorder: (oldIndex, newIndex) => viewModel.reorder(oldIndex, newIndex),
+                  itemBuilder: (context, index) {
+                    final attachment = state.attachments[index];
+                    return ReorderableDragStartListener(
+                      key: ValueKey(attachment.filename),
+                      index: index,
+                      child: AttachmentPreview(attachment: attachment),
+                    );
+                  },
                 ),
               ),
           ],
