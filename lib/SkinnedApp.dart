@@ -8,37 +8,40 @@ import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/pages/HomePage.dart';
 import 'package:fyx/pages/LoginPage.dart';
 import 'package:fyx/theme/skin/Skin.dart';
+import 'package:toastification/toastification.dart';
 
 class SkinnedApp extends StatelessWidget {
   const SkinnedApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return CupertinoApp(
-        title: 'Fyx',
-        theme: Skin.of(context).theme.data,
-        home: MainRepository().credentials != null && MainRepository().credentials!.isValid ? HomePage() : LoginPage(),
-        debugShowCheckedModeBanner: FyxApp.isDev,
-        onUnknownRoute: (RouteSettings settings) => CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings),
-        onGenerateRoute: FyxApp.routes,
-        navigatorKey: FyxApp.navigatorKey,
-        navigatorObservers: [
-          FyxApp.routeObserver,
-          FirebaseAnalyticsObserver(
-              analytics: FyxApp.analytics,
-              onError: (error) => LogService.captureError(
-                    error,
-                  ))
-        ],
-        localizationsDelegates: [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: [
-          Locale('en', ''),
-          Locale('cs', ''),
-          Locale('sk', ''),
-        ]);
+    return ToastificationWrapper(
+      child: CupertinoApp(
+          title: 'Fyx',
+          theme: Skin.of(context).theme.data,
+          home: MainRepository().credentials != null && MainRepository().credentials!.isValid ? HomePage() : LoginPage(),
+          debugShowCheckedModeBanner: FyxApp.isDev,
+          onUnknownRoute: (RouteSettings settings) => CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings),
+          onGenerateRoute: FyxApp.routes,
+          navigatorKey: FyxApp.navigatorKey,
+          navigatorObservers: [
+            FyxApp.routeObserver,
+            FirebaseAnalyticsObserver(
+                analytics: FyxApp.analytics,
+                onError: (error) => LogService.captureError(
+                      error,
+                    ))
+          ],
+          localizationsDelegates: [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: [
+            Locale('en', ''),
+            Locale('cs', ''),
+            Locale('sk', ''),
+          ]),
+    );
   }
 }

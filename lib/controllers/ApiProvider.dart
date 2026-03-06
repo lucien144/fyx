@@ -84,7 +84,7 @@ class ApiProvider implements IApiProvider {
         onError!(L.API_ERROR);
       }
       return handler.next(response);
-    }, onError: (DioError e, ErrorInterceptorHandler handler) async {
+    }, onError: (DioException e, ErrorInterceptorHandler handler) async {
       // Not Authorized
       if (e.response?.statusCode == 401) {
         if (onAuthError != null) {
@@ -94,8 +94,9 @@ class ApiProvider implements IApiProvider {
       }
 
       // Other problem
-      if ([400, 404].contains(e.response?.statusCode)) {
-        if (onError != null) {
+      if ([400, 404, 413].contains(e.response?.statusCode)) {
+        debugPrint(e.response?.data.toString());
+        if (onError != null && (e.response?.data['message']?.toString() ?? '').length > 3) {
           onError!(e.response!.data['message']);
         }
         return handler.next(e);

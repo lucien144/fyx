@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
@@ -250,8 +251,8 @@ class ApiController {
         // TODO: Notify user?
       }
 
-      try {
-        for (Attachment attachment in attachments) {
+      for (Attachment attachment in attachments) {
+        try {
           final result = await provider.uploadFile(attachment, id: id);
           final response = FileUploadResponse.fromJson(result.data);
 
@@ -259,11 +260,14 @@ class ApiController {
           if (attachment.quality == ImageQuality.url) {
             await provider.embedFile(response.id);
           }
-        }
-      } catch (error) {
-        if (provider.onError != null) {
-          debugPrint(error.toString());
-          provider.onError!('👎 Nějakteré z obrázků se nepodařilo správně uložit.');
+        } on DioException catch (e) {
+          if (e.response?.statusCode == 413 && provider.onError != null) {
+            provider.onError!('Soubor "...${attachment.filename.substring(max(0, attachment.filename.length - 20))}" je pro nahrání příliš velký.');
+          }
+        } catch (error) {
+          if (provider.onError != null) {
+            provider.onError!('Soubor "...${attachment.filename.substring(max(0, attachment.filename.length - 20))}" se nepodařilo nahrát.');
+          }
         }
       }
     }

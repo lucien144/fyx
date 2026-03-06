@@ -106,6 +106,8 @@ class MessageViewModel extends ChangeNotifier {
         _state.attachments.isNotEmpty ? _state.attachments : [],
       );
       return result;
+    } catch(e) {
+      return false;
     } finally {
       setSending(false);
     }
