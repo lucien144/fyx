@@ -11,7 +11,7 @@ description: Fyx for Nyx.cz
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 11.1.2+180
+version: 12.0.0+186
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -39,7 +39,6 @@ dependencies:
   flutter_markdown: ^0.7.3+1
   flutter_riverpod: ^2.0.0-dev.4
   flutter_sticky_header: ^0.7.0
-  fluttertoast: ^8.0.9
   google_fonts: ^6.1.0
   hive: ^2.0.6
   hive_flutter: ^1.1.0
@@ -85,6 +84,10 @@ dependencies:
   supabase_flutter: ^2.10.3
   flutter_it: ^2.1.1
   modal_bottom_sheet: ^3.0.0
+  sqflite: ^2.4.2
+  file_picker: ^10.3.10
+  freezed: ^2.5.7
+  toastification: ^3.0.3
 
 dependency_overrides:
   intl: any

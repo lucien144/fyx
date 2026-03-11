@@ -4,15 +4,13 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/widgets.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/LaunchModeEnum.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
+import 'package:toastification/toastification.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // Theme helpers
@@ -28,37 +26,39 @@ class T {
   // ************************
   // Theme mixins
   // ************************
+  static _toast(String message, {int duration = 7, Color bg = Colors.transparent, Color color = Colors.white}) {
+    toastification.showCustom(
+        autoCloseDuration: Duration(seconds: duration),
+        builder: (ctx, item) {
+          return GestureDetector(
+            onTapDown: (_) => item.pause(),
+            onTapUp: (_) => item.start(),
+            onTap: () => toastification.dismissById(item.id),
+            child: Center(
+              child: Container(
+                decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(8)),
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.all(8),
+                child: Text(
+                  message,
+                  style: TextStyle(color: color, fontSize: 14.0),
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
   static error(String message, {int duration = 7, Color bg = Colors.red}) {
-    Fluttertoast.showToast(
-        msg: message,
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.TOP,
-        timeInSecForIosWeb: duration,
-        backgroundColor: bg,
-        textColor: Colors.white,
-        fontSize: 14.0);
+    T._toast(message, duration: duration, bg: bg);
   }
 
   static success(String message, {int duration = 7, Color bg = Colors.green}) {
-    Fluttertoast.showToast(
-        msg: message,
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.TOP,
-        timeInSecForIosWeb: duration,
-        backgroundColor: bg,
-        textColor: Colors.white,
-        fontSize: 14.0);
+    T._toast(message, duration: duration, bg: bg);
   }
 
   static warn(String message, {int duration = 7, Color bg = Colors.orangeAccent}) {
-    Fluttertoast.showToast(
-        msg: message,
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.TOP,
-        timeInSecForIosWeb: duration,
-        backgroundColor: bg,
-        textColor: Colors.black,
-        fontSize: 14.0);
+    T._toast(message, duration: duration, bg: bg, color: Colors.black);
   }
 
   static Future<bool> openLink(String link, {mode = LaunchModeEnum.externalApplication}) async {

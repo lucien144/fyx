@@ -4,12 +4,13 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:fyx/components/premium_feature.dart';
 import 'package:fyx/components/search/search_notfound.dart';
 import 'package:fyx/components/search_box.dart';
 import 'package:fyx/controllers/log_service.dart';
+import 'package:fyx/features/userstats/domain/entities/global_stat.dart';
+import 'package:fyx/features/userstats/domain/enums/global_stat_type.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/FirstUnreadEnum.dart';
 import 'package:fyx/model/enums/premium_feature_enum.dart';
@@ -18,6 +19,8 @@ import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
+
+import '../shared/services/service_locator.dart' as DI;
 
 // ignore: must_be_immutable
 class PullToRefreshList<TProvider> extends StatefulWidget {
@@ -83,6 +86,9 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
   final _scrollKey = UniqueKey();
   late AnimationController slideController;
   late Animation<Offset> slideOffset;
+
+  // Information about scroll distance for user stats
+  int _totalScrollDelta = 0;
 
   // Min. number of unreads to display the "Jump to first unread"
   final int kJumpButtonThreshold = 3;
@@ -204,6 +210,8 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
                         debugPrint('Unfocus');
                       }
 
+                      _saveScrollInformation(scrollInfo);
+
                       // Hide the jump to first unread button if user scrolls twice the height of the screen height
                       if (scrollInfo.metrics.pixels > 2 * height) {
                         slideController.reverse();
@@ -221,6 +229,9 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
                         }
                       }
                     }
+
+                    // Calculate scroll disntance in cms here
+
                     return false;
                   },
                   child: CupertinoScrollbar(
@@ -440,6 +451,18 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
               ),
       ),
     );
+  }
+
+  _saveScrollInformation(ScrollNotification scrollInfo) {
+    if (scrollInfo is ScrollEndNotification) {
+      DI.userstatsRepo.upsertGlobalStat(GlobalStat(year: DateTime.now().year, statType: GlobalStatType.totalScrollPx.value, number: _totalScrollDelta));
+      _totalScrollDelta = 0;
+    }
+
+    if (scrollInfo is ScrollUpdateNotification && scrollInfo.scrollDelta != null) {
+      final scrollDelta = scrollInfo.scrollDelta!.abs().round();
+      _totalScrollDelta += scrollDelta;
+    }
   }
 }
 

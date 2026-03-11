@@ -12,6 +12,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/exceptions/AuthException.dart';
+import 'package:fyx/features/message/domain/entities/attachment.dart';
+import 'package:fyx/features/message/domain/entities/attachment.dart';
+import 'package:fyx/features/message/domain/entities/attachment.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -98,13 +101,13 @@ class ApiMock implements IApiProvider {
   }
 
   @override
-  Future<Response> postDiscussionMessage(int id, String message, {Map<ATTACHMENT, dynamic>? attachment}) {
+  Future<Response> postDiscussionMessage(int id, String message, {Attachment? attachment}) {
     // TODO: implement postDiscussionMessage
     throw UnimplementedError();
   }
 
   @override
-  Future<Response> sendMail(String recipient, String message, {Map<ATTACHMENT, dynamic>? attachment}) {
+  Future<Response> sendMail(String recipient, String message, {Attachment? attachment}) {
     // TODO: implement sendMail
     throw UnimplementedError();
   }
@@ -158,8 +161,14 @@ class ApiMock implements IApiProvider {
   }
 
   @override
-  Future<List> uploadFile(List<Map<ATTACHMENT, dynamic>> attachments, {int? id}) {
+  Future<Response> uploadFile(Attachment attachments, {int? id}) {
     // TODO: implement uploadFile
+    throw UnimplementedError();
+  }
+
+  @override
+  Future embedFile(int id) {
+    // TODO: implement embedFile
     throw UnimplementedError();
   }
 

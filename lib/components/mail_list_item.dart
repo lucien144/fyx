@@ -8,6 +8,7 @@ import 'package:fyx/components/gesture_feedback.dart';
 import 'package:fyx/components/post/post_avatar.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
+import 'package:fyx/features/message/domain/entities/attachment.dart';
 import 'package:fyx/features/message/domain/message_settings.dart';
 import 'package:fyx/features/message/presentation/message_screen.dart';
 import 'package:fyx/features/message/presentation/viewmodel/message_viewmodel.dart';
@@ -97,7 +98,7 @@ class _MailListItemState extends ConsumerState<MailListItem> {
                   onTap: () {
                     final viewModel = getIt<MessageViewModel>();
                     viewModel.initializeFromSettings(MessageSettings(
-                        onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                        onSubmit: (String? inputField, String message, List<Attachment> attachments) async {
                           if (inputField == null) {
                             return false;
                           }

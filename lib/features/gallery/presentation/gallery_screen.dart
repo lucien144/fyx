@@ -4,12 +4,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_it/flutter_it.dart';
-import 'package:fyx/components/post/post_hero_attachment.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/features/gallery/presentation/viewmodel/gallery_viewmodel.dart';
 import 'package:fyx/features/gallery/presentation/widgets/context_menu_button.dart';
 import 'package:fyx/features/gallery/presentation/widgets/throw_it_away.dart';
+import 'package:fyx/features/userstats/domain/entities/global_stat.dart';
+import 'package:fyx/features/userstats/domain/enums/global_stat_type.dart';
 import 'package:fyx/libs/fyx_image_cache_manager.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/shared/services/service_locator.dart';
@@ -51,6 +52,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
     });
 
     AnalyticsProvider().setScreen('Gallery', 'GalleryPage');
+    userstatsRepo.upsertGlobalStat(GlobalStat(year: DateTime.now().year, statType: GlobalStatType.galleryOpens.value, number: 1));
   }
 
   @override

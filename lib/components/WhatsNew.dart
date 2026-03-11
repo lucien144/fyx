@@ -23,6 +23,7 @@ class WhatsNew extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.only(bottom: 32),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(icon, size: 40),
             SizedBox(width: 20),
@@ -77,9 +78,9 @@ class WhatsNew extends StatelessWidget {
       SizedBox(height: 24),
       item(
           context: context,
-          icon: MdiIcons.bugCheck,
-          title: 'Drobné opravy chyb',
-          description: '- oprava mizející klávesnice 🤞\n- možnost refresh obrázku\n- nové kontextové menu v galerii',),
+          icon: MdiIcons.fileUpload,
+          title: 'Vylepšené nahrávání médií',
+          description: '- 🎬 nově lze nahrát videa\n- 📁 nebo soubory\n- je možné vybrat více souborů najednou\n- obrázky lze resizovat (SD, MD, HD) nebo orig. jako odkaz\n- zachovává se pořadí uploadu\n- pořadí souborů je možné změnit',),
       // item(
       //     context: context,
       //     icon: MdiIcons.typewriter,
