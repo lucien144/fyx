@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
@@ -7,6 +8,10 @@ import 'package:fyx/controllers/ApiProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/exceptions/AuthException.dart';
+import 'package:fyx/features/userstats/domain/entities/global_stat.dart';
+import 'package:fyx/features/message/domain/entities/attachment.dart';
+import 'package:fyx/features/userstats/domain/enums/global_stat_type.dart';
+import 'package:fyx/features/message/domain/enums/image_quality.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/ResponseContext.dart';
@@ -27,6 +32,7 @@ import 'package:fyx/model/reponses/PostRatingsResponse.dart';
 import 'package:fyx/model/reponses/RatingResponse.dart';
 import 'package:fyx/model/reponses/UnifiedSearchResponse.dart';
 import 'package:fyx/model/reponses/WaitingFilesResponse.dart';
+import 'package:fyx/shared/services/service_locator.dart' as DI;
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:provider/provider.dart';
@@ -237,7 +243,7 @@ class ApiController {
     return FeedNoticesResponse.fromJson(response.data);
   }
 
-  Future<OkResponse> postDiscussionMessage(int id, String message, {List<Map<ATTACHMENT, dynamic>>? attachments, Post? replyPost}) async {
+  Future<OkResponse> postDiscussionMessage(int id, String message, {List<Attachment>? attachments, Post? replyPost}) async {
     if (attachments != null) {
       try {
         WaitingFilesResponse waitingFilesResponse = await this.fetchDiscussionWaitingFiles(id);
@@ -248,20 +254,53 @@ class ApiController {
         // TODO: Notify user?
       }
 
-      try {
-        await provider.uploadFile(attachments, id: id);
-      } catch (error) {
-        if (provider.onError != null) {
-          provider.onError!('👎 Nějakteré z obrázků se nepodařilo nahrát.');
+      for (Attachment attachment in attachments) {
+        try {
+          final result = await provider.uploadFile(attachment, id: id);
+          final response = FileUploadResponse.fromJson(result.data);
+
+          // Embed image if requested
+          if (attachment.quality == ImageQuality.url) {
+            await provider.embedFile(response.id);
+          }
+        } on DioException catch (e) {
+          if (e.response?.statusCode == 413 && provider.onError != null) {
+            provider.onError!('Soubor "...${attachment.filename.substring(max(0, attachment.filename.length - 20))}" je pro nahrání příliš velký.');
+          }
+        } catch (error) {
+          if (provider.onError != null) {
+            provider.onError!('Soubor "...${attachment.filename.substring(max(0, attachment.filename.length - 20))}" se nepodařilo nahrát.');
+          }
         }
       }
     }
 
+    Map<String, int> userStats = {};
     if (replyPost != null) {
       message = '{reply ${replyPost.nick}|${replyPost.id}}: $message';
+      userStats = {
+        GlobalStatType.postReplies.value: 1,
+        GlobalStatType.postsLength.value: message.length,
+        GlobalStatType.postAttachments.value: attachments?.length ?? 0
+      };
+    } else {
+      userStats = {
+        GlobalStatType.postsCreated.value: 1,
+        GlobalStatType.postsLength.value: message.length,
+        GlobalStatType.postAttachments.value: attachments?.length ?? 0
+      };
     }
 
     var result = await provider.postDiscussionMessage(id, message);
+
+    userStats.forEach((type, val) {
+        DI.userstatsRepo.upsertGlobalStat(GlobalStat(
+          year: DateTime.now().year,
+          statType: type,
+          number: val,
+        ));
+      });
+
     return OkResponse.fromJson(result.data);
   }
 
@@ -314,7 +353,7 @@ class ApiController {
     return await Future.wait(deletes);
   }
 
-  Future<OkResponse> sendMail(String recipient, String message, {List<Map<ATTACHMENT, dynamic>>? attachments}) async {
+  Future<OkResponse> sendMail(String recipient, String message, {List<Attachment>? attachments}) async {
     // Upload image
     if (attachments != null) {
       try {
@@ -325,16 +364,41 @@ class ApiController {
         LogService.captureError(error);
         // TODO: Notify user?
       }
+
       try {
-        await provider.uploadFile(attachments);
+        for (Attachment attachment in attachments) {
+          final result = await provider.uploadFile(attachment);
+          final response = FileUploadResponse.fromJson(result.data);
+
+          // Embed image if requested
+          if (attachment.quality == ImageQuality.url) {
+            await provider.embedFile(response.id);
+          }
+        }
       } catch (error) {
         if (provider.onError != null) {
-          provider.onError!('👎 Nějakteré z obrázků se nepodařilo nahrát.');
+          debugPrint(error.toString());
+          provider.onError!('👎 Nějakteré z obrázků se nepodařilo správně uložit.');
         }
       }
     }
 
     var result = await provider.sendMail(recipient, message);
+
+    // User stats
+    final userStats = {
+      GlobalStatType.mailsCreated.value: 1,
+      GlobalStatType.mailsLength.value: message.length,
+      GlobalStatType.mailAttachments.value: attachments?.length ?? 0
+    };
+    userStats.forEach((type, val) {
+      DI.userstatsRepo.upsertGlobalStat(GlobalStat(
+        year: DateTime.now().year,
+        statType: type,
+        number: val,
+      ));
+    });
+
     return OkResponse.fromJson(result.data);
   }
 

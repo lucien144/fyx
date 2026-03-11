@@ -6,6 +6,7 @@ import 'package:fyx/components/pull_to_refresh_list.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
+import 'package:fyx/features/message/domain/entities/attachment.dart';
 import 'package:fyx/features/message/domain/message_settings.dart';
 import 'package:fyx/features/message/presentation/message_screen.dart';
 import 'package:fyx/features/message/presentation/viewmodel/message_viewmodel.dart';
@@ -133,7 +134,7 @@ class _MailboxTabState extends State<MailboxTab> {
                   viewModel.initializeFromSettings(MessageSettings(
                       onClose: this.refreshData,
                       hasInputField: true,
-                      onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                      onSubmit: (String? inputField, String message, List<Attachment> attachments) async {
                         if (inputField == null) {
                           return false;
                         }

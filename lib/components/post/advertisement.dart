@@ -8,6 +8,7 @@ import 'package:fyx/components/post/post_html.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
+import 'package:fyx/features/message/domain/entities/attachment.dart';
 import 'package:fyx/features/message/domain/message_settings.dart';
 import 'package:fyx/features/message/presentation/message_screen.dart';
 import 'package:fyx/features/message/presentation/viewmodel/message_viewmodel.dart';
@@ -123,7 +124,7 @@ class Advertisement extends StatelessWidget {
                                 inputFieldPlaceholder: this.username,
                                 messageFieldPlaceholder: '${content.link}\n',
                                 onClose: () => T.success('👍 Zpráva poslána.', bg: colors.success),
-                                onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                                onSubmit: (String? inputField, String message, List<Attachment> attachments) async {
                                   if (inputField == null) return false;
 
                                   var response = await ApiController().sendMail(inputField, message, attachments: attachments);

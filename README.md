@@ -81,6 +81,13 @@ Build produkce lze spustit zavoláním skpriput `$ ./build.sh`, který zároveň
 
 Tento repozitář používá [Gitflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow). Připravujte veškerou práci ve `feature` větvích nebo forku, pak pošlete PR do `develop` větve. PR jsou mergovány pouze adminy (a jako `squash commits`).
 
+#### Spuštění
+
+Aplikace používá knihovnu Freezed pro snadnější generování modelů, před každým spuštěním a buildem je proto nutné spustit:
+
+```shell
+$ dart run build_runner build --delete-conflicting-outputs
+```
 
 ### CI/CD
 

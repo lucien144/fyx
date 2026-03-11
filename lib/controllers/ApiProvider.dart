@@ -1,8 +1,19 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
+import 'package:fyx/features/message/domain/entities/attachment.dart';
+import 'package:fyx/features/message/domain/enums/image_quality.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
+import 'package:image/image.dart' as img;
+
+Uint8List _resizeIsolate(({Uint8List bytes, int maxWidth}) params) {
+  final decoded = img.decodeImage(params.bytes);
+  if (decoded == null || decoded.width <= params.maxWidth) return params.bytes;
+  final resized = img.copyResize(decoded, width: params.maxWidth);
+  return Uint8List.fromList(img.encodeJpg(resized));
+}
 
 class ApiProvider implements IApiProvider {
   final Dio dio = Dio();
@@ -73,7 +84,7 @@ class ApiProvider implements IApiProvider {
         onError!(L.API_ERROR);
       }
       return handler.next(response);
-    }, onError: (DioError e, ErrorInterceptorHandler handler) async {
+    }, onError: (DioException e, ErrorInterceptorHandler handler) async {
       // Not Authorized
       if (e.response?.statusCode == 401) {
         if (onAuthError != null) {
@@ -83,8 +94,9 @@ class ApiProvider implements IApiProvider {
       }
 
       // Other problem
-      if ([400, 404].contains(e.response?.statusCode)) {
-        if (onError != null) {
+      if ([400, 404, 413].contains(e.response?.statusCode)) {
+        debugPrint(e.response?.data.toString());
+        if (onError != null && (e.response?.data['message']?.toString() ?? '').length > 3) {
           onError!(e.response!.data['message']);
         }
         return handler.next(e);
@@ -221,18 +233,19 @@ class ApiProvider implements IApiProvider {
     return await dio.get('$URL/discussion/$id/waiting_files');
   }
 
-  Future<List> uploadFile(List<Map<ATTACHMENT, dynamic>> attachments, {int id = 0}) async {
-    List<Future> uploads = [];
-    for (Map<ATTACHMENT, dynamic> attachment in attachments) {
-      FormData fileData = new FormData.fromMap({
-        'file': MultipartFile.fromBytes(attachment[ATTACHMENT.bytes],
-            filename: attachment[ATTACHMENT.filename], contentType: attachment[ATTACHMENT.mediatype]),
-        'file_type': id == 0 ? 'mail_attachment' : 'discussion_attachment',
-        'id_specific': id
-      });
-      uploads.add(dio.put('$URL/file/upload', data: fileData));
-    }
-    return Future.wait(uploads);
+  Future<Response> uploadFile(Attachment attachment, {int id = 0}) async {
+    final needResize = attachment.mediaType.type == 'image' && [ImageQuality.sd, ImageQuality.md].contains(attachment.quality);
+    final bytes = needResize ? await compute(_resizeIsolate, (bytes: attachment.bytes, maxWidth: attachment.width)) : attachment.bytes;
+    FormData fileData = FormData.fromMap({
+      'file': MultipartFile.fromBytes(bytes, filename: attachment.filename, contentType: attachment.mediaType),
+      'file_type': id == 0 ? 'mail_attachment' : 'discussion_attachment',
+      'id_specific': id,
+    });
+    return await dio.put('$URL/file/upload', data: fileData);
+  }
+
+  Future<Response> embedFile(id) async {
+    return await dio.post('$URL/file/embed/$id/false');
   }
 
   Future<Response> votePoll(int discussionId, int postId, List<int> votes) async {

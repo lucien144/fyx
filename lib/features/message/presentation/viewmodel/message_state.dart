@@ -1,11 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
+import 'package:fyx/features/message/domain/entities/attachment.dart';
 
 typedef OnSubmitCallback = Future<bool> Function(
   String? inputField,
   String message,
-  List<Map<ATTACHMENT, dynamic>> attachment,
+  List<Attachment> attachment,
 );
 typedef OnComposeCallback = void Function(String message);
 
@@ -24,7 +25,7 @@ class MessageState {
   final OnSubmitCallback onSubmit;
 
   // UI State
-  final List<Map<ATTACHMENT, dynamic>> images;
+  final List<Attachment> attachments;
   final bool loadingImage;
   final bool sending;
   final bool useMarkdown;
@@ -40,7 +41,7 @@ class MessageState {
     this.onDraftRemove,
     this.onCompose,
     required this.onSubmit,
-    this.images = const [],
+    this.attachments = const [],
     this.loadingImage = false,
     this.sending = false,
     this.useMarkdown = false,
@@ -85,7 +86,7 @@ class MessageState {
     Function? onDraftRemove,
     OnComposeCallback? onCompose,
     OnSubmitCallback? onSubmit,
-    List<Map<ATTACHMENT, dynamic>>? images,
+    List<Attachment>? attachments,
     bool? loadingImage,
     bool? sending,
     bool? useMarkdown,
@@ -101,7 +102,7 @@ class MessageState {
       onDraftRemove: onDraftRemove ?? this.onDraftRemove,
       onCompose: onCompose ?? this.onCompose,
       onSubmit: onSubmit ?? this.onSubmit,
-      images: images ?? this.images,
+      attachments: attachments ?? this.attachments,
       loadingImage: loadingImage ?? this.loadingImage,
       sending: sending ?? this.sending,
       useMarkdown: useMarkdown ?? this.useMarkdown,

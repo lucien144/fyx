@@ -10,13 +10,16 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/controllers/drafts_service.dart';
+import 'package:fyx/features/message/domain/entities/attachment.dart';
 import 'package:fyx/features/message/domain/message_settings.dart';
 import 'package:fyx/features/message/presentation/message_screen.dart';
 import 'package:fyx/features/message/presentation/viewmodel/message_viewmodel.dart';
+import 'package:fyx/features/userstats/domain/entities/global_stat.dart';
+import 'package:fyx/features/userstats/domain/enums/global_stat_type.dart';
 import 'package:fyx/model/Discussion.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
-import 'package:fyx/shared/services/service_locator.dart';
+import 'package:fyx/shared/services/service_locator.dart' as DI;
 import 'package:fyx/state/batch_actions_provider.dart';
 import 'package:fyx/state/nsfw_provider.dart';
 import 'package:fyx/theme/Helpers.dart';
@@ -103,8 +106,10 @@ class _PostListItemState extends ConsumerState<PostListItem> {
             ApiController().giveRating(_post!.idKlub, _post!.id, remove: _post!.myRating != 'none').then((response) {
               if (_post!.myRating != 'none') {
                 T.success('👎', bg: colors.success);
+                DI.userstatsRepo.upsertGlobalStat(GlobalStat(year: DateTime.now().year, statType: GlobalStatType.likes.value, number: -1));
               } else {
                 T.success('👍', bg: colors.success);
+                DI.userstatsRepo.upsertGlobalStat(GlobalStat(year: DateTime.now().year, statType: GlobalStatType.likes.value, number: 1));
               }
               setState(() {
                 _post!.rating = response.currentRating;
@@ -171,7 +176,7 @@ class _PostListItemState extends ConsumerState<PostListItem> {
                                 child: GestureDetector(
                                   behavior: HitTestBehavior.opaque,
                                   onTap: () {
-                                    final viewModel = getIt<MessageViewModel>();
+                                    final viewModel = DI.getIt<MessageViewModel>();
                                     viewModel.initializeFromSettings(MessageSettings(
                                               draft: DraftsService().loadPostMessage(_post!.id),
                                               onDraftRemove: () => DraftsService().removePostMessage(_post!.id),
@@ -182,7 +187,7 @@ class _PostListItemState extends ConsumerState<PostListItem> {
                                                 discussion: widget.discussion,
                                               ),
                                               onClose: this.widget.onUpdate,
-                                              onSubmit: (String? inputField, String message, List<Map<ATTACHMENT, dynamic>> attachments) async {
+                                              onSubmit: (String? inputField, String message, List<Attachment> attachments) async {
                                                 var result = await ApiController()
                                                     .postDiscussionMessage(_post!.idKlub, message, attachments: attachments, replyPost: _post);
                                                 DraftsService().removePostMessage(_post!.id);

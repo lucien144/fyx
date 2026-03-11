@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,9 +9,10 @@ import 'package:fyx/components/bottom_sheets/context_menu/grid.dart';
 import 'package:fyx/components/bottom_sheets/context_menu/item.dart';
 import 'package:fyx/components/premium_feature.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
-import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/controllers/log_service.dart';
+import 'package:fyx/features/message/domain/entities/attachment.dart';
 import 'package:fyx/features/message/presentation/viewmodel/message_viewmodel.dart';
+import 'package:fyx/features/message/presentation/widgets/attachment_preview.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/premium_feature_enum.dart';
 import 'package:fyx/shared/services/service_locator.dart';
@@ -25,6 +27,8 @@ import 'package:mime/mime.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:pasteboard/pasteboard.dart';
 import 'package:path/path.dart' as p;
+
+enum FileSource { media, camera, files }
 
 class MessageScreen extends WatchingStatefulWidget {
   const MessageScreen({super.key});
@@ -44,46 +48,55 @@ class _MessageScreenState extends State<MessageScreen> {
   final _scaffoldKey = UniqueKey();
   final _scrollKey = UniqueKey();
 
-  Future getImage(ImageSource source) async {
-    final viewModel = getIt<MessageViewModel>();
-    final picker = ImagePicker();
-    viewModel.setLoadingImage(true);
-    final XFile? file = await picker.pickImage(source: source, maxWidth: 2048);
-    if (file != null) {
-      String ext = 'jpg';
-      try {
-        ext = Helpers.fileExtension(file.path) ?? '';
-      } catch (error) {}
+  final viewModel = getIt<MessageViewModel>();
 
-      final list = await file.readAsBytes();
-      final mime = lookupMimeType(file.path);
-      viewModel.addImage({
-        ATTACHMENT.bytes: list,
-        ATTACHMENT.filename: '${p.basename(file.path)}.$ext',
-        ATTACHMENT.mime: mime,
-        ATTACHMENT.extension: ext,
-        ATTACHMENT.mediatype: MediaType(mime!.split('/')[0], mime.split('/')[1]),
-        ATTACHMENT.previewWidget: Image.memory(
-          Uint8List.fromList(list),
-          width: 80,
-          height: 80,
-          fit: BoxFit.cover,
-          frameBuilder: (BuildContext context, Widget child, int? frame, bool wasSynchronouslyLoaded) {
-            if (frame == null) {
-              return CupertinoActivityIndicator();
-            }
-            return child;
-          },
-        ),
-      });
+  Future getImage(FileSource source) async {
+    viewModel.setLoadingImage(true);
+    switch (source) {
+      case FileSource.media:
+        final picker = ImagePicker();
+        var files = await picker.pickMultipleMedia();
+        if (files.isNotEmpty) {
+          files.forEach((file) => addAttachment(file));
+        }
+        break;
+      case FileSource.camera:
+        final picker = ImagePicker();
+        var file = await picker.pickImage(source: ImageSource.camera);
+        if (file != null) {
+          addAttachment(file);
+        }
+        break;
+      case FileSource.files:
+        FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true);
+        if (result != null) {
+          result.xFiles.forEach((file) => addAttachment(file));
+        } else {
+          // User canceled the picker
+        }
+        break;
     }
     viewModel.setLoadingImage(false);
   }
 
+  addAttachment(XFile file) async {
+    String ext = 'jpg';
+    try {
+      ext = Helpers.fileExtension(file.path) ?? '';
+    } catch (error) {}
+
+    final list = await file.readAsBytes();
+    final mime = lookupMimeType(file.path);
+    viewModel.addAttachment(new Attachment(
+      filename: '${p.basename(file.path)}.$ext',
+      extension: ext,
+      mediaType: MediaType(mime!.split('/')[0], mime.split('/')[1]),
+      bytes: list,
+    ));
+  }
+
   @override
   void initState() {
-    final viewModel = getIt<MessageViewModel>();
-
     // _recipientFocusNode.addListener(_focusCallback);
     // _messageFocusNode.addListener(_focusCallback);
 
@@ -113,8 +126,6 @@ class _MessageScreenState extends State<MessageScreen> {
     if (!_hasInitializedControllers) {
       _hasInitializedControllers = true;
 
-      final viewModel = getIt<MessageViewModel>();
-
       // Initialize settings from route arguments
       _recipientController.text = viewModel.state.inputFieldPlaceholder.toUpperCase();
       _messageController.text = viewModel.state.draft.isNotEmpty ? viewModel.state.draft : viewModel.state.messageFieldPlaceholder;
@@ -143,8 +154,6 @@ class _MessageScreenState extends State<MessageScreen> {
   // Saving where the focus is.
   // Gallery/Photo picker (or other action where we lose app focus) loses the input focus, therefore, we need to save latest state in order to restore it.
   _focusCallback() {
-    final viewModel = getIt<MessageViewModel>();
-
     if (_messageFocusNode.hasFocus) {
       viewModel.setRecipientFocus(false);
       return;
@@ -157,7 +166,6 @@ class _MessageScreenState extends State<MessageScreen> {
   void _requestInitialFocus() {
     if (_hasRequestedInitialFocus) return;
     _hasRequestedInitialFocus = true;
-    final viewModel = getIt<MessageViewModel>();
 
     LogService.log('[MessageScreen] Scheduling initial focus request');
 
@@ -389,7 +397,7 @@ class _MessageScreenState extends State<MessageScreen> {
                                             onTap: () async {
                                               Navigator.of(context).pop();
                                               FocusScope.of(context).unfocus();
-                                              await getImage(ImageSource.camera);
+                                              await getImage(FileSource.camera);
                                               //FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
                                             },
                                           ),
@@ -399,7 +407,17 @@ class _MessageScreenState extends State<MessageScreen> {
                                             onTap: () async {
                                               Navigator.of(context).pop();
                                               FocusScope.of(context).unfocus();
-                                              await getImage(ImageSource.gallery);
+                                              await getImage(FileSource.media);
+                                              //FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
+                                            },
+                                          ),
+                                          ContextMenuItem(
+                                            label: 'Soubory',
+                                            icon: MdiIcons.fileDocument,
+                                            onTap: () async {
+                                              Navigator.of(context).pop();
+                                              FocusScope.of(context).unfocus();
+                                              await getImage(FileSource.files);
                                               //FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
                                             },
                                           ),
@@ -415,27 +433,12 @@ class _MessageScreenState extends State<MessageScreen> {
                                                       FocusScope.of(context).unfocus();
                                                       final imageBytes = await Pasteboard.image;
                                                       if (imageBytes != null) {
-                                                        viewModel.addImage({
-                                                          ATTACHMENT.bytes: imageBytes,
-                                                          ATTACHMENT.filename: 'pasteboard_image.${DateTime.now().millisecondsSinceEpoch}.jpg',
-                                                          ATTACHMENT.mime: 'image/jpeg',
-                                                          ATTACHMENT.extension: 'jpg',
-                                                          ATTACHMENT.mediatype: MediaType('image', 'jpeg'),
-                                                          ATTACHMENT.previewWidget: Image.memory(
-                                                            imageBytes,
-                                                            width: 80,
-                                                            height: 80,
-                                                            fit: BoxFit.cover,
-                                                            frameBuilder:
-                                                                (BuildContext context, Widget child, int? frame, bool wasSynchronouslyLoaded) {
-                                                              if (frame == null) {
-                                                                return CupertinoActivityIndicator();
-                                                              }
-                                                              return child;
-                                                              //FocusScope.of(context).requestFocus(state.recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
-                                                            },
-                                                          ),
-                                                        });
+                                                        viewModel.addAttachment(new Attachment(
+                                                          filename: 'pasteboard_image.${DateTime.now().millisecondsSinceEpoch}.jpg',
+                                                          extension: 'jpg',
+                                                          mediaType: MediaType('image', 'jpeg'),
+                                                          bytes: imageBytes,
+                                                        ));
                                                       }
                                                       //FocusScope.of(context).requestFocus(state.recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
                                                     },
@@ -484,55 +487,22 @@ class _MessageScreenState extends State<MessageScreen> {
             else
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 16.0),
-                sliver: SliverToBoxAdapter(
-                  child: Wrap(
-                    runAlignment: WrapAlignment.start,
-                    children: state.images
-                        .map((Map<ATTACHMENT, dynamic> image) => _buildPreviewWidget(
-                              image[ATTACHMENT.bytes],
-                              image[ATTACHMENT.previewWidget],
-                              colors,
-                              viewModel,
-                            ))
-                        .toList(),
-                  ),
+                sliver: SliverReorderableList(
+                  itemCount: state.attachments.length,
+                  onReorder: (oldIndex, newIndex) => viewModel.reorder(oldIndex, newIndex),
+                  itemBuilder: (context, index) {
+                    final attachment = state.attachments[index];
+                    return ReorderableDragStartListener(
+                      key: ValueKey(attachment.filename),
+                      index: index,
+                      child: AttachmentPreview(attachment: attachment),
+                    );
+                  },
                 ),
               ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildPreviewWidget(
-    List<int> bytes,
-    previewWidget,
-    SkinColors colors,
-    MessageViewModel viewModel,
-  ) {
-    return Stack(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 13.0, right: 14.0),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: previewWidget,
-          ),
-        ),
-        Positioned(
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              child: Icon(MdiIcons.closeCircle, size: 32, color: colors.grey),
-              width: 24,
-              height: 24,
-            ),
-            onTap: () => viewModel.removeImage(bytes),
-          ),
-          right: 4,
-          top: 0,
-        ),
-      ],
     );
   }
 }

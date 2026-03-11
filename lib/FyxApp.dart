@@ -15,6 +15,8 @@ import 'package:fyx/controllers/drafts_service.dart';
 import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/features/gallery/presentation/gallery_screen.dart';
 import 'package:fyx/features/message/presentation/message_screen.dart';
+import 'package:fyx/features/userstats/domain/entities/global_stat.dart';
+import 'package:fyx/features/userstats/domain/enums/global_stat_type.dart';
 import 'package:fyx/libs/DeviceInfo.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
@@ -36,6 +38,7 @@ import 'package:fyx/pages/search_page.dart';
 import 'package:fyx/pages/settings_design_screen.dart';
 import 'package:fyx/pages/settings_screen.dart';
 import 'package:fyx/pages/tab_bar/MailboxTab.dart';
+import 'package:fyx/shared/services/service_locator.dart' as DI;
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/skins/ForestSkin.dart';
@@ -174,6 +177,9 @@ class FyxApp extends StatefulWidget {
     }
 
     AnalyticsProvider.provider = analytics;
+    DI.userstatsRepo.trackDailyUsage();
+    DI.userstatsRepo.trackHourlyUsage();
+    DI.userstatsRepo.upsertGlobalStat(GlobalStat(year: DateTime.now().year, statType: GlobalStatType.appLaunches.value, number: 1));
   }
 
   static Route routes(RouteSettings settings) {
@@ -246,12 +252,14 @@ class FyxApp extends StatefulWidget {
 
 class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
   Brightness? _platformBrightness;
+  DateTime? _resumedAt;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _platformBrightness ??= WidgetsBinding.instance.window.platformBrightness;
+    _resumedAt = DateTime.now();
   }
 
   @override
@@ -296,5 +304,20 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
   void didChangePlatformBrightness() {
     setState(() => _platformBrightness = WidgetsBinding.instance.window.platformBrightness);
     super.didChangePlatformBrightness(); // make sure you call this
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _resumedAt = DateTime.now();
+      DI.userstatsRepo.trackHourlyUsage();
+      DI.userstatsRepo.trackDailyUsage();
+    }
+    if (state == AppLifecycleState.paused && _resumedAt != null) {
+      final seconds = DateTime.now().difference(_resumedAt!).inSeconds;
+      DI.userstatsRepo.upsertGlobalStat(GlobalStat(year: DateTime.now().year, statType: GlobalStatType.sessionDurationSeconds.value, number: seconds));
+      _resumedAt = null;
+    }
+    super.didChangeAppLifecycleState(state);
   }
 }
