@@ -260,6 +260,10 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
                 child: Center(
                   child: GestureDetector(
                     onTap: () {
+                      if (!MainRepository().credentials!.isPremiumUser) {
+                        return;
+                      }
+
                       if (_result != null && _result!.jumpIndex >= kJumpButtonThreshold) {
                         _controller.scrollToIndex(_result!.jumpIndex - 1, preferPosition: AutoScrollPosition.begin);
                         slideController.reverse();
