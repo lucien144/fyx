@@ -26,10 +26,11 @@ class T {
   // ************************
   // Theme mixins
   // ************************
-  static _toast(String message, {int duration = 7, Color bg = Colors.transparent, Color color = Colors.white}) {
+  static _toast(String message, {int duration = 2500, Color bg = Colors.transparent, Color color = Colors.white}) {
     toastification.showCustom(
-        autoCloseDuration: Duration(seconds: duration),
+        autoCloseDuration: Duration(milliseconds: duration),
         alignment: Alignment.topCenter,
+        animationDuration: Duration(milliseconds: 400),
         builder: (ctx, item) {
           return GestureDetector(
             onTapDown: (_) => item.pause(),
@@ -50,15 +51,15 @@ class T {
         });
   }
 
-  static error(String message, {int duration = 7, Color bg = Colors.red}) {
+  static error(String message, {int duration = 2500, Color bg = Colors.red}) {
     T._toast(message, duration: duration, bg: bg);
   }
 
-  static success(String message, {int duration = 7, Color bg = Colors.green}) {
+  static success(String message, {int duration = 2500, Color bg = Colors.green}) {
     T._toast(message, duration: duration, bg: bg);
   }
 
-  static warn(String message, {int duration = 7, Color bg = Colors.orangeAccent}) {
+  static warn(String message, {int duration = 2500, Color bg = Colors.orangeAccent}) {
     T._toast(message, duration: duration, bg: bg, color: Colors.black);
   }
 

@@ -340,8 +340,8 @@ class ApiController {
     }
   }
 
-  Future<MailResponse> loadMail({int? lastId}) async {
-    var response = await provider.fetchMail(lastId: lastId);
+  Future<MailResponse> loadMail({int? lastId, String? search}) async {
+    var response = await provider.fetchMail(lastId: lastId, search: search);
     return MailResponse.fromJson(response.data);
   }
 

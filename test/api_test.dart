@@ -67,7 +67,7 @@ class ApiMock implements IApiProvider {
   }
 
   @override
-  Future<Response> fetchMail({int? lastId}) {
+  Future<Response> fetchMail({int? lastId, String? search}) {
     // TODO: implement fetchMail
     throw UnimplementedError();
   }
