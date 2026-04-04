@@ -117,6 +117,8 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
       return CupertinoPageScaffold(
         resizeToAvoidBottomInset: false,
         navigationBar: CupertinoNavigationBar(
+          automaticBackgroundVisibility: false,
+          backgroundColor: colors.barBackground,
             leading: provider.Consumer<NotificationsModel>(
                 builder: (context, notifications, child) => NotificationBadge(
                     widget: CupertinoButton(

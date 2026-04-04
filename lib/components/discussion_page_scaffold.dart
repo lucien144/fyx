@@ -6,6 +6,7 @@ class DiscussionPageScaffold extends StatelessWidget {
   final String title;
   final Widget? trailing;
   final Widget child;
+
   const DiscussionPageScaffold({Key? key, required this.title, required this.child, this.trailing}) : super(key: key);
 
   @override
@@ -15,6 +16,8 @@ class DiscussionPageScaffold extends StatelessWidget {
 
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
+          automaticBackgroundVisibility: false,
+          backgroundColor: colors.barBackground,
           leading: CupertinoNavigationBarBackButton(
             color: colors.primary,
             onPressed: () {
@@ -31,7 +34,8 @@ class DiscussionPageScaffold extends StatelessWidget {
                     Characters(title).replaceAll(Characters(''), Characters('\u{200B}')).toString(),
                     style: TextStyle(color: colors.text),
                     overflow: TextOverflow.ellipsis),
-                padding: EdgeInsets.all(8.0), // needed until https://github.com/flutter/flutter/issues/86170 is fixed
+                padding: EdgeInsets.all(8.0),
+                // needed until https://github.com/flutter/flutter/issues/86170 is fixed
                 margin: EdgeInsets.all(8.0),
                 showDuration: Duration(seconds: 3),
               )),

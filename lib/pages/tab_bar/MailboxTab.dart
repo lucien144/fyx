@@ -69,6 +69,8 @@ class _MailboxTabState extends State<MailboxTab> {
     return CupertinoTabView(builder: (context) {
       return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
+            automaticBackgroundVisibility: false,
+            backgroundColor: colors.barBackground,
             leading: Visibility(
               visible: tabArguments?.mailId != null,
               child: CupertinoNavigationBarBackButton(

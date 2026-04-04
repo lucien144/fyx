@@ -114,6 +114,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
+            automaticBackgroundVisibility: false,
+            backgroundColor: colors.barBackground,
             middle: Text(
               L.SETTINGS,
               style: TextStyle(color: colors.text),
@@ -415,7 +417,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       context: context,
                       backgroundColor: colors.barBackground,
                       barrierColor: colors.dark.withOpacity(0.5),
-                      builder: (BuildContext context) => PremiumFeatureBottomSheet(preview: true,)),
+                      builder: (BuildContext context) => PremiumFeatureBottomSheet(
+                            preview: true,
+                          )),
                 ),
                 SettingsTile.navigation(
                   leading: Icon(Icons.volunteer_activism, color: colors.grey),

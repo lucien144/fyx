@@ -51,7 +51,7 @@ class _SettingsDesignScreenState extends State<SettingsDesignScreen> {
     final skin = Skin.of(context).skins.firstWhere((skinData) => skinData.id == skinId);
     final skinColors = skin.lightData.colors;
     final skinDarkColors = skin.darkData.colors;
-    
+
     return CustomSettingsTile(
       child: PremiumFeature(
         feature: PremiumFeatureEnum.skins,
@@ -101,6 +101,8 @@ class _SettingsDesignScreenState extends State<SettingsDesignScreen> {
 
     return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
+            automaticBackgroundVisibility: false,
+            backgroundColor: colors.barBackground,
             middle: Text(
               L.SETTINGS,
               style: TextStyle(color: colors.text),
