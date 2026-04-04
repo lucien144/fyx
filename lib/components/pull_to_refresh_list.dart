@@ -398,8 +398,8 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
         setState(() => _lastId = _result!.lastId);
       }
 
-      // Add the pinned widget only if the list is active
-      if (widget.pinnedWidget is Widget && !makeInactive) {
+      // Add the pinned widget only if the list is active and not appending (to avoid duplicates)
+      if (widget.pinnedWidget is Widget && !makeInactive && !append) {
         _slivers.insert(1, SliverToBoxAdapter(child: widget.pinnedWidget));
       }
 
