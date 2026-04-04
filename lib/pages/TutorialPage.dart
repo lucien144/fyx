@@ -113,6 +113,7 @@ class _TutorialPageState extends State<TutorialPage> {
             Navigator.of(context).pop();
           },
         ),
+        automaticBackgroundVisibility: false,
         backgroundColor: Colors.transparent,
         border: Border.all(color: Colors.transparent, width: 0, style: BorderStyle.none),
         trailing: _isLastSlide
