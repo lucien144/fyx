@@ -29,6 +29,7 @@ class T {
   static _toast(String message, {int duration = 7, Color bg = Colors.transparent, Color color = Colors.white}) {
     toastification.showCustom(
         autoCloseDuration: Duration(seconds: duration),
+        alignment: Alignment.topCenter,
         builder: (ctx, item) {
           return GestureDetector(
             onTapDown: (_) => item.pause(),
