@@ -54,7 +54,9 @@ class _SearchBoxState extends ConsumerState<SearchBox> with TickerProviderStateM
     _loading = widget.loading;
 
     if (widget.focus) {
-      focus.requestFocus();
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) focus.requestFocus();
+      });
     }
   }
 
