@@ -18,7 +18,9 @@ class Poll extends StatefulWidget {
   _PollState createState() => _PollState();
 }
 
-class _PollState extends State<Poll> {
+class _PollState extends State<Poll> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
   List<int> _votes = [];
   bool _loading = false;
   ContentPoll? _poll;
@@ -94,6 +96,7 @@ class _PollState extends State<Poll> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     SkinColors colors = Skin.of(context).theme.colors;
 
     return Container(

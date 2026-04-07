@@ -22,7 +22,9 @@ class VideoPlayer extends StatefulWidget {
   _VideoPlayerState createState() => _VideoPlayerState();
 }
 
-class _VideoPlayerState extends State<VideoPlayer> {
+class _VideoPlayerState extends State<VideoPlayer> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
   bool? $isVideoPlayerLoaded = false;
   VideoPlayerController? videoPlayerController;
   ChewieController? chewieController;
@@ -98,6 +100,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final colors = Skin.of(context).theme.colors;
     if (videoUrl?.isEmpty ?? true) {
       return T.somethingsWrongButton(widget.element.outerHtml);

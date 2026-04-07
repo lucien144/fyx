@@ -11,7 +11,9 @@ class Spoiler extends StatefulWidget {
   _SpoilerState createState() => _SpoilerState();
 }
 
-class _SpoilerState extends State<Spoiler> {
+class _SpoilerState extends State<Spoiler> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
   late final Widget _parsedChild;
   bool _toggle = false;
 
@@ -23,6 +25,7 @@ class _SpoilerState extends State<Spoiler> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     SkinColors colors = Skin.of(context).theme.colors;
 
     return GestureDetector(
