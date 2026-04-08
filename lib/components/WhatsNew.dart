@@ -79,19 +79,19 @@ class WhatsNew extends StatelessWidget {
         SizedBox(height: 24),
         item(
             context: context,
-            icon: MdiIcons.fileUpload,
-            title: 'Vylepšené nahrávání médií',
-            description: '- 🎬 nově lze nahrát videa\n- 📁 nebo soubory\n- je možné vybrat více souborů najednou\n- obrázky lze resizovat (SD, MD, HD) nebo orig. jako odkaz\n- zachovává se pořadí uploadu\n- pořadí souborů je možné změnit',),
-        // item(
-        //     context: context,
-        //     icon: MdiIcons.typewriter,
-        //     title: 'Redesign editoru',
-        //     description: 'Editor příspěvků má nově lepší vzhled a je přehlednější. Zároveň lze vkládat obrázky přímo ze schránky.',),
-        // item(
-        //     context: context,
-        //     icon: MdiIcons.lock,
-        //     title: 'Fuknce pro podporovatele',
-        //     description: 'Některé funkce jsou nově pouze pro podporovatele.',),
+            icon: MdiIcons.emailSearchOutline,
+            title: 'Hledání v poště',
+            description: 'Konečně lze hledat v poště 🎉',),
+        item(
+            context: context,
+            icon: MdiIcons.brushOutline,
+            title: 'UI/UX vylepšení',
+            description: 'Pár drobných vylepšení, které krvavé oko uvítá.',),
+        item(
+            context: context,
+            icon: MdiIcons.bugOutline,
+            title: 'Menší opravy',
+            description: 'Další menší opravy a vylepšení pod kapotou.',),
         // item(
         //     context: context,
         //     icon: MdiIcons.themeLightDark,
