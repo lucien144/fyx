@@ -171,7 +171,10 @@ class _SettingsDesignScreenState extends State<SettingsDesignScreen> {
                   ),
                 ),
                 SettingsTile(
-                    title: Text('Resetovat', style: TextStyle(color: colors.danger), textAlign: TextAlign.center),
+                    title: Padding(
+                      padding: EdgeInsets.only(bottom: MediaQuery.viewPaddingOf(context).bottom),
+                      child: Text('Resetovat', style: TextStyle(color: colors.danger), textAlign: TextAlign.center),
+                    ),
                     onPressed: (_) {
                       MainRepository().settings.fontSize = Settings().fontSize;
                       Provider.of<ThemeModel>(context, listen: false).setFontSize(Settings().fontSize);

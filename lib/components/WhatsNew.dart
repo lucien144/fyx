@@ -60,43 +60,45 @@ class WhatsNew extends StatelessWidget {
     var pkg = MainRepository().packageInfo;
     var version = '${pkg.version} (${pkg.buildNumber})';
 
-    return ListView(shrinkWrap: true, padding: const EdgeInsets.only(left: 32, top: 32, right: 32, bottom: 48), children: [
-      Text(
-        'Co je nového?',
-        style: TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.w800,
+    return SafeArea(
+      child: ListView(shrinkWrap: true, padding: const EdgeInsets.only(left: 32, top: 32, right: 32, bottom: 48), children: [
+        Text(
+          'Co je nového?',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w800,
+          ),
+          textAlign: TextAlign.center,
         ),
-        textAlign: TextAlign.center,
-      ),
-      SizedBox(height: 4),
-      Text(
-        'Verze $version',
-        textAlign: TextAlign.center,
-        style: TextStyle(fontFamily: 'JetBrainsMono', fontSize: 13),
-      ),
-      SizedBox(height: 24),
-      item(
-          context: context,
-          icon: MdiIcons.fileUpload,
-          title: 'Vylepšené nahrávání médií',
-          description: '- 🎬 nově lze nahrát videa\n- 📁 nebo soubory\n- je možné vybrat více souborů najednou\n- obrázky lze resizovat (SD, MD, HD) nebo orig. jako odkaz\n- zachovává se pořadí uploadu\n- pořadí souborů je možné změnit',),
-      // item(
-      //     context: context,
-      //     icon: MdiIcons.typewriter,
-      //     title: 'Redesign editoru',
-      //     description: 'Editor příspěvků má nově lepší vzhled a je přehlednější. Zároveň lze vkládat obrázky přímo ze schránky.',),
-      // item(
-      //     context: context,
-      //     icon: MdiIcons.lock,
-      //     title: 'Fuknce pro podporovatele',
-      //     description: 'Některé funkce jsou nově pouze pro podporovatele.',),
-      // item(
-      //     context: context,
-      //     icon: MdiIcons.themeLightDark,
-      //     title: 'Nový skin: Dark',
-      //     description: 'Přidal jsem další klasický skin, který znáte z Nyxu - Dark.'),
-      CupertinoButton(child: Text('Pokračovat', style: TextStyle(color: colors.background),), onPressed: () => Navigator.of(context).pop(), color: colors.primary)
-    ]);
+        SizedBox(height: 4),
+        Text(
+          'Verze $version',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontFamily: 'JetBrainsMono', fontSize: 13),
+        ),
+        SizedBox(height: 24),
+        item(
+            context: context,
+            icon: MdiIcons.fileUpload,
+            title: 'Vylepšené nahrávání médií',
+            description: '- 🎬 nově lze nahrát videa\n- 📁 nebo soubory\n- je možné vybrat více souborů najednou\n- obrázky lze resizovat (SD, MD, HD) nebo orig. jako odkaz\n- zachovává se pořadí uploadu\n- pořadí souborů je možné změnit',),
+        // item(
+        //     context: context,
+        //     icon: MdiIcons.typewriter,
+        //     title: 'Redesign editoru',
+        //     description: 'Editor příspěvků má nově lepší vzhled a je přehlednější. Zároveň lze vkládat obrázky přímo ze schránky.',),
+        // item(
+        //     context: context,
+        //     icon: MdiIcons.lock,
+        //     title: 'Fuknce pro podporovatele',
+        //     description: 'Některé funkce jsou nově pouze pro podporovatele.',),
+        // item(
+        //     context: context,
+        //     icon: MdiIcons.themeLightDark,
+        //     title: 'Nový skin: Dark',
+        //     description: 'Přidal jsem další klasický skin, který znáte z Nyxu - Dark.'),
+        CupertinoButton(child: Text('Pokračovat', style: TextStyle(color: colors.background),), onPressed: () => Navigator.of(context).pop(), color: colors.primary)
+      ]),
+    );
   }
 }

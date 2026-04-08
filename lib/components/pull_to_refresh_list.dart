@@ -284,7 +284,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
                           style: TextStyle(color: colors.background),
                         ),
                       ),
-                      padding: const EdgeInsets.only(top: 16, left: 20, right: 20, bottom: 40),
+                      padding: EdgeInsets.only(top: 16, left: 20, right: 20, bottom: 40 + MediaQuery.viewPaddingOf(context).bottom),
                     ),
                   ),
                 ),

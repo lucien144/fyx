@@ -389,68 +389,70 @@ class _MessageScreenState extends State<MessageScreen> {
                                     context: context,
                                     expand: false,
                                     builder: (context) {
-                                      return ContextMenuGrid(
-                                        children: [
-                                          ContextMenuItem(
-                                            label: 'Kamera',
-                                            icon: MdiIcons.camera,
-                                            onTap: () async {
-                                              Navigator.of(context).pop();
-                                              FocusScope.of(context).unfocus();
-                                              await getImage(FileSource.camera);
-                                              //FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
-                                            },
-                                          ),
-                                          ContextMenuItem(
-                                            label: 'Galerie',
-                                            icon: MdiIcons.image,
-                                            onTap: () async {
-                                              Navigator.of(context).pop();
-                                              FocusScope.of(context).unfocus();
-                                              await getImage(FileSource.media);
-                                              //FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
-                                            },
-                                          ),
-                                          ContextMenuItem(
-                                            label: 'Soubory',
-                                            icon: MdiIcons.fileDocument,
-                                            onTap: () async {
-                                              Navigator.of(context).pop();
-                                              FocusScope.of(context).unfocus();
-                                              await getImage(FileSource.files);
-                                              //FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
-                                            },
-                                          ),
-                                          FutureBuilder(
-                                              future: Pasteboard.image,
-                                              builder: (_, data) {
-                                                if (data.hasData) {
+                                      return SafeArea(
+                                        child: ContextMenuGrid(
+                                          children: [
+                                            ContextMenuItem(
+                                              label: 'Kamera',
+                                              icon: MdiIcons.camera,
+                                              onTap: () async {
+                                                Navigator.of(context).pop();
+                                                FocusScope.of(context).unfocus();
+                                                await getImage(FileSource.camera);
+                                                //FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
+                                              },
+                                            ),
+                                            ContextMenuItem(
+                                              label: 'Galerie',
+                                              icon: MdiIcons.image,
+                                              onTap: () async {
+                                                Navigator.of(context).pop();
+                                                FocusScope.of(context).unfocus();
+                                                await getImage(FileSource.media);
+                                                //FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
+                                              },
+                                            ),
+                                            ContextMenuItem(
+                                              label: 'Soubory',
+                                              icon: MdiIcons.fileDocument,
+                                              onTap: () async {
+                                                Navigator.of(context).pop();
+                                                FocusScope.of(context).unfocus();
+                                                await getImage(FileSource.files);
+                                                //FocusScope.of(context).requestFocus(recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
+                                              },
+                                            ),
+                                            FutureBuilder(
+                                                future: Pasteboard.image,
+                                                builder: (_, data) {
+                                                  if (data.hasData) {
+                                                    return ContextMenuItem(
+                                                      label: 'Schránka',
+                                                      icon: MdiIcons.contentPaste,
+                                                      onTap: () async {
+                                                        Navigator.of(context).pop();
+                                                        FocusScope.of(context).unfocus();
+                                                        final imageBytes = await Pasteboard.image;
+                                                        if (imageBytes != null) {
+                                                          viewModel.addAttachment(new Attachment(
+                                                            filename: 'pasteboard_image.${DateTime.now().millisecondsSinceEpoch}.jpg',
+                                                            extension: 'jpg',
+                                                            mediaType: MediaType('image', 'jpeg'),
+                                                            bytes: imageBytes,
+                                                          ));
+                                                        }
+                                                        //FocusScope.of(context).requestFocus(state.recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
+                                                      },
+                                                    );
+                                                  }
                                                   return ContextMenuItem(
-                                                    label: 'Schránka',
                                                     icon: MdiIcons.contentPaste,
-                                                    onTap: () async {
-                                                      Navigator.of(context).pop();
-                                                      FocusScope.of(context).unfocus();
-                                                      final imageBytes = await Pasteboard.image;
-                                                      if (imageBytes != null) {
-                                                        viewModel.addAttachment(new Attachment(
-                                                          filename: 'pasteboard_image.${DateTime.now().millisecondsSinceEpoch}.jpg',
-                                                          extension: 'jpg',
-                                                          mediaType: MediaType('image', 'jpeg'),
-                                                          bytes: imageBytes,
-                                                        ));
-                                                      }
-                                                      //FocusScope.of(context).requestFocus(state.recipientHasFocus ? _recipientFocusNode : _messageFocusNode);
-                                                    },
+                                                    label: 'Schránka',
+                                                    disabled: true,
                                                   );
-                                                }
-                                                return ContextMenuItem(
-                                                  icon: MdiIcons.contentPaste,
-                                                  label: 'Schránka',
-                                                  disabled: true,
-                                                );
-                                              }),
-                                        ],
+                                                }),
+                                          ],
+                                        ),
                                       );
                                     },
                                   );

@@ -53,7 +53,11 @@ class _InfoPageState extends State<InfoPage> {
             future: _response,
             builder: (BuildContext context, AsyncSnapshot<Response> snapshot) {
               if (snapshot.hasData) {
-                return Markdown(data: snapshot.data!.body, styleSheet: MarkdownStyleSheet.fromCupertinoTheme(CupertinoTheme.of(context)), onTapLink: (String text, String? url, String title) => url != null ? T.openLink(url, mode: SettingsProvider().linksMode) : null);
+                return Markdown(
+                    data: snapshot.data!.body,
+                    padding: EdgeInsets.only(left: 16, right: 16, top: 16, bottom: MediaQuery.viewPaddingOf(context).bottom),
+                    styleSheet: MarkdownStyleSheet.fromCupertinoTheme(CupertinoTheme.of(context)),
+                    onTapLink: (String text, String? url, String title) => url != null ? T.openLink(url, mode: SettingsProvider().linksMode) : null);
               }
               if (snapshot.hasError) {
                 return T.feedbackScreen(

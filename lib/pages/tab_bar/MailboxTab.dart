@@ -145,33 +145,31 @@ class _MailboxTabState extends State<MailboxTab> {
           Positioned(
             right: 20,
             bottom: 20,
-            child: SafeArea(
-              child: FloatingActionButton(
-                backgroundColor: colors.primary,
-                foregroundColor: colors.background,
-                child: Icon(Icons.add),
-                onPressed: () {
-                  final viewModel = getIt<MessageViewModel>();
-                  viewModel.initializeFromSettings(MessageSettings(
-                      onClose: this.refreshData,
-                      hasInputField: true,
-                      onSubmit: (String? inputField, String message, List<Attachment> attachments) async {
-                        if (inputField == null) {
-                          return false;
-                        }
+            child: FloatingActionButton(
+              backgroundColor: colors.primary,
+              foregroundColor: colors.background,
+              child: Icon(Icons.add),
+              onPressed: () {
+                final viewModel = getIt<MessageViewModel>();
+                viewModel.initializeFromSettings(MessageSettings(
+                    onClose: this.refreshData,
+                    hasInputField: true,
+                    onSubmit: (String? inputField, String message, List<Attachment> attachments) async {
+                      if (inputField == null) {
+                        return false;
+                      }
 
-                        var response = await ApiController().sendMail(inputField, message, attachments: attachments);
-                        return response.isOk;
-                      }));
+                      var response = await ApiController().sendMail(inputField, message, attachments: attachments);
+                      return response.isOk;
+                    }));
 
-                  showCupertinoModalBottomSheet(
-                      context: context,
-                      backgroundColor: colors.barBackground,
-                      barrierColor: colors.dark.withOpacity(0.5),
-                      useRootNavigator: true,
-                      builder: (BuildContext context) => _newMessage);
-                },
-              ),
+                showCupertinoModalBottomSheet(
+                    context: context,
+                    backgroundColor: colors.barBackground,
+                    barrierColor: colors.dark.withOpacity(0.5),
+                    useRootNavigator: true,
+                    builder: (BuildContext context) => _newMessage);
+              },
             ),
           )
         ]),
