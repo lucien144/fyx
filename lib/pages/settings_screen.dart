@@ -114,6 +114,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
+            automaticBackgroundVisibility: false,
+            backgroundColor: colors.barBackground,
             middle: Text(
               L.SETTINGS,
               style: TextStyle(color: colors.text),
@@ -415,14 +417,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       context: context,
                       backgroundColor: colors.barBackground,
                       barrierColor: colors.dark.withOpacity(0.5),
-                      builder: (BuildContext context) => PremiumFeatureBottomSheet(preview: true,)),
+                      builder: (BuildContext context) => PremiumFeatureBottomSheet(
+                            preview: true,
+                          )),
                 ),
-                SettingsTile.navigation(
-                  leading: Icon(Icons.volunteer_activism, color: colors.grey),
-                  title: Text(L.BACKERS),
-                  onPressed: (_) => Navigator.of(context).pushNamed('/settings/info',
-                      arguments: InfoPageSettings(L.BACKERS, 'https://raw.githubusercontent.com/lucien144/fyx/develop/BACKERS.md')),
-                ),
+                // SettingsTile.navigation(
+                //   leading: Icon(Icons.volunteer_activism, color: colors.grey),
+                //   title: Text(L.BACKERS),
+                //   onPressed: (_) => Navigator.of(context).pushNamed('/settings/info',
+                //       arguments: InfoPageSettings(L.BACKERS, 'https://raw.githubusercontent.com/lucien144/fyx/develop/BACKERS.md')),
+                // ),
                 SettingsTile.navigation(
                   leading: Icon(Icons.info, color: colors.grey),
                   title: Text(L.ABOUT),
@@ -493,7 +497,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   behavior: HitTestBehavior.opaque,
                   onTap: () => setState(() => $showDebug--),
                   child: Padding(
-                    padding: const EdgeInsets.only(bottom: 20),
+                    padding: EdgeInsets.only(bottom: 20 + MediaQuery.viewPaddingOf(context).bottom),
                     child: Text(
                       'Verze: $version ${$showDebug <= 3 ? $showDebug : ''}',
                       textAlign: TextAlign.center,

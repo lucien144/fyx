@@ -51,7 +51,7 @@ class _SettingsDesignScreenState extends State<SettingsDesignScreen> {
     final skin = Skin.of(context).skins.firstWhere((skinData) => skinData.id == skinId);
     final skinColors = skin.lightData.colors;
     final skinDarkColors = skin.darkData.colors;
-    
+
     return CustomSettingsTile(
       child: PremiumFeature(
         feature: PremiumFeatureEnum.skins,
@@ -101,6 +101,8 @@ class _SettingsDesignScreenState extends State<SettingsDesignScreen> {
 
     return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
+            automaticBackgroundVisibility: false,
+            backgroundColor: colors.barBackground,
             middle: Text(
               L.SETTINGS,
               style: TextStyle(color: colors.text),
@@ -169,7 +171,10 @@ class _SettingsDesignScreenState extends State<SettingsDesignScreen> {
                   ),
                 ),
                 SettingsTile(
-                    title: Text('Resetovat', style: TextStyle(color: colors.danger), textAlign: TextAlign.center),
+                    title: Padding(
+                      padding: EdgeInsets.only(bottom: MediaQuery.viewPaddingOf(context).bottom),
+                      child: Text('Resetovat', style: TextStyle(color: colors.danger), textAlign: TextAlign.center),
+                    ),
                     onPressed: (_) {
                       MainRepository().settings.fontSize = Settings().fontSize;
                       Provider.of<ThemeModel>(context, listen: false).setFontSize(Settings().fontSize);

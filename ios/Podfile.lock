@@ -153,8 +153,6 @@ PODS:
     - PromisesSwift (~> 2.1)
   - FirebaseSharedSwift (11.15.0)
   - Flutter (1.0.0)
-  - fluttertoast (0.0.2):
-    - Flutter
   - gallery_saver_plus (0.0.1):
     - Flutter
   - GoogleAdsOnDeviceConversion (2.1.0):
@@ -265,7 +263,6 @@ DEPENDENCIES:
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - firebase_performance (from `.symlinks/plugins/firebase_performance/ios`)
   - Flutter (from `Flutter`)
-  - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - gallery_saver_plus (from `.symlinks/plugins/gallery_saver_plus/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
@@ -327,8 +324,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_performance/ios"
   Flutter:
     :path: Flutter
-  fluttertoast:
-    :path: ".symlinks/plugins/fluttertoast/ios"
   gallery_saver_plus:
     :path: ".symlinks/plugins/gallery_saver_plus/ios"
   image_picker_ios:
@@ -382,7 +377,6 @@ SPEC CHECKSUMS:
   FirebaseSessions: b9a92c1c51bbb81e78fc3142cda6d925d700f8e7
   FirebaseSharedSwift: e17c654ef1f1a616b0b33054e663ad1035c8fd40
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
-  fluttertoast: 21eecd6935e7064cc1fcb733a4c5a428f3f24f0f
   gallery_saver_plus: c4b59c605df1049a02d036ef81d82972b6dfd606
   GoogleAdsOnDeviceConversion: 2be6297a4f048459e0ae17fad9bfd2844e10cf64
   GoogleAppMeasurement: 700dce7541804bec33db590a5c496b663fbe2539

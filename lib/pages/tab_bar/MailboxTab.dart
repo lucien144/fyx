@@ -36,6 +36,7 @@ class MailboxTab extends StatefulWidget {
 
 class _MailboxTabState extends State<MailboxTab> {
   int _refreshData = 0;
+  String? _searchTerm;
   final _newMessage = MessageScreen(key: UniqueKey());
 
   refreshData() {
@@ -69,6 +70,8 @@ class _MailboxTabState extends State<MailboxTab> {
     return CupertinoTabView(builder: (context) {
       return CupertinoPageScaffold(
         navigationBar: CupertinoNavigationBar(
+            automaticBackgroundVisibility: false,
+            backgroundColor: colors.barBackground,
             leading: Visibility(
               visible: tabArguments?.mailId != null,
               child: CupertinoNavigationBarBackButton(
@@ -84,6 +87,24 @@ class _MailboxTabState extends State<MailboxTab> {
           PullToRefreshList(
               rebuild: _refreshData,
               isInfinite: true,
+              searchEnabled: this._searchTerm != null,
+              searchLabel: 'Hledej @nick a nebo text...',
+              searchTerm: this._searchTerm,
+              onSearch: (term) {
+                setState(() => this._searchTerm = term);
+                this.refreshData();
+              },
+              onSearchClear: () {
+                setState(() => this._searchTerm = null);
+                this.refreshData();
+              },
+              onPullDown: (scrollInfo) {
+                if (scrollInfo.metrics.pixels > 80 && this._searchTerm != null) {
+                  if (this._searchTerm == '') setState(() => this._searchTerm = null);
+                } else if (scrollInfo.metrics.pixels < -60 && this._searchTerm == null) {
+                  setState(() => this._searchTerm = '');
+                }
+              },
               sliverListBuilder: (List data, {controller}) {
                 return ValueListenableBuilder(
                   valueListenable: MainRepository().settings.box.listenable(keys: ['blockedMails', 'blockedUsers']),
@@ -105,7 +126,7 @@ class _MailboxTabState extends State<MailboxTab> {
                 );
               },
               dataProvider: (lastId) async {
-                var result = await ApiController().loadMail(lastId: lastId ?? tabArguments?.mailId);
+                var result = await ApiController().loadMail(lastId: lastId ?? tabArguments?.mailId, search: this._searchTerm);
                 var mails = result.mails
                     .map((_mail) => Mail.fromJson(_mail, isCompact: MainRepository().settings.useCompactMode))
                     .where((mail) => !MainRepository().settings.isMailBlocked(mail.id))
@@ -124,33 +145,31 @@ class _MailboxTabState extends State<MailboxTab> {
           Positioned(
             right: 20,
             bottom: 20,
-            child: SafeArea(
-              child: FloatingActionButton(
-                backgroundColor: colors.primary,
-                foregroundColor: colors.background,
-                child: Icon(Icons.add),
-                onPressed: () {
-                  final viewModel = getIt<MessageViewModel>();
-                  viewModel.initializeFromSettings(MessageSettings(
-                      onClose: this.refreshData,
-                      hasInputField: true,
-                      onSubmit: (String? inputField, String message, List<Attachment> attachments) async {
-                        if (inputField == null) {
-                          return false;
-                        }
+            child: FloatingActionButton(
+              backgroundColor: colors.primary,
+              foregroundColor: colors.background,
+              child: Icon(Icons.add),
+              onPressed: () {
+                final viewModel = getIt<MessageViewModel>();
+                viewModel.initializeFromSettings(MessageSettings(
+                    onClose: this.refreshData,
+                    hasInputField: true,
+                    onSubmit: (String? inputField, String message, List<Attachment> attachments) async {
+                      if (inputField == null) {
+                        return false;
+                      }
 
-                        var response = await ApiController().sendMail(inputField, message, attachments: attachments);
-                        return response.isOk;
-                      }));
+                      var response = await ApiController().sendMail(inputField, message, attachments: attachments);
+                      return response.isOk;
+                    }));
 
-                  showCupertinoModalBottomSheet(
-                      context: context,
-                      backgroundColor: colors.barBackground,
-                      barrierColor: colors.dark.withOpacity(0.5),
-                      useRootNavigator: true,
-                      builder: (BuildContext context) => _newMessage);
-                },
-              ),
+                showCupertinoModalBottomSheet(
+                    context: context,
+                    backgroundColor: colors.barBackground,
+                    barrierColor: colors.dark.withOpacity(0.5),
+                    useRootNavigator: true,
+                    builder: (BuildContext context) => _newMessage);
+              },
             ),
           )
         ]),

@@ -22,7 +22,9 @@ class VideoPlayer extends StatefulWidget {
   _VideoPlayerState createState() => _VideoPlayerState();
 }
 
-class _VideoPlayerState extends State<VideoPlayer> {
+class _VideoPlayerState extends State<VideoPlayer> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
   bool? $isVideoPlayerLoaded = false;
   VideoPlayerController? videoPlayerController;
   ChewieController? chewieController;
@@ -46,8 +48,17 @@ class _VideoPlayerState extends State<VideoPlayer> {
     if (videoUrl != null && videoUrl!.isNotEmpty) {
       videoPlayerController = VideoPlayerController.networkUrl(Uri.parse(videoUrl!))
         ..initialize()
-            .then((_) => setState(() => $isVideoPlayerLoaded = true))
-            .timeout(Duration(seconds: 3), onTimeout: () => setState(() => $isVideoPlayerLoaded = null));
+            .then((_) {
+              if (mounted) {
+                setState(() {
+                  chewieController = initChewie(context);
+                  $isVideoPlayerLoaded = true;
+                });
+              }
+            })
+            .timeout(Duration(seconds: 3), onTimeout: () {
+              if (mounted) setState(() => $isVideoPlayerLoaded = null);
+            });
     }
   }
 
@@ -89,6 +100,7 @@ class _VideoPlayerState extends State<VideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final colors = Skin.of(context).theme.colors;
     if (videoUrl?.isEmpty ?? true) {
       return T.somethingsWrongButton(widget.element.outerHtml);
@@ -101,8 +113,8 @@ class _VideoPlayerState extends State<VideoPlayer> {
             color: colors.background,
             child: Column(
               children: <Widget>[
-                if ($isVideoPlayerLoaded == true)
-                  AspectRatio(aspectRatio: videoPlayerController!.value.aspectRatio, child: Chewie(controller: initChewie(context))),
+                if ($isVideoPlayerLoaded == true && chewieController != null)
+                  AspectRatio(aspectRatio: videoPlayerController!.value.aspectRatio, child: Chewie(controller: chewieController!)),
                 if ($isVideoPlayerLoaded == false) CupertinoActivityIndicator(),
                 if ($isVideoPlayerLoaded == null) T.somethingsWrongButton(widget.element.outerHtml, icon: Icons.play_disabled, title: 'Video se nepodařilo načíst.'),
                 SizedBox(

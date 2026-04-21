@@ -211,8 +211,8 @@ class ApiProvider implements IApiProvider {
     return await dio.delete('$URL/profile/delete_token/${_credentials?.token}');
   }
 
-  Future<Response> fetchMail({int? lastId, String? username}) async {
-    Map<String, dynamic> params = {'order': lastId == null ? 'newest' : 'older_than', 'from_id': lastId, 'user': username};
+  Future<Response> fetchMail({int? lastId, String? username, String? search}) async {
+    Map<String, dynamic> params = {'order': lastId == null ? 'newest' : 'older_than', 'from_id': lastId, 'user': username, 'text': search};
     return await dio.get('$URL/mail', queryParameters: params);
   }
 

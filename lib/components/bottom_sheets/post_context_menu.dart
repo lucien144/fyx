@@ -74,7 +74,7 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
   bool get canDeletePost => isPost && post.canBeDeleted;
 
   Widget createGridView({required List<Widget> children, required BuildContext context}) {
-    return ContextMenuGrid(children: children);
+    return SafeArea(child: ContextMenuGrid(children: children));
   }
 
   void confirmationDialog(String title, String content, Function()? onPressed) {
