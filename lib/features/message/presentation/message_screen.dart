@@ -342,6 +342,7 @@ class _MessageScreenState extends State<MessageScreen> {
                                   String message = state.useMarkdown
                                       ? md.markdownToHtml(
                                           _messageController.text,
+                                          inlineOnly: true,
                                           inlineSyntaxes: [
                                             md.DelimiterSyntax('§+', tags: [md.DelimiterTag('span class="spoiler"', 1)], requiresDelimiterRun: true),
                                             md.AutolinkExtensionSyntax()
