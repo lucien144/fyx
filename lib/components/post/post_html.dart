@@ -139,7 +139,6 @@ class PostHtml extends StatelessWidget {
                   child: PostHeroAttachment(
                     img,
                     images: content!.images,
-                    openGallery: true,
                     onTap: () => _isImageTap = true,
                     crop: false,
                     blur: blur,

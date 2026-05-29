@@ -20,7 +20,6 @@ class PostHeroAttachment extends StatefulWidget {
   final List<model.Image> images;
   final bool crop;
   final Function? onTap;
-  final bool openGallery;
   final bool blur;
   final Size size;
   final bool showStrip;
@@ -32,7 +31,6 @@ class PostHeroAttachment extends StatefulWidget {
     this.showStrip = true,
     this.size = const Size(100, 100),
     this.onTap,
-    this.openGallery = true,
     this.blur = false,
   });
 
@@ -68,11 +66,9 @@ class _PostHeroAttachmentState extends State<PostHeroAttachment> {
           if (widget.onTap != null) {
             widget.onTap!();
           }
-          if (widget.openGallery) {
-            // Load images into GalleryViewModel and open gallery screen
-            getIt<GalleryViewModel>().loadImages(images: widget.images, currentImageUrl: (widget.attachment as model.Image).image);
-            Navigator.of(context, rootNavigator: true).pushNamed('/gallery');
-          }
+          // Load images into GalleryViewModel and open gallery screen
+          getIt<GalleryViewModel>().loadImages(images: widget.images, currentImageUrl: (widget.attachment as model.Image).image);
+          Navigator.of(context, rootNavigator: true).pushNamed('/gallery');
         },
         onLongPress: () => showCupertinoModalBottomSheet(
             context: context,
