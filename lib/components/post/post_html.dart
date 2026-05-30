@@ -15,6 +15,7 @@ import 'package:fyx/model/post/Content.dart' as fyx;
 import 'package:fyx/model/post/Image.dart' as post;
 import 'package:fyx/model/post/Video.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
+import 'package:fyx/pages/discussion_home_page.dart';
 import 'package:fyx/pages/search_page.dart';
 import 'package:fyx/pages/tab_bar/MailboxTab.dart';
 import 'package:fyx/shared/services/service_locator.dart';
@@ -304,6 +305,15 @@ class PostHtml extends StatelessWidget {
     if (parserResult.isNotEmpty) {
       var arguments = DiscussionPageArguments(parserResult[INTERNAL_URI_PARSER.discussionId]!, postId: parserResult[INTERNAL_URI_PARSER.postId]! + 1);
       Navigator.of(buildContext, rootNavigator: true).pushNamed('/discussion', arguments: arguments);
+      return;
+    }
+
+    // Click through to discussion header or home
+    parserResult = Helpers.parseDiscussionContentUri(link);
+    if (parserResult.isNotEmpty) {
+      var arguments = DiscussionHomePageArguments(parserResult[INTERNAL_URI_PARSER.discussionId]!);
+      String route = parserResult[INTERNAL_URI_PARSER.homeOrHeader] == 'header' ? '/discussion/header' : '/discussion/home';
+      Navigator.of(buildContext, rootNavigator: true).pushNamed(route, arguments: arguments);
       return;
     }
 
