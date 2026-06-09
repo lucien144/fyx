@@ -117,7 +117,7 @@ class _SearchPageState extends State<SearchPage> {
                       ]))
                   .toList();
 
-              int? id = posts.length > 0 ? posts.last['id'] : null;
+              int? id = posts.length > 0 ? posts.last['id'] : lastId;
               return DataProviderResult(data, lastId: id);
             }));
   }
