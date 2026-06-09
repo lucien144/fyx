@@ -190,7 +190,7 @@ class ContentRegular extends Content {
         whitespaceTag.remove();
       });
       String start = testDocument.body!.innerHtml.replaceAll(new RegExp(r"\s|\n|\r|\t"), "");
-      String cleanedBody = document.body!.innerHtml.replaceAll(new RegExp(r"\s|\n|\r|\t"), "");
+      String cleanedBody = document.body!.innerHtml.replaceAll('<br>', '').replaceAll(new RegExp(r"\s|\n|\r|\t"), "");
       _consecutiveImages = cleanedBody.startsWith(start);
 
       document.querySelectorAll('img[src]').forEach((Element el) {
