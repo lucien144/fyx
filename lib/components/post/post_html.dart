@@ -26,6 +26,16 @@ import 'package:html/dom.dart' as dom;
 import 'package:html_unescape/html_unescape.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
+// Stable GlobalKeys for inline video players, keyed by their <video> dom.Element.
+//
+// Html() recreates its internal subtree (a fresh GlobalKey) on every PostHtml rebuild,
+// which would otherwise tear down and dispose the VideoPlayer (and its ChewieController)
+// mid-playback/mid-fullscreen. Giving each VideoPlayer a stable GlobalKey lets Flutter
+// reparent the existing element+state into the rebuilt subtree instead of recreating it.
+// The element instance is stable across rebuilds (flutter_html only re-parses when the
+// data changes), and the Expando holds it weakly so keys are collected with the element.
+final Expando<GlobalKey> _videoPlayerKeys = Expando<GlobalKey>('postHtmlVideoPlayerKeys');
+
 class PostHtml extends StatelessWidget {
   final fyx.Content? content;
   final bool blur;
@@ -156,7 +166,7 @@ class PostHtml extends StatelessWidget {
               ) {
                 final element = renderContext.element;
                 if (element != null) {
-                  return VideoPlayer(element, blur: blur);
+                  return VideoPlayer(element, key: _videoPlayerKeys[element] ??= GlobalKey(), blur: blur);
                 }
                 return T.somethingsWrongButton(content!.rawBody);
               }),

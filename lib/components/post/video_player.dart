@@ -16,7 +16,7 @@ class VideoPlayer extends StatefulWidget {
   final bool blur;
   late final String? videoUrl;
 
-  VideoPlayer(this.element, {this.blur = false});
+  VideoPlayer(this.element, {super.key, this.blur = false});
 
   @override
   _VideoPlayerState createState() => _VideoPlayerState();
