@@ -1,0 +1,162 @@
+workflows:
+  fyx_release:
+    name: Fyx release (Android + iOS)
+    instance_type: mac_mini_m2
+    max_build_duration: 120
+
+    # App Store Connect API key configured in Codemagic > Teams > Integrations.
+    # Replace `CodemagicASCKey` with the actual integration name from your team settings.
+    integrations:
+      app_store_connect: 2UP4294984
+
+    triggering:
+      events:
+        - tag
+      branch_patterns:
+        - pattern: feature/cdci
+          include: true
+          source: true
+#        - pattern: master
+#          include: true
+#          source: true
+      tag_patterns:
+        - pattern: 'v*.*.*'
+          include: true
+
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+      # Automatic iOS code signing via the App Store Connect integration above.
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: wtf.144.fyx
+      # TODO: enable Android signing once the keystore is uploaded to
+      # Codemagic > Code signing identities, then reference it here:
+      # android_signing:
+      #   - fyx_keystore
+      groups:
+        - app_store_credentials   # APP_STORE_CONNECT_* (handled via integration), FIREBASE_SERVICE_ACCOUNT
+        - firebase_credentials    # FIREBASE_*, SUPABASE_*, GOOGLE_APP_ID, GCM_SENDER_ID
+      vars:
+        BUNDLE_ID: "wtf.144.fyx"
+        ANDROID_PACKAGE_NAME: "net.lucien144.fyx"
+
+    scripts:
+      - name: Flutter dependencies
+        script: |
+          flutter --version
+          flutter pub get
+
+      - name: Generate .env file
+        script: |
+          # The app loads `.env` as a Flutter asset (flutter_dotenv) and reads
+          # Firebase + Supabase config from it. `.env` is gitignored, so it must
+          # be generated from the environment variables on every build.
+          cat > .env <<EOF
+          SUPABASE_URL=${SUPABASE_URL}
+          SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+
+          FIREBASE_ANDROID_API_KEY=${FIREBASE_ANDROID_API_KEY}
+          FIREBASE_ANDROID_APP_ID=${FIREBASE_ANDROID_APP_ID}
+          FIREBASE_ANDROID_MESSAGING_SENDER_ID=${FIREBASE_ANDROID_MESSAGING_SENDER_ID}
+          FIREBASE_ANDROID_PROJECT_ID=${FIREBASE_ANDROID_PROJECT_ID}
+          FIREBASE_ANDROID_DATABASE_URL=${FIREBASE_ANDROID_DATABASE_URL}
+          FIREBASE_ANDROID_STORAGE_BUCKET=${FIREBASE_ANDROID_STORAGE_BUCKET}
+
+          FIREBASE_IOS_API_KEY=${FIREBASE_IOS_API_KEY}
+          FIREBASE_IOS_APP_ID=${FIREBASE_IOS_APP_ID}
+          FIREBASE_IOS_MESSAGING_SENDER_ID=${FIREBASE_IOS_MESSAGING_SENDER_ID}
+          FIREBASE_IOS_PROJECT_ID=${FIREBASE_IOS_PROJECT_ID}
+          FIREBASE_IOS_DATABASE_URL=${FIREBASE_IOS_DATABASE_URL}
+          FIREBASE_IOS_STORAGE_BUCKET=${FIREBASE_IOS_STORAGE_BUCKET}
+          FIREBASE_IOS_ANDROID_CLIENT_ID=${FIREBASE_IOS_ANDROID_CLIENT_ID}
+          FIREBASE_IOS_IOS_CLIENT_ID=${FIREBASE_IOS_IOS_CLIENT_ID}
+          FIREBASE_IOS_IOS_BUNDLE_ID=${FIREBASE_IOS_IOS_BUNDLE_ID}
+          EOF
+
+      - name: Generate iOS firebase_app_id_file.json
+        script: |
+          cat > ios/firebase_app_id_file.json <<EOF
+          {
+            "GOOGLE_APP_ID": "${GOOGLE_APP_ID}",
+            "FIREBASE_PROJECT_ID": "${FIREBASE_PROJECT_ID}",
+            "GCM_SENDER_ID": "${GCM_SENDER_ID}"
+          }
+          EOF
+
+      - name: Resolve build name/number
+        script: |
+          RAW_TAG="${CM_TAG#v}"
+          BUILD_NAME="${RAW_TAG%%+*}"
+
+          if [[ "$RAW_TAG" == *"+"* ]]; then
+            BUILD_NUMBER="${RAW_TAG##*+}"
+          else
+            BUILD_NUMBER="${PROJECT_BUILD_NUMBER}"
+          fi
+
+          echo "Resolved version: ${BUILD_NAME}+${BUILD_NUMBER}"
+          echo "BUILD_NAME=${BUILD_NAME}" >> $CM_ENV
+          echo "BUILD_NUMBER=${BUILD_NUMBER}" >> $CM_ENV
+
+      # TODO: remove this guard once the Android keystore is configured.
+      # Without key.properties the release AAB is built UNSIGNED (OK for Firebase
+      # App Distribution testing, NOT acceptable for Google Play upload).
+      - name: Set up Android signing (key.properties)
+        script: |
+          if [ -n "$CM_KEYSTORE_PATH" ]; then
+            cat > "$CM_BUILD_DIR/android/key.properties" <<EOF
+          storeFile=$CM_KEYSTORE_PATH
+          storePassword=$CM_KEYSTORE_PASSWORD
+          keyAlias=$CM_KEY_ALIAS
+          keyPassword=$CM_KEY_PASSWORD
+          EOF
+          else
+            echo "No keystore configured — building unsigned release AAB."
+          fi
+
+      - name: Set up iOS code signing
+        script: |
+          xcode-project use-profiles
+
+      - name: Build Android (AAB)
+        script: |
+          flutter build appbundle \
+            -t lib/main_production.dart \
+            --release \
+            --build-name=$BUILD_NAME \
+            --build-number=$BUILD_NUMBER
+
+      - name: Build iOS (IPA)
+        script: |
+          flutter build ipa \
+            -t lib/main_production.dart \
+            --release \
+            --build-name=$BUILD_NAME \
+            --build-number=$BUILD_NUMBER \
+            --export-options-plist=/Users/builder/export_options.plist
+
+    artifacts:
+      - build/**/outputs/**/*.aab
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
+
+    publishing:
+      firebase:
+        firebase_service_account: $FIREBASE_SERVICE_ACCOUNT
+        android:
+          app_id: $FIREBASE_ANDROID_APP_ID
+          groups:
+            - internal-testers
+        ios:
+          app_id: $FIREBASE_IOS_APP_ID
+          groups:
+            - internal-testers
+
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        beta_groups:
+          - Internal
