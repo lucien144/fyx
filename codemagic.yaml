@@ -25,8 +25,8 @@ workflows:
           include: true
 
     environment:
-      flutter: stable
-      xcode: latest
+      flutter: 3.29.3
+      xcode: 26.2
       cocoapods: default
       # iOS code signing is set up explicitly in the "Set up iOS code signing"
       # script below (fetch-signing-files --create), so no ios_signing block here.
