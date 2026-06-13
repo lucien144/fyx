@@ -27,10 +27,8 @@ workflows:
       flutter: stable
       xcode: latest
       cocoapods: default
-      # Automatic iOS code signing via the App Store Connect integration above.
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: wtf.144.fyx
+      # iOS code signing is set up explicitly in the "Set up iOS code signing"
+      # script below (fetch-signing-files --create), so no ios_signing block here.
       # TODO: enable Android signing once the keystore is uploaded to
       # Codemagic > Code signing identities, then reference it here:
       # android_signing:
@@ -118,6 +116,13 @@ workflows:
 
       - name: Set up iOS code signing
         script: |
+          keychain initialize
+          # --create makes the App Store provisioning profile (and a distribution
+          # certificate, if none exists yet) when it isn't found in the account.
+          app-store-connect fetch-signing-files "$BUNDLE_ID" \
+            --type IOS_APP_STORE \
+            --create
+          keychain add-certificates
           xcode-project use-profiles
 
       - name: Build Android (AAB)
