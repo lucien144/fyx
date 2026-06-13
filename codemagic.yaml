@@ -5,9 +5,10 @@ workflows:
     max_build_duration: 120
 
     # App Store Connect API key configured in Codemagic > Teams > Integrations.
-    # Replace `CodemagicASCKey` with the actual integration name from your team settings.
+    # This must be the integration NAME (the label you chose when adding the key),
+    # NOT the Apple Key ID. Find it under Teams > Integrations > App Store Connect.
     integrations:
-      app_store_connect: 2UP4294984
+      app_store_connect: Fyx App Store Connect API
 
     triggering:
       events:
