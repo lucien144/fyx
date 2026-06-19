@@ -11,7 +11,7 @@ import 'package:image/image.dart' as img;
 Uint8List _resizeIsolate(({Uint8List bytes, int maxWidth, String extension}) params) {
   final decoded = img.decodeImage(params.bytes);
   if (decoded == null || decoded.width <= params.maxWidth) return params.bytes;
-  final resized = img.copyResize(decoded, width: params.maxWidth);
+  final resized = img.copyResize(decoded, width: params.maxWidth, interpolation: img.Interpolation.cubic);
   return img.encodeNamedImage('file.${params.extension}', resized) ?? img.encodeJpg(resized);
 }
 
