@@ -8,11 +8,11 @@ import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:image/image.dart' as img;
 
-Uint8List _resizeIsolate(({Uint8List bytes, int maxWidth}) params) {
+Uint8List _resizeIsolate(({Uint8List bytes, int maxWidth, String extension}) params) {
   final decoded = img.decodeImage(params.bytes);
   if (decoded == null || decoded.width <= params.maxWidth) return params.bytes;
   final resized = img.copyResize(decoded, width: params.maxWidth);
-  return Uint8List.fromList(img.encodeJpg(resized));
+  return img.encodeNamedImage('file.${params.extension}', resized) ?? img.encodeJpg(resized);
 }
 
 class ApiProvider implements IApiProvider {
@@ -235,7 +235,7 @@ class ApiProvider implements IApiProvider {
 
   Future<Response> uploadFile(Attachment attachment, {int id = 0}) async {
     final needResize = attachment.mediaType.type == 'image' && [ImageQuality.sd, ImageQuality.md].contains(attachment.quality);
-    final bytes = needResize ? await compute(_resizeIsolate, (bytes: attachment.bytes, maxWidth: attachment.width)) : attachment.bytes;
+    final bytes = needResize ? await compute(_resizeIsolate, (bytes: attachment.bytes, maxWidth: attachment.width, extension: attachment.extension)) : attachment.bytes;
     FormData fileData = FormData.fromMap({
       'file': MultipartFile.fromBytes(bytes, filename: attachment.filename, contentType: attachment.mediaType),
       'file_type': id == 0 ? 'mail_attachment' : 'discussion_attachment',
