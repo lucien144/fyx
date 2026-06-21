@@ -45,8 +45,11 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           # Providing `prompt` makes the action run automatically (no @claude needed).
-          # `track_progress` posts a single sticky tracking/summary comment.
-          track_progress: "true"
+          # `track_progress` posts a single sticky tracking/summary comment, but it
+          # is not supported for the `labeled` action — enable it only for the
+          # automatic triggers. Label-triggered runs still post inline + summary
+          # comments from the prompt, just without the progress comment.
+          track_progress: ${{ github.event.action != 'labeled' }}
           claude_args: |
             --model claude-sonnet-4-6
             --allowedTools "Read,Grep,Glob,Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr comment:*),mcp__github_inline_comment__create_inline_comment"
