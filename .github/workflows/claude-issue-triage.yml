@@ -1,0 +1,73 @@
+name: Claude issue triage
+
+# Hands-off triage of newly opened issues. Most issues are filed automatically
+# from inside the app under the `fyxbot` account, so this workflow does NOT talk
+# to the reporter — it only:
+#   1. Adds classification labels (bug / enhancement / question, platform, etc.).
+#   2. Searches existing issues and, ONLY on a strong match, posts one short
+#      Czech comment listing likely-related tickets (for the maintainer).
+# It stays completely silent when the issue is well-formed and has no near match.
+#
+# Note: `allowed_bots` must include `fyxbot`, otherwise the action ignores
+# bot-authored events and would do nothing on exactly the issues we care about.
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Allow the in-app bot account so its issues are actually triaged.
+          allowed_bots: "fyxbot"
+          claude_args: |
+            --model claude-sonnet-4-6
+            --allowedTools "Read,Grep,Glob,Bash(gh issue view:*),Bash(gh issue list:*),Bash(gh issue edit:*),Bash(gh issue comment:*),Bash(gh search issues:*)"
+          prompt: |
+            Triage nově otevřeného issue #${{ github.event.issue.number }}
+            ("${{ github.event.issue.title }}") v repozitáři Fyx — neoficiální
+            Flutter klient pro českou diskuzní síť Nyx.cz. Většina issues vzniká
+            automaticky z aplikace pod účtem `fyxbot`.
+
+            DŮLEŽITÉ: S reportérem NEKOMUNIKUJ. Nepokládej dotazy, nežádej o
+            doplnění informací, nepiš uvítací ani děkovné komentáře. Tvým úkolem
+            je jen klasifikovat a zkusit najít duplicity.
+
+            1) LABELY — přidej (přes `gh issue edit`) jen ty, které z obsahu
+               jednoznačně plynou. Stávající labely neměň a neodebírej.
+
+               POZOR: bot `fyxbot` už sám přidává "bug 🐛" a "user report 👨‍💻"
+               — ty NIKDY znovu nepřidávej. Soustřeď se na to, co chybí, hlavně
+               na platformu. Přidávej POUZE z této množiny:
+               - "ios 🍎"         … týká se iOS (zmínka iPhone / iOS verze)
+               - "android 🤖"     … týká se Androidu
+               - "nyx-related"   … problém je na straně Nyxu, ne v aplikaci
+               - "enhancement 🚀" … návrh nové funkce / vylepšení (jen pokud to
+                                    NENÍ chyba)
+               - "question"      … dotaz
+               Když si u některého labelu nejsi jistý, NEPŘIDÁVEJ ho. Raději míň
+               labelů než špatný label. Label "duplicate" NEPŘIDÁVEJ nikdy
+               automaticky.
+
+            2) PODOBNÉ TICKETY — prohledej existující issues (otevřené i zavřené)
+               přes `gh search issues` / `gh issue list` podle klíčových slov z
+               titulku a popisu. Vyhodnoť, zda jde o pravděpodobný duplikát nebo
+               úzce související ticket.
+               - Pokud najdeš SILNOU shodu (pravděpodobný duplikát nebo zjevně
+                 stejný problém), napiš JEDEN stručný český komentář ve formátu:
+                 "🔁 Možná souvisí s: #123, #456 — zkontroluj prosím, jestli nejde
+                 o duplikát." Nic víc.
+               - Pokud silná shoda není, NEPIŠ žádný komentář. Buď úplně potichu.
+
+            Měň co nejméně. Když je issue v pořádku a bez blízké shody, klidně jen
+            přidej labely a skonči bez komentáře.
