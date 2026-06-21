@@ -18,6 +18,7 @@ on:
 permissions:
   contents: read
   issues: write
+  id-token: write # required: the action fetches its GitHub token via OIDC
 
 jobs:
   triage:
