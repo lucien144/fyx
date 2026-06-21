@@ -16,7 +16,9 @@ name: Claude PR review
 
 on:
   pull_request_target:
-    types: [opened, reopened, ready_for_review]
+    # `labeled` enables a one-click manual (re-)trigger: add the `ai-review`
+    # label to any PR and the full structured review runs (even on drafts).
+    types: [opened, reopened, ready_for_review, labeled]
     branches: [develop]
 
 permissions:
@@ -27,8 +29,11 @@ permissions:
 
 jobs:
   review:
-    # Skip drafts — review only once a PR is ready for review.
-    if: github.event.pull_request.draft == false
+    # Manual trigger via the `ai-review` label runs regardless of draft state.
+    # Automatic triggers (opened / reopened / ready_for_review) skip drafts.
+    if: >
+      (github.event.action == 'labeled' && github.event.label.name == 'ai-review') ||
+      (github.event.action != 'labeled' && github.event.pull_request.draft == false)
     runs-on: ubuntu-latest
     steps:
       # Check out the BASE ref only (no `ref:`). This is the trusted code and
