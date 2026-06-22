@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fyx/SkinnedApp.dart';
@@ -186,28 +186,28 @@ class FyxApp extends StatefulWidget {
     switch (settings.name) {
       case '/token':
         print('[Router] Token');
-        return CupertinoPageRoute(builder: (_) => TutorialPage(), settings: settings);
+        return MaterialPageRoute(builder: (_) => TutorialPage(), settings: settings);
       case '/home':
         print('[Router] Homepage');
-        return CupertinoPageRoute(builder: (_) => HomePage(), settings: settings);
+        return MaterialPageRoute(builder: (_) => HomePage(), settings: settings);
       case '/login':
         print('[Router] Login');
-        return CupertinoPageRoute(builder: (_) => LoginPage(), settings: settings);
+        return MaterialPageRoute(builder: (_) => LoginPage(), settings: settings);
       case '/mail':
         print('[Router] Mail');
-        return CupertinoPageRoute(builder: (_) => MailboxTab(), settings: settings);
+        return MaterialPageRoute(builder: (_) => MailboxTab(), settings: settings);
       case '/discussion':
         print('[Router] Discussion');
-        return CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings);
+        return MaterialPageRoute(builder: (_) => DiscussionPage(), settings: settings);
       case '/discussion/home':
         print('[Router] Discussion home');
-        return CupertinoPageRoute(builder: (_) => DiscussionHomePage(), settings: settings);
+        return MaterialPageRoute(builder: (_) => DiscussionHomePage(), settings: settings);
       case '/discussion/header':
         print('[Router] Discussion home');
-        return CupertinoPageRoute(builder: (_) => DiscussionHomePage(header: true), settings: settings);
+        return MaterialPageRoute(builder: (_) => DiscussionHomePage(header: true), settings: settings);
       case '/new-message':
         print('[Router] New Message');
-        return CupertinoPageRoute(builder: (_) => MessageScreen(), settings: settings, fullscreenDialog: true);
+        return MaterialPageRoute(builder: (_) => MessageScreen(), settings: settings, fullscreenDialog: true);
       case '/gallery':
         print('[Router] Gallery');
         return PageRouteBuilder(
@@ -218,31 +218,31 @@ class FyxApp extends StatefulWidget {
             fullscreenDialog: true);
       case '/settings':
         print('[Router] Settings');
-        return CupertinoPageRoute(builder: (_) => SettingsScreen(), settings: settings);
+        return MaterialPageRoute(builder: (_) => SettingsScreen(), settings: settings);
       case '/settings/design':
         print('[Router] Settings');
-        return CupertinoPageRoute(builder: (_) => SettingsDesignScreen(), settings: settings);
+        return MaterialPageRoute(builder: (_) => SettingsDesignScreen(), settings: settings);
       case '/settings/info':
         print('[Router] Settings / info');
-        return CupertinoPageRoute(builder: (_) => InfoPage(), settings: settings);
+        return MaterialPageRoute(builder: (_) => InfoPage(), settings: settings);
       case '/notices':
         print('[Router] Notices');
-        return CupertinoPageRoute(builder: (_) => NoticesPage(), settings: settings);
+        return MaterialPageRoute(builder: (_) => NoticesPage(), settings: settings);
       case '/search':
         print('[Router] Search');
-        return CupertinoPageRoute(builder: (_) => SearchPage(), settings: settings);
+        return MaterialPageRoute(builder: (_) => SearchPage(), settings: settings);
       case '/fulltext':
         print('[Router] Fulltext');
-        return CupertinoPageRoute(builder: (_) => FulltextPage(), settings: settings);
+        return MaterialPageRoute(builder: (_) => FulltextPage(), settings: settings);
       case '/last':
         print('[Router] Last');
-        return CupertinoPageRoute(builder: (_) => LastPage(), settings: settings);
+        return MaterialPageRoute(builder: (_) => LastPage(), settings: settings);
       case '/reminders':
         print('[Router] Reminders');
-        return CupertinoPageRoute(builder: (_) => RemindersPage(), settings: settings);
+        return MaterialPageRoute(builder: (_) => RemindersPage(), settings: settings);
       default:
         print('[Router] Discussion');
-        return CupertinoPageRoute(builder: (_) => DiscussionPage(), settings: settings);
+        return MaterialPageRoute(builder: (_) => DiscussionPage(), settings: settings);
     }
   }
 
