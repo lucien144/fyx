@@ -23,7 +23,7 @@ class _GestureFeedbackState extends State<GestureFeedback> {
       onTap: () async {
         setState(() => _isDown = true);
         widget.onTap();
-              await Future.delayed(Duration(milliseconds: 50));
+        await Future.delayed(Duration(milliseconds: 50));
         setState(() => _isDown = false);
       },
       onTapDown: (details) => setState(() => _isDown = true),
