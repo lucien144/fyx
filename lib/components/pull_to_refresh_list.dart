@@ -64,8 +64,7 @@ class PullToRefreshList<TProvider> extends StatefulWidget {
       this.pinnedWidget})
       : _isInfinite = isInfinite,
         _rebuild = rebuild,
-        _disabled = disabled,
-        assert(dataProvider != null);
+        _disabled = disabled;
 
   @override
   _PullToRefreshListState createState() => _PullToRefreshListState<TProvider>();
