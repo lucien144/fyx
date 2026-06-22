@@ -269,7 +269,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
 
                 int? id = lastId;
                 try {
-                  id = Post.fromJson((result as List).last, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode).id;
+                  id = Post.fromJson(result.last, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode).id;
                 } catch (error) {}
 
                 return DataProviderResult(data,

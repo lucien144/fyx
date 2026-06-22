@@ -134,7 +134,7 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
               unselectedColor: colors.barBackground,
               groupValue: activeTab,
               onValueChanged: (value) {
-                _bookmarksController.animateToPage(TabsEnum.values.indexOf(value as TabsEnum),
+                _bookmarksController.animateToPage(TabsEnum.values.indexOf(value),
                     duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
               },
               children: {
