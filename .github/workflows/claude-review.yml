@@ -44,6 +44,12 @@ jobs:
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Use the workflow's built-in GITHUB_TOKEN directly instead of the
+          # Claude GitHub App. This skips the OIDC -> app-token exchange (which
+          # requires the app to be installed). Comments are posted as
+          # github-actions[bot]. Under pull_request_target this token has write
+          # access even for fork PRs.
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           # Providing `prompt` makes the action run automatically (no @claude needed).
           # `track_progress` posts a single sticky tracking/summary comment, but it
           # is not supported for the `labeled` action — enable it only for the

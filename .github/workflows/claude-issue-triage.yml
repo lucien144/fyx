@@ -29,6 +29,9 @@ jobs:
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Use the built-in GITHUB_TOKEN directly (no Claude GitHub App, no OIDC
+          # exchange). Comments/labels are applied as github-actions[bot].
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           # Allow the in-app bot account so its issues are actually triaged.
           allowed_bots: "fyxbot"
           claude_args: |

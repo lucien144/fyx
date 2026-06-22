@@ -34,6 +34,9 @@ jobs:
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Use the built-in GITHUB_TOKEN directly (no Claude GitHub App, no OIDC
+          # exchange). Comments are posted as github-actions[bot].
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           # No `prompt` here → tag mode: the action reads the @claude comment as
           # the instruction. `--append-system-prompt` nudges the reply language
           # without leaving tag mode. Same static, read-only tool restrictions
