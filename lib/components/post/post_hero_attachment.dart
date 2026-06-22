@@ -16,7 +16,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class PostHeroAttachment extends StatefulWidget {
-  final dynamic attachment;
+  final Object attachment;
   final List<model.Image> images;
   final bool crop;
   final Function? onTap;
@@ -43,12 +43,15 @@ class _PostHeroAttachmentState extends State<PostHeroAttachment> {
 
   @override
   void initState() {
-    _cacheKey = widget.attachment.thumb;
+    if (widget.attachment is model.Image) {
+      _cacheKey = (widget.attachment as model.Image).thumb;
+    }
     super.initState();
   }
 
   Future<void> _reloadImage() async {
-    final url = widget.attachment.thumb;
+    if (widget.attachment is! model.Image) return;
+    final url = (widget.attachment as model.Image).thumb;
     final newCacheKey = await ImageCacheService.invalidateAndReload(url);
 
     if (mounted) {
@@ -61,13 +64,14 @@ class _PostHeroAttachmentState extends State<PostHeroAttachment> {
     final SkinColors colors = Skin.of(context).theme.colors;
 
     if (widget.attachment is model.Image) {
+      final image = widget.attachment as model.Image;
       return GestureDetector(
         onTap: () {
           if (widget.onTap != null) {
             widget.onTap!();
           }
           // Load images into GalleryViewModel and open gallery screen
-          getIt<GalleryViewModel>().loadImages(images: widget.images, currentImageUrl: (widget.attachment as model.Image).image);
+          getIt<GalleryViewModel>().loadImages(images: widget.images, currentImageUrl: image.image);
           Navigator.of(context, rootNavigator: true).pushNamed('/gallery');
         },
         onLongPress: () => showCupertinoModalBottomSheet(
@@ -85,7 +89,7 @@ class _PostHeroAttachmentState extends State<PostHeroAttachment> {
                         isColumn: false,
                         icon: MdiIcons.openInNew,
                         onTap: () {
-                          T.openLink(widget.attachment.thumb, mode: SettingsProvider().linksMode);
+                          T.openLink(image.thumb, mode: SettingsProvider().linksMode);
                           Navigator.of(context).pop();
                         }),
                     ContextMenuItem(
@@ -105,7 +109,7 @@ class _PostHeroAttachmentState extends State<PostHeroAttachment> {
               PostHeroAttachmentImage(
                 crop: widget.crop,
                 size: widget.size,
-                url: widget.attachment.thumb,
+                url: image.thumb,
                 cacheKey: _cacheKey,
               ),
               if (widget.blur) Positioned.fill(child: T.nsfwMask())
