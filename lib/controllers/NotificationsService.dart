@@ -22,7 +22,7 @@ class NotificationService {
 
     _tokenStream = _firebaseMessaging.onTokenRefresh.listen((fcmToken) {
       this._onTokenRefresh(fcmToken);
-        });
+    });
     _firebaseMessaging.getToken().then((fcmToken) {
       if (fcmToken is String) {
         this._onToken(fcmToken);
