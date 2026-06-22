@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:fyx/components/premium_feature.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
@@ -11,7 +10,6 @@ import 'package:fyx/model/provider/ThemeModel.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
-import 'package:fyx/theme/skin/skins/dark_skin.dart';
 import 'package:provider/provider.dart';
 import 'package:settings_ui/settings_ui.dart';
 

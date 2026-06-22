@@ -7,7 +7,6 @@ import 'package:fyx/components/post/post_hero_attachment.dart';
 import 'package:fyx/components/post/post_html.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
-import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/features/message/domain/entities/attachment.dart';
 import 'package:fyx/features/message/domain/message_settings.dart';
 import 'package:fyx/features/message/presentation/message_screen.dart';

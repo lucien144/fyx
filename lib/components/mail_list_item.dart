@@ -1,20 +1,16 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fyx/components/bottom_sheets/post_context_menu.dart';
 import 'package:fyx/components/content_box_layout.dart';
 import 'package:fyx/components/gesture_feedback.dart';
 import 'package:fyx/components/post/post_avatar.dart';
 import 'package:fyx/controllers/ApiController.dart';
-import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/features/message/domain/entities/attachment.dart';
 import 'package:fyx/features/message/domain/message_settings.dart';
 import 'package:fyx/features/message/presentation/message_screen.dart';
 import 'package:fyx/features/message/presentation/viewmodel/message_viewmodel.dart';
 import 'package:fyx/model/Mail.dart';
 import 'package:fyx/model/MainRepository.dart';
-import 'package:fyx/model/post/content/Regular.dart';
 
 import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/state/mail_provider.dart';

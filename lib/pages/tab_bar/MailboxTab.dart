@@ -5,7 +5,6 @@ import 'package:fyx/components/post/syntax_highlighter.dart';
 import 'package:fyx/components/pull_to_refresh_list.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
-import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/features/message/domain/entities/attachment.dart';
 import 'package:fyx/features/message/domain/message_settings.dart';
 import 'package:fyx/features/message/presentation/message_screen.dart';

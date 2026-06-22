@@ -1,12 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:fyx/components/avatar.dart';
 import 'package:fyx/model/post/PostThumbItem.dart';
 import 'package:fyx/theme/Helpers.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class PostThumbs extends StatelessWidget {
   final List<PostThumbItem> items;

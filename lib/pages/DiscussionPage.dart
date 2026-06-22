@@ -12,7 +12,6 @@ import 'package:fyx/components/premium_feature.dart';
 import 'package:fyx/components/pull_to_refresh_list.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
-import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/controllers/drafts_service.dart';
 import 'package:fyx/features/message/domain/entities/attachment.dart';

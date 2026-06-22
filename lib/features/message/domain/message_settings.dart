@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart';
-import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/features/message/domain/entities/attachment.dart';
 
 typedef F = Future<bool> Function(String? inputField, String message, List<Attachment> attachment);

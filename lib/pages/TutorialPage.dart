@@ -1,14 +1,12 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
-import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 
 class TutorialPageArguments {
