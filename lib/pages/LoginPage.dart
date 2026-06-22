@@ -134,9 +134,9 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     CupertinoSwitch(
-                      activeColor: colors.highlight,
+                      activeTrackColor: colors.highlight,
                       thumbColor: colors.background,
-                      trackColor: colors.primary,
+                      inactiveTrackColor: colors.primary,
                       onChanged: (bool? value) => setState(() => _terms = value ?? false),
                       value: _terms,
                     ),

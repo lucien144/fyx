@@ -209,7 +209,7 @@ class ApiController {
       }
       return DiscussionResponse.fromJson(response.data);
     } catch (error) {
-      if (error is DioError) {
+      if (error is DioException) {
         if (error.response?.statusCode == 400) {
           return DiscussionResponse.accessDenied();
         }
