@@ -1,0 +1,111 @@
+name: Claude PR review
+
+# Automatic, hands-off AI review of incoming pull requests targeting `develop`.
+# Runs once when a PR is opened / reopened / marked ready-for-review.
+# Use the companion `claude-mention.yml` workflow (comment `@claude`) to re-review.
+#
+# Security model (see anthropics/claude-code-action docs/security.md):
+# - `pull_request_target` is required so that PRs from forks (community
+#   contributors) can access the ANTHROPIC_API_KEY secret.
+# - We deliberately check out the BASE ref only (no `ref:`), so untrusted PR
+#   code never lands in the workspace root and is never executed. The trusted
+#   CLAUDE.md from `develop` is what feeds the review context.
+# - The review is static: Claude reads the PR diff via the GitHub API and is
+#   restricted (via --allowedTools) to read-only + comment tools. No build,
+#   no `flutter`/`pub get`, no arbitrary Bash.
+
+on:
+  pull_request_target:
+    # `labeled` enables a one-click manual (re-)trigger: add the `ai-review`
+    # label to any PR and the full structured review runs (even on drafts).
+    types: [opened, reopened, ready_for_review, labeled]
+    branches: [develop]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  id-token: write # required: the action fetches its GitHub token via OIDC
+
+jobs:
+  review:
+    # Manual trigger via the `ai-review` label runs regardless of draft state.
+    # Automatic triggers (opened / reopened / ready_for_review) skip drafts.
+    if: >
+      (github.event.action == 'labeled' && github.event.label.name == 'ai-review') ||
+      (github.event.action != 'labeled' && github.event.pull_request.draft == false)
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the BASE ref only (no `ref:`). This is the trusted code and
+      # gives Claude the real CLAUDE.md for project context. PR changes are
+      # read through the GitHub API, not from the filesystem.
+      - uses: actions/checkout@v6
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Use the workflow's built-in GITHUB_TOKEN directly instead of the
+          # Claude GitHub App. This skips the OIDC -> app-token exchange (which
+          # requires the app to be installed). Comments are posted as
+          # github-actions[bot]. Under pull_request_target this token has write
+          # access even for fork PRs.
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Providing `prompt` makes the action run automatically (no @claude needed).
+          # `track_progress` posts a single sticky tracking/summary comment, but it
+          # is not supported for the `labeled` action — enable it only for the
+          # automatic triggers. Label-triggered runs still post inline + summary
+          # comments from the prompt, just without the progress comment.
+          track_progress: ${{ github.event.action != 'labeled' }}
+          claude_args: |
+            --model claude-sonnet-4-6
+            --allowedTools "Read,Grep,Glob,Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr comment:*),mcp__github_inline_comment__create_inline_comment"
+          prompt: |
+            Recenzuješ pull request #${{ github.event.pull_request.number }}
+            ("${{ github.event.pull_request.title }}") otevřený proti větvi
+            `develop` v repozitáři Fyx — neoficiální Flutter (Dart) mobilní
+            klient pro českou diskuzní síť Nyx.cz.
+
+            Tohle je automatická triage recenze prvního průchodu. Jejím úkolem je
+            upozornit na věci, které by si měl správce projít DŘÍV, než tomu věnuje
+            vlastní čas. Optimalizuj na vysoký signál a nízký šum.
+
+            Přečti si CLAUDE.md v repozitáři kvůli architektuře a specifickým
+            úskalím projektu, pak zrecenzuj diff PR. Priority zhruba v tomto pořadí:
+
+            1. Chyby v korektnosti — logické chyby, null-safety problémy,
+               neošetřené async/await, mutace stavu, off-by-one, ošetření chyb.
+            2. Rizikové oblasti specifické pro projekt:
+               - Změny schématu Hive / SQLite (sqflite) — potřebuje userstats DB
+                 (aktuálně v5) bump verze + migraci v `_onUpgrade`?
+               - Změny riverpod providerů/stavu, které by mohly rozbít reaktivitu.
+               - Práce s credentials / `.env` / secrety (credentials jsou v
+                 SharedPreferences jako JSON; `.env` se načítá jako Flutter asset).
+               - Breaking změny v ApiController / modelech requestů a response.
+               - Cokoliv, co sahá na pinnutý `app_links` override nebo build config
+                 iOS/Androidu (deployment targets, verze SDK, NDK).
+            3. Bezpečnostní rizika nebo riziko ztráty dat.
+            4. Výkonnostní problémy (zbytečné rebuildy, velké seznamy, blokující I/O).
+            5. Soulad s konvencemi projektu (zejména u nového kódu):
+               - Konzistentní názvosloví a terminologie se stávajícím kódem.
+               - Zjednodušená clean architecture založená na features, BEZ vrstvy
+                 use-casů: `domain/` (entities, enums, rozhraní repozitářů),
+                 `data/` (datasources, models, implementace repozitářů),
+                 `presentation/`. Referenční vzor: `lib/features/userstats`.
+               - State management přes get_it + watch_it: ViewModely se registrují
+                 v `lib/shared/services/service_locator.dart` (getIt) a sledují se
+                 v presentation přes watch_it. Referenční vzor: `lib/features/gallery`
+                 a `lib/features/message`. Nový kód by NEMĚL přidávat nové riverpod
+                 providery — riverpod je v projektu legacy.
+
+            Styl / drobnosti: zmiň jen když na nich opravdu záleží; nešťourej.
+
+            Výstup:
+            - K konkrétním nálezům piš inline komentáře na konkrétní řádky pomocí
+              inline comment nástroje.
+            - Pak napiš JEDEN souhrnný komentář: 1–2 věty verdiktu, krátký
+              odrážkový seznam nejdůležitějších nálezů (nebo „žádné blokující
+              problémy nenalezeny") a explicitní poznámku, že jde o automatický
+              první průchod, který nenahrazuje lidskou recenzi.
+
+            Piš recenzi česky. Buď stručný a konkrétní; odkazuj soubor a řádek.
+            Pokud je diff triviální, řekni to krátce místo vaty.

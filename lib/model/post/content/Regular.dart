@@ -118,12 +118,10 @@ class ContentRegular extends Content {
       _body = _body.replaceAll(RegExp(r'<!--(.*?)-->'), '');
 
       // Remove trailing <br>
-      // TODO: This consumes a lot of memory. Is it really needed?
-      var startBr = RegExp(r'^(((\s*)<\s*br\s*\/?\s*>(\s*))*)', caseSensitive: false);
+      var startBr = RegExp(r'^\s*(<\s*br\s*\/?\s*>\s*)*', caseSensitive: false);
       _body = _body.replaceAll(startBr, '');
 
-      // TODO: This consumes a lot of memory. Is it really needed?
-      var trailingBr = RegExp(r'(((\s*)<\s*br\s*\/?\s*>(\s*))*)$', caseSensitive: false);
+      var trailingBr = RegExp(r'(\s*<\s*br\s*\/?\s*>)*\s*$', caseSensitive: false);
       _body = _body.replaceAll(trailingBr, '');
 
       var xmpTag = RegExp(r'<xmp>(.*?)</xmp>', caseSensitive: false, multiLine: true, dotAll: true);
