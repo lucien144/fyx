@@ -21,12 +21,10 @@ class NotificationService {
         this._onTokenRefresh = onTokenRefresh {
 
     _tokenStream = _firebaseMessaging.onTokenRefresh.listen((fcmToken) {
-      if (fcmToken is String && this._onTokenRefresh is TokenCallback) {
-        this._onTokenRefresh(fcmToken);
-      }
-    });
+      this._onTokenRefresh(fcmToken);
+        });
     _firebaseMessaging.getToken().then((fcmToken) {
-      if (fcmToken is String && this._onToken is TokenCallback) {
+      if (fcmToken is String) {
         this._onToken(fcmToken);
       }
     });

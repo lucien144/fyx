@@ -33,7 +33,7 @@ class Advertisement extends StatelessWidget {
   final String username;
 
   // If this widget needs to be displayed within PostListItem (in discussion) or as a standalone widget (pinned to pull-to-refresh)
-  bool get isStandaloneWidget => this.username is String && this.username.isNotEmpty;
+  bool get isStandaloneWidget => this.username.isNotEmpty;
 
   String get heading => this.title ?? (content.fullName);
 
