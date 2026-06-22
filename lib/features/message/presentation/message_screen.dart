@@ -435,7 +435,7 @@ class _MessageScreenState extends State<MessageScreen> {
                                                         FocusScope.of(context).unfocus();
                                                         final imageBytes = await Pasteboard.image;
                                                         if (imageBytes != null) {
-                                                          final detectedMime = lookupMimeType('', headerBytes: imageBytes.sublist(0, 12)) ?? 'image/jpeg';
+                                                          final detectedMime = lookupMimeType('', headerBytes: imageBytes.sublist(0, imageBytes.length < 12 ? imageBytes.length : 12)) ?? 'image/jpeg';
                                                           final mimeParts = detectedMime.split('/');
                                                           final subtype = mimeParts.length > 1 ? mimeParts[1] : 'jpeg';
                                                           viewModel.addAttachment(new Attachment(
