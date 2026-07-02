@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:fyx/theme/L.dart';
+import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:intl/intl.dart';
 
@@ -9,6 +10,9 @@ enum INTERNAL_URI_PARSER { discussionId, postId, search, mailId }
 class Helpers {
   static stripHtmlTags(String html) {
     final document = parse(html);
+    document.querySelectorAll('br').forEach((element) {
+      element.replaceWith(Text('\n'));
+    });
     return parse(document.body?.text).documentElement?.text.trim();
   }
 
