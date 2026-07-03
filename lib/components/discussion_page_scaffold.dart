@@ -37,7 +37,7 @@ class DiscussionPageScaffold extends StatelessWidget {
                 padding: EdgeInsets.all(8.0),
                 // needed until https://github.com/flutter/flutter/issues/86170 is fixed
                 margin: EdgeInsets.all(8.0),
-                showDuration: Duration(seconds: 3),
+                showDuration: Duration(seconds: 5),
               )),
           trailing: this.trailing),
       child: this.child,
