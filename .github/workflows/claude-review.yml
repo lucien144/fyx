@@ -22,7 +22,7 @@ on:
     branches: [develop]
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
   issues: write
   id-token: write # required: the action fetches its GitHub token via OIDC
