@@ -430,7 +430,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                                   setState(() {
                                     _bookmark = !_bookmark!;
                                     _popupMenu = false;
-                                    T.success(_bookmark! ? 'Přidáno do sledovaných.' : 'Odebráno ze sledovaných', duration: 1);
+                                    T.success(_bookmark! ? 'Přidáno do sledovaných.' : 'Odebráno ze sledovaných', duration: 1500);
                                   });
                                 },
                                 child: Row(
