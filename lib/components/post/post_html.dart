@@ -11,10 +11,12 @@ import 'package:fyx/components/post/video_player.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/features/gallery/presentation/viewmodel/gallery_viewmodel.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/enums/DiscussionContentTypeEnum.dart';
 import 'package:fyx/model/post/Content.dart' as fyx;
 import 'package:fyx/model/post/Image.dart' as post;
 import 'package:fyx/model/post/Video.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
+import 'package:fyx/pages/discussion_home_page.dart';
 import 'package:fyx/pages/search_page.dart';
 import 'package:fyx/pages/tab_bar/MailboxTab.dart';
 import 'package:fyx/shared/services/service_locator.dart';
@@ -301,6 +303,18 @@ class PostHtml extends StatelessWidget {
     if (parserResult.isNotEmpty) {
       var arguments = DiscussionPageArguments(parserResult[INTERNAL_URI_PARSER.discussionId]!, postId: parserResult[INTERNAL_URI_PARSER.postId]! + 1);
       Navigator.of(buildContext, rootNavigator: true).pushNamed('/discussion', arguments: arguments);
+      return;
+    }
+
+    // Click through to discussion header or home
+    parserResult = Helpers.parseDiscussionContentUri(link);
+    if (parserResult.isNotEmpty) {
+      var arguments = DiscussionHomePageArguments(parserResult[INTERNAL_URI_PARSER.discussionId]!);
+      final String route = switch (parserResult[INTERNAL_URI_PARSER.homeOrHeader] as DiscussionContentTypeEnum) {
+        DiscussionContentTypeEnum.header => '/discussion/header',
+        DiscussionContentTypeEnum.home => '/discussion/home',
+      };
+      Navigator.of(buildContext, rootNavigator: true).pushNamed(route, arguments: arguments);
       return;
     }
 

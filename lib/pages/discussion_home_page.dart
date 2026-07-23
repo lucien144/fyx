@@ -1,20 +1,21 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/discussion_page_scaffold.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/reponses/DiscussionHomeResponse.dart';
-import 'package:fyx/model/reponses/DiscussionResponse.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class DiscussionHomePageArguments {
-  final DiscussionResponse discussionResponse;
+  final int discussionId;
 
-  DiscussionHomePageArguments(this.discussionResponse);
+  /// Known upfront when navigating from within the discussion, unknown when
+  /// the page is opened through a deeplink. Saves an empty navigation bar
+  /// while the content is loading.
+  final String? title;
+
+  DiscussionHomePageArguments(this.discussionId, {this.title});
 }
 
 class DiscussionHomePage extends StatelessWidget {
@@ -26,18 +27,20 @@ class DiscussionHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     DiscussionHomePageArguments? pageArguments = ModalRoute.of(context)?.settings.arguments as DiscussionHomePageArguments?;
 
-    return DiscussionPageScaffold(
-        title: pageArguments?.discussionResponse.discussion.name ?? '',
-        child: FutureBuilder(
-            future: this.header
-                ? ApiController().getDiscussionHeader(pageArguments?.discussionResponse.discussion.idKlub ?? -1)
-                : ApiController().getDiscussionHome(pageArguments?.discussionResponse.discussion.idKlub ?? -1),
-            builder: (BuildContext context, AsyncSnapshot<DiscussionHomeResponse> snapshot) {
-              if (snapshot.hasError) {
-                return T.feedbackScreen(context,
-                    isWarning: true, title: snapshot.error.toString(), label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
-              } else if (snapshot.hasData) {
-                final html = '''
+    return FutureBuilder(
+        future: this.header
+            ? ApiController().getDiscussionHeader(pageArguments?.discussionId ?? -1)
+            : ApiController().getDiscussionHome(pageArguments?.discussionId ?? -1),
+        builder: (BuildContext context, AsyncSnapshot<DiscussionHomeResponse> snapshot) {
+          final title = pageArguments?.title ?? snapshot.data?.discussion.name ?? '';
+
+          if (snapshot.hasError) {
+            return DiscussionPageScaffold(
+                title: title,
+                child: T.feedbackScreen(context,
+                    isWarning: true, title: snapshot.error.toString(), label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop()));
+          } else if (snapshot.hasData) {
+            final html = '''
               <!doctype html>
               <head>
                 <meta http-equiv=Content-Type content="text/html; charset=UTF-8">
@@ -49,14 +52,16 @@ class DiscussionHomePage extends StatelessWidget {
               </body>
               </html>
 ''';
-                final controller = WebViewController()
-                  ..setJavaScriptMode(JavaScriptMode.unrestricted)
-                  ..loadHtmlString(html);
-                return WebViewWidget(
+            final controller = WebViewController()
+              ..setJavaScriptMode(JavaScriptMode.unrestricted)
+              ..loadHtmlString(html);
+            return DiscussionPageScaffold(
+                title: title,
+                child: WebViewWidget(
                   controller: controller,
-                );
-              }
-              return T.feedbackScreen(context, isLoading: true);
-            }));
+                ));
+          }
+          return DiscussionPageScaffold(title: title, child: T.feedbackScreen(context, isLoading: true));
+        });
   }
 }

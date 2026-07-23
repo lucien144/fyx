@@ -450,7 +450,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                             if (discussionResponse.discussion.hasHeader)
                               GestureDetector(
                                 onTap: () => Navigator.of(context)
-                                    .pushNamed('/discussion/header', arguments: new DiscussionHomePageArguments(discussionResponse)),
+                                    .pushNamed('/discussion/header', arguments: new DiscussionHomePageArguments(discussionResponse.discussion.idKlub, title: discussionResponse.discussion.name)),
                                 child: Row(
                                   children: [
                                     Expanded(child: Text('Záhlaví', style: textStyleContext)),
@@ -466,7 +466,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                             if (discussionResponse.discussion.hasHome)
                               GestureDetector(
                                 onTap: () => Navigator.of(context)
-                                    .pushNamed('/discussion/home', arguments: new DiscussionHomePageArguments(discussionResponse)),
+                                    .pushNamed('/discussion/home', arguments: new DiscussionHomePageArguments(discussionResponse.discussion.idKlub, title: discussionResponse.discussion.name)),
                                 child: Row(
                                   children: [
                                     Expanded(child: Text('Nástěnka', style: textStyleContext)),

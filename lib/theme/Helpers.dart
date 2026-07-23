@@ -1,10 +1,11 @@
 import 'dart:math';
 
+import 'package:fyx/model/enums/DiscussionContentTypeEnum.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:html/parser.dart';
 import 'package:intl/intl.dart';
 
-enum INTERNAL_URI_PARSER { discussionId, postId, search, mailId }
+enum INTERNAL_URI_PARSER { discussionId, postId, search, mailId, homeOrHeader }
 
 class Helpers {
   static stripHtmlTags(String html) {
@@ -108,6 +109,22 @@ class Helpers {
         discussionId = int.parse(matches.elementAt(0).group(4) ?? '0');
       }
       return {INTERNAL_URI_PARSER.discussionId: discussionId, INTERNAL_URI_PARSER.search: parsed.queryParameters['text']};
+    }
+    return {};
+  }
+
+  static Map<INTERNAL_URI_PARSER, dynamic> parseDiscussionContentUri(String uri) {
+    RegExp test = RegExp(r'/discussion/([0-9]+)/content/(header|home)$');
+    Iterable<RegExpMatch> matches = test.allMatches(uri);
+    if (matches.length == 1) {
+      int discussionId = int.parse(matches.elementAt(0).group(1) ?? '0');
+      String? contentType = matches.elementAt(0).group(2);
+      if (discussionId > 0 && contentType != null) {
+        return {
+          INTERNAL_URI_PARSER.discussionId: discussionId,
+          INTERNAL_URI_PARSER.homeOrHeader: DiscussionContentTypeEnum.values.byName(contentType)
+        };
+      }
     }
     return {};
   }
