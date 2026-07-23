@@ -126,14 +126,12 @@ class PostHtml extends StatelessWidget {
                 }
 
                 String src = thumb;
-                bool openGallery = true;
                 if (element.parent!.localName == 'a') {
-                  final RegExp r = RegExp(r'\.(jpg|jpeg|png|gif|webp)(\?.*)?$');
-                  if (r.hasMatch(element.parent!.attributes['href'] ?? '')) {
-                    src = element.parent!.attributes['href'] ?? '';
-                  } else {
-                    openGallery = false;
+                  final String? href = element.parent!.attributes['href'];
+                  if (Helpers.isImageUrl(href)) {
+                    src = href!;
                   }
+                  // Non-image href: keep src as img.src so the gallery still opens correctly
                 }
 
                 post.Image img = post.Image(src, thumb: thumb);
@@ -142,8 +140,7 @@ class PostHtml extends StatelessWidget {
                   child: PostHeroAttachment(
                     img,
                     images: content!.images,
-                    openGallery: openGallery,
-                    onTap: () => openGallery ? _isImageTap = true : null,
+                    onTap: () => _isImageTap = true,
                     crop: false,
                     blur: blur,
                   ),

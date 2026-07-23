@@ -124,6 +124,14 @@ class Helpers {
     }
     return {};
   }
+  
+  /// Matches URLs pointing directly to an image file.
+  static final RegExp _imageUrlRegExp = RegExp(r'\.(jpg|jpeg|png|gif|webp)(\?.*)?$', caseSensitive: false);
+
+  /// Nyx wraps hotlinked images into a link pointing to the full size image.
+  /// Telling such a gallery wrapper apart from a link added by the user comes down
+  /// to whether the href points to an image file.
+  static bool isImageUrl(String? url) => url != null && _imageUrlRegExp.hasMatch(url);
 
   static String? fileExtension(String filePath) {
     final regexp = RegExp(r'\.(?<ext>[a-z]{3,})$', caseSensitive: false);

@@ -105,10 +105,10 @@ class _PostListItemState extends ConsumerState<PostListItem> {
 
             ApiController().giveRating(_post!.idKlub, _post!.id, remove: _post!.myRating != 'none').then((response) {
               if (_post!.myRating != 'none') {
-                T.success('👎', bg: colors.success);
+                T.success('👎', bg: colors.success, duration: 1000);
                 DI.userstatsRepo.upsertGlobalStat(GlobalStat(year: DateTime.now().year, statType: GlobalStatType.likes.value, number: -1));
               } else {
-                T.success('👍', bg: colors.success);
+                T.success('👍', bg: colors.success, duration: 1000);
                 DI.userstatsRepo.upsertGlobalStat(GlobalStat(year: DateTime.now().year, statType: GlobalStatType.likes.value, number: 1));
               }
               setState(() {

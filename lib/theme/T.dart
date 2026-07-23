@@ -114,7 +114,7 @@ class T {
     return GestureDetector(
       onTap: () => T.prefillGithubIssue(
           title: title,
-          body: '**Zdroj:**\n```$content```\n\n**Stack:**\n```$stack```',
+          body: '**Zdroj:**\n```\n$content\n```\n\n**Stack:**\n```\n$stack\n```',
           user: MainRepository().credentials!.nickname,
           url: url,
           appContext: MainRepository()),
