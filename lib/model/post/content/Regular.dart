@@ -31,10 +31,16 @@ class ContentRegular extends Content {
 
     this._cleanupBody();
     this._parseEmbeds();
+    this._parseWrappedImageLinks();
     this._parseAttachedImages();
     this._parseEmptyLinks();
     this._cleanupBody();
   }
+
+  /// Matches URLs pointing directly to an image file.
+  static final RegExp _imageUrlRegExp = RegExp(r'\.(jpg|jpeg|png|gif|webp)(\?.*)?$', caseSensitive: false);
+
+  static bool _isImageUrl(String? url) => url != null && _imageUrlRegExp.hasMatch(url);
 
   @override
   PostTypeEnum get contentType => PostTypeEnum.text;
@@ -215,6 +221,57 @@ class ContentRegular extends Content {
   }
 
   ///
+  /// Images hotlinked from another server are wrapped by Nyx into a link pointing to the full size image
+  /// so the gallery can be opened. When the user wraps an image into their own link, the href points
+  /// somewhere else than to an image file.
+  ///
+  /// Such a link is unreachable in the app (tapping the image opens the gallery) and it's lost completely
+  /// once the image is turned into an attachment. Therefore we collect it and render it below the post.
+  ///
+  /// Example
+  /// Post: <a href="https://ibb.co/xxx"><img src="https://i.ibb.co/xxx/001.jpg"></a>
+  ///
+  void _parseWrappedImageLinks() {
+    try {
+      Document document = parse(_body);
+      document.querySelectorAll('img').forEach((Element img) {
+        Element? link = img.parent;
+        if (link == null || link.localName != 'a') {
+          return;
+        }
+
+        String? url = link.attributes['href'];
+        if (url == null || url.isEmpty || _isImageUrl(url)) {
+          return;
+        }
+
+        // If the link wraps anything else than the image, it stays tappable in the post itself.
+        if (link.text.trim().isNotEmpty || link.children.length > 1) {
+          return;
+        }
+
+        _emptyLinks.add(Link(url));
+
+        // Unwrap the link, otherwise it would be collected once again by _parseEmptyLinks().
+        Element? parent = link.parent;
+        if (parent == null) {
+          return;
+        }
+        int index = parent.nodes.indexOf(link);
+        List<Node> children = List.from(link.nodes);
+        children.reversed.forEach((child) {
+          child.remove();
+          parent.nodes.insert(index, child);
+        });
+        link.remove();
+      });
+      _body = document.body!.innerHtml;
+    } catch (error) {
+      LogService.captureError(error, stack: StackTrace.current);
+    }
+  }
+
+  ///
   /// Nyx wraps all images to a link. So if we pick the images to the gallery, there will be empty links if the image has been wrapped by user.
   ///
   /// Example
@@ -228,6 +285,12 @@ class ContentRegular extends Content {
         String? element = match.group(0);
         Document html = parse(element);
         String? url = html.querySelector('a')?.attributes['href'];
+        // Links to an image file are Nyx gallery wrappers left over after the image has been
+        // turned into an attachment. There's no point in showing them below the post.
+        if (_isImageUrl(url)) {
+          _body = _body.replaceFirst(element!, '');
+          return;
+        }
         if (url != null && element != null) {
           _emptyLinks.add(Link(url));
           _body = _body.replaceFirst(element, '');
