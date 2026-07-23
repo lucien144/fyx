@@ -1,0 +1,1 @@
+enum DiscussionContentTypeEnum { header, home }

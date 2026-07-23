@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:fyx/model/enums/DiscussionContentTypeEnum.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:html/parser.dart';
 import 'package:intl/intl.dart';
@@ -119,12 +120,15 @@ class Helpers {
       int discussionId = int.parse(matches.elementAt(0).group(1) ?? '0');
       String? contentType = matches.elementAt(0).group(2);
       if (discussionId > 0 && contentType != null) {
-        return {INTERNAL_URI_PARSER.discussionId: discussionId, INTERNAL_URI_PARSER.homeOrHeader: contentType};
+        return {
+          INTERNAL_URI_PARSER.discussionId: discussionId,
+          INTERNAL_URI_PARSER.homeOrHeader: DiscussionContentTypeEnum.values.byName(contentType)
+        };
       }
     }
     return {};
   }
-  
+
   /// Matches URLs pointing directly to an image file.
   static final RegExp _imageUrlRegExp = RegExp(r'\.(jpg|jpeg|png|gif|webp)(\?.*)?$', caseSensitive: false);
 

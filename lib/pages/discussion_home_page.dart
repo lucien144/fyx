@@ -10,7 +10,12 @@ import 'package:webview_flutter/webview_flutter.dart';
 class DiscussionHomePageArguments {
   final int discussionId;
 
-  DiscussionHomePageArguments(this.discussionId);
+  /// Known upfront when navigating from within the discussion, unknown when
+  /// the page is opened through a deeplink. Saves an empty navigation bar
+  /// while the content is loading.
+  final String? title;
+
+  DiscussionHomePageArguments(this.discussionId, {this.title});
 }
 
 class DiscussionHomePage extends StatelessWidget {
@@ -27,7 +32,7 @@ class DiscussionHomePage extends StatelessWidget {
             ? ApiController().getDiscussionHeader(pageArguments?.discussionId ?? -1)
             : ApiController().getDiscussionHome(pageArguments?.discussionId ?? -1),
         builder: (BuildContext context, AsyncSnapshot<DiscussionHomeResponse> snapshot) {
-          final title = snapshot.data?.discussion.name ?? '';
+          final title = pageArguments?.title ?? snapshot.data?.discussion.name ?? '';
 
           if (snapshot.hasError) {
             return DiscussionPageScaffold(

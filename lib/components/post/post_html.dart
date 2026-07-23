@@ -11,6 +11,7 @@ import 'package:fyx/components/post/video_player.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/features/gallery/presentation/viewmodel/gallery_viewmodel.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/enums/DiscussionContentTypeEnum.dart';
 import 'package:fyx/model/post/Content.dart' as fyx;
 import 'package:fyx/model/post/Image.dart' as post;
 import 'package:fyx/model/post/Video.dart';
@@ -309,7 +310,10 @@ class PostHtml extends StatelessWidget {
     parserResult = Helpers.parseDiscussionContentUri(link);
     if (parserResult.isNotEmpty) {
       var arguments = DiscussionHomePageArguments(parserResult[INTERNAL_URI_PARSER.discussionId]!);
-      String route = parserResult[INTERNAL_URI_PARSER.homeOrHeader] == 'header' ? '/discussion/header' : '/discussion/home';
+      final String route = switch (parserResult[INTERNAL_URI_PARSER.homeOrHeader] as DiscussionContentTypeEnum) {
+        DiscussionContentTypeEnum.header => '/discussion/header',
+        DiscussionContentTypeEnum.home => '/discussion/home',
+      };
       Navigator.of(buildContext, rootNavigator: true).pushNamed(route, arguments: arguments);
       return;
     }
