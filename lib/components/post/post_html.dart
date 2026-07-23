@@ -126,9 +126,9 @@ class PostHtml extends StatelessWidget {
 
                 String src = thumb;
                 if (element.parent!.localName == 'a') {
-                  final RegExp r = RegExp(r'\.(jpg|jpeg|png|gif|webp)(\?.*)?$');
-                  if (r.hasMatch(element.parent!.attributes['href'] ?? '')) {
-                    src = element.parent!.attributes['href'] ?? '';
+                  final String? href = element.parent!.attributes['href'];
+                  if (Helpers.isImageUrl(href)) {
+                    src = href!;
                   }
                   // Non-image href: keep src as img.src so the gallery still opens correctly
                 }

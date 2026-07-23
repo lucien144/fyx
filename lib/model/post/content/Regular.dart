@@ -37,11 +37,6 @@ class ContentRegular extends Content {
     this._cleanupBody();
   }
 
-  /// Matches URLs pointing directly to an image file.
-  static final RegExp _imageUrlRegExp = RegExp(r'\.(jpg|jpeg|png|gif|webp)(\?.*)?$', caseSensitive: false);
-
-  static bool _isImageUrl(String? url) => url != null && _imageUrlRegExp.hasMatch(url);
-
   @override
   PostTypeEnum get contentType => PostTypeEnum.text;
 
@@ -241,7 +236,7 @@ class ContentRegular extends Content {
         }
 
         String? url = link.attributes['href'];
-        if (url == null || url.isEmpty || _isImageUrl(url)) {
+        if (url == null || url.isEmpty || Helpers.isImageUrl(url)) {
           return;
         }
 
@@ -287,8 +282,8 @@ class ContentRegular extends Content {
         String? url = html.querySelector('a')?.attributes['href'];
         // Links to an image file are Nyx gallery wrappers left over after the image has been
         // turned into an attachment. There's no point in showing them below the post.
-        if (_isImageUrl(url)) {
-          _body = _body.replaceFirst(element!, '');
+        if (Helpers.isImageUrl(url) && element != null) {
+          _body = _body.replaceFirst(element, '');
           return;
         }
         if (url != null && element != null) {

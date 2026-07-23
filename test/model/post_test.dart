@@ -244,6 +244,43 @@ void main() {
     expect(post.content.emptyLinks.length, 1);
   });
 
+  test('Image wrapped into a non-image link is moved below the post', () {
+    const image =
+        '<a href="https://ibb.co/SDTtqGf" rel="noopener noreferrer"><img alt="001" border="0" height="180" src="https://i.ibb.co/SDTtqGf/001.jpg" style="background-color:#d5d9e1" width="180"></a>';
+
+    var json = Map<String, dynamic>.from(_json);
+    json.putIfAbsent("content", () => 'Lorem ipsum.<br><br>$image<br>Dolor sit amet.');
+
+    var post = Post.fromJson(json, 1, isCompact: true);
+    expect(post.content.consecutiveImages, false, reason: 'There is a copy after the image.');
+    expect(post.content.images.length, 1);
+    expect(post.content.images[0].image, 'https://i.ibb.co/SDTtqGf/001.jpg');
+    expect(post.content.emptyLinks.length, 1);
+    expect(post.content.emptyLinks[0].url, 'https://ibb.co/SDTtqGf');
+    expect(parse(post.content.body).querySelectorAll('a').length, 0, reason: 'The link has been unwrapped.');
+    expect(parse(post.content.body).querySelectorAll('img').length, 1, reason: 'The image stays in the body.');
+  });
+
+  test('Gallery link of a hotlinked image is not shown below the post', () {
+    var json = Map<String, dynamic>.from(_json);
+    json.putIfAbsent(
+        "content", () => '<a href="https://example.com/full.jpg"><img src="http://www.nyx.cz/i/t/thumb.png" class="thumb"></a>');
+
+    var post = Post.fromJson(json, 1, isCompact: true);
+    expect(post.content.consecutiveImages, true);
+    expect(post.content.images.length, 1);
+    expect(post.content.emptyLinks.length, 0);
+  });
+
+  test('Gallery link is recognized regardless of the extension case', () {
+    var json = Map<String, dynamic>.from(_json);
+    json.putIfAbsent(
+        "content", () => '<a href="https://example.com/FULL.JPG"><img src="http://www.nyx.cz/i/t/thumb.png" class="thumb"></a>');
+
+    var post = Post.fromJson(json, 1, isCompact: true);
+    expect(post.content.emptyLinks.length, 0, reason: 'Uppercase extension is still an image link.');
+  });
+
   test('Content has tagged link images', () {
     var content = """
     test
