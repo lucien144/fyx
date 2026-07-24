@@ -429,7 +429,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                                   setState(() {
                                     _bookmark = !_bookmark!;
                                     _popupMenu = false;
-                                    T.success(_bookmark! ? 'Přidáno do sledovaných.' : 'Odebráno ze sledovaných', duration: 1);
+                                    T.success(_bookmark! ? 'Přidáno do sledovaných.' : 'Odebráno ze sledovaných', duration: 1500);
                                   });
                                 },
                                 child: Row(
@@ -449,7 +449,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                             if (discussionResponse.discussion.hasHeader)
                               GestureDetector(
                                 onTap: () => Navigator.of(context)
-                                    .pushNamed('/discussion/header', arguments: new DiscussionHomePageArguments(discussionResponse)),
+                                    .pushNamed('/discussion/header', arguments: new DiscussionHomePageArguments(discussionResponse.discussion.idKlub, title: discussionResponse.discussion.name)),
                                 child: Row(
                                   children: [
                                     Expanded(child: Text('Záhlaví', style: textStyleContext)),
@@ -465,7 +465,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                             if (discussionResponse.discussion.hasHome)
                               GestureDetector(
                                 onTap: () => Navigator.of(context)
-                                    .pushNamed('/discussion/home', arguments: new DiscussionHomePageArguments(discussionResponse)),
+                                    .pushNamed('/discussion/home', arguments: new DiscussionHomePageArguments(discussionResponse.discussion.idKlub, title: discussionResponse.discussion.name)),
                                 child: Row(
                                   children: [
                                     Expanded(child: Text('Nástěnka', style: textStyleContext)),

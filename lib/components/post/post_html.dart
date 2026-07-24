@@ -10,10 +10,12 @@ import 'package:fyx/components/post/video_player.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/features/gallery/presentation/viewmodel/gallery_viewmodel.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/model/enums/DiscussionContentTypeEnum.dart';
 import 'package:fyx/model/post/Content.dart' as fyx;
 import 'package:fyx/model/post/Image.dart' as post;
 import 'package:fyx/model/post/Video.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
+import 'package:fyx/pages/discussion_home_page.dart';
 import 'package:fyx/pages/search_page.dart';
 import 'package:fyx/pages/tab_bar/MailboxTab.dart';
 import 'package:fyx/shared/services/service_locator.dart';
@@ -24,6 +26,16 @@ import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html_unescape/html_unescape.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+
+// Stable GlobalKeys for inline video players, keyed by their <video> dom.Element.
+//
+// Html() recreates its internal subtree (a fresh GlobalKey) on every PostHtml rebuild,
+// which would otherwise tear down and dispose the VideoPlayer (and its ChewieController)
+// mid-playback/mid-fullscreen. Giving each VideoPlayer a stable GlobalKey lets Flutter
+// reparent the existing element+state into the rebuilt subtree instead of recreating it.
+// The element instance is stable across rebuilds (flutter_html only re-parses when the
+// data changes), and the Expando holds it weakly so keys are collected with the element.
+final Expando<GlobalKey> _videoPlayerKeys = Expando<GlobalKey>('postHtmlVideoPlayerKeys');
 
 class PostHtml extends StatelessWidget {
   final fyx.Content? content;
@@ -124,14 +136,12 @@ class PostHtml extends StatelessWidget {
                 }
 
                 String src = thumb;
-                bool openGallery = true;
                 if (element.parent!.localName == 'a') {
-                  final RegExp r = RegExp(r'\.(jpg|jpeg|png|gif|webp)(\?.*)?$');
-                  if (r.hasMatch(element.parent!.attributes['href'] ?? '')) {
-                    src = element.parent!.attributes['href'] ?? '';
-                  } else {
-                    openGallery = false;
+                  final String? href = element.parent!.attributes['href'];
+                  if (Helpers.isImageUrl(href)) {
+                    src = href!;
                   }
+                  // Non-image href: keep src as img.src so the gallery still opens correctly
                 }
 
                 post.Image img = post.Image(src, thumb: thumb);
@@ -140,8 +150,7 @@ class PostHtml extends StatelessWidget {
                   child: PostHeroAttachment(
                     img,
                     images: content!.images,
-                    openGallery: openGallery,
-                    onTap: () => openGallery ? _isImageTap = true : null,
+                    onTap: () => _isImageTap = true,
                     crop: false,
                     blur: blur,
                   ),
@@ -155,7 +164,7 @@ class PostHtml extends StatelessWidget {
               ) {
                 final element = renderContext.element;
                 if (element != null) {
-                  return VideoPlayer(element, blur: blur);
+                  return VideoPlayer(element, key: _videoPlayerKeys[element] ??= GlobalKey(), blur: blur);
                 }
                 return T.somethingsWrongButton(content!.rawBody);
               }),
@@ -303,6 +312,18 @@ class PostHtml extends StatelessWidget {
     if (parserResult.isNotEmpty) {
       var arguments = DiscussionPageArguments(parserResult[INTERNAL_URI_PARSER.discussionId]!, postId: parserResult[INTERNAL_URI_PARSER.postId]! + 1);
       Navigator.of(buildContext, rootNavigator: true).pushNamed('/discussion', arguments: arguments);
+      return;
+    }
+
+    // Click through to discussion header or home
+    parserResult = Helpers.parseDiscussionContentUri(link);
+    if (parserResult.isNotEmpty) {
+      var arguments = DiscussionHomePageArguments(parserResult[INTERNAL_URI_PARSER.discussionId]!);
+      final String route = switch (parserResult[INTERNAL_URI_PARSER.homeOrHeader] as DiscussionContentTypeEnum) {
+        DiscussionContentTypeEnum.header => '/discussion/header',
+        DiscussionContentTypeEnum.home => '/discussion/home',
+      };
+      Navigator.of(buildContext, rootNavigator: true).pushNamed(route, arguments: arguments);
       return;
     }
 

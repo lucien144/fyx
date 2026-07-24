@@ -1,14 +1,19 @@
 import 'dart:math';
 
+import 'package:fyx/model/enums/DiscussionContentTypeEnum.dart';
 import 'package:fyx/theme/L.dart';
+import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:intl/intl.dart';
 
-enum INTERNAL_URI_PARSER { discussionId, postId, search, mailId }
+enum INTERNAL_URI_PARSER { discussionId, postId, search, mailId, homeOrHeader }
 
 class Helpers {
   static stripHtmlTags(String html) {
     final document = parse(html);
+    document.querySelectorAll('br').forEach((element) {
+      element.replaceWith(Text('\n'));
+    });
     return parse(document.body?.text).documentElement?.text.trim();
   }
 
@@ -111,6 +116,30 @@ class Helpers {
     }
     return {};
   }
+
+  static Map<INTERNAL_URI_PARSER, dynamic> parseDiscussionContentUri(String uri) {
+    RegExp test = RegExp(r'/discussion/([0-9]+)/content/(header|home)$');
+    Iterable<RegExpMatch> matches = test.allMatches(uri);
+    if (matches.length == 1) {
+      int discussionId = int.parse(matches.elementAt(0).group(1) ?? '0');
+      String? contentType = matches.elementAt(0).group(2);
+      if (discussionId > 0 && contentType != null) {
+        return {
+          INTERNAL_URI_PARSER.discussionId: discussionId,
+          INTERNAL_URI_PARSER.homeOrHeader: DiscussionContentTypeEnum.values.byName(contentType)
+        };
+      }
+    }
+    return {};
+  }
+
+  /// Matches URLs pointing directly to an image file.
+  static final RegExp _imageUrlRegExp = RegExp(r'\.(jpg|jpeg|png|gif|webp)(\?.*)?$', caseSensitive: false);
+
+  /// Nyx wraps hotlinked images into a link pointing to the full size image.
+  /// Telling such a gallery wrapper apart from a link added by the user comes down
+  /// to whether the href points to an image file.
+  static bool isImageUrl(String? url) => url != null && _imageUrlRegExp.hasMatch(url);
 
   static String? fileExtension(String filePath) {
     final regexp = RegExp(r'\.(?<ext>[a-z]{3,})$', caseSensitive: false);
