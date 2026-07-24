@@ -33,7 +33,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace 'net.lucien144.fyx'
-    compileSdkVersion 35
+    compileSdkVersion 36
     android.ndkVersion '27.0.12077973'
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -47,7 +47,7 @@ android {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId 'net.lucien144.fyx'
         minSdkVersion 21
-        targetSdkVersion 35
+        targetSdkVersion 36
         //multiDexEnabled true // Uncomment for dev
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName

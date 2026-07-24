@@ -9,7 +9,7 @@ Fyx is an unofficial mobile client (Android & iOS) for the Czech discussion serv
 - **Flutter Version**: ^3.3.0
 - **Dart SDK**: >=3.0.0 <4.0.0
 - **Current Version**: 12.0.0+181
-- **Target Platforms**: iOS 15.0+, Android API 21+, Android SDK 35
+- **Target Platforms**: iOS 15.0+, Android API 21+, Android SDK 36
 - **NDK Version**: 27.0.12077973
 
 ## Development Setup
@@ -223,4 +223,4 @@ This repository uses **Gitflow**:
 - **Let's Encrypt Certificate**: Custom cert loaded in main for Nyx.cz compatibility
 - **Dependency Override**: `app_links: 6.3.0` is pinned (see pubspec.yaml comment)
 - **iOS Deployment Target**: Set to 15.0 in Podfile
-- **Android Compile SDK**: Version 35
+- **Android Compile SDK**: Version 36

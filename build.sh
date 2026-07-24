@@ -67,6 +67,19 @@ if [ $android == true ]; then
   # shellcheck disable=SC2059
   printf "$GREEN Building Android: ${version}$NC\n"
 
+  # Gradle's Kotlin plugin cannot parse very new JDKs (e.g. 26) and the build
+  # dies while evaluating settings.gradle. Pin to JDK 21 whenever the active
+  # JDK falls outside the AGP-supported 17-21 range. Export a compatible
+  # JAVA_HOME yourself before running to skip this override.
+  java_bin="${JAVA_HOME:+$JAVA_HOME/bin/}java"
+  java_major=$("$java_bin" -version 2>&1 | sed -n 's/.*version "\([0-9][0-9]*\).*/\1/p')
+  if { [ -z "$java_major" ] || [ "$java_major" -lt 17 ] || [ "$java_major" -gt 21 ]; } \
+     && /usr/libexec/java_home -v 21 >/dev/null 2>&1; then
+    export JAVA_HOME="$(/usr/libexec/java_home -v 21)"
+    # shellcheck disable=SC2059
+    printf "${YELLOW}⚠️  JAVA_HOME overridden to JDK 21 (was: ${java_major:-unknown}): ${JAVA_HOME}${NC}\n"
+  fi
+
   if [ $ios == false ]; then
     fvm flutter clean
     fvm flutter pub get
