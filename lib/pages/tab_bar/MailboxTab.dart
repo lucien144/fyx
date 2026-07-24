@@ -1,22 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_it/flutter_it.dart';
 import 'package:fyx/components/mail_list_item.dart';
 import 'package:fyx/components/post/syntax_highlighter.dart';
 import 'package:fyx/components/pull_to_refresh_list.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
+import 'package:fyx/features/mail/presentation/viewmodel/mailbox_viewmodel.dart';
 import 'package:fyx/features/message/domain/entities/attachment.dart';
 import 'package:fyx/features/message/domain/message_settings.dart';
 import 'package:fyx/features/message/presentation/message_screen.dart';
 import 'package:fyx/features/message/presentation/viewmodel/message_viewmodel.dart';
-import 'package:fyx/model/Mail.dart';
-import 'package:fyx/model/MainRepository.dart';
-import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/theme/skin/Skin.dart';
-import 'package:fyx/theme/skin/SkinColors.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:fyx/model/MainRepository.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class MailboxTabArguments {
@@ -25,23 +23,17 @@ class MailboxTabArguments {
   MailboxTabArguments({this.mailId});
 }
 
-class MailboxTab extends StatefulWidget {
+class MailboxTab extends WatchingStatefulWidget {
+  const MailboxTab({super.key, this.refreshTimestamp = 0});
+
   final int refreshTimestamp;
 
-  MailboxTab({this.refreshTimestamp = 0});
-
   @override
-  _MailboxTabState createState() => _MailboxTabState();
+  State<MailboxTab> createState() => _MailboxTabState();
 }
 
 class _MailboxTabState extends State<MailboxTab> {
-  int _refreshData = 0;
-  String? _searchTerm;
   final _newMessage = MessageScreen(key: UniqueKey());
-
-  refreshData() {
-    setState(() => _refreshData = DateTime.now().millisecondsSinceEpoch);
-  }
 
   @override
   void initState() {
@@ -51,8 +43,8 @@ class _MailboxTabState extends State<MailboxTab> {
 
   @override
   void didUpdateWidget(MailboxTab oldWidget) {
-    if (widget.refreshTimestamp > _refreshData) {
-      this.refreshData();
+    if (widget.refreshTimestamp > oldWidget.refreshTimestamp) {
+      getIt<MailboxViewModel>().refresh();
     }
     super.didUpdateWidget(oldWidget);
   }
@@ -62,10 +54,13 @@ class _MailboxTabState extends State<MailboxTab> {
     // Reset the language context.
     // TODO: Not ideal. Get rid of the static.
     SyntaxHighlighter.languageContext = '';
-    SkinColors colors = Skin.of(context).theme.colors;
+    final colors = Skin.of(context).theme.colors;
 
-    MailboxTabArguments? tabArguments =
-        ModalRoute.of(context)?.settings.arguments is MailboxTabArguments ? ModalRoute.of(context)?.settings.arguments as MailboxTabArguments : null;
+    final tabArguments = ModalRoute.of(context)?.settings.arguments is MailboxTabArguments
+        ? ModalRoute.of(context)?.settings.arguments as MailboxTabArguments
+        : null;
+
+    final mailboxViewModel = watchIt<MailboxViewModel>();
 
     return CupertinoTabView(builder: (context) {
       return CupertinoPageScaffold(
@@ -85,62 +80,47 @@ class _MailboxTabState extends State<MailboxTab> {
             )),
         child: Stack(children: [
           PullToRefreshList(
-              rebuild: _refreshData,
+              rebuild: mailboxViewModel.state.refreshTimestamp,
               isInfinite: true,
-              searchEnabled: this._searchTerm != null,
+              searchEnabled: mailboxViewModel.state.searchTerm != null,
               searchLabel: 'Hledej @nick a nebo text...',
-              searchTerm: this._searchTerm,
-              onSearch: (term) {
-                setState(() => this._searchTerm = term);
-                this.refreshData();
-              },
-              onSearchClear: () {
-                setState(() => this._searchTerm = null);
-                this.refreshData();
-              },
+              searchTerm: mailboxViewModel.state.searchTerm,
+              onSearch: (term) => mailboxViewModel.setSearchTerm(term),
+              onSearchClear: () => mailboxViewModel.setSearchTerm(null),
               onPullDown: (scrollInfo) {
-                if (scrollInfo.metrics.pixels > 80 && this._searchTerm != null) {
-                  if (this._searchTerm == '') setState(() => this._searchTerm = null);
-                } else if (scrollInfo.metrics.pixels < -60 && this._searchTerm == null) {
-                  setState(() => this._searchTerm = '');
+                if (scrollInfo.metrics.pixels > 80 && mailboxViewModel.state.searchTerm != null) {
+                  if (mailboxViewModel.state.searchTerm == '') {
+                    mailboxViewModel.setSearchTerm(null);
+                  }
+                } else if (scrollInfo.metrics.pixels < -60 && mailboxViewModel.state.searchTerm == null) {
+                  mailboxViewModel.setSearchTerm('');
                 }
               },
               sliverListBuilder: (List data, {controller}) {
                 return ValueListenableBuilder(
                   valueListenable: MainRepository().settings.box.listenable(keys: ['blockedMails', 'blockedUsers']),
                   builder: (BuildContext context, value, Widget? child) {
-                    var filtered = data;
-                    if (data[0] is MailListItem) {
-                      filtered = data
-                          .where((item) => !MainRepository().settings.isMailBlocked((item as MailListItem).mail.id))
-                          .where((item) => !MainRepository().settings.isUserBlocked((item as MailListItem).mail.participant))
-                          .toList();
-                    }
                     return SliverList(
                       delegate: SliverChildBuilderDelegate(
-                        (context, i) => filtered[i],
-                        childCount: filtered.length,
+                        (context, i) => data[i],
+                        childCount: data.length,
                       ),
                     );
                   },
                 );
               },
               dataProvider: (lastId) async {
-                var result = await ApiController().loadMail(lastId: lastId ?? tabArguments?.mailId, search: this._searchTerm);
-                var mails = result.mails
-                    .map((_mail) => Mail.fromJson(_mail, isCompact: MainRepository().settings.useCompactMode))
-                    .where((mail) => !MainRepository().settings.isMailBlocked(mail.id))
-                    .where((mail) => !MainRepository().settings.isUserBlocked(mail.participant))
-                    .map((mail) {
-                  (mail.content as ContentRegular).parseEmailAddresses();
-                  (mail.content as ContentRegular).parsePhoneNumbers();
-                  return MailListItem(
-                    mail,
-                    onUpdate: this.refreshData,
-                  );
-                }).toList();
-                var id = result.mails.isEmpty ? lastId : Mail.fromJson(result.mails.last, isCompact: MainRepository().settings.useCompactMode).id;
-                return DataProviderResult(mails, lastId: id);
+                final page = await mailboxViewModel.loadMails(lastId: lastId ?? tabArguments?.mailId);
+                final items = page.mails
+                    .map(
+                      (mail) => MailListItem(
+                        mail,
+                        onUpdate: mailboxViewModel.refresh,
+                      ),
+                    )
+                    .toList(growable: false);
+
+                return DataProviderResult(items, lastId: page.nextLastId);
               }),
           Positioned(
             right: 20,
@@ -152,7 +132,7 @@ class _MailboxTabState extends State<MailboxTab> {
               onPressed: () {
                 final viewModel = getIt<MessageViewModel>();
                 viewModel.initializeFromSettings(MessageSettings(
-                    onClose: this.refreshData,
+                    onClose: getIt<MailboxViewModel>().refresh,
                     hasInputField: true,
                     onSubmit: (String? inputField, String message, List<Attachment> attachments) async {
                       if (inputField == null) {
