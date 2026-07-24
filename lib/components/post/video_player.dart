@@ -1,8 +1,8 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fyx/FyxApp.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -16,7 +16,7 @@ class VideoPlayer extends StatefulWidget {
   final bool blur;
   late final String? videoUrl;
 
-  VideoPlayer(this.element, {this.blur = false});
+  VideoPlayer(this.element, {super.key, this.blur = false});
 
   @override
   _VideoPlayerState createState() => _VideoPlayerState();
@@ -73,6 +73,7 @@ class _VideoPlayerState extends State<VideoPlayer> with AutomaticKeepAliveClient
     return ChewieController(
         videoPlayerController: videoPlayerController!,
         aspectRatio: aspectRatio,
+        deviceOrientationsAfterFullScreen: FyxApp.deviceOrientations,
         errorBuilder: (_, error) => Container(
               child: T.somethingsWrongButton(widget.element.outerHtml, icon: Icons.play_disabled, title: 'Video se nepodařilo spustit.\n$error', stack: error),
             ),

@@ -76,6 +76,8 @@ class FyxApp extends StatefulWidget {
 
   static GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
 
+  static const List<DeviceOrientation> deviceOrientations = [DeviceOrientation.portraitUp, DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight];
+
   setEnv(env) {
     FyxApp.env = env;
   }
@@ -114,7 +116,7 @@ class FyxApp extends StatefulWidget {
     }
 
     SystemUiOverlayStyle(statusBarBrightness: Brightness.light);
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp, DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
+    SystemChrome.setPreferredOrientations(deviceOrientations);
 
     // TODO: Move to build using FutureBuilder.
     var results = await Future.wait([
