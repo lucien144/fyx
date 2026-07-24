@@ -3,7 +3,6 @@ import 'package:fyx/model/enums/FirstUnreadEnum.dart';
 import 'package:fyx/model/enums/LaunchModeEnum.dart';
 import 'package:fyx/model/enums/SkinEnum.dart';
 import 'package:fyx/model/enums/ThemeEnum.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class Settings {
   bool useCompactMode = false;

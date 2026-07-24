@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:fyx/components/bottom_sheets/post_rating_sheet.dart';
 import 'package:fyx/components/feedback_indicator.dart';
 import 'package:fyx/components/gesture_feedback.dart';

@@ -1,5 +1,4 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_html/flutter_html.dart';
 
 class ThrowItAway extends StatefulWidget {
   ThrowItAway({Key? key, required this.child, this.onDismiss, this.onTap, this.onDoubleTap, this.enabled = true}) : super(key: key);

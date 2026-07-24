@@ -12,7 +12,6 @@ import 'package:fyx/components/premium_feature.dart';
 import 'package:fyx/components/pull_to_refresh_list.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
-import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/controllers/drafts_service.dart';
 import 'package:fyx/features/message/domain/entities/attachment.dart';
@@ -270,7 +269,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
 
                 int? id = lastId;
                 try {
-                  id = Post.fromJson((result as List).last, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode).id;
+                  id = Post.fromJson(result.last, pageArguments.discussionId, isCompact: MainRepository().settings.useCompactMode).id;
                 } catch (error) {}
 
                 return DataProviderResult(data,

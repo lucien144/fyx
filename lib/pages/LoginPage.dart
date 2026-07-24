@@ -1,6 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/Credentials.dart';
@@ -136,9 +134,9 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     CupertinoSwitch(
-                      activeColor: colors.highlight,
+                      activeTrackColor: colors.highlight,
                       thumbColor: colors.background,
-                      trackColor: colors.primary,
+                      inactiveTrackColor: colors.primary,
                       onChanged: (bool? value) => setState(() => _terms = value ?? false),
                       value: _terms,
                     ),

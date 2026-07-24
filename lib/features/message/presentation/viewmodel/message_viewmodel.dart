@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/features/message/domain/entities/attachment.dart';
 import 'package:fyx/features/message/domain/enums/image_quality.dart';
 import 'package:fyx/features/message/domain/message_settings.dart';

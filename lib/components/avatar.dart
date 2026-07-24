@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:fyx/libs/fyx_image_cache_manager.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/theme/skin/Skin.dart';

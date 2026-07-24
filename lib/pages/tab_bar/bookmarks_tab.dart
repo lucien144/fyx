@@ -1,6 +1,5 @@
 import 'package:diacritic/diacritic.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fyx/components/discussion_list_item.dart';
 import 'package:fyx/components/discussion_search_list_item.dart';
@@ -135,7 +134,7 @@ class _BookmarksTabState extends ConsumerState<BookmarksTab> {
               unselectedColor: colors.barBackground,
               groupValue: activeTab,
               onValueChanged: (value) {
-                _bookmarksController.animateToPage(TabsEnum.values.indexOf(value as TabsEnum),
+                _bookmarksController.animateToPage(TabsEnum.values.indexOf(value),
                     duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
               },
               children: {

@@ -7,7 +7,6 @@ import 'package:fyx/components/post/post_avatar.dart';
 import 'package:fyx/components/post/post_rating.dart';
 import 'package:fyx/components/text_icon.dart';
 import 'package:fyx/controllers/ApiController.dart';
-import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/controllers/drafts_service.dart';
 import 'package:fyx/features/message/domain/entities/attachment.dart';

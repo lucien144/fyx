@@ -1,5 +1,4 @@
 import 'package:flutter/painting.dart';
-import 'package:meta/meta.dart';
 
 class UnreadBadgeDecoration extends Decoration {
   final Color badgeColor;

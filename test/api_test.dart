@@ -5,15 +5,12 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/exceptions/AuthException.dart';
-import 'package:fyx/features/message/domain/entities/attachment.dart';
-import 'package:fyx/features/message/domain/entities/attachment.dart';
 import 'package:fyx/features/message/domain/entities/attachment.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:shared_preferences/shared_preferences.dart';

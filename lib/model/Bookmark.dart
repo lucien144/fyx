@@ -1,5 +1,4 @@
 import 'package:fyx/model/BookmarkedDiscussion.dart';
-import 'package:fyx/model/Discussion.dart';
 
 class Bookmark {
   int categoryId = 0;

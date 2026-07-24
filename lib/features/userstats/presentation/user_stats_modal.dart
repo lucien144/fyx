@@ -1,10 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/widgets.dart';
 import 'package:fyx/features/userstats/domain/entities/daily_usage.dart';
 import 'package:fyx/features/userstats/domain/entities/global_stat.dart';
 import 'package:fyx/features/userstats/domain/entities/hourly_usage.dart';
 import 'package:fyx/features/userstats/domain/enums/global_stat_type.dart';
-import 'package:fyx/model/Discussion.dart';
 import 'package:fyx/shared/services/service_locator.dart';
 
 import '../domain/entities/discussion_visit.dart';

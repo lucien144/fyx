@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/post/content/discussion_request.dart';
 import 'package:fyx/theme/skin/Skin.dart';

@@ -1,6 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:fyx/components/post/post_html.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/post/content/Poll.dart';
@@ -65,25 +63,24 @@ class _PollState extends State<Poll> with AutomaticKeepAliveClientMixin {
                     border: _poll!.canVote ? Border.all(color: colors.primary) : null),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   PostHtml(ContentRegular(answer.answer), selectable: false,),
-                  if (answer.result != null)
-                    Row(
-                      mainAxisSize: MainAxisSize.max,
-                      children: [
-                        Flexible(
-                          child: FractionallySizedBox(
-                            widthFactor: totalRespondents > 0 ? (answer.result.respondentsCount / totalRespondents) + 0.005 : .005,
-                            child: Container(
-                              color: answer.result.isMyVote ? colors.highlight : colors.primary,
-                              height: 10,
-                            ),
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Flexible(
+                        child: FractionallySizedBox(
+                          widthFactor: totalRespondents > 0 ? (answer.result.respondentsCount / totalRespondents) + 0.005 : .005,
+                          child: Container(
+                            color: answer.result.isMyVote ? colors.highlight : colors.primary,
+                            height: 10,
                           ),
                         ),
-                        SizedBox(width: 8),
-                        Text(
-                            '${totalRespondents == 0 ? 0 : (answer.result.respondentsCount / totalRespondents * 100).toStringAsFixed(1)}% / ${answer.result.respondentsCount}',
-                            style: DefaultTextStyle.of(context).style.copyWith(fontSize: 13)),
-                      ],
-                    )
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                          '${totalRespondents == 0 ? 0 : (answer.result.respondentsCount / totalRespondents * 100).toStringAsFixed(1)}% / ${answer.result.respondentsCount}',
+                          style: DefaultTextStyle.of(context).style.copyWith(fontSize: 13)),
+                    ],
+                  )
                 ]),
               ),
             ),
@@ -107,11 +104,10 @@ class _PollState extends State<Poll> with AutomaticKeepAliveClientMixin {
             textScaleFactor: 1.25,
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          if (_poll!.instructions != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: PostHtml(ContentRegular(_poll!.instructions)),
-            ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: PostHtml(ContentRegular(_poll!.instructions)),
+          ),
           if (_poll!.pollComputedValues != null)
             Text('Hlasů: ${_poll!.pollComputedValues!.totalVotes}\nHlasujících: ${_poll!.pollComputedValues!.totalRespondents}'),
           SizedBox(

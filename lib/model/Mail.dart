@@ -1,7 +1,5 @@
 // ignore_for_file: non_constant_identifier_names
 import 'package:fyx/model/Active.dart';
-import 'package:fyx/model/Post.dart';
-import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/model/post/ipost.dart';
 
