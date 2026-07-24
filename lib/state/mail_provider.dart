@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fyx/model/Mail.dart';
+import 'package:fyx/features/mail/domain/entities/mail.dart';
 
 class MailsToDelete extends StateNotifier<List<Mail>> {
   MailsToDelete() : super([]);

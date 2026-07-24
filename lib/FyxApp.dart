@@ -37,7 +37,7 @@ import 'package:fyx/pages/reminders_page.dart';
 import 'package:fyx/pages/search_page.dart';
 import 'package:fyx/pages/settings_design_screen.dart';
 import 'package:fyx/pages/settings_screen.dart';
-import 'package:fyx/pages/tab_bar/MailboxTab.dart';
+import 'package:fyx/features/mail/presentation/mailbox_tab.dart';
 import 'package:fyx/shared/services/service_locator.dart' as DI;
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
