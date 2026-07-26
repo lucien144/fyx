@@ -1,5 +1,6 @@
 // ignore_for_file: non_constant_identifier_names
 import 'package:fyx/model/ContentRaw.dart';
+import 'package:fyx/model/post/Content.dart';
 import 'package:fyx/model/post/content/Advertisement.dart';
 import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/model/post/ipost.dart';
@@ -7,6 +8,8 @@ import 'package:fyx/theme/Helpers.dart';
 
 class Post extends IPost {
   // TODO: Refactor all params to follow names from the new API like _id_wu -> id ...
+  @override
+  late Content content;
   final bool isCompact;
   bool _canReply = true;
   bool _isNew = false;

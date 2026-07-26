@@ -1,7 +1,7 @@
 import 'package:fyx/model/post/Content.dart';
 
 abstract class IPost {
-  late Content content;
+  Content get content;
 
   String get nick;
 

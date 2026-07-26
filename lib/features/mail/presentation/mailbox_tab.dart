@@ -1,17 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fyx/components/mail_list_item.dart';
+import 'package:flutter_it/flutter_it.dart';
+import 'package:fyx/features/mail/presentation/widgets/mail_list_item.dart';
 import 'package:fyx/components/post/syntax_highlighter.dart';
 import 'package:fyx/components/pull_to_refresh_list.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/features/mail/presentation/viewmodel/mail_viewmodel.dart';
 import 'package:fyx/features/message/domain/entities/attachment.dart';
 import 'package:fyx/features/message/domain/message_settings.dart';
 import 'package:fyx/features/message/presentation/message_screen.dart';
 import 'package:fyx/features/message/presentation/viewmodel/message_viewmodel.dart';
-import 'package:fyx/model/Mail.dart';
 import 'package:fyx/model/MainRepository.dart';
-import 'package:fyx/model/post/content/Regular.dart';
 import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
@@ -24,23 +24,17 @@ class MailboxTabArguments {
   MailboxTabArguments({this.mailId});
 }
 
-class MailboxTab extends StatefulWidget {
+class MailboxTab extends WatchingStatefulWidget {
   final int refreshTimestamp;
 
-  MailboxTab({this.refreshTimestamp = 0});
+  MailboxTab({super.key, this.refreshTimestamp = 0});
 
   @override
   _MailboxTabState createState() => _MailboxTabState();
 }
 
 class _MailboxTabState extends State<MailboxTab> {
-  int _refreshData = 0;
-  String? _searchTerm;
   final _newMessage = MessageScreen(key: UniqueKey());
-
-  refreshData() {
-    setState(() => _refreshData = DateTime.now().millisecondsSinceEpoch);
-  }
 
   @override
   void initState() {
@@ -50,8 +44,10 @@ class _MailboxTabState extends State<MailboxTab> {
 
   @override
   void didUpdateWidget(MailboxTab oldWidget) {
-    if (widget.refreshTimestamp > _refreshData) {
-      this.refreshData();
+    if (widget.refreshTimestamp > oldWidget.refreshTimestamp) {
+      // Defer to after this frame: didUpdateWidget runs during the parent build,
+      // so notifying a watching widget synchronously would mark it dirty mid-build.
+      WidgetsBinding.instance.addPostFrameCallback((_) => getIt<MailViewModel>().refresh());
     }
     super.didUpdateWidget(oldWidget);
   }
@@ -62,6 +58,8 @@ class _MailboxTabState extends State<MailboxTab> {
     // TODO: Not ideal. Get rid of the static.
     SyntaxHighlighter.languageContext = '';
     SkinColors colors = Skin.of(context).theme.colors;
+
+    final viewModel = watchIt<MailViewModel>();
 
     MailboxTabArguments? tabArguments =
         ModalRoute.of(context)?.settings.arguments is MailboxTabArguments ? ModalRoute.of(context)?.settings.arguments as MailboxTabArguments : null;
@@ -84,24 +82,18 @@ class _MailboxTabState extends State<MailboxTab> {
             )),
         child: Stack(children: [
           PullToRefreshList(
-              rebuild: _refreshData,
+              rebuild: viewModel.state.refreshTimestamp,
               isInfinite: true,
-              searchEnabled: this._searchTerm != null,
+              searchEnabled: viewModel.state.searchTerm != null,
               searchLabel: 'Hledej @nick a nebo text...',
-              searchTerm: this._searchTerm,
-              onSearch: (term) {
-                setState(() => this._searchTerm = term);
-                this.refreshData();
-              },
-              onSearchClear: () {
-                setState(() => this._searchTerm = null);
-                this.refreshData();
-              },
+              searchTerm: viewModel.state.searchTerm,
+              onSearch: (term) => viewModel.setSearchTerm(term),
+              onSearchClear: () => viewModel.setSearchTerm(null),
               onPullDown: (scrollInfo) {
-                if (scrollInfo.metrics.pixels > 80 && this._searchTerm != null) {
-                  if (this._searchTerm == '') setState(() => this._searchTerm = null);
-                } else if (scrollInfo.metrics.pixels < -60 && this._searchTerm == null) {
-                  setState(() => this._searchTerm = '');
+                if (scrollInfo.metrics.pixels > 80 && viewModel.state.searchTerm != null) {
+                  if (viewModel.state.searchTerm == '') viewModel.setSearchTerm(null);
+                } else if (scrollInfo.metrics.pixels < -60 && viewModel.state.searchTerm == null) {
+                  viewModel.setSearchTerm('');
                 }
               },
               sliverListBuilder: (List data, {controller}) {
@@ -125,21 +117,19 @@ class _MailboxTabState extends State<MailboxTab> {
                 );
               },
               dataProvider: (lastId) async {
-                var result = await ApiController().loadMail(lastId: lastId ?? tabArguments?.mailId, search: this._searchTerm);
-                var mails = result.mails
-                    .map((_mail) => Mail.fromJson(_mail, isCompact: MainRepository().settings.useCompactMode))
+                var isCompact = MainRepository().settings.useCompactMode;
+                // A null cursor means an initial load or a pull-to-refresh -> reset the
+                // list; otherwise continue paginating. State lives in the ViewModel so the
+                // list can be rendered from it once PullToRefreshList is refactored away.
+                var mails = lastId == null
+                    ? await viewModel.loadInitial(fromId: tabArguments?.mailId, isCompact: isCompact)
+                    : await viewModel.loadMore(isCompact: isCompact);
+                var items = mails
                     .where((mail) => !MainRepository().settings.isMailBlocked(mail.id))
                     .where((mail) => !MainRepository().settings.isUserBlocked(mail.participant))
-                    .map((mail) {
-                  (mail.content as ContentRegular).parseEmailAddresses();
-                  (mail.content as ContentRegular).parsePhoneNumbers();
-                  return MailListItem(
-                    mail,
-                    onUpdate: this.refreshData,
-                  );
-                }).toList();
-                var id = result.mails.isEmpty ? lastId : Mail.fromJson(result.mails.last, isCompact: MainRepository().settings.useCompactMode).id;
-                return DataProviderResult(mails, lastId: id);
+                    .map((mail) => MailListItem(mail, onUpdate: viewModel.refresh))
+                    .toList();
+                return DataProviderResult(items, lastId: viewModel.state.lastId);
               }),
           Positioned(
             right: 20,
@@ -149,9 +139,9 @@ class _MailboxTabState extends State<MailboxTab> {
               foregroundColor: colors.background,
               child: Icon(Icons.add),
               onPressed: () {
-                final viewModel = getIt<MessageViewModel>();
-                viewModel.initializeFromSettings(MessageSettings(
-                    onClose: this.refreshData,
+                final messageViewModel = getIt<MessageViewModel>();
+                messageViewModel.initializeFromSettings(MessageSettings(
+                    onClose: viewModel.refresh,
                     hasInputField: true,
                     onSubmit: (String? inputField, String message, List<Attachment> attachments) async {
                       if (inputField == null) {

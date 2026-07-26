@@ -103,9 +103,12 @@ fvm flutter pub run build_runner watch
 ### Core Structure
 
 **State Management**:
-- Uses `flutter_riverpod` (v2.0.0-dev.4) for reactive state management
-- Provider-based architecture with `NotificationsModel`, `ThemeModel`
-- Riverpod providers located in `lib/state/` directory
+- New code: `get_it` (DI) + `watch_it`/`flutter_it` (reactive `watchIt<VM>()`) with
+  `ChangeNotifier` ViewModels holding an immutable state. See
+  [ADR 0001](docs/adr/0001-feature-architecture.md).
+- Legacy: `flutter_riverpod` (v2.0.0-dev.4), providers in `lib/state/`. Do not add
+  new Riverpod providers.
+- Provider-based legacy models: `NotificationsModel`, `ThemeModel`
 
 **API Layer**:
 - `lib/controllers/ApiController.dart` - Singleton managing all API calls
@@ -119,12 +122,14 @@ fvm flutter pub run build_runner watch
 - Enums in `lib/model/enums/`
 - Hive is used for local storage (see generated `.g.dart` files)
 
-**Features (Clean Architecture)**:
-- `lib/features/` - Feature modules following Clean Architecture
-- Each feature has `domain/` (entities, repositories interfaces), `data/` (models, repository implementations, datasources), and `presentation/` layers
-- Uses `freezed` for immutable entities/models with code generation
+**Features (Clean Architecture)** — full rules in [ADR 0001](docs/adr/0001-feature-architecture.md):
+- `lib/features/` - feature-first modules following a use-case-less Clean Architecture
+- Each feature has `domain/` (entities, enums, repository interfaces), `data/` (models, repository implementations, datasources), and `presentation/` (ViewModel + immutable state + widgets) layers
+- **No use-case layer** — ViewModels call repository interfaces directly
+- Presentation is MVVM: a `ChangeNotifier` ViewModel holds one immutable state, mutated via `copyWith`, watched with `watchIt<VM>()`
+- Uses `freezed` for immutable entities/models with code generation (real `build_runner`, commit generated files)
 - Uses `sqflite` for SQLite database storage
-- Example: `lib/features/userstats/` - User statistics tracking (scroll distance, likes, discussion visits, daily usage streaks, hourly usage, weekday activity, posts/mails counts)
+- Reference features: `userstats` (repository-only), `gallery` / `message` / `mail` (ViewModel + state); `mail` also shows a freezed domain entity implementing a shared interface
 
 **Pages (Screens)**:
 - `lib/pages/HomePage.dart` - Main tabbed interface

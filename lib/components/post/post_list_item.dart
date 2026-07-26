@@ -79,7 +79,7 @@ class _PostListItemState extends ConsumerState<PostListItem> {
     return Visibility(
       visible: !isDeleted,
       child: Dismissible(
-        key: UniqueKey(),
+        key: ObjectKey(_post),
         direction: _post!.canBeDeleted && SettingsProvider().useBulkActions ? DismissDirection.endToStart : DismissDirection.none,
         confirmDismiss: (_) {
           ref.read(PostsSelection.provider.notifier).toggle(this._post!);
