@@ -130,3 +130,4 @@ lib/firebase_options.dart
 .fvm/
 android/app/.cxx/*
 
+ios/Flutter/ephemeral/*

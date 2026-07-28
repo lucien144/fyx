@@ -1,21 +1,10 @@
 name: fyx
 description: Fyx for Nyx.cz
-
-# The following defines the version and build number for your application.
-# A version number is three numbers separated by dots, like 1.2.43
-# followed by an optional build number separated by a +.
-# Both the version and the builder number may be overridden in flutter
-# build by specifying --build-name and --build-number, respectively.
-# In Android, build-name is used as versionName while build-number used as versionCode.
-# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
-# In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
-# Read more about iOS versioning at
-# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 12.2.0+190
+version: 12.2.0+191
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
-  flutter: ^3.3.0
+  flutter: ^3.32.0
 
 dependencies:
   async: ^2.8.2
@@ -38,7 +27,7 @@ dependencies:
   flutter_html: ^3.0.0-beta.2
   flutter_markdown: ^0.7.3+1
   flutter_riverpod: ^2.0.0-dev.4
-  flutter_sticky_header: ^0.7.0
+  flutter_sticky_header: ^0.8.0
   google_fonts: ^6.1.0
   hive: ^2.0.6
   hive_flutter: ^1.1.0
