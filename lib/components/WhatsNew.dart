@@ -78,16 +78,6 @@ class WhatsNew extends StatelessWidget {
         SizedBox(height: 24),
         item(
             context: context,
-            icon: MdiIcons.emailSearchOutline,
-            title: 'Hledání v poště',
-            description: 'Konečně lze hledat v poště 🎉',),
-        item(
-            context: context,
-            icon: MdiIcons.brushOutline,
-            title: 'UI/UX vylepšení',
-            description: 'Pár drobných vylepšení, které krvavé oko uvítá.',),
-        item(
-            context: context,
             icon: MdiIcons.bugOutline,
             title: 'Menší opravy',
             description: 'Další menší opravy a vylepšení pod kapotou.',),
