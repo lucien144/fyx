@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_it/flutter_it.dart';
 import 'package:fyx/components/avatar.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/features/premium/presentation/viewmodel/premium_viewmodel.dart';
 import 'package:fyx/features/userstats/presentation/user_stats_modal.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
@@ -11,7 +13,7 @@ import 'package:fyx/theme/skin/Skin.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-class BottomTabBar extends StatefulWidget {
+class BottomTabBar extends StatefulWidget with WatchItStatefulWidgetMixin {
   final List items;
   final ValueChanged<int>? onTap;
   final bool activeSubmenu;
@@ -60,7 +62,7 @@ class _BottomTabBarState extends State<BottomTabBar> {
                   MainRepository().credentials!.nickname.toUpperCase(),
                   style: TextStyle(fontSize: 14),
                 ),
-                if (MainRepository().credentials!.isPremiumUser)
+                if (watchIt<PremiumViewModel>().state.isPremium)
                   Icon(
                     MdiIcons.starFourPoints,
                     size: 10,

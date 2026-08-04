@@ -176,6 +176,7 @@ fvm flutter pub run build_runner watch
 ### Dependency Injection
 
 - `lib/shared/services/service_locator.dart` - GetIt DI container setup
+- `lib/shared/services/supabase_service.dart` - shared lazy Supabase client (build feature datasources on top of it)
 - Global accessor: `userstatsRepo` for UserstatsRepository
 
 ### Repository Pattern
@@ -224,7 +225,7 @@ This repository uses **Gitflow**:
 
 - **Environment**: App has dev/staging/production environments set via `FyxApp.setEnv()`
 - **Credentials**: Stored in SharedPreferences as JSON
-- **Premium Features**: Checked via Supabase (`subscribers` table)
+- **Premium Features**: Owned by `lib/features/premium/` — cached locally with grace-period semantics (see ADR 0002); read via `getIt<PremiumViewModel>().state.isPremium` / `watchIt<PremiumViewModel>()`. Source of truth is the Supabase `subscribers` table, fetched lazily through the shared `SupabaseService`
 - **Let's Encrypt Certificate**: Custom cert loaded in main for Nyx.cz compatibility
 - **Dependency Override**: `app_links: 6.3.0` is pinned (see pubspec.yaml comment)
 - **iOS Deployment Target**: Set to 15.0 in Podfile

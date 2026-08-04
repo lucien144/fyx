@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/list_header.dart';
-import 'package:fyx/components/premium_feature.dart';
+import 'package:fyx/features/premium/presentation/widgets/premium_feature.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/model/MainRepository.dart';

@@ -5,12 +5,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
-import 'package:fyx/components/premium_feature.dart';
+import 'package:fyx/features/premium/presentation/widgets/premium_feature.dart';
 import 'package:fyx/components/search/search_notfound.dart';
 import 'package:fyx/components/search_box.dart';
 import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/features/userstats/domain/entities/global_stat.dart';
 import 'package:fyx/features/userstats/domain/enums/global_stat_type.dart';
+import 'package:fyx/features/premium/presentation/viewmodel/premium_viewmodel.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/FirstUnreadEnum.dart';
 import 'package:fyx/model/enums/premium_feature_enum.dart';
@@ -259,7 +260,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
                 child: Center(
                   child: GestureDetector(
                     onTap: () {
-                      if (!MainRepository().credentials!.isPremiumUser) {
+                      if (!DI.getIt<PremiumViewModel>().state.isPremium) {
                         return;
                       }
 

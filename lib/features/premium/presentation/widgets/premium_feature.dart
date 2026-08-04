@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:fyx/components/premium_feature_bottom_sheet.dart';
-import 'package:fyx/model/MainRepository.dart';
+import 'package:flutter_it/flutter_it.dart';
+import 'package:fyx/features/premium/presentation/widgets/premium_feature_bottom_sheet.dart';
+import 'package:fyx/features/premium/presentation/viewmodel/premium_viewmodel.dart';
 import 'package:fyx/model/enums/premium_feature_enum.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-class PremiumFeature extends StatelessWidget {
-  const PremiumFeature({
+class PremiumFeature extends StatelessWidget with WatchItMixin {
+  PremiumFeature({
     Key? key,
     required this.child,
     required this.feature,
@@ -22,7 +23,7 @@ class PremiumFeature extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Skin.of(context).theme.colors;
 
-    if (MainRepository().credentials!.isPremiumUser) {
+    if (watchIt<PremiumViewModel>().state.isPremium) {
       return this.child;
     }
 

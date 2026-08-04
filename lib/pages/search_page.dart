@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/discussion_page_scaffold.dart';
 import 'package:fyx/components/post/post_list_item.dart';
-import 'package:fyx/components/premium_feature.dart';
+import 'package:fyx/features/premium/presentation/widgets/premium_feature.dart';
 import 'package:fyx/components/pull_to_refresh_list.dart';
 import 'package:fyx/components/search/search_help_notfound.dart';
 import 'package:fyx/components/search/search_help_posts.dart';

@@ -7,6 +7,8 @@ import 'package:fyx/FyxApp.dart';
 import 'package:fyx/controllers/ApiProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/controllers/log_service.dart';
+import 'package:fyx/features/premium/presentation/viewmodel/premium_viewmodel.dart';
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/exceptions/AuthException.dart';
 import 'package:fyx/features/userstats/domain/entities/global_stat.dart';
 import 'package:fyx/features/message/domain/entities/attachment.dart';
@@ -335,6 +337,9 @@ class ApiController {
 
   void logout({bool removeAuthrorization = true}) {
     SharedPreferences.getInstance().then((prefs) => prefs.clear());
+    if (getIt.isRegistered<PremiumViewModel>()) {
+      getIt<PremiumViewModel>().clear();
+    }
     if (removeAuthrorization) {
       provider.logout();
     }

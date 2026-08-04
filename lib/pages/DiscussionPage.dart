@@ -8,7 +8,7 @@ import 'package:fyx/components/discussion_page_scaffold.dart';
 import 'package:fyx/components/post/advertisement.dart';
 import 'package:fyx/components/post/post_list_item.dart';
 import 'package:fyx/components/post/syntax_highlighter.dart';
-import 'package:fyx/components/premium_feature.dart';
+import 'package:fyx/features/premium/presentation/widgets/premium_feature.dart';
 import 'package:fyx/components/pull_to_refresh_list.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
@@ -18,6 +18,7 @@ import 'package:fyx/features/message/domain/entities/attachment.dart';
 import 'package:fyx/features/message/domain/message_settings.dart';
 import 'package:fyx/features/message/presentation/message_screen.dart';
 import 'package:fyx/features/message/presentation/viewmodel/message_viewmodel.dart';
+import 'package:fyx/features/premium/presentation/viewmodel/premium_viewmodel.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/model/Settings.dart';
@@ -359,7 +360,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                           onPressed: () {
                             final viewModel = DI.getIt<MessageViewModel>();
                             viewModel.initializeFromSettings(MessageSettings(
-                                useMarkdown: MainRepository().credentials!.isPremiumUser && SettingsProvider().useMarkdown,
+                                useMarkdown: DI.getIt<PremiumViewModel>().state.isPremium && SettingsProvider().useMarkdown,
                                 draft: DraftsService().loadDiscussionMessage(pageArguments.discussionId),
                                 onDraftRemove: () => DraftsService().removeDiscussionMessage(pageArguments.discussionId),
                                 onCompose: (message) => DraftsService().saveDiscussionMessage(id: pageArguments.discussionId, message: message),
@@ -570,7 +571,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
             username: discussionResponse.discussion.owner != null ? discussionResponse.discussion.owner!.username : '',
           ),
         );
-      case true when discussionResponse.discussion.idKlub == 24237 && !MainRepository().credentials!.isPremiumUser:
+      case true when discussionResponse.discussion.idKlub == 24237 && !DI.getIt<PremiumViewModel>().state.isPremium:
         return GestureDetector(
           onTap: () => T.openLink('https://fyx.144.wtf/#premium', mode: SettingsProvider().linksMode),
           child: Container(

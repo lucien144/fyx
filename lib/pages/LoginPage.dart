@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/features/premium/presentation/viewmodel/premium_viewmodel.dart';
 import 'package:fyx/model/Credentials.dart';
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/reponses/LoginResponse.dart';
 import 'package:fyx/pages/TutorialPage.dart';
@@ -188,6 +190,7 @@ class _LoginPageState extends State<LoginPage> {
                       // TODO: Refactor 👇? This is edge case usage...
                       ApiController().provider.setCredentials(credentials);
                       MainRepository().credentials = credentials;
+                      getIt<PremiumViewModel>().refresh();
                       Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
                     }
                   }).whenComplete(() {

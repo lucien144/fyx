@@ -38,6 +38,7 @@ import 'package:fyx/pages/search_page.dart';
 import 'package:fyx/pages/settings_design_screen.dart';
 import 'package:fyx/pages/settings_screen.dart';
 import 'package:fyx/features/mail/presentation/mailbox_tab.dart';
+import 'package:fyx/features/premium/presentation/viewmodel/premium_viewmodel.dart';
 import 'package:fyx/shared/services/service_locator.dart' as DI;
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -47,7 +48,6 @@ import 'package:fyx/theme/skin/skins/GreyMatterSkin.dart';
 import 'package:fyx/theme/skin/skins/dark_skin.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:tap_canvas/tap_canvas.dart';
 
 import 'controllers/NotificationsService.dart';
@@ -157,26 +157,7 @@ class FyxApp extends StatefulWidget {
     };
     MainRepository().notifications = _notificationsService;
 
-    try {
-      if (MainRepository().credentials?.isValid == true) {
-        await Supabase.initialize(
-          url: dotenv.env['SUPABASE_URL'] ?? '',
-          anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
-        );
-
-        final result = await Supabase.instance.client
-            .from('subscribers')
-            .select()
-            .eq('nickname', MainRepository().credentials!.nickname.toLowerCase())
-            .or('valid_to.gte.${DateTime.now()},is_god.eq.true')
-            .maybeSingle();
-        if (result != null) {
-          MainRepository().credentials!.isPremiumUser = true;
-        }
-      }
-    } catch (e) {
-      FirebaseCrashlytics.instance.recordError(e, null);
-    }
+    DI.getIt<PremiumViewModel>().init(); // loads cache; refreshes in background when stale
 
     AnalyticsProvider.provider = analytics;
     DI.userstatsRepo.trackDailyUsage();
@@ -276,21 +257,23 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
         ],
         builder: (ctx, widget) => Directionality(
             textDirection: TextDirection.ltr,
-            child: Skin(
-                skins: [
-                  FyxSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
-                  ForestSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
-                  GreyMatterSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
-                  DarkSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
-                ],
-                skin: (MainRepository().credentials?.isPremiumUser ?? false) ? ctx.watch<ThemeModel>().skin : SkinEnum.fyx,
-                brightness: (() {
-                  if (ctx.watch<ThemeModel>().theme == ThemeEnum.system && _platformBrightness != null) {
-                    return _platformBrightness!;
-                  }
-                  return ctx.watch<ThemeModel>().theme == ThemeEnum.light ? Brightness.light : Brightness.dark;
-                })(),
-                child: SkinnedApp())),
+            child: ListenableBuilder(
+                listenable: DI.getIt<PremiumViewModel>(),
+                builder: (_, __) => Skin(
+                    skins: [
+                      FyxSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
+                      ForestSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
+                      GreyMatterSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
+                      DarkSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
+                    ],
+                    skin: DI.getIt<PremiumViewModel>().state.isPremium ? ctx.watch<ThemeModel>().skin : SkinEnum.fyx,
+                    brightness: (() {
+                      if (ctx.watch<ThemeModel>().theme == ThemeEnum.system && _platformBrightness != null) {
+                        return _platformBrightness!;
+                      }
+                      return ctx.watch<ThemeModel>().theme == ThemeEnum.light ? Brightness.light : Brightness.dark;
+                    })(),
+                    child: SkinnedApp()))),
       ),
     );
   }
@@ -314,6 +297,7 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
       _resumedAt = DateTime.now();
       DI.userstatsRepo.trackHourlyUsage();
       DI.userstatsRepo.trackDailyUsage();
+      DI.getIt<PremiumViewModel>().refreshIfStale();
     }
     if (state == AppLifecycleState.paused && _resumedAt != null) {
       final seconds = DateTime.now().difference(_resumedAt!).inSeconds;

@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_it/flutter_it.dart';
 import 'package:fyx/components/bottom_sheets/context_menu/grid.dart';
 import 'package:fyx/components/bottom_sheets/context_menu/item.dart';
-import 'package:fyx/components/premium_feature.dart';
+import 'package:fyx/features/premium/presentation/widgets/premium_feature.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/features/message/domain/entities/attachment.dart';

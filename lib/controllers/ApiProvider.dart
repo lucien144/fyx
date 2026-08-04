@@ -58,7 +58,7 @@ class ApiProvider implements IApiProvider {
       print('[API] ${options.method.toUpperCase()}: ${options.uri}');
 
       if (_credentials != null && _credentials!.isValid) {
-        print('[API] -> Bearer: ${_credentials!.token}');
+        print('[API] -> Bearer: ${_credentials!.token.substring(0, 5)}...');
         options.headers['Authorization'] = 'Bearer ${_credentials!.token}';
       }
       return handler.next(options);

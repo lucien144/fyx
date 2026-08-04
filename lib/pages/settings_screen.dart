@@ -6,12 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fyx/FyxApp.dart';
 import 'package:fyx/components/WhatsNew.dart';
-import 'package:fyx/components/premium_feature.dart';
-import 'package:fyx/components/premium_feature_bottom_sheet.dart';
+import 'package:fyx/features/premium/presentation/widgets/premium_feature.dart';
+
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/drafts_service.dart';
 import 'package:fyx/controllers/log_service.dart';
+import 'package:fyx/features/premium/presentation/widgets/premium_feature_bottom_sheet.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Settings.dart';

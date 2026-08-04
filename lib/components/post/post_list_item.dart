@@ -16,6 +16,7 @@ import 'package:fyx/features/message/presentation/viewmodel/message_viewmodel.da
 import 'package:fyx/features/userstats/domain/entities/global_stat.dart';
 import 'package:fyx/features/userstats/domain/enums/global_stat_type.dart';
 import 'package:fyx/model/Discussion.dart';
+import 'package:fyx/features/premium/presentation/viewmodel/premium_viewmodel.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Post.dart';
 import 'package:fyx/shared/services/service_locator.dart' as DI;
@@ -123,7 +124,7 @@ class _PostListItemState extends ConsumerState<PostListItem> {
             isPreview: widget._isPreview,
             isHighlighted: widget._isHighlighted,
             isSelected: isSelected,
-            blur: MainRepository().credentials!.isPremiumUser && ref.watch(NsfwDiscussionList.provider).containsKey(_post!.idKlub),
+            blur: DI.getIt<PremiumViewModel>().state.isPremium && ref.watch(NsfwDiscussionList.provider).containsKey(_post!.idKlub),
             topLeftWidget: Expanded(
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,

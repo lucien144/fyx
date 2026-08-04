@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/features/premium/presentation/viewmodel/premium_viewmodel.dart';
 import 'package:fyx/model/MainRepository.dart';
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -74,6 +76,7 @@ class _TutorialPageState extends State<TutorialPage> {
                     setState(() => _loggingIn = true);
                     ApiController().getCredentials().then((credentials) {
                       MainRepository().credentials = credentials!;
+                      getIt<PremiumViewModel>().refresh();
                       Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
                     }).catchError((error) => onError(error));
                   })
