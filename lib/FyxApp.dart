@@ -44,6 +44,7 @@ import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/skins/ForestSkin.dart';
 import 'package:fyx/theme/skin/skins/FyxSkin.dart';
 import 'package:fyx/theme/skin/skins/GreyMatterSkin.dart';
+import 'package:fyx/theme/skin/skins/DraculaSkin.dart';
 import 'package:fyx/theme/skin/skins/dark_skin.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
@@ -282,6 +283,7 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
                   ForestSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
                   GreyMatterSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
                   DarkSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
+                  DraculaSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
                 ],
                 skin: (MainRepository().credentials?.isPremiumUser ?? false) ? ctx.watch<ThemeModel>().skin : SkinEnum.fyx,
                 brightness: (() {

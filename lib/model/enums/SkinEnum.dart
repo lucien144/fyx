@@ -12,4 +12,6 @@ enum SkinEnum {
   greymatter,
   @HiveField(3)
   dark,
+  @HiveField(4)
+  dracula,
 }
