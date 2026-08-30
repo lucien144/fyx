@@ -42,8 +42,8 @@ class _LoginPageState extends State<LoginPage> {
     final colors = Skin.of(context).theme.colors;
     final size = MediaQuery.sizeOf(context);
 
-    return WillPopScope(
-        onWillPop: () async => false,
+    return PopScope(
+        canPop: false,
         child: SingleChildScrollView(
             physics: NeverScrollableScrollPhysics(),
             child: ConstrainedBox(
