@@ -75,7 +75,7 @@ dependencies:
   modal_bottom_sheet: ^3.0.0
   sqflite: ^2.4.2
   file_picker: ^10.3.10
-  freezed: ^2.5.7
+  freezed: ">=2.5.2 <2.5.7"
   toastification: ^3.0.3
 
 dependency_overrides:
@@ -86,8 +86,8 @@ dependency_overrides:
 dev_dependencies:
   hive_generator: ^2.0.1
   build_runner: ^2.0.6
+  analyzer: ">=6.2.0 <6.5.0"
   flutter_launcher_icons: ^0.14.3
-  analyzer: ^6.2.0
   flutter_test:
     sdk: flutter
 

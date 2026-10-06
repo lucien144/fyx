@@ -55,7 +55,7 @@ android {
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId 'net.lucien144.fyx'
-        minSdkVersion 21
+        minSdkVersion flutter.minSdkVersion
         targetSdkVersion 36
         //multiDexEnabled true // Uncomment for dev
         versionCode flutterVersionCode.toInteger()
