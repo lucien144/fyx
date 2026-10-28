@@ -44,11 +44,11 @@ class User {
   String get notificationsLastVisit => _notificationsLastVisit;
 
   User.fromJson(Map<String, dynamic> json) {
-    _username = json['username'];
-    _mailUnread = json['mail_unread'];
+    _username = json['username'] ?? '';
+    _mailUnread = json['mail_unread'] ?? 0;
     mailLastFrom = json['mail_last_from'];
-    _notificationsUnread = json['notifications_unread'];
-    _notificationsLastVisit = json['notifications_last_visit'];
+    _notificationsUnread = json['notifications_unread'] ?? 0;
+    _notificationsLastVisit = json['notifications_last_visit'] ?? '';
   }
 }
 

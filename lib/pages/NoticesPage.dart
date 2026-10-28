@@ -6,6 +6,7 @@ import 'package:fyx/components/post/post_thumbs.dart';
 import 'package:fyx/components/pull_to_refresh_list.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
+import 'package:fyx/libs/resume_from_background_observer.dart';
 import 'package:fyx/model/Settings.dart';
 import 'package:fyx/model/post/PostThumbItem.dart';
 import 'package:fyx/model/post/content/Regular.dart';
@@ -23,7 +24,7 @@ class NoticesPage extends StatefulWidget {
   _NoticesPageState createState() => _NoticesPageState();
 }
 
-class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
+class _NoticesPageState extends State<NoticesPage> with ResumeFromBackgroundObserver {
   int _refreshData = 0;
 
   refresh() {
@@ -33,21 +34,12 @@ class _NoticesPageState extends State<NoticesPage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     AnalyticsProvider().setScreen('Notices', 'NoticesPage');
   }
 
   @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed && ModalRoute.of(context)!.isCurrent) {
-      this.refresh();
-    }
+  void onResumedFromBackground() {
+    this.refresh();
   }
 
   @override
