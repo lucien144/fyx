@@ -24,14 +24,18 @@ dependencies:
   flutter_cache_manager: ^3.3.1
   flutter_dotenv: ^5.0.2
   flutter_highlight: ^0.7.0
-  flutter_html: ^3.0.0-beta.2
+  flutter_html: ^3.0.0
+  flutter_html_table: ^3.0.0
   flutter_markdown: ^0.7.3+1
   flutter_riverpod: ^2.0.0-dev.4
   flutter_sticky_header: ^0.8.0
   google_fonts: ^6.1.0
   hive: ^2.0.6
   hive_flutter: ^1.1.0
-  html: ^0.15.0
+  # flutter_html 3.0.0 calls html's internal query_selector.matches(), removed in 0.15.7.
+  # Upstream bug, unfixed: https://github.com/Sub6Resources/flutter_html/issues/1522
+  # Revisit this pin once that's resolved.
+  html: ">=0.15.5 <0.15.7"
   html_unescape: ^2.0.0
   http: ^1.2.0
   image: ^4.1.7

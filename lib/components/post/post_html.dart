@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_html_table/flutter_html_table.dart';
 import 'package:fyx/components/post/post_hero_attachment.dart';
 import 'package:fyx/components/post/spoiler.dart';
 import 'package:fyx/components/post/syntax_highlighter.dart';
@@ -63,6 +64,17 @@ class PostHtml extends StatelessWidget {
           'a': Style(color: colors.primary, textDecoration: TextDecoration.underline),
           'em': Style(fontStyle: FontStyle.italic),
           'blockquote': Style(fontStyle: FontStyle.italic, border: Border(left: BorderSide(color: colors.divider, width: 5)), margin: Margins(left: Margin(10)), padding: HtmlPaddings(left: HtmlPadding(10))),
+          // No outer border: flutter_html_table can't shrink-wrap the table box to its
+          // content width (unlike a browser), so an outer border would visibly frame
+          // the leftover space past the last column. The th/td borders below still
+          // outline the actual grid.
+          'table': Style(margin: Margins.symmetric(vertical: 8)),
+          'thead': Style(backgroundColor: colors.divider.withValues(alpha: 0.15)),
+          // width: auto overrides the "width: 1px" shrink-to-content hack some server-rendered tables
+          // use for browsers; flutter_html applies it as a literal hard constraint and collapses the cell.
+          'th': Style(width: Width.auto(), padding: HtmlPaddings.all(6), fontWeight: FontWeight.bold, textAlign: TextAlign.left, border: Border.all(color: colors.divider, width: 0.5)),
+          'td': Style(width: Width.auto(), padding: HtmlPaddings.all(6), border: Border.all(color: colors.divider, width: 0.5)),
+          'caption': Style(fontStyle: FontStyle.italic, color: colors.text, padding: HtmlPaddings.only(bottom: 4)),
           '.fill': Style(textDecoration: TextDecoration.none, display: Display.block, color: colors.text),
           '.twitter-header a, .twitter-text a': Style(color: colors.twitter),
           '.twitter-header .name': Style(fontWeight: FontWeight.bold),
@@ -263,6 +275,7 @@ class PostHtml extends StatelessWidget {
               Navigator.of(context).pushNamed('/gallery');
             },
           ),
+          TableHtmlExtension(),
         ],
         onLinkTap: (link, attr, el) => _onLinkTap(context, link, attr, el));
 
