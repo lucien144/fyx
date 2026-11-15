@@ -71,7 +71,7 @@ void main() {
   test('doomscroll sentence', () {
     expect(
       YearInReviewTexts.doomSentence(_doom(653)),
-      'Tvůj palec se prostřílel přes 653${_s}m feedu. To je *10${_s}Petřínských rozhleden* čistého pekla.',
+      'Tvůj palec scrolloval přes 653${_s}m feedu. To je *10${_s}Petřínských rozhleden* čistého pekla.',
     );
     expect(YearInReviewTexts.doomSentence(_doom(40)), endsWith('Zatím ani jedna Petřínská rozhledna.'));
     expect(YearInReviewTexts.doomSentence(_doom(70)), contains('*1${_s}Petřínská rozhledna*'));
