@@ -261,7 +261,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
                 child: Center(
                   child: GestureDetector(
                     onTap: () {
-                      if (!DI.getIt<PremiumViewModel>().state.isPremium) {
+                      if (!DI.getIt<PremiumViewModel>().state.isUnlocked) {
                         return;
                       }
 

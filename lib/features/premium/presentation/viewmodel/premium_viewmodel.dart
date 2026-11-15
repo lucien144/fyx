@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:fyx/controllers/log_service.dart';
+import 'package:fyx/features/premium/domain/entities/christmas_unlock.dart';
 import 'package:fyx/features/premium/domain/entities/premium_status.dart';
 import 'package:fyx/features/premium/domain/enums/premium_freshness.dart';
 import 'package:fyx/features/premium/domain/repositories/premium_repository.dart';
@@ -52,8 +53,9 @@ class PremiumViewModel extends ChangeNotifier {
   /// Re-evaluates freshness against the current clock and refreshes unless
   /// the cache is still fresh. Called on app resume.
   Future<void> refreshIfStale() async {
-    if (_state.status != null) _apply(_state.status);
-    if (_state.freshness == PremiumFreshness.fresh || _state.isRefreshing) return;
+    if (_state.isRefreshing) return;
+    _apply(_state.status); // also re-evaluates the Christmas unlock
+    if (_state.freshness == PremiumFreshness.fresh) return;
     await refresh();
   }
 
@@ -80,10 +82,12 @@ class PremiumViewModel extends ChangeNotifier {
 
   void _apply(PremiumStatus? status, {bool? refreshFailed}) {
     final now = _clock();
+    final isPremium = status?.isPremiumAt(now) ?? false;
     _state = PremiumState(
       status: status,
       freshness: status?.freshnessAt(now) ?? PremiumFreshness.none,
-      isPremium: status?.isPremiumAt(now) ?? false,
+      isPremium: isPremium,
+      isUnlocked: isPremium || ChristmasUnlock.isActive(now),
       isRefreshing: false,
       lastRefreshFailed: refreshFailed ?? _state.lastRefreshFailed,
     );

@@ -15,6 +15,10 @@ class PremiumState {
   /// Effective premium at the last evaluation (fresh or grace, see ADR 0002).
   final bool isPremium;
 
+  /// Premium features are available: [isPremium] or the Christmas unlock.
+  /// Gate features on this; use [isPremium] for what belongs to subscribers only.
+  final bool isUnlocked;
+
   final bool isRefreshing;
 
   /// The most recent refresh attempt threw. Cleared by a successful refresh.
@@ -24,6 +28,7 @@ class PremiumState {
     this.status,
     this.freshness = PremiumFreshness.none,
     this.isPremium = false,
+    this.isUnlocked = false,
     this.isRefreshing = false,
     this.lastRefreshFailed = false,
   });
@@ -33,6 +38,7 @@ class PremiumState {
     bool clearStatus = false,
     PremiumFreshness? freshness,
     bool? isPremium,
+    bool? isUnlocked,
     bool? isRefreshing,
     bool? lastRefreshFailed,
   }) {
@@ -40,6 +46,7 @@ class PremiumState {
       status: clearStatus ? null : (status ?? this.status),
       freshness: freshness ?? this.freshness,
       isPremium: isPremium ?? this.isPremium,
+      isUnlocked: isUnlocked ?? this.isUnlocked,
       isRefreshing: isRefreshing ?? this.isRefreshing,
       lastRefreshFailed: lastRefreshFailed ?? this.lastRefreshFailed,
     );

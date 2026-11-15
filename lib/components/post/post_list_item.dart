@@ -124,7 +124,7 @@ class _PostListItemState extends ConsumerState<PostListItem> {
             isPreview: widget._isPreview,
             isHighlighted: widget._isHighlighted,
             isSelected: isSelected,
-            blur: DI.getIt<PremiumViewModel>().state.isPremium && ref.watch(NsfwDiscussionList.provider).containsKey(_post!.idKlub),
+            blur: DI.getIt<PremiumViewModel>().state.isUnlocked && ref.watch(NsfwDiscussionList.provider).containsKey(_post!.idKlub),
             topLeftWidget: Expanded(
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,

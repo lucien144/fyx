@@ -109,4 +109,45 @@ void main() {
     expect(viewModel.state.status, isNull);
     expect(viewModel.state.isPremium, false);
   });
+
+  group('Christmas unlock', () {
+    PremiumViewModel vmAt(DateTime Function() clock) =>
+        PremiumViewModel(repo, getNickname: () => 'lucien144', clock: clock, logError: (_, __) {});
+
+    test('unlocks features for a non-premium user without making them premium', () async {
+      final christmas = DateTime(2026, 12, 26);
+      repo.cached = status(fetchedAt: christmas);
+      final viewModel = vmAt(() => christmas);
+      await viewModel.init();
+      expect(viewModel.state.isPremium, false);
+      expect(viewModel.state.isUnlocked, true);
+    });
+
+    test('unlocks features for a user with no cached status', () async {
+      final christmas = DateTime(2026, 12, 24);
+      repo.remote = status(fetchedAt: christmas);
+      final viewModel = vmAt(() => christmas);
+      await viewModel.init();
+      expect(viewModel.state.isUnlocked, true);
+    });
+
+    test('ends on resume once the window is over', () async {
+      var clock = DateTime(2026, 12, 31, 23);
+      repo.cached = status(fetchedAt: clock);
+      final viewModel = vmAt(() => clock);
+      await viewModel.init();
+      expect(viewModel.state.isUnlocked, true);
+
+      clock = DateTime(2027, 1, 1, 0, 5);
+      await viewModel.refreshIfStale();
+      expect(viewModel.state.isUnlocked, false);
+    });
+
+    test('premium stays unlocked outside the window', () async {
+      repo.cached = status(validTo: DateTime(2026, 9, 1));
+      final viewModel = vm();
+      await viewModel.init();
+      expect(viewModel.state.isUnlocked, true);
+    });
+  });
 }

@@ -375,7 +375,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                           onPressed: () {
                             final viewModel = DI.getIt<MessageViewModel>();
                             viewModel.initializeFromSettings(MessageSettings(
-                                useMarkdown: DI.getIt<PremiumViewModel>().state.isPremium && SettingsProvider().useMarkdown,
+                                useMarkdown: DI.getIt<PremiumViewModel>().state.isUnlocked && SettingsProvider().useMarkdown,
                                 draft: DraftsService().loadDiscussionMessage(pageArguments.discussionId),
                                 onDraftRemove: () => DraftsService().removeDiscussionMessage(pageArguments.discussionId),
                                 onCompose: (message) => DraftsService().saveDiscussionMessage(id: pageArguments.discussionId, message: message),

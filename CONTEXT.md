@@ -35,6 +35,11 @@ The window after a cached Premium Status expires during which premium features
 stay enabled even though a refresh has not succeeded. Only a successful remote
 answer of "not premium" — or the end of the Grace Period — turns premium off.
 
+**Christmas Unlock**:
+Easter egg: from December 24 to 31 premium features are available to everyone.
+It does not change the Premium Status — the user is not premium, the features
+are just unlocked. Statistics (Year in Review) stay subscriber-only.
+
 **Refresh**:
 Fetching the Subscriber from Supabase and replacing the cached Premium Status
 with the result. Never blocks the UI; runs on cold start and resume when the

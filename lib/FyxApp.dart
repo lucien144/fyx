@@ -268,7 +268,7 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
                       GreyMatterSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
                       DarkSkin.create(fontSize: ctx.watch<ThemeModel>().fontSize),
                     ],
-                    skin: DI.getIt<PremiumViewModel>().state.isPremium ? ctx.watch<ThemeModel>().skin : SkinEnum.fyx,
+                    skin: DI.getIt<PremiumViewModel>().state.isUnlocked ? ctx.watch<ThemeModel>().skin : SkinEnum.fyx,
                     brightness: (() {
                       if (ctx.watch<ThemeModel>().theme == ThemeEnum.system && _platformBrightness != null) {
                         return _platformBrightness!;

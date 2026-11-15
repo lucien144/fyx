@@ -23,7 +23,7 @@ class PremiumFeature extends StatelessWidget with WatchItMixin {
   Widget build(BuildContext context) {
     final colors = Skin.of(context).theme.colors;
 
-    if (watchIt<PremiumViewModel>().state.isPremium) {
+    if (watchIt<PremiumViewModel>().state.isUnlocked) {
       return this.child;
     }
 
