@@ -129,7 +129,7 @@ fvm flutter pub run build_runner watch
 - Presentation is MVVM: a `ChangeNotifier` ViewModel holds one immutable state, mutated via `copyWith`, watched with `watchIt<VM>()`
 - Uses `freezed` for immutable entities/models with code generation (real `build_runner`, commit generated files)
 - Uses `sqflite` for SQLite database storage
-- Reference features: `userstats` (repository-only), `gallery` / `message` / `mail` (ViewModel + state); `mail` also shows a freezed domain entity implementing a shared interface
+- Reference features: `userstats` (repository + SQLite; its Year in Review adds a ViewModel and a freezed sealed union), `gallery` / `message` / `mail` (ViewModel + state); `mail` also shows a freezed domain entity implementing a shared interface
 
 **Pages (Screens)**:
 - `lib/pages/HomePage.dart` - Main tabbed interface
@@ -215,6 +215,12 @@ This repository uses **Gitflow**:
   - `mailsCreated` / `mailsLength` / `mailAttachments` — mail statistics
   - `appLaunches` — cold starts
   - `galleryOpens` — gallery/image opens
+
+- **Year in Review ("Rok s Fyxem")** — story-style walkthrough of one year's statistics; terms in `CONTEXT.md`:
+  - Domain: `YearInReview.fromStatistics()` builds the slide list (`YearInReviewSlide` sealed union) from the same four repository reads the stats modal uses; slides without data are left out. All thresholds live in domain enums (`YearInReviewRhythm`, `YearInReviewCharacter`, `ScrollLandmark`, `WritingVolume`) and `YearInReviewWindow` (January 1–14, premium, at least 7 active days). No DB changes.
+  - Presentation: `YearInReviewViewModel` + `year_in_review_screen.dart`; one widget per slide under `presentation/widgets/year_in_review/slides/`. Czech wording and plurals only in `year_in_review_texts.dart`, skin colours only in `year_in_review_palette.dart` (the doomscroll slide has fixed colours).
+  - Entry points: opens on its own once per year from `HomePage` (cold start and resume; "What's new" takes precedence), a menu item in `bottom_tab_bar.dart` during the window (premium only, hidden otherwise), and a button in the stats modal for beta testers (running year, no gating). Deliberately not listed among premium features — it is an easter egg.
+  - Fonts: Inter on both platforms; Press Start 2P is bundled in `assets/fonts/` and has unreliable Czech accents, so its texts go through `unaccented()`.
 
 - **Derived statistics** (no DB, computed from existing tables):
   - `DailyUsageListExtension.peakWeekday` — most active weekday (1–7), from `daily_usage`

@@ -30,4 +30,6 @@ class Settings {
   FirstUnreadEnum firstUnread = FirstUnreadEnum.button;
   LaunchModeEnum linksMode = LaunchModeEnum.externalApplication;
   String whatsNew = '';
+  // The year whose Year in Review has already opened on its own.
+  int yearInReviewAutoOpened = 0;
 }

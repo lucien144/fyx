@@ -20,6 +20,13 @@ extension GlobalStatListExtension on List<GlobalStat> {
     return where((s) => s.statType == type.value).firstOrNull?.number ?? 0;
   }
 
+  /// Scrolled distance in meters. [devicePixelRatio] turns logical pixels
+  /// into physical ones, assuming the 160 dpi baseline per logical pixel.
+  double scrollMeters(double devicePixelRatio) {
+    final pixelsPerCm = 160 * devicePixelRatio / 2.54;
+    return valueOf(GlobalStatType.totalScrollPx) / pixelsPerCm / 100;
+  }
+
   /// Get GlobalStat by GlobalStatType, returns null if not found
   GlobalStat? statOf(GlobalStatType type) {
     return where((s) => s.statType == type.value).firstOrNull;

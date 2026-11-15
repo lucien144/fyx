@@ -54,7 +54,7 @@ lib/features/<feature>/
    `presentation`. `presentation` depends only on `domain` (never on a `data`
    model). `data` depends on `domain`.
 2. **No use-case layer.** ViewModels (or callers) talk to repository interfaces
-   directly. `userstats` is the repository-only reference; `gallery`, `message`
+   directly. `userstats` tracking is the repository-only reference; `gallery`, `message`
    and `mail` add a ViewModel.
 3. **Models with freezed.** Entities and data models use `@freezed`. Generate
    with the real `build_runner` (`fvm flutter pub run build_runner build
@@ -100,7 +100,9 @@ lib/features/<feature>/
 
 ## Reference implementations
 
-- `lib/features/userstats/` — repository-only (no ViewModel), SQLite datasource.
+- `lib/features/userstats/` — SQLite datasource; tracking is repository-only
+  (no ViewModel). Its Year in Review adds a ViewModel + immutable State and
+  models the slides as a freezed sealed union built by a domain factory.
 - `lib/features/gallery/`, `lib/features/message/` — ViewModel + immutable State.
 - `lib/features/mail/` — ViewModel + immutable State, a freezed domain entity
   that `implements IPost`, data-layer JSON mapping, consumed by `MailboxTab` via

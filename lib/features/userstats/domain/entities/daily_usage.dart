@@ -15,24 +15,36 @@ class DailyUsage with _$DailyUsage {
 
 /// Extension for calculating streaks from daily usage list
 extension DailyUsageListExtension on List<DailyUsage> {
+  /// Distinct calendar days, ascending. UTC midnights, so that a day is always
+  /// exactly 24 hours apart from the next one regardless of DST.
+  List<DateTime> get _days {
+    return map((e) => DateTime.utc(e.date.year, e.date.month, e.date.day)).toSet().toList()..sort();
+  }
+
+  /// Number of distinct days the app was opened on
+  int get activeDays => _days.length;
+
+  /// The earliest recorded day, null if empty
+  DateTime? get firstDay {
+    final days = _days;
+    return days.isEmpty ? null : DateTime(days.first.year, days.first.month, days.first.day);
+  }
+
   /// Calculate the longest streak of consecutive days within the year
   int get longestStreak {
-    if (isEmpty) return 0;
-
-    final dates = map((e) => DateTime(e.date.year, e.date.month, e.date.day)).toList()..sort();
+    final days = _days;
+    if (days.isEmpty) return 0;
 
     int longest = 1;
     int current = 1;
 
-    for (int i = 1; i < dates.length; i++) {
-      final diff = dates[i].difference(dates[i - 1]).inDays;
-      if (diff == 1) {
+    for (int i = 1; i < days.length; i++) {
+      if (days[i].difference(days[i - 1]).inDays == 1) {
         current++;
         longest = max(longest, current);
-      } else if (diff > 1) {
+      } else {
         current = 1;
       }
-      // diff == 0 means duplicate day, skip
     }
 
     return longest;
@@ -41,34 +53,23 @@ extension DailyUsageListExtension on List<DailyUsage> {
   /// Calculate current streak within the year
   /// For current year: consecutive days ending today or yesterday
   /// For past years: streak ending at the most recent recorded day
-  int get currentStreak {
-    if (isEmpty) return 0;
+  int get currentStreak => currentStreakAt(DateTime.now());
 
-    final year = first.year;
-    final now = DateTime.now();
-    final isCurrentYear = year == now.year;
-
-    // Removing duplicate days
-    final dates = map((e) => DateTime(e.date.year, e.date.month, e.date.day)).toSet().toList()..sort((a, b) => b.compareTo(a));
-
-    final mostRecent = dates.first;
+  /// [currentStreak] evaluated against an explicit clock
+  int currentStreakAt(DateTime now) {
+    final days = _days.reversed.toList();
+    if (days.isEmpty) return 0;
 
     // For current year, streak is broken if last activity was more than 1 day ago
-    if (isCurrentYear) {
-      final todayNormalized = DateTime(now.year, now.month, now.day);
-      final daysSinceMostRecent = todayNormalized.difference(mostRecent).inDays;
-      if (daysSinceMostRecent > 1) return 0;
+    if (first.year == now.year) {
+      final today = DateTime.utc(now.year, now.month, now.day);
+      if (today.difference(days.first).inDays > 1) return 0;
     }
-    // For past years, just return the streak ending at the most recent recorded day
 
     int streak = 1;
-    for (int i = 1; i < dates.length; i++) {
-      final diff = dates[i - 1].difference(dates[i]).inDays;
-      if (diff == 1) {
-        streak++;
-      } else {
-        break;
-      }
+    for (int i = 1; i < days.length; i++) {
+      if (days[i - 1].difference(days[i]).inDays != 1) break;
+      streak++;
     }
 
     return streak;

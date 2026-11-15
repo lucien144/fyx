@@ -3,6 +3,7 @@ import 'package:fyx/features/userstats/domain/entities/daily_usage.dart';
 import 'package:fyx/features/userstats/domain/entities/global_stat.dart';
 import 'package:fyx/features/userstats/domain/entities/hourly_usage.dart';
 import 'package:fyx/features/userstats/domain/enums/global_stat_type.dart';
+import 'package:fyx/features/userstats/presentation/year_in_review_screen.dart';
 import 'package:fyx/shared/services/service_locator.dart';
 
 import '../domain/entities/discussion_visit.dart';
@@ -43,18 +44,6 @@ class UserStatsModal extends StatelessWidget {
     return '${m}m';
   }
 
-  /// Convert logical pixels to kilometers
-  /// devicePixelRatio - from MediaQuery.devicePixelRatioOf
-  double _pxToKm(int pixels, double devicePixelRatio) {
-    // Approximate DPI (baseline 160 for Android mdpi)
-    final dpi = 160 * devicePixelRatio;
-    // 1 inch = 2.54 cm
-    final pxPerCm = dpi / 2.54;
-    final cm = pixels / pxPerCm;
-    // cm to km
-    return cm / 100000;
-  }
-
   @override
   Widget build(BuildContext context) {
     var year = DateTime.now().year;
@@ -73,13 +62,18 @@ class UserStatsModal extends StatelessWidget {
             List<DiscussionVisit> discussionVisits = data.data![1] as List<DiscussionVisit>;
             List<DailyUsage> dailyUsage = data.data![2] as List<DailyUsage>;
             List<HourlyUsage> hourlyUsage = data.data![3] as List<HourlyUsage>;
-            var km = _pxToKm(globalStats.valueOf(GlobalStatType.totalScrollPx), MediaQuery.devicePixelRatioOf(context));
+            var km = globalStats.scrollMeters(MediaQuery.devicePixelRatioOf(context)) / 1000;
       
             final peakHour = hourlyUsage.peakHour;
             final peakWeekday = dailyUsage.peakWeekday;
             final peakMonth = dailyUsage.peakMonth;
       
             return ListView(shrinkWrap: true, padding: const EdgeInsets.only(left: 32, top: 32, right: 32, bottom: 48), children: [
+              CupertinoButton.filled(
+                child: Text('Rok s Fyxem'),
+                onPressed: () => YearInReviewScreen.open(context, year: year, source: YearInReviewSource.statistics),
+              ),
+              const SizedBox(height: 16),
               Text('Doomscrolling: ${km < 1 ? [(km * 1000).toStringAsFixed(4), 'm'].join() : [km.toStringAsFixed(4), 'km'].join()}'),
               Text('Spuštění aplikace: ${globalStats.valueOf(GlobalStatType.appLaunches)}'),
               Text('Otevření galerie: ${globalStats.valueOf(GlobalStatType.galleryOpens)}'),

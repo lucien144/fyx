@@ -78,6 +78,7 @@ dependencies:
   file_picker: ^10.3.10
   freezed: ">=2.5.2 <2.5.7"
   toastification: ^3.0.3
+  lucide_icons: ^0.257.0
 
 dependency_overrides:
   intl: any
@@ -123,6 +124,7 @@ flutter:
     - assets/philosoraptor.png
     - assets/lets-encrypt-r3.cer
     - assets/inter_font/
+    - assets/fonts/
 
   fonts:
     - family: JetBrainsMono

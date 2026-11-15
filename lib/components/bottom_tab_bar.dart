@@ -5,6 +5,7 @@ import 'package:fyx/components/avatar.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/features/premium/presentation/viewmodel/premium_viewmodel.dart';
 import 'package:fyx/features/userstats/presentation/user_stats_modal.dart';
+import 'package:fyx/features/userstats/presentation/widgets/year_in_review/year_in_review_menu_item.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
 import 'package:fyx/theme/L.dart';
@@ -227,7 +228,7 @@ class _BottomTabBarState extends State<BottomTabBar> {
                           )
                         ],
                       )) : Container()),
-              Expanded(child: Container()),
+              Expanded(child: const YearInReviewMenuItem()),
             ],
           )
         ],

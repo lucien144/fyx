@@ -38,6 +38,12 @@ class SettingsProvider {
     _settings.fontSize = fontSize;
   }
 
+  int get yearInReviewAutoOpened => _settings.yearInReviewAutoOpened;
+  set yearInReviewAutoOpened(int year) {
+    _box.put('yearInReviewAutoOpened', year);
+    _settings.yearInReviewAutoOpened = year;
+  }
+
   String get whatsNew => _settings.whatsNew;
   set whatsNew(String whatsNew) {
     _box.put('whatsNew', whatsNew);
@@ -144,6 +150,7 @@ class SettingsProvider {
     _settings.appIcon = _box.get('appIcon', defaultValue: Settings().appIcon);
     _settings.linksMode = _box.get('linksMode', defaultValue: Settings().linksMode);
     _settings.whatsNew = _box.get('whatsNew', defaultValue: Settings().whatsNew);
+    _settings.yearInReviewAutoOpened = _box.get('yearInReviewAutoOpened', defaultValue: Settings().yearInReviewAutoOpened);
     _settings.savedSearch = _box.get('savedSearch', defaultValue: Settings().savedSearch);
 
     return _singleton;

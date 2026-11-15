@@ -12,6 +12,10 @@ import 'package:fyx/model/enums/RefreshDataEnum.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/pages/tab_bar/bookmarks_tab.dart';
 import 'package:fyx/features/mail/presentation/mailbox_tab.dart';
+import 'package:fyx/features/premium/presentation/viewmodel/premium_viewmodel.dart';
+import 'package:fyx/features/userstats/presentation/viewmodel/year_in_review_viewmodel.dart';
+import 'package:fyx/features/userstats/presentation/year_in_review_screen.dart';
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -85,6 +89,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     // See: https://github.com/lucien144/fyx/issues/57
     if (state == AppLifecycleState.resumed && ModalRoute.of(context)!.isCurrent) {
       this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? RefreshDataEnum.mail : RefreshDataEnum.bookmarks);
+      _maybeOpenYearInReview();
     }
   }
 
@@ -115,7 +120,21 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
           barrierColor: colors.dark.withOpacity(0.5),
         );
       });
+      // "What's new" wins; the Year in Review opens on a later visit.
+      getIt<YearInReviewViewModel>().refreshWindow();
+    } else {
+      // Gives the premium status time to load from its cache.
+      Future.delayed(Duration(seconds: 2), _maybeOpenYearInReview);
     }
+  }
+
+  /// Opens the Year in Review on its own, once, during the January Window.
+  Future<void> _maybeOpenYearInReview() async {
+    final viewModel = getIt<YearInReviewViewModel>();
+    final year = await viewModel.yearToAutoOpen(isPremium: getIt<PremiumViewModel>().state.isPremium);
+    if (year == null || !mounted || !(ModalRoute.of(context)?.isCurrent ?? false)) return;
+    viewModel.markAutoOpened(year);
+    YearInReviewScreen.open(context, year: year, source: YearInReviewSource.auto);
   }
 
   void didPop() {

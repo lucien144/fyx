@@ -11,6 +11,7 @@ import 'package:fyx/features/premium/presentation/viewmodel/premium_viewmodel.da
 import 'package:fyx/features/userstats/data/datasources/userstats_database.dart';
 import 'package:fyx/features/userstats/data/repositories/userstats_repository_impl.dart';
 import 'package:fyx/features/userstats/domain/repositories/userstats_repository.dart';
+import 'package:fyx/features/userstats/presentation/viewmodel/year_in_review_viewmodel.dart';
 import 'package:fyx/shared/services/supabase_service.dart';
 import 'package:get_it/get_it.dart';
 
@@ -41,6 +42,7 @@ void setupServiceLocator() {
     getIt.registerLazySingleton<UserstatsRepository>(
         () => UserstatsRepositoryImpl(getIt<UserstatsDatabase>()),
     );
+    getIt.registerSingleton<YearInReviewViewModel>(YearInReviewViewModel(getIt<UserstatsRepository>()));
 
 }
 

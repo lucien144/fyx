@@ -39,3 +39,38 @@ answer of "not premium" — or the end of the Grace Period — turns premium off
 Fetching the Subscriber from Supabase and replacing the cached Premium Status
 with the result. Never blocks the UI; runs on cold start and resume when the
 cache is not fresh, after login, or manually from settings.
+
+### Statistics
+
+**Statistics**:
+The raw per-year usage numbers the app collects locally on the device (time in
+app, scroll distance, ratings, posts, streaks, top discussions), shown as a
+plain list. Nothing leaves the device.
+_Avoid_: userstats (that's the module name), analytics (that's Firebase)
+
+**Year in Review**:
+A story-style walkthrough of one year's Statistics, shown to the user as "Rok s
+Fyxem". Always about one specific year: the previous year during the January
+Window, the running year when a beta tester opens it from Statistics. A premium
+easter egg — it is not advertised among the premium features.
+_Avoid_: Wrapped, recap, stories
+
+**January Window**:
+The first 14 days of January, when the Year in Review for the previous year is
+offered to premium users: once on its own, and on demand from the menu. Users
+with fewer than 7 active days in that year are not offered it.
+
+**Active Day**:
+A calendar day on which the user opened the app at least once.
+
+**Streak**:
+A run of consecutive Active Days within one year.
+
+**Rhythm**:
+The label a Year in Review gives the user for the hour of day they are most
+active in (e.g. "Ranní ptáče", "Fachman").
+
+**Character**:
+The film character a Year in Review assigns the user from the share of
+positive ratings among all ratings they gave (e.g. Gandalf, Tichý Bob).
+_Avoid_: persona, mood
