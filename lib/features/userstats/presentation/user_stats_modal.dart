@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/features/userstats/domain/entities/daily_usage.dart';
 import 'package:fyx/features/userstats/domain/entities/global_stat.dart';
 import 'package:fyx/features/userstats/domain/entities/hourly_usage.dart';
@@ -47,6 +48,7 @@ class UserStatsModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var year = DateTime.now().year;
+    final colors = Skin.of(context).theme.colors;
 
     return SafeArea(
       child: FutureBuilder(
@@ -69,8 +71,9 @@ class UserStatsModal extends StatelessWidget {
             final peakMonth = dailyUsage.peakMonth;
       
             return ListView(shrinkWrap: true, padding: const EdgeInsets.only(left: 32, top: 32, right: 32, bottom: 48), children: [
-              CupertinoButton.filled(
-                child: Text('Rok s Fyxem'),
+              CupertinoButton(
+                color: colors.primary,
+                child: Text('Rok s Fyxem', style: TextStyle(color: colors.background)),
                 onPressed: () => YearInReviewScreen.open(context, year: year, source: YearInReviewSource.statistics),
               ),
               const SizedBox(height: 16),
