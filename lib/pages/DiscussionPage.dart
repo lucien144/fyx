@@ -55,7 +55,7 @@ class DiscussionPage extends ConsumerStatefulWidget {
 }
 
 class _DiscussionPageState extends ConsumerState<DiscussionPage> {
-  final AsyncMemoizer<DiscussionResponse> _memoizer = AsyncMemoizer<DiscussionResponse>();
+  AsyncMemoizer<DiscussionResponse> _memoizer = AsyncMemoizer<DiscussionResponse>();
   int _refreshList = 0;
   bool _hasInitData = false;
 
@@ -77,6 +77,11 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
 
   // Missing keyboard workaround fix attempt
   final _newMessage = MessageScreen(key: UniqueKey());
+
+  // Resets the memoizer so the FutureBuilder re-runs _fetchData.
+  void _retryFetch() {
+    setState(() => _memoizer = AsyncMemoizer<DiscussionResponse>());
+  }
 
   Future<DiscussionResponse> _fetchData(discussionId, postId, user, {String? search, bool filterReplies = false}) {
     return this._memoizer.runOnce(() {
@@ -118,16 +123,20 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
             search: pageArguments.search, filterReplies: pageArguments.filterReplies),
         builder: (BuildContext context, AsyncSnapshot<DiscussionResponse> snapshot) {
           if (snapshot.hasError) {
-            return T.feedbackScreen(context,
-                isWarning: true, title: snapshot.error.toString(), label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
+            return _pageScaffold(
+                title: L.GENERAL_ERROR,
+                body: T.feedbackScreen(context,
+                    isWarning: true, title: snapshot.error.toString(), label: L.GENERAL_REFRESH, onPress: _retryFetch));
           }
           if (snapshot.hasData) {
             if (snapshot.data!.error) {
-              return T.feedbackScreen(context,
-                  isWarning: true,
-                  title: 'Něco se pokazilo.\nChybu, prosím, nahlašte ID LUCIEN.',
-                  label: L.GENERAL_CLOSE,
-                  onPress: () => Navigator.of(context).pop());
+              return _pageScaffold(
+                  title: L.GENERAL_ERROR,
+                  body: T.feedbackScreen(context,
+                      isWarning: true,
+                      title: 'Něco se pokazilo.\nZkontroluj připojení a zkus to znovu.\nPřetrvávající chybu, prosím, nahlašte ID LUCIEN.',
+                      label: L.GENERAL_REFRESH,
+                      onPress: _retryFetch));
             } else if (snapshot.data!.discussion.accessDenied) {
               return T.feedbackScreen(context,
                   title: L.ACCESS_DENIED_ERROR, icon: Icons.do_not_disturb_alt, label: L.GENERAL_CLOSE, onPress: () => Navigator.of(context).pop());
@@ -256,6 +265,12 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                     response =
                         await ApiController().loadDiscussion(pageArguments.discussionId, user: pageArguments.filterByUser, search: this._searchTerm);
                   }
+                }
+
+                // Propagate connection failures to PullToRefreshList so it shows its retry screen
+                // instead of silently rendering an empty list.
+                if (response.error) {
+                  throw Exception(L.CONNECTION_ERROR);
                 }
 
                 result = response.posts;
