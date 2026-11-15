@@ -6,6 +6,7 @@ import 'package:fyx/components/notification_badge.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
+import 'package:fyx/libs/resume_from_background_observer.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
 import 'package:fyx/model/enums/RefreshDataEnum.dart';
@@ -32,7 +33,7 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObserver {
+class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObserver, ResumeFromBackgroundObserver {
   int _pageIndex = 0;
   Map<RefreshDataEnum, int> _refreshData = {RefreshDataEnum.bookmarks: 0, RefreshDataEnum.mail: 0};
   bool _filterUnread = false;
@@ -80,12 +81,12 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     setState(() => _showSubmenu = false);
+    super.didChangeAppLifecycleState(state);
+  }
 
-    // If we omit the Route check, there's very rare issue during authorization
-    // See: https://github.com/lucien144/fyx/issues/57
-    if (state == AppLifecycleState.resumed && ModalRoute.of(context)!.isCurrent) {
-      this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? RefreshDataEnum.mail : RefreshDataEnum.bookmarks);
-    }
+  @override
+  void onResumedFromBackground() {
+    this.refreshData(_pageIndex == HomePage.PAGE_MAIL ? RefreshDataEnum.mail : RefreshDataEnum.bookmarks);
   }
 
   @override
