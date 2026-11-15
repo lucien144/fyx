@@ -1,6 +1,6 @@
 name: fyx
 description: Fyx for Nyx.cz
-version: 12.2.0+192
+version: 12.2.0+193
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
