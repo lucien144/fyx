@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:fyx/features/premium/presentation/widgets/premium_feature.dart';
+import 'package:fyx/components/christmas_refresh_indicator.dart';
 import 'package:fyx/components/search/search_notfound.dart';
 import 'package:fyx/components/search_box.dart';
 import 'package:fyx/controllers/log_service.dart';
@@ -114,7 +115,7 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
 
       // Add the refresh control on first position
       _slivers.add(CupertinoSliverRefreshControl(
-        builder: Platform.isIOS ? CupertinoSliverRefreshControl.buildRefreshIndicator : buildAndroidRefreshIndicator,
+        builder: _buildRefreshIndicator,
         onRefresh: () {
           setState(() => _hasPulledDown = true);
           if (!widget._disabled) {
@@ -425,6 +426,25 @@ class _PullToRefreshListState<TProvider> extends State<PullToRefreshList> with S
         _isLoading = false;
       });
     }
+  }
+
+  Widget _buildRefreshIndicator(
+    BuildContext context,
+    RefreshIndicatorMode refreshState,
+    double pulledExtent,
+    double refreshTriggerPullDistance,
+    double refreshIndicatorExtent,
+  ) {
+    if (ChristmasRefreshIndicator.isChristmasEve()) {
+      return ChristmasRefreshIndicator(
+        refreshState: refreshState,
+        pulledExtent: pulledExtent,
+        refreshTriggerPullDistance: refreshTriggerPullDistance,
+      );
+    }
+
+    final builder = Platform.isIOS ? CupertinoSliverRefreshControl.buildRefreshIndicator : buildAndroidRefreshIndicator;
+    return builder(context, refreshState, pulledExtent, refreshTriggerPullDistance, refreshIndicatorExtent);
   }
 
   Widget buildAndroidRefreshIndicator(
