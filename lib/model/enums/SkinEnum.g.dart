@@ -21,6 +21,8 @@ class SkinEnumAdapter extends TypeAdapter<SkinEnum> {
         return SkinEnum.greymatter;
       case 3:
         return SkinEnum.dark;
+      case 4:
+        return SkinEnum.dracula;
       default:
         return SkinEnum.fyx;
     }
@@ -40,6 +42,9 @@ class SkinEnumAdapter extends TypeAdapter<SkinEnum> {
         break;
       case SkinEnum.dark:
         writer.writeByte(3);
+        break;
+      case SkinEnum.dracula:
+        writer.writeByte(4);
         break;
     }
   }
