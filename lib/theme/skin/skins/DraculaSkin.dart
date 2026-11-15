@@ -25,20 +25,20 @@ class DraculaSkin extends SkinData {
       primary: const Color(0xff644ac9), // purple
       primaryContrasting: const Color(0xff644ac9),
       background: const Color(0xfffffbeb),
-      barBackground: const Color(0xfff4eeda),
+      barBackground: const Color(0xffdedccf), // background light
       text: const Color(0xff1f1f1f),
-      success: const Color(0xff14710a), // green
-      danger: const Color(0xffcb3a2a), // red
+      success: const Color(0xff089108), // functional green
+      danger: const Color(0xffde5735), // functional red
       highlight: const Color(0xffa3144d), // pink
       highlightedText: const Color(0xff846e15), // yellow
-      divider: const Color(0xffe8e2cd),
+      divider: const Color(0xffceccc0), // background dark
       light: CupertinoColors.white,
       dark: const Color(0xff1f1f1f),
-      grey: const Color(0xff635d97), // comment
-      disabled: const Color(0x33635d97),
+      grey: const Color(0xff6c664b), // comment
+      disabled: const Color(0x666c664b),
       twitter: const Color(0xff036a96), // cyan
-      pollBackground: const Color(0xffefe9d4),
-      pollAnswer: const Color(0xffe0dabf),
+      pollBackground: const Color(0xffece9df), // background lighter
+      pollAnswer: const Color(0xffdedccf), // background light
       pollAnswerSelected: const Color(0xffcfcfde),
       gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xff644ac9), Color(0xffa3144d)]),
       textFieldDecoration: const BoxDecoration(
@@ -48,8 +48,8 @@ class DraculaSkin extends SkinData {
         ),
         border: Border.fromBorderSide(BorderSide(
           color: CupertinoDynamicColor.withBrightness(
-            color: Color(0xffcfcfde),
-            darkColor: Color(0xffcfcfde),
+            color: Color(0xffceccc0),
+            darkColor: Color(0xffceccc0),
           ),
           width: 0.0,
         )),
@@ -68,15 +68,15 @@ class DraculaSkin extends SkinData {
       danger: const Color(0xffff5555), // red
       highlight: const Color(0xffff79c6), // pink
       highlightedText: const Color(0xfff1fa8c), // yellow
-      divider: const Color(0xff191a21),
+      divider: const Color(0xff343746), // background light
       light: CupertinoColors.white,
       dark: const Color(0xff21222c),
       grey: const Color(0xff6272a4), // comment
-      disabled: const Color(0xff6272a4),
+      disabled: const Color(0x806272a4),
       twitter: const Color(0xff8be9fd), // cyan
-      pollBackground: const Color(0xff44475a),
-      pollAnswer: const Color(0xff44475a),
-      pollAnswerSelected: const Color(0xff6272a4),
+      pollBackground: const Color(0xff343746), // background light
+      pollAnswer: const Color(0xff424450), // background lighter
+      pollAnswerSelected: const Color(0xff44475a), // selection
       gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xffbd93f9), Color(0xffff79c6)]),
       textFieldDecoration: const BoxDecoration(
         color: CupertinoDynamicColor.withBrightness(
@@ -85,8 +85,8 @@ class DraculaSkin extends SkinData {
         ),
         border: Border.fromBorderSide(BorderSide(
           color: CupertinoDynamicColor.withBrightness(
-            color: Color(0xff44475a),
-            darkColor: Color(0xff44475a),
+            color: Color(0xff424450),
+            darkColor: Color(0xff424450),
           ),
           width: 0.0,
         )),
