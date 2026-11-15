@@ -16,3 +16,4 @@ capture a significant architectural decision, its context and its consequences.
 | ADR | Title | Status |
 |-----|-------|--------|
 | [0001](0001-feature-architecture.md) | Feature architecture: MVVM over a use-case-less Clean Architecture | Accepted |
+| [0002](0002-premium-status-caching.md) | Premium status caching policy | Accepted |

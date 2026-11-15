@@ -226,6 +226,7 @@ This repository uses **Gitflow**:
 - **Environment**: App has dev/staging/production environments set via `FyxApp.setEnv()`
 - **Credentials**: Stored in SharedPreferences as JSON
 - **Premium Features**: Owned by `lib/features/premium/` — cached locally with grace-period semantics (see ADR 0002); read via `getIt<PremiumViewModel>().state.isPremium` / `watchIt<PremiumViewModel>()`. Source of truth is the Supabase `subscribers` table, fetched lazily through the shared `SupabaseService`
+- **App Icon Switching** (iOS only): icons are declared in `AppIconEnum`; the alternate-icon build setting must stay in `ios/Flutter/AppIcons.xcconfig`, because `flutter_launcher_icons` rewrites `ASSETCATALOG_*` in `project.pbxproj` on every regeneration. iOS is the source of truth for the applied icon; `Settings.appIcon` is only a cache. Adding an icon: [docs/app-icons.md](docs/app-icons.md)
 - **Let's Encrypt Certificate**: Custom cert loaded in main for Nyx.cz compatibility
 - **Dependency Override**: `app_links: 6.3.0` is pinned (see pubspec.yaml comment)
 - **iOS Deployment Target**: Set to 15.0 in Podfile

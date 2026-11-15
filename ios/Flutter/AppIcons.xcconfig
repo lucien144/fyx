@@ -1,0 +1,9 @@
+// Alternate app icons the user can switch to at runtime (see AppIconEnum).
+//
+// This lives in an xcconfig rather than in project.pbxproj on purpose:
+// `flutter_launcher_icons` rewrites the ASSETCATALOG_* settings inside
+// project.pbxproj on every regeneration and would reset the value.
+//
+// Each name must match an App Icon set in Runner/Assets.xcassets. Xcode
+// generates the CFBundleAlternateIcons entries in Info.plist from this.
+ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = AppIconDark AppIconLove AppIconOriginal AppIconTypingBrigade

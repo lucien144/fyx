@@ -1,4 +1,5 @@
 import 'package:fyx/model/enums/DefaultView.dart';
+import 'package:fyx/model/enums/app_icon_enum.dart';
 import 'package:fyx/model/enums/FirstUnreadEnum.dart';
 import 'package:fyx/model/enums/LaunchModeEnum.dart';
 import 'package:fyx/model/enums/SkinEnum.dart';
@@ -22,6 +23,9 @@ class Settings {
   Map<int, String> nsfwDiscussionList = {};
   ThemeEnum theme = ThemeEnum.system;
   SkinEnum skin = SkinEnum.fyx;
+  // Stored as the enum name so no Hive adapter is needed. iOS remains the
+  // source of truth — this is only here to render the picker synchronously.
+  String appIcon = AppIconEnum.defaultIcon.name;
   double fontSize = 16;
   FirstUnreadEnum firstUnread = FirstUnreadEnum.button;
   LaunchModeEnum linksMode = LaunchModeEnum.externalApplication;

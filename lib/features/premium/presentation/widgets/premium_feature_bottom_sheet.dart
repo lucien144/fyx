@@ -1,6 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_it/flutter_it.dart';
-import 'package:fyx/features/premium/presentation/viewmodel/premium_state.dart';
 import 'package:fyx/features/premium/presentation/viewmodel/premium_viewmodel.dart';
 import 'package:fyx/model/enums/premium_feature_enum.dart';
 import 'package:fyx/shared/services/service_locator.dart' as DI;
@@ -72,6 +73,12 @@ class PremiumFeatureBottomSheet extends StatelessWidget with WatchItMixin {
             icon: MdiIcons.invertColors,
             title: 'Skiny',
             description: 'Zobrazte si Fyx v různých barevných provedeních podle svého gusta.',
+          ),
+        if (Platform.isIOS && [null, PremiumFeatureEnum.appIcon].contains(feature))
+          featureItem(
+            icon: MdiIcons.cellphoneCog,
+            title: 'Ikona aplikace',
+            description: 'Vyber si jakou chceš ikonu na ploše.',
           ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

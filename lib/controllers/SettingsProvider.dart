@@ -1,5 +1,6 @@
 import 'package:fyx/model/Settings.dart';
 import 'package:fyx/model/enums/DefaultView.dart';
+import 'package:fyx/model/enums/app_icon_enum.dart';
 import 'package:fyx/model/enums/FirstUnreadEnum.dart';
 import 'package:fyx/model/enums/LaunchModeEnum.dart';
 import 'package:fyx/model/enums/SkinEnum.dart';
@@ -23,6 +24,12 @@ class SettingsProvider {
   set skin(SkinEnum skin) {
     _box.put('skin', skin);
     _settings.skin = skin;
+  }
+
+  AppIconEnum get appIcon => AppIconEnum.values.firstWhere((icon) => icon.name == _settings.appIcon, orElse: () => AppIconEnum.defaultIcon);
+  set appIcon(AppIconEnum icon) {
+    _box.put('appIcon', icon.name);
+    _settings.appIcon = icon.name;
   }
 
   double get fontSize => _settings.fontSize;
@@ -134,6 +141,7 @@ class SettingsProvider {
     _settings.useAutocorrect = _box.get('useAutocorrect', defaultValue: Settings().useAutocorrect);
     _settings.firstUnread = _box.get('firstUnread', defaultValue: Settings().firstUnread);
     _settings.skin = _box.get('skin', defaultValue: Settings().skin);
+    _settings.appIcon = _box.get('appIcon', defaultValue: Settings().appIcon);
     _settings.linksMode = _box.get('linksMode', defaultValue: Settings().linksMode);
     _settings.whatsNew = _box.get('whatsNew', defaultValue: Settings().whatsNew);
     _settings.savedSearch = _box.get('savedSearch', defaultValue: Settings().savedSearch);

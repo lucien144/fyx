@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fyx/FyxApp.dart';
 import 'package:fyx/components/WhatsNew.dart';
+import 'package:fyx/components/bottom_sheets/app_icon_bottom_sheet.dart';
+import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/features/premium/presentation/widgets/premium_feature.dart';
 
 import 'package:fyx/controllers/AnalyticsProvider.dart';
@@ -103,6 +105,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
         setState(() => _linksMode = value);
         MainRepository().settings.linksMode = value;
       },
+    );
+  }
+
+  /// iOS-only: Android has no supported way to swap the launcher icon.
+  AbstractSettingsTile _appIconTile(SkinColors colors) {
+    final icon = SettingsProvider().appIcon;
+
+    return CustomSettingsTile(
+      child: PremiumFeature(
+        feature: PremiumFeatureEnum.appIcon,
+        child: SettingsTile.navigation(
+          title: Text('Ikona aplikace'),
+          value: ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: Image.asset(icon.preview, width: 28, height: 28),
+          ),
+          onPressed: (_) async {
+            await showCupertinoModalBottomSheet(
+              context: context,
+              backgroundColor: colors.barBackground,
+              barrierColor: colors.dark.withOpacity(0.5),
+              builder: (_) => const AppIconBottomSheet(),
+            );
+            // The sheet owns the change; refresh the tile's preview.
+            if (mounted) setState(() {});
+          },
+        ),
+      ),
     );
   }
 
@@ -218,7 +248,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               SettingsSection(
                 title: Text('Vzhled'),
-                tiles: <SettingsTile>[
+                tiles: <AbstractSettingsTile>[
                   SettingsTile.navigation(
                     title: Text('Barevný režim'),
                     value: Text((() {
@@ -245,6 +275,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     value: Text(Skin.of(context).skins.firstWhere((skin) => skin.id == MainRepository().settings.skin).name),
                     onPressed: (context) => Navigator.of(context).pushNamed('/settings/design'),
                   ),
+                  if (Platform.isIOS) _appIconTile(colors),
                 ],
               ),
               SettingsSection(

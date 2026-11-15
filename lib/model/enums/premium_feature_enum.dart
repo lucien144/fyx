@@ -3,5 +3,6 @@ enum PremiumFeatureEnum {
   savedSearch,
   jumpToFirstUnread,
   skins,
-  nsfw
+  nsfw,
+  appIcon
 }

@@ -23,6 +23,7 @@ dependencies:
   firebase_messaging: ^15.2.5
   flutter_cache_manager: ^3.3.1
   flutter_dotenv: ^5.0.2
+  flutter_dynamic_icon_plus: ^1.4.1
   flutter_highlight: ^0.7.0
   flutter_html: ^3.0.0-beta.2
   flutter_markdown: ^0.7.3+1
@@ -109,6 +110,11 @@ flutter:
   assets:
     - .env
     - assets/logo.png
+    - assets/app_icon.png
+    - assets/app_icon-dark.png
+    - assets/app_icon-love.png
+    - assets/app_icon-orig.png
+    - assets/app_icon-tb.png
     - assets/tutorial-1.png
     - assets/tutorial-2.png
     - assets/tutorial-3.png
