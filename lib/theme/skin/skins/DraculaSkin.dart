@@ -59,16 +59,16 @@ class DraculaSkin extends SkinData {
 
     // Dracula (dark) palette.
     final darkColors = SkinColors(
-      primary: const Color(0xffbd93f9), // purple
-      primaryContrasting: const Color(0xffbd93f9),
+      primary: const Color(0xff9580ff), // purple
+      primaryContrasting: const Color(0xff9580ff),
       background: const Color(0xff282a36),
       barBackground: const Color(0xff21222c),
       text: const Color(0xfff8f8f2),
       success: const Color(0xff50fa7b), // green
       danger: const Color(0xffff5555), // red
-      highlight: const Color(0xffff79c6), // pink
+      highlight: const Color(0xffff80bf), // pink
       highlightedText: const Color(0xfff1fa8c), // yellow
-      divider: const Color(0xff343746), // background light
+      divider: const Color(0xff282a36), // background
       light: CupertinoColors.white,
       dark: const Color(0xff21222c),
       grey: const Color(0xff6272a4), // comment
@@ -77,7 +77,7 @@ class DraculaSkin extends SkinData {
       pollBackground: const Color(0xff343746), // background light
       pollAnswer: const Color(0xff424450), // background lighter
       pollAnswerSelected: const Color(0xff44475a), // selection
-      gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xffbd93f9), Color(0xffff79c6)]),
+      gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xff9580ff), Color(0xffff80bf)]),
       textFieldDecoration: const BoxDecoration(
         color: CupertinoDynamicColor.withBrightness(
           color: Color(0xff21222c),
