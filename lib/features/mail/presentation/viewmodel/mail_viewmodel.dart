@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:fyx/features/mail/domain/entities/mail.dart';
 import 'package:fyx/features/mail/domain/repositories/mail_repository.dart';
+import 'package:fyx/features/mail/domain/repositories/mail_settings_repository.dart';
 import 'package:fyx/features/mail/presentation/viewmodel/mail_state.dart';
 
 /// ViewModel driving the mailbox. Holds the whole loaded list plus the search
@@ -8,10 +9,14 @@ import 'package:fyx/features/mail/presentation/viewmodel/mail_state.dart';
 /// straight from state.
 class MailViewModel extends ChangeNotifier {
   final MailRepository _repository;
+  final MailSettingsRepository _settings;
 
-  MailViewModel(this._repository);
+  MailViewModel(this._repository, this._settings);
 
   MailState _state = const MailState();
+
+  // Settings are not open yet when the ViewModel is registered, so the flag is read on first use.
+  bool _nsfwLoaded = false;
 
   MailState get state => _state;
 
@@ -65,9 +70,25 @@ class MailViewModel extends ChangeNotifier {
     }
   }
 
-  /// Reset back to the empty state.
+  bool get isNsfw {
+    if (!_nsfwLoaded) {
+      _nsfwLoaded = true;
+      _state = _state.copyWith(isNsfw: _settings.isNsfw);
+    }
+    return _state.isNsfw;
+  }
+
+  /// Mark or unmark the whole mailbox as NSFW and persist the choice.
+  void setNsfw(bool value) {
+    _nsfwLoaded = true;
+    _settings.isNsfw = value;
+    _state = _state.copyWith(isNsfw: value);
+    notifyListeners();
+  }
+
+  /// Reset back to the empty state. The NSFW mark is a setting, so it stays.
   void clear() {
-    _state = const MailState();
+    _state = MailState(isNsfw: _state.isNsfw);
     notifyListeners();
   }
 }

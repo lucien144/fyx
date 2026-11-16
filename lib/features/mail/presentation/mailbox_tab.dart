@@ -11,12 +11,16 @@ import 'package:fyx/features/message/domain/entities/attachment.dart';
 import 'package:fyx/features/message/domain/message_settings.dart';
 import 'package:fyx/features/message/presentation/message_screen.dart';
 import 'package:fyx/features/message/presentation/viewmodel/message_viewmodel.dart';
+import 'package:fyx/features/premium/presentation/widgets/premium_feature.dart';
+import 'package:fyx/model/enums/premium_feature_enum.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/SkinColors.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:tap_canvas/tap_canvas.dart';
 
 class MailboxTabArguments {
   final int? mailId;
@@ -35,6 +39,8 @@ class MailboxTab extends WatchingStatefulWidget {
 
 class _MailboxTabState extends State<MailboxTab> {
   final _newMessage = MessageScreen(key: UniqueKey());
+  bool _popupMenu = false;
+  bool _closedByOutsideTap = false;
 
   @override
   void initState() {
@@ -79,6 +85,18 @@ class _MailboxTabState extends State<MailboxTab> {
             middle: Text(
               'Pošta',
               style: TextStyle(color: colors.text),
+            ),
+            trailing: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                // The outside-tap detector has just closed the menu with this very tap.
+                if (_closedByOutsideTap) {
+                  setState(() => _closedByOutsideTap = false);
+                  return;
+                }
+                setState(() => _popupMenu = true);
+              },
+              child: Icon(Icons.more_horiz, color: colors.primary),
             )),
         child: Stack(children: [
           PullToRefreshList(
@@ -160,9 +178,75 @@ class _MailboxTabState extends State<MailboxTab> {
                     builder: (BuildContext context) => _newMessage);
               },
             ),
-          )
+          ),
+          _buildPopupMenu(colors, viewModel),
         ]),
       );
     });
+  }
+
+  // Same look and behaviour as the menu on the discussion page.
+  Widget _buildPopupMenu(SkinColors colors, MailViewModel viewModel) {
+    final isNsfw = viewModel.isNsfw;
+
+    return TapOutsideDetectorWidget(
+      onTappedOutside: () {
+        if (_popupMenu) {
+          setState(() {
+            _popupMenu = false;
+            _closedByOutsideTap = true;
+          });
+          return;
+        }
+        setState(() => _closedByOutsideTap = false);
+      },
+      child: Positioned(
+        top: 10,
+        right: 12,
+        child: IgnorePointer(
+          ignoring: !_popupMenu,
+          child: AnimatedOpacity(
+            opacity: _popupMenu ? 1 : 0,
+            duration: Duration(milliseconds: 280),
+            curve: Curves.linearToEaseOut,
+            child: AnimatedScale(
+              curve: Curves.linearToEaseOut,
+              scale: _popupMenu ? 1 : 0,
+              alignment: Alignment.topRight,
+              duration: Duration(milliseconds: 280),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                  color: colors.barBackground,
+                  boxShadow: [BoxShadow(color: colors.grey.withOpacity(0.4), blurRadius: 15.0)],
+                ),
+                child: IntrinsicWidth(
+                  child: PremiumFeature(
+                    feature: PremiumFeatureEnum.nsfw,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        viewModel.setNsfw(!isNsfw);
+                        setState(() => _popupMenu = false);
+                        AnalyticsProvider().logEvent('toggleNsfwMail');
+                      },
+                      child: Row(
+                        children: [
+                          Text(isNsfw ? 'Označit jako SFW' : 'Označit jako NSFW',
+                              style: TextStyle(fontSize: MainRepository().settings.fontSize, color: colors.text)),
+                          SizedBox(width: 10),
+                          Icon(isNsfw ? MdiIcons.chiliOff : MdiIcons.chiliHot, color: colors.text),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }

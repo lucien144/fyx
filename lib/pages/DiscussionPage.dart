@@ -525,8 +525,8 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
                                   children: [
                                     Text(
                                         !ref.watch(NsfwDiscussionList.provider).containsKey(pageArguments.discussionId)
-                                            ? 'Označit za peprné'
-                                            : 'Označit za ne-peprné',
+                                            ? 'Označit jako NSFW'
+                                            : 'Označit jako SFW',
                                         style: textStyleContext),
                                     SizedBox(
                                       width: 10,

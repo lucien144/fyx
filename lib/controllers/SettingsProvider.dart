@@ -120,6 +120,10 @@ class SettingsProvider {
 
   Map get nsfwDiscussionList => _box.get('nsfwDiscussionList', defaultValue: Settings().nsfwDiscussionList);
 
+  bool get nsfwMail => _box.get('nsfwMail', defaultValue: Settings().nsfwMail);
+
+  set nsfwMail(bool value) => _box.put('nsfwMail', value);
+
   factory SettingsProvider() {
     return _singleton;
   }

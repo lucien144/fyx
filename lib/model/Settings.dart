@@ -21,6 +21,7 @@ class Settings {
   List<String> blockedUsers = [];
   List<String> savedSearch = [];
   Map<int, String> nsfwDiscussionList = {};
+  bool nsfwMail = false;
   ThemeEnum theme = ThemeEnum.system;
   SkinEnum skin = SkinEnum.fyx;
   // Stored as the enum name so no Hive adapter is needed. iOS remains the

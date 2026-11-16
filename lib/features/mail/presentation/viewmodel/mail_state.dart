@@ -22,6 +22,9 @@ class MailState {
   /// Set when the last load failed. Transient — cleared on the next load.
   final Object? error;
 
+  /// The whole mailbox is marked as NSFW; attachments in mails are blurred.
+  final bool isNsfw;
+
   const MailState({
     this.mails = const [],
     this.isLoading = false,
@@ -29,6 +32,7 @@ class MailState {
     this.searchTerm,
     this.refreshTimestamp = 0,
     this.error,
+    this.isNsfw = false,
   });
 
   MailState copyWith({
@@ -41,6 +45,7 @@ class MailState {
     int? refreshTimestamp,
     Object? error,
     bool clearError = false,
+    bool? isNsfw,
   }) {
     return MailState(
       mails: mails ?? this.mails,
@@ -49,6 +54,7 @@ class MailState {
       searchTerm: clearSearchTerm ? null : (searchTerm ?? this.searchTerm),
       refreshTimestamp: refreshTimestamp ?? this.refreshTimestamp,
       error: clearError ? null : (error ?? this.error),
+      isNsfw: isNsfw ?? this.isNsfw,
     );
   }
 }

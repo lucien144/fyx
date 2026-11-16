@@ -15,6 +15,7 @@ import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/drafts_service.dart';
 import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/features/premium/presentation/widgets/premium_feature_bottom_sheet.dart';
+import 'package:fyx/features/mail/presentation/viewmodel/mail_viewmodel.dart';
 import 'package:fyx/model/Credentials.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Settings.dart';
@@ -24,6 +25,7 @@ import 'package:fyx/model/enums/LaunchModeEnum.dart';
 import 'package:fyx/model/enums/ThemeEnum.dart';
 import 'package:fyx/model/enums/premium_feature_enum.dart';
 import 'package:fyx/pages/InfoPage.dart';
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -330,7 +332,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         }),
                   ),
                   SettingsTile(
-                    title: Text('Peprných diskuzí'),
+                    title: Text('NSFW diskuze'),
                     trailing: ValueListenableBuilder(
                         valueListenable: MainRepository().settings.box.listenable(keys: ['nsfwDiscussionList']),
                         builder: (BuildContext context, value, Widget? child) {
@@ -367,6 +369,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       onPressed: (_) {
                         MainRepository().settings.resetBlockedContent();
                         MainRepository().settings.resetNsfwDiscussion();
+                        getIt<MailViewModel>().setNsfw(false);
                         DraftsService().flush();
                         T.success(L.SETTINGS_CACHE_RESET, bg: colors.success);
                         AnalyticsProvider().logEvent('resetBlockedContent');

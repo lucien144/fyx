@@ -65,8 +65,8 @@ class PremiumFeatureBottomSheet extends StatelessWidget with WatchItMixin {
         if ([null, PremiumFeatureEnum.nsfw].contains(feature))
           featureItem(
             icon: MdiIcons.chiliHot,
-            title: 'Peprný obsah',
-            description: 'Pokud si označíte diskuzi jako peprnou, zobrazí se vám obrázky rozmazaně.',
+            title: 'NSFW označení',
+            description: 'Pokud si označíte diskuzi nebo poštu jako NSFW, zobrazí se vám obrázky rozmazaně.',
           ),
         if ([null, PremiumFeatureEnum.skins].contains(feature))
           featureItem(

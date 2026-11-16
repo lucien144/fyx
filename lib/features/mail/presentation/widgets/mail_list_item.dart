@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_it/flutter_it.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fyx/components/bottom_sheets/post_context_menu.dart';
 import 'package:fyx/components/content_box_layout.dart';
@@ -11,6 +12,8 @@ import 'package:fyx/features/message/presentation/message_screen.dart';
 import 'package:fyx/features/message/presentation/viewmodel/message_viewmodel.dart';
 import 'package:fyx/features/mail/domain/entities/mail.dart';
 import 'package:fyx/features/mail/domain/enums/mail_direction.dart';
+import 'package:fyx/features/mail/presentation/viewmodel/mail_viewmodel.dart';
+import 'package:fyx/features/premium/presentation/viewmodel/premium_viewmodel.dart';
 import 'package:fyx/model/MainRepository.dart';
 
 import 'package:fyx/shared/services/service_locator.dart';
@@ -52,7 +55,9 @@ class _MailListItemState extends ConsumerState<MailListItem> {
 
     return Visibility(
       visible: !isDeleted,
-      child: ContentBoxLayout(
+      child: _NsfwAware(
+          builder: (context, isNsfw) => ContentBoxLayout(
+        blur: isNsfw && getIt<PremiumViewModel>().state.isUnlocked,
         isHighlighted: widget.mail.isNew,
         isPreview: widget.isPreview == true,
         content: widget.mail.content,
@@ -118,7 +123,17 @@ class _MailListItemState extends ConsumerState<MailListItem> {
                   },
                 )
               ]),
-      ),
+      )),
     );
   }
+}
+
+/// Rebuilds only when the NSFW mark of the mailbox changes.
+class _NsfwAware extends WatchingWidget {
+  final Widget Function(BuildContext context, bool isNsfw) builder;
+
+  const _NsfwAware({required this.builder});
+
+  @override
+  Widget build(BuildContext context) => builder(context, watchPropertyValue((MailViewModel vm) => vm.isNsfw));
 }

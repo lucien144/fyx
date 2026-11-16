@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fyx/features/mail/data/models/mail_model.dart';
 import 'package:fyx/features/mail/domain/entities/mail.dart';
 import 'package:fyx/features/mail/domain/repositories/mail_repository.dart';
+import 'package:fyx/features/mail/domain/repositories/mail_settings_repository.dart';
 import 'package:fyx/features/mail/presentation/viewmodel/mail_viewmodel.dart';
 
 Mail _mail(int id) => MailModel.fromJson({
@@ -33,12 +34,19 @@ class _StubMailRepository implements MailRepository {
   }
 }
 
+class _MemoryMailSettings implements MailSettingsRepository {
+  @override
+  bool isNsfw;
+
+  _MemoryMailSettings({this.isNsfw = false});
+}
+
 void main() {
   test('loadInitial fills the state and toggles loading off', () async {
     final repo = _StubMailRepository([
       MailPage(mails: [_mail(1), _mail(2)], lastId: 2),
     ]);
-    final vm = MailViewModel(repo);
+    final vm = MailViewModel(repo, _MemoryMailSettings());
 
     final page = await vm.loadInitial();
 
@@ -54,7 +62,7 @@ void main() {
       MailPage(mails: [_mail(1), _mail(2)], lastId: 2),
       MailPage(mails: [_mail(3)], lastId: 3),
     ]);
-    final vm = MailViewModel(repo);
+    final vm = MailViewModel(repo, _MemoryMailSettings());
 
     await vm.loadInitial();
     await vm.loadMore();
@@ -69,7 +77,7 @@ void main() {
       MailPage(mails: [_mail(1)], lastId: 1),
       MailPage(mails: [_mail(1)], lastId: 1),
     ]);
-    final vm = MailViewModel(repo);
+    final vm = MailViewModel(repo, _MemoryMailSettings());
 
     vm.setSearchTerm('foo');
     expect(vm.state.searchTerm, 'foo');
@@ -89,7 +97,7 @@ void main() {
       MailPage(mails: [_mail(1), _mail(2)], lastId: 2),
       MailPage(mails: [_mail(9)], lastId: 9),
     ]);
-    final vm = MailViewModel(repo);
+    final vm = MailViewModel(repo, _MemoryMailSettings());
 
     await vm.loadInitial();
     await vm.loadInitial();
@@ -99,12 +107,43 @@ void main() {
   });
 
   test('a failing load records the error and clears loading', () async {
-    final vm = MailViewModel(_StubMailRepository([], throwError: true));
+    final vm = MailViewModel(_StubMailRepository([], throwError: true), _MemoryMailSettings());
 
     await vm.loadInitial();
 
     expect(vm.state.error, isNotNull);
     expect(vm.state.isLoading, false);
     expect(vm.state.mails, isEmpty);
+  });
+
+  group('NSFW mailbox', () {
+    test('reads the stored mark on first use', () {
+      expect(MailViewModel(_StubMailRepository([]), _MemoryMailSettings(isNsfw: true)).isNsfw, isTrue);
+      expect(MailViewModel(_StubMailRepository([]), _MemoryMailSettings()).isNsfw, isFalse);
+    });
+
+    test('setNsfw persists the mark and notifies', () {
+      final settings = _MemoryMailSettings();
+      final vm = MailViewModel(_StubMailRepository([]), settings);
+      var notified = 0;
+      vm.addListener(() => notified++);
+
+      vm.setNsfw(true);
+      expect(vm.isNsfw, isTrue);
+      expect(settings.isNsfw, isTrue);
+
+      vm.setNsfw(false);
+      expect(vm.isNsfw, isFalse);
+      expect(settings.isNsfw, isFalse);
+      expect(notified, 2);
+    });
+
+    test('clear keeps the mark', () {
+      final vm = MailViewModel(_StubMailRepository([]), _MemoryMailSettings(isNsfw: true));
+      expect(vm.isNsfw, isTrue);
+
+      vm.clear();
+      expect(vm.isNsfw, isTrue);
+    });
   });
 }
