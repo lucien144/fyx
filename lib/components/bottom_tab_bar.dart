@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_it/flutter_it.dart';
 import 'package:fyx/components/avatar.dart';
+import 'package:fyx/features/app_release/presentation/app_release_post.dart';
+import 'package:fyx/features/app_release/presentation/viewmodel/app_release_viewmodel.dart';
 import 'package:fyx/shared/services/analytics/analytics_service.dart';
 import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/features/premium/presentation/viewmodel/premium_viewmodel.dart';
@@ -9,6 +11,7 @@ import 'package:fyx/features/userstats/presentation/user_stats_modal.dart';
 import 'package:fyx/features/userstats/presentation/widgets/year_in_review/year_in_review_menu_item.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/pages/DiscussionPage.dart';
+import 'package:fyx/shared/widgets/notification_badge.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -34,6 +37,18 @@ class _BottomTabBarState extends State<BottomTabBar> {
   void initState() {
     _activeSubmenu = widget.activeSubmenu;
     super.initState();
+  }
+
+  /// Opens the changelog post of a newer release, otherwise the Fyx club.
+  void _openDevelopment() {
+    final viewModel = getIt<AppReleaseViewModel>();
+    final state = viewModel.state;
+    final update = state.update;
+    if (update != null && state.showPostDot) {
+      getIt<AnalyticsService>().logEvent('open_app_release', parameters: {'build': update.build, 'current_build': state.currentBuild});
+      viewModel.markPostOpened();
+    }
+    Navigator.of(context).pushNamed('/discussion', arguments: releasePostArguments(update?.postUrl));
   }
 
   Widget submenu() {
@@ -72,15 +87,15 @@ class _BottomTabBarState extends State<BottomTabBar> {
               ],
             ),
             GestureDetector(
-              onTap: () => Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(24237)),
+              onTap: _openDevelopment,
               behavior: HitTestBehavior.translucent,
               child: Container(
                 padding: EdgeInsets.all(2),
                 child: Row(
                   children: [
-                    Icon(
-                      MdiIcons.bullhornOutline,
-                      color: colors.text,
+                    NotificationBadge(
+                      widget: Icon(MdiIcons.bullhornOutline, color: colors.text),
+                      isVisible: watchIt<AppReleaseViewModel>().state.showPostDot,
                     ),
                     const SizedBox(width: 4),
                     Text(

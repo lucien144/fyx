@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fyx/components/discussion_list_item.dart';
 import 'package:fyx/components/discussion_search_list_item.dart';
 import 'package:fyx/components/list_header.dart';
-import 'package:fyx/components/notification_badge.dart';
+import 'package:fyx/shared/widgets/notification_badge.dart';
 import 'package:fyx/components/pull_to_refresh_list.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/model/BookmarkedDiscussion.dart';

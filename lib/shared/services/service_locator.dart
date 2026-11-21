@@ -1,3 +1,9 @@
+import 'package:fyx/FyxApp.dart';
+import 'package:fyx/features/app_release/data/datasources/app_release_local_datasource.dart';
+import 'package:fyx/features/app_release/data/datasources/app_release_remote_datasource.dart';
+import 'package:fyx/features/app_release/data/repositories/app_release_repository_impl.dart';
+import 'package:fyx/features/app_release/domain/repositories/app_release_repository.dart';
+import 'package:fyx/features/app_release/presentation/viewmodel/app_release_viewmodel.dart';
 import 'package:fyx/features/gallery/presentation/viewmodel/gallery_viewmodel.dart';
 import 'package:fyx/features/mail/data/repositories/mail_repository_impl.dart';
 import 'package:fyx/features/mail/data/repositories/mail_settings_repository_impl.dart';
@@ -48,6 +54,15 @@ void setupServiceLocator() {
     getIt.registerLazySingleton<PremiumRepository>(
         () => PremiumRepositoryImpl(getIt<PremiumLocalDatasource>(), getIt<PremiumRemoteDatasource>()));
     getIt.registerSingleton<PremiumViewModel>(PremiumViewModel(getIt<PremiumRepository>()));
+
+    // App release
+    getIt.registerLazySingleton<AppReleaseLocalDatasource>(() => AppReleaseLocalDatasource());
+    getIt.registerLazySingleton<AppReleaseRemoteDatasource>(() => AppReleaseRemoteDatasource(getIt<SupabaseService>()));
+    getIt.registerLazySingleton<AppReleaseRepository>(
+        () => AppReleaseRepositoryImpl(getIt<AppReleaseLocalDatasource>(), getIt<AppReleaseRemoteDatasource>(),
+            // Short outside production so a new row in app_releases can be tested right away.
+            checkInterval: () => FyxApp.isProduction ? AppReleaseRepositoryImpl.checkInterval : const Duration(seconds: 20)));
+    getIt.registerSingleton<AppReleaseViewModel>(AppReleaseViewModel(getIt<AppReleaseRepository>()));
 
     // Userstats
     getIt.registerLazySingleton<UserstatsDatabase>(() => UserstatsDatabase());

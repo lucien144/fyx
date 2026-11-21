@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fyx/FyxApp.dart';
 import 'package:fyx/components/WhatsNew.dart';
 import 'package:fyx/components/bottom_tab_bar.dart';
-import 'package:fyx/components/notification_badge.dart';
+import 'package:fyx/shared/widgets/notification_badge.dart';
 import 'package:fyx/shared/services/analytics/analytics_service.dart';
 import 'package:fyx/shared/services/analytics/analytics_user_properties.dart';
 import 'package:fyx/controllers/ApiController.dart';
@@ -13,6 +13,7 @@ import 'package:fyx/model/enums/DefaultView.dart';
 import 'package:fyx/model/enums/RefreshDataEnum.dart';
 import 'package:fyx/model/provider/NotificationsModel.dart';
 import 'package:fyx/pages/tab_bar/bookmarks_tab.dart';
+import 'package:fyx/features/app_release/presentation/viewmodel/app_release_viewmodel.dart';
 import 'package:fyx/features/mail/presentation/mailbox_tab.dart';
 import 'package:fyx/features/premium/presentation/viewmodel/premium_viewmodel.dart';
 import 'package:fyx/features/userstats/presentation/viewmodel/year_in_review_viewmodel.dart';
@@ -191,6 +192,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
             activeSubmenu: _showSubmenu,
             onTap: (index) {
               if (index == tabs.length) {
+                if (!_showSubmenu) getIt<AppReleaseViewModel>().markMenuSeen();
                 setState(() => _showSubmenu = !_showSubmenu);
                 return;
               }
@@ -216,11 +218,14 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
                     counter: notifications.newMails,
                     isVisible: notifications.newMails > 0),
               ),
-              Center(
-                  child: Icon(
-                MdiIcons.menu,
-                size: 34,
-              ))
+              ListenableBuilder(
+                listenable: getIt<AppReleaseViewModel>(),
+                builder: (context, child) => NotificationBadge(
+                  widget: child!,
+                  isVisible: getIt<AppReleaseViewModel>().state.showMenuDot,
+                ),
+                child: Icon(MdiIcons.menu, size: 34),
+              )
             ],
           ),
         ),

@@ -37,6 +37,7 @@ import 'package:fyx/pages/search_page.dart';
 import 'package:fyx/pages/settings_design_screen.dart';
 import 'package:fyx/pages/settings_screen.dart';
 import 'package:fyx/features/mail/presentation/mailbox_tab.dart';
+import 'package:fyx/features/app_release/presentation/viewmodel/app_release_viewmodel.dart';
 import 'package:fyx/features/premium/presentation/viewmodel/premium_viewmodel.dart';
 import 'package:fyx/shared/services/analytics/analytics_service.dart';
 import 'package:fyx/shared/services/analytics/analytics_user_properties.dart';
@@ -167,6 +168,7 @@ class FyxApp extends StatefulWidget {
     // Premium is part of the user properties, so resend them once it loads or changes.
     premium.addListener(() => DI.getIt<AnalyticsService>().trackUserProperties(MainRepository().settings, premium.state));
     premium.init(); // loads cache; refreshes in background when stale
+    DI.getIt<AppReleaseViewModel>().init(); // needs packageInfo, loaded above
 
     DI.userstatsRepo.trackDailyUsage();
     DI.userstatsRepo.trackHourlyUsage();
@@ -320,6 +322,7 @@ class _FyxAppState extends State<FyxApp> with WidgetsBindingObserver {
       DI.userstatsRepo.trackHourlyUsage();
       DI.userstatsRepo.trackDailyUsage();
       DI.getIt<PremiumViewModel>().refreshIfStale();
+      DI.getIt<AppReleaseViewModel>().check();
     }
     if (state == AppLifecycleState.paused && _resumedAt != null) {
       final seconds = DateTime.now().difference(_resumedAt!).inSeconds;

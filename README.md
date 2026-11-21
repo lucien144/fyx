@@ -125,6 +125,9 @@ Fyx komunikuje s Nyxem přímo, obsah diskuzí, pošty ani tvoje přihlašovací
 **Premium**
 - Při ověření premium se podle tvé přezdívky dotazuje databáze podporovatelů (Supabase).
 
+**Nová verze**
+- Aplikace se jednou za pár hodin zeptá databáze (Supabase), jaká je nejnovější verze pro tvou platformu. O tobě ani o tvém zařízení nic neposílá.
+
 **Statistiky „Rok s Fyxem“**
 - Statistiky používání (čas v aplikaci, navštívené diskuze, počty příspěvků, …) se ukládají **jen v telefonu** a nikam se neodesílají.
 

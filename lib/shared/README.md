@@ -1,6 +1,15 @@
-# Shared Services
+# Shared
 
-This directory contains reusable services that can be used across the application.
+Reusable services (`services/`) and widgets (`widgets/`) used across the application.
+
+## NotificationBadge
+
+`widgets/notification_badge.dart` marks the top-right corner of a widget with a red counter, or with a plain dot when `counter` is omitted.
+
+```dart
+NotificationBadge(widget: Icon(Icons.email_outlined), isVisible: newMails > 0, counter: newMails);
+NotificationBadge(widget: Icon(MdiIcons.menu), isVisible: hasUpdate); // dot
+```
 
 ## ImageCacheService
 
