@@ -23,7 +23,11 @@ import 'package:fyx/model/enums/DefaultView.dart';
 import 'package:fyx/model/enums/FirstUnreadEnum.dart';
 import 'package:fyx/model/enums/LaunchModeEnum.dart';
 import 'package:fyx/model/enums/ThemeEnum.dart';
+import 'package:fyx/model/enums/app_icon_enum.dart';
 import 'package:fyx/model/enums/premium_feature_enum.dart';
+import 'package:fyx/model/provider/ThemeModel.dart';
+import 'package:flutter_dynamic_icon_plus/flutter_dynamic_icon_plus.dart';
+import 'package:provider/provider.dart';
 import 'package:fyx/pages/InfoPage.dart';
 import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/theme/L.dart';
@@ -136,6 +140,52 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _confirmResetAppearance(SkinColors colors) async {
+    final confirmed = await showCupertinoDialog<bool>(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: Text('Resetovat vzhled?'),
+        content: Text('Barevný režim, skin, velikost písma i ikona aplikace se vrátí do výchozího stavu.'),
+        actions: [
+          CupertinoDialogAction(child: Text('Zrušit'), onPressed: () => Navigator.of(context).pop(false)),
+          CupertinoDialogAction(isDestructiveAction: true, child: Text('Resetovat'), onPressed: () => Navigator.of(context).pop(true)),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    await _resetAppearance();
+    if (!mounted) return;
+    setState(() {});
+    T.success('👍 Vzhled resetován.', bg: colors.success);
+    AnalyticsProvider().logEvent('resetAppearance');
+  }
+
+  Future<void> _resetAppearance() async {
+    final defaults = Settings();
+    final themeModel = Provider.of<ThemeModel>(context, listen: false);
+
+    MainRepository().settings.theme = defaults.theme;
+    MainRepository().settings.skin = defaults.skin;
+    MainRepository().settings.fontSize = defaults.fontSize;
+    themeModel.setTheme(defaults.theme);
+    themeModel.setSkin(defaults.skin);
+    themeModel.setFontSize(defaults.fontSize);
+
+    if (Platform.isIOS) {
+      try {
+        // iOS is the source of truth; skip the call (and its system alert) when the default icon is already applied.
+        final applied = AppIconEnum.fromAlternateIconName(await FlutterDynamicIconPlus.alternateIconName);
+        if (applied != AppIconEnum.defaultIcon) {
+          await FlutterDynamicIconPlus.setAlternateIconName(iconName: AppIconEnum.defaultIcon.alternateIconName);
+        }
+        SettingsProvider().appIcon = AppIconEnum.defaultIcon;
+      } catch (error, stack) {
+        LogService.captureError(error, stack: stack);
+      }
+    }
   }
 
   @override
@@ -278,6 +328,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     onPressed: (context) => Navigator.of(context).pushNamed('/settings/design'),
                   ),
                   if (Platform.isIOS) _appIconTile(colors),
+                  SettingsTile(
+                    title: Text('Resetovat vzhled', style: TextStyle(color: colors.danger), textAlign: TextAlign.center),
+                    onPressed: (_) => _confirmResetAppearance(colors),
+                    description: Text('Vrátí barevný režim, skin, velikost písma a ikonu aplikace do výchozího stavu.'),
+                  ),
                 ],
               ),
               SettingsSection(
