@@ -215,6 +215,16 @@ PODS:
     - GoogleUtilities/Privacy
   - image_picker_ios (0.0.1):
     - Flutter
+  - Mixpanel-swift (7.1.0):
+    - Mixpanel-swift/Complete (= 7.1.0)
+    - MixpanelSwiftCommon (~> 2.0.0)
+  - Mixpanel-swift/Complete (7.1.0):
+    - MixpanelSwiftCommon (~> 2.0.0)
+  - mixpanel_flutter (3.2.0):
+    - Flutter
+    - Mixpanel-swift (= 7.1.0)
+    - MixpanelSwiftCommon (~> 2.0.0)
+  - MixpanelSwiftCommon (2.0.0)
   - nanopb (3.30910.0):
     - nanopb/decode (= 3.30910.0)
     - nanopb/encode (= 3.30910.0)
@@ -268,6 +278,7 @@ DEPENDENCIES:
   - flutter_dynamic_icon_plus (from `.symlinks/plugins/flutter_dynamic_icon_plus/ios`)
   - gallery_saver_plus (from `.symlinks/plugins/gallery_saver_plus/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
+  - mixpanel_flutter (from `.symlinks/plugins/mixpanel_flutter/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - pasteboard (from `.symlinks/plugins/pasteboard/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
@@ -302,6 +313,8 @@ SPEC REPOS:
     - GoogleAppMeasurement
     - GoogleDataTransport
     - GoogleUtilities
+    - Mixpanel-swift
+    - MixpanelSwiftCommon
     - nanopb
     - PromisesObjC
     - PromisesSwift
@@ -333,6 +346,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/gallery_saver_plus/ios"
   image_picker_ios:
     :path: ".symlinks/plugins/image_picker_ios/ios"
+  mixpanel_flutter:
+    :path: ".symlinks/plugins/mixpanel_flutter/ios"
   package_info_plus:
     :path: ".symlinks/plugins/package_info_plus/ios"
   pasteboard:
@@ -389,6 +404,9 @@ SPEC CHECKSUMS:
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   image_picker_ios: 7fe1ff8e34c1790d6fff70a32484959f563a928a
+  Mixpanel-swift: 948b8a3433b2d5930bc3cd44ed98db849f1d1bf0
+  mixpanel_flutter: f414ffa5f844b737a89e079295489da04042e1eb
+  MixpanelSwiftCommon: ccfed9a4daa971d9cb0c32a39ee68d92dad1d838
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
   pasteboard: 49088aeb6119d51f976a421db60d8e1ab079b63c
