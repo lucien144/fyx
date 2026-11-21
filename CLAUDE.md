@@ -161,7 +161,7 @@ fvm flutter pub run build_runner watch
 
 - Crashlytics for error reporting
 - Performance monitoring
-- Analytics via `AnalyticsProvider`
+- Analytics via `AnalyticsProvider` (Firebase + Mixpanel)
 - FCM for push notifications via `NotificationService`
 - Configuration in `lib/firebase_options.dart` and `lib/libs/firebase_options.dart`
 
@@ -171,7 +171,7 @@ fvm flutter pub run build_runner watch
 - `lib/controllers/SettingsProvider.dart` - User preferences management
 - `lib/controllers/drafts_service.dart` - Draft post persistence
 - `lib/controllers/log_service.dart` - Logging abstraction with Firebase provider
-- `lib/controllers/AnalyticsProvider.dart` - Analytics wrapper
+- `lib/controllers/AnalyticsProvider.dart` - Analytics facade fanning out to `IAnalyticsProvider`s: Firebase always, Mixpanel (`mixpanel_analytics_provider.dart`, EU servers) only in production with `MIXPANEL_TOKEN` in `.env`. All destinations identify users by a SHA-256 fingerprint of the nickname (`AnalyticsProvider.fingerprint`), never the nickname itself. User settings go out as user properties via `trackUserProperties()` (`analytics_user_properties.dart`) — counts and choices only, never content
 
 ### Dependency Injection
 

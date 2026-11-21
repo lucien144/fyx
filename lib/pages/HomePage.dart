@@ -4,6 +4,7 @@ import 'package:fyx/components/WhatsNew.dart';
 import 'package:fyx/components/bottom_tab_bar.dart';
 import 'package:fyx/components/notification_badge.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/controllers/analytics_user_properties.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/libs/resume_from_background_observer.dart';
@@ -66,12 +67,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     MainRepository().notifications.request();
 
     AnalyticsProvider().setUser(MainRepository().credentials!.nickname);
-    AnalyticsProvider().setUserProperty('autocorrect', MainRepository().settings.useAutocorrect.toString());
-    AnalyticsProvider().setUserProperty('compactMode', MainRepository().settings.useCompactMode.toString());
-    AnalyticsProvider().setUserProperty('defaultView', MainRepository().settings.defaultView.toString());
-    AnalyticsProvider().setUserProperty('blockedMails', MainRepository().settings.blockedMails.length.toString());
-    AnalyticsProvider().setUserProperty('blockedPosts', MainRepository().settings.blockedPosts.length.toString());
-    AnalyticsProvider().setUserProperty('blockedUsers', MainRepository().settings.blockedUsers.length.toString());
+    trackUserProperties(MainRepository().settings, getIt<PremiumViewModel>().state);
     AnalyticsProvider().setScreen('Home', 'HomePage');
   }
 
@@ -201,6 +197,10 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
 
               if (_pageIndex == index && index == HomePage.PAGE_BOOKMARK) {
                 setState(() => _filterUnread = !_filterUnread);
+              }
+              // The mailbox tab logs itself in initState.
+              if (_pageIndex != index && index == HomePage.PAGE_BOOKMARK) {
+                AnalyticsProvider().setScreen('Bookmarks', 'BookmarksTab');
               }
               setState(() {
                 _pageIndex = index;

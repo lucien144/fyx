@@ -83,6 +83,8 @@ dependencies:
   freezed: ">=2.5.2 <2.5.7"
   toastification: ^3.0.3
   lucide_icons: ^0.257.0
+  mixpanel_flutter: ^3.2.0
+  crypto: ^3.0.8
 
 dependency_overrides:
   intl: any

@@ -103,6 +103,31 @@ sed -i '' "s/{FIREBASE_PROJECT_ID}/$FIREBASE_PROJECT_ID/g" ios/firebase_app_id_f
 sed -i '' "s/{GCM_SENDER_ID}/$GCM_SENDER_ID/g" ios/firebase_app_id_file.json
 ```
 
+## Soukromí
+
+Fyx komunikuje s Nyxem přímo, obsah diskuzí, pošty ani tvoje přihlašovací údaje nikam jinam neposílá. Pro vývoj aplikace se sbírá jen to, co je níže.
+
+**Analytika (Firebase Analytics a Mixpanel)**
+- Jaké obrazovky otevíráš (např. Nastavení, Pošta, Diskuze) a jaké funkce používáš (např. kopírování odkazu, sdílení, hodnocení).
+- Tvoje nastavení aplikace: barevný režim, skin, velikost písma, ikonu, přepínače (kompaktní zobrazení, markdown, …), výchozí obrazovku a jestli máš premium.
+- U blokovaných uživatelů, skrytých příspěvků a pošty, NSFW diskuzí a uložených hledání jen jejich **počet**, nikdy obsah.
+- Nesbírá se obsah: co čteš, co píšeš, komu píšeš, jaké diskuze otevíráš ani koho blokuješ.
+- Místo přezdívky se posílá jen její otisk (SHA-256), ze kterého přezdívku zpětně zjistit nejde. Pozná se tak jen to, že jde o stejného uživatele.
+- Data Mixpanelu jsou uložená v EU. Mixpanel se zapíná jen v produkčních buildech.
+
+**Hlášení pádů (Firebase Crashlytics, Firebase Performance)**
+- Při pádu aplikace se odešle technický popis chyby, verze aplikace a zařízení. Pro dohledání nahlášených chyb je u hlášení i tvoje přezdívka.
+- Firebase Performance měří rychlost načítání a síťových požadavků.
+
+**Notifikace**
+- Token pro push notifikace (Firebase Cloud Messaging) se registruje u Nyxu, aby ti mohl posílat upozornění.
+
+**Premium**
+- Při ověření premium se podle tvé přezdívky dotazuje databáze podporovatelů (Supabase).
+
+**Statistiky „Rok s Fyxem“**
+- Statistiky používání (čas v aplikaci, navštívené diskuze, počty příspěvků, …) se ukládají **jen v telefonu** a nikam se neodesílají.
+
 ## Hlášení chyb
 Pokud jste našli chybu, pak ji nahlaste ideálně přes aplikaci. Pokud to nejde, pak přes [Issues](https://github.com/lucien144/fyx/issues) - nezapomeňte uvést verzi aplikace a popsat chybu.
 

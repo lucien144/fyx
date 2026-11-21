@@ -9,6 +9,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fyx/SkinnedApp.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/controllers/analytics_user_properties.dart';
+import 'package:fyx/controllers/mixpanel_analytics_provider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/controllers/drafts_service.dart';
@@ -158,12 +160,29 @@ class FyxApp extends StatefulWidget {
     };
     MainRepository().notifications = _notificationsService;
 
-    DI.getIt<PremiumViewModel>().init(); // loads cache; refreshes in background when stale
+    await _initAnalytics();
 
-    AnalyticsProvider.provider = analytics;
+    final premium = DI.getIt<PremiumViewModel>();
+    // Premium is part of the user properties, so resend them once it loads or changes.
+    premium.addListener(() => trackUserProperties(MainRepository().settings, premium.state));
+    premium.init(); // loads cache; refreshes in background when stale
+
     DI.userstatsRepo.trackDailyUsage();
     DI.userstatsRepo.trackHourlyUsage();
     DI.userstatsRepo.upsertGlobalStat(GlobalStat(year: DateTime.now().year, statType: GlobalStatType.appLaunches.value, number: 1));
+  }
+
+  static Future<void> _initAnalytics() async {
+    final providers = <IAnalyticsProvider>[FirebaseAnalyticsProvider(analytics)];
+    final mixpanelToken = dotenv.env['MIXPANEL_TOKEN'] ?? '';
+    if (FyxApp.isProduction && mixpanelToken.isNotEmpty) {
+      try {
+        providers.add(await MixpanelAnalyticsProvider.create(mixpanelToken));
+      } catch (error, stack) {
+        LogService.captureError(error, stack: stack);
+      }
+    }
+    AnalyticsProvider.init(providers);
   }
 
   static Route routes(RouteSettings settings) {

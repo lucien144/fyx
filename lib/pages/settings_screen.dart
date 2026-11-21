@@ -11,6 +11,8 @@ import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/features/premium/presentation/widgets/premium_feature.dart';
 
 import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/controllers/analytics_user_properties.dart';
+import 'package:fyx/features/premium/presentation/viewmodel/premium_viewmodel.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/drafts_service.dart';
 import 'package:fyx/controllers/log_service.dart';
@@ -78,6 +80,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _useFyxImageCache = MainRepository().settings.useFyxImageCache;
     _cacheSize = _getCacheSize();
     AnalyticsProvider().setScreen('Settings', 'SettingsPage');
+  }
+
+  @override
+  void dispose() {
+    // Covers the design sub-screen too, it is opened from here.
+    trackUserProperties(MainRepository().settings, getIt<PremiumViewModel>().state);
+    super.dispose();
   }
 
   SettingsTile _firstUnreadFactory(String label, FirstUnreadEnum value, {Widget? description}) {

@@ -274,13 +274,13 @@ packages:
     source: hosted
     version: "0.3.4+2"
   crypto:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: crypto
-      sha256: c8ea0233063ba03258fbcf2ca4d6dadfefe14f02fab57702265467a19f27fadf
+      sha256: e3626ae6270383c9e3a549f34c9e4cd26c09ae6a9adaab2bf4737a00340efdc4
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.7"
+    version: "3.0.8"
   csslib:
     dependency: transitive
     description:
@@ -1069,6 +1069,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.6"
+  mixpanel_flutter:
+    dependency: "direct main"
+    description:
+      name: mixpanel_flutter
+      sha256: a0b2b0e8df14fa772a20d9ab9f47391cecf9f762275011a0525e2574df906a21
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.0"
+  mixpanel_flutter_common:
+    dependency: transitive
+    description:
+      name: mixpanel_flutter_common
+      sha256: "63e69237a2d606a0e6b17bd33909b0e0aa8ef547aaeb79ab825467c2b99bbd58"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   modal_bottom_sheet:
     dependency: "direct main"
     description:
