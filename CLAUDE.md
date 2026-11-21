@@ -161,7 +161,7 @@ fvm flutter pub run build_runner watch
 
 - Crashlytics for error reporting
 - Performance monitoring
-- Analytics via `AnalyticsService` (Firebase + Mixpanel), see `lib/shared/services/analytics/`
+- Analytics via `AnalyticsService` (Firebase + Mixpanel), see `lib/shared/services/analytics/`. All screens, events and user properties are listed in [docs/analytics-events.md](docs/analytics-events.md) — update it whenever an event is added, renamed or removed
 - FCM for push notifications via `NotificationService`
 - Configuration in `lib/firebase_options.dart` and `lib/libs/firebase_options.dart`
 
