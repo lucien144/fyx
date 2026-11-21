@@ -229,7 +229,7 @@ This repository uses **Gitflow**:
 
 ## Common Gotchas
 
-- **Environment**: App has dev/staging/production environments set via `FyxApp.setEnv()`
+- **Environment**: App has dev/staging/production environments set via `FyxApp.env` in the entry point before `FyxApp.init()` (init reads it)
 - **Credentials**: Stored in SharedPreferences as JSON
 - **Premium Features**: Owned by `lib/features/premium/` — cached locally with grace-period semantics (see ADR 0002); read via `getIt<PremiumViewModel>().state` / `watchIt<PremiumViewModel>()`. Gate features on `state.isUnlocked` (premium or the Christmas unlock, December 24–31, see `ChristmasUnlock`); use `state.isPremium` only for what belongs to subscribers (premium badge, promo banner, Year in Review). Source of truth is the Supabase `subscribers` table, fetched lazily through the shared `SupabaseService`
 - **Update dot**: `lib/features/app_release/` reads the newest build per platform from the Supabase `app_releases` table (one row per release: `platform`, `build`, `version`, `post_url`), at most every 6 hours in production, 20 seconds in dev/staging (cold start + resume). A higher `build` than the installed one lights a red dot on the menu button (cleared when the menu opens) and on "Sleduj vývoj Fyxu" (cleared when tapped; it opens `post_url`, otherwise club 24237). Dismissals are remembered per build. The "Zobrazit celý changelog" button in What's new opens the post of the installed build's release (highest `build` not above it, cached per build), otherwise club 24237. The dot itself is the shared `NotificationBadge` (`lib/shared/widgets/`) without a `counter`

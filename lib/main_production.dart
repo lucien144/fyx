@@ -10,7 +10,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   ByteData data = await PlatformAssetBundle().load('assets/lets-encrypt-r3.cer');
   SecurityContext.defaultContext.setTrustedCertificatesBytes(data.buffer.asUint8List());
+  FyxApp.env = Environment.production; // Before init(), which reads it.
   setupServiceLocator();
   await FyxApp.init();
-  runApp(ProviderScope(child: FyxApp()..setEnv(Environment.production)));
+  runApp(ProviderScope(child: FyxApp()));
 }

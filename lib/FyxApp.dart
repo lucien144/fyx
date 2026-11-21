@@ -63,9 +63,9 @@ enum Environment { dev, staging, production }
 class FyxApp extends StatefulWidget {
   static Environment _env = Environment.dev;
 
-  static set env(val) => FyxApp._env = val;
+  static set env(Environment val) => FyxApp._env = val;
 
-  static get env => FyxApp._env;
+  static Environment get env => FyxApp._env;
 
   static get isDev => FyxApp.env == Environment.dev;
 
@@ -82,10 +82,6 @@ class FyxApp extends StatefulWidget {
   static GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
 
   static const List<DeviceOrientation> deviceOrientations = [DeviceOrientation.portraitUp, DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight];
-
-  setEnv(env) {
-    FyxApp.env = env;
-  }
 
   static get routeObserver {
     return _routeObserver;
