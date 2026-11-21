@@ -129,7 +129,7 @@ fvm flutter pub run build_runner watch
 - Presentation is MVVM: a `ChangeNotifier` ViewModel holds one immutable state, mutated via `copyWith`, watched with `watchIt<VM>()`
 - Uses `freezed` for immutable entities/models with code generation (real `build_runner`, commit generated files)
 - Uses `sqflite` for SQLite database storage
-- Reference features: `userstats` (repository + SQLite; its Year in Review adds a ViewModel and a freezed sealed union), `gallery` / `message` / `mail` (ViewModel + state); `mail` also shows a freezed domain entity implementing a shared interface
+- Reference features: `userstats` (repository + SQLite; its Year in Review adds a ViewModel and a freezed sealed union), `gallery` / `message` / `mail` (ViewModel + state); `mail` also shows a freezed domain entity implementing a shared interface; `post` (replies sheet) shows a per-instance ViewModel registered as a factory
 
 **Pages (Screens)**:
 - `lib/pages/HomePage.dart` - Main tabbed interface

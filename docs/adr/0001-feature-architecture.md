@@ -79,6 +79,13 @@ lib/features/<feature>/
    `registerLazySingleton`, ViewModels as `registerSingleton`. Inject
    collaborators through the constructor (e.g. `MailViewModel(getIt<MailRepository>())`)
    so they can be unit-tested with fakes.
+
+   **Exception — per-instance ViewModels.** When several instances of the same
+   UI can be alive at once (e.g. stacked bottom sheets: the replies of a reply),
+   register the ViewModel with `registerFactory`. The widget that obtains it
+   owns it: it creates it in `initState`, watches it with `watch(viewModel)`
+   instead of `watchIt<VM>()`, and calls `dispose()` in its own `dispose`.
+   Reference: `PostRepliesViewModel` / `PostRepliesSheet`.
 8. **Riverpod is legacy.** Do not add new Riverpod providers. Existing ones stay
    until migrated.
 
@@ -107,3 +114,5 @@ lib/features/<feature>/
 - `lib/features/mail/` — ViewModel + immutable State, a freezed domain entity
   that `implements IPost`, data-layer JSON mapping, consumed by `MailboxTab` via
   `watchIt`. Note the transitional `PullToRefreshList` coupling described above.
+- `lib/features/post/` — replies sheet: per-instance ViewModel registered as a factory
+  (see the exception in rule 7).

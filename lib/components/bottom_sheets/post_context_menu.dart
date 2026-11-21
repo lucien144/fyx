@@ -5,7 +5,7 @@ import 'package:fyx/components/bottom_sheets/context_menu/grid.dart';
 import 'package:fyx/components/bottom_sheets/context_menu/item.dart';
 import 'package:fyx/components/bottom_sheets/post_rating_sheet.dart';
 import 'package:fyx/components/feedback_indicator.dart';
-import 'package:fyx/components/post/post_list_item.dart';
+import 'package:fyx/features/post/presentation/post_replies_sheet.dart';
 import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/features/message/domain/entities/attachment.dart';
@@ -210,34 +210,7 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
         if (isPost && post.replies.length > 0)
           gridItem(
               'Zobrazit\n${post.replies.length} ${Intl.plural(post.replies.length, one: 'odpověď', few: 'odpovědi', other: 'odpovědí', locale: 'cs_CZ')}',
-              MdiIcons.timelineText, onTap: () {
-            ApiController().loadDiscussion(post.idKlub, lastId: post.id, filterReplies: true).then((response) {
-              final postItems = response.posts.map((item) => PostListItem(Post.fromJson(item, post.idKlub))).toList();
-              showCupertinoModalBottomSheet(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return SingleChildScrollView(
-                      controller: ModalScrollController.of(context),
-                      child: Container(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: Column(
-                          children: [
-                            Container(child: PostListItem(post), color: colors!.primary.withOpacity(.1)),
-                            ListView.builder(
-                                itemBuilder: (context, index) {
-                                  return postItems[index];
-                                },
-                                itemCount: postItems.length,
-                                physics: NeverScrollableScrollPhysics(),
-                                shrinkWrap: true),
-                          ],
-                        ),
-                      ),
-                    );
-                  });
-            });
-            AnalyticsProvider().logEvent('filter_user_posts');
-          }),
+              MdiIcons.timelineText, onTap: () => PostRepliesSheet.show(context, post: post)),
         if (isPost && post.rating != null)
           gridItem('Zobrazit palečky', MdiIcons.thumbsUpDownOutline, onTap: () {
             showCupertinoModalBottomSheet(

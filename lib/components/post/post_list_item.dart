@@ -13,6 +13,7 @@ import 'package:fyx/features/message/domain/entities/attachment.dart';
 import 'package:fyx/features/message/domain/message_settings.dart';
 import 'package:fyx/features/message/presentation/message_screen.dart';
 import 'package:fyx/features/message/presentation/viewmodel/message_viewmodel.dart';
+import 'package:fyx/features/post/presentation/post_replies_sheet.dart';
 import 'package:fyx/features/userstats/domain/entities/global_stat.dart';
 import 'package:fyx/features/userstats/domain/enums/global_stat_type.dart';
 import 'package:fyx/model/Discussion.dart';
@@ -69,6 +70,29 @@ class _PostListItemState extends ConsumerState<PostListItem> {
         context: context,
         builder: (BuildContext context) => PostContextMenu<Post>(
             parentContext: context, item: _post!, adminTools: adminTools, flagPostCallback: (postId) => MainRepository().settings.blockPost(postId)));
+  }
+
+  /// "| N replies" in the header; tappable (opens the replies sheet) except in a preview.
+  Widget _repliesLabel(SkinColors colors) {
+    final count = _post!.replies.length;
+    final label = Text.rich(
+      TextSpan(
+        style: TextStyle(color: colors.primary, fontSize: 10),
+        children: [
+          const TextSpan(text: ' | '),
+          TextSpan(
+            text: '$count ${Intl.plural(count, one: 'odpověď', few: 'odpovědi', other: 'odpovědí', locale: 'cs_CZ')}',
+            style: widget._isPreview ? null : TextStyle(decoration: TextDecoration.underline, decorationColor: colors.primary),
+          ),
+        ],
+      ),
+    );
+    if (widget._isPreview) return label;
+
+    return GestureFeedback(
+      onTap: () => PostRepliesSheet.show(context, post: _post!, discussion: widget.discussion),
+      child: label,
+    );
   }
 
   @override
@@ -145,11 +169,7 @@ class _PostListItemState extends ConsumerState<PostListItem> {
                         ' ~${Helpers.relativeTime(_post!.time)}',
                         style: TextStyle(color: colors.text.withOpacity(0.38), fontSize: 10),
                       ),
-                      if (_post!.replies.length > 0)
-                        Text(
-                          ' | ${_post!.replies.length} ${Intl.plural(_post!.replies.length, one: 'odpověď', few: 'odpovědi', other: 'odpovědí', locale: 'cs_CZ')}',
-                          style: TextStyle(color: colors.primary, fontSize: 10),
-                        ),
+                      if (_post!.replies.length > 0) _repliesLabel(colors),
                     ],
                   ),
                 ),

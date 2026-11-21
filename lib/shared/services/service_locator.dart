@@ -5,6 +5,9 @@ import 'package:fyx/features/mail/domain/repositories/mail_repository.dart';
 import 'package:fyx/features/mail/domain/repositories/mail_settings_repository.dart';
 import 'package:fyx/features/mail/presentation/viewmodel/mail_viewmodel.dart';
 import 'package:fyx/features/message/presentation/viewmodel/message_viewmodel.dart';
+import 'package:fyx/features/post/data/repositories/post_repository_impl.dart';
+import 'package:fyx/features/post/domain/repositories/post_repository.dart';
+import 'package:fyx/features/post/presentation/viewmodel/post_replies_viewmodel.dart';
 import 'package:fyx/features/premium/data/datasources/premium_local_datasource.dart';
 import 'package:fyx/features/premium/data/datasources/premium_remote_datasource.dart';
 import 'package:fyx/features/premium/data/repositories/premium_repository_impl.dart';
@@ -32,6 +35,11 @@ void setupServiceLocator() {
     getIt.registerLazySingleton<MailRepository>(() => MailRepositoryImpl());
     getIt.registerLazySingleton<MailSettingsRepository>(() => MailSettingsRepositoryImpl());
     getIt.registerSingleton<MailViewModel>(MailViewModel(getIt<MailRepository>(), getIt<MailSettingsRepository>()));
+
+    // Post
+    getIt.registerLazySingleton<PostRepository>(() => PostRepositoryImpl());
+    // Factory: replies sheets can be stacked, each owns (and disposes) its ViewModel.
+    getIt.registerFactory<PostRepliesViewModel>(() => PostRepliesViewModel(getIt<PostRepository>()));
 
     // Premium
     getIt.registerLazySingleton<PremiumLocalDatasource>(() => PremiumLocalDatasource());

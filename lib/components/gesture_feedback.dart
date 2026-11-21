@@ -16,6 +16,7 @@ class _GestureFeedbackState extends State<GestureFeedback> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       child: Opacity(
         child: widget.child,
         opacity: _isDown ? 0.6 : 1,
@@ -24,9 +25,10 @@ class _GestureFeedbackState extends State<GestureFeedback> {
         setState(() => _isDown = true);
         widget.onTap();
         await Future.delayed(Duration(milliseconds: 50));
-        setState(() => _isDown = false);
+        if (mounted) setState(() => _isDown = false);
       },
       onTapDown: (details) => setState(() => _isDown = true),
+      onTapCancel: () => setState(() => _isDown = false),
     );
   }
 }
