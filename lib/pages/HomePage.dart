@@ -3,8 +3,8 @@ import 'package:fyx/FyxApp.dart';
 import 'package:fyx/components/WhatsNew.dart';
 import 'package:fyx/components/bottom_tab_bar.dart';
 import 'package:fyx/components/notification_badge.dart';
-import 'package:fyx/controllers/AnalyticsProvider.dart';
-import 'package:fyx/controllers/analytics_user_properties.dart';
+import 'package:fyx/shared/services/analytics/analytics_service.dart';
+import 'package:fyx/shared/services/analytics/analytics_user_properties.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/libs/resume_from_background_observer.dart';
@@ -66,9 +66,9 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
     // Request for push notifications
     MainRepository().notifications.request();
 
-    AnalyticsProvider().setUser(MainRepository().credentials!.nickname);
-    trackUserProperties(MainRepository().settings, getIt<PremiumViewModel>().state);
-    AnalyticsProvider().setScreen('Home', 'HomePage');
+    getIt<AnalyticsService>().setUser(MainRepository().credentials!.nickname);
+    getIt<AnalyticsService>().trackUserProperties(MainRepository().settings, getIt<PremiumViewModel>().state);
+    getIt<AnalyticsService>().setScreen('Home', 'HomePage');
   }
 
   @override
@@ -200,7 +200,7 @@ class _HomePageState extends State<HomePage> with RouteAware, WidgetsBindingObse
               }
               // The mailbox tab logs itself in initState.
               if (_pageIndex != index && index == HomePage.PAGE_BOOKMARK) {
-                AnalyticsProvider().setScreen('Bookmarks', 'BookmarksTab');
+                getIt<AnalyticsService>().setScreen('Bookmarks', 'BookmarksTab');
               }
               setState(() {
                 _pageIndex = index;

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_it/flutter_it.dart';
-import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/shared/services/analytics/analytics_service.dart';
 import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/features/userstats/domain/entities/year_in_review.dart';
 import 'package:fyx/features/userstats/domain/entities/year_in_review_slide.dart';
@@ -40,7 +40,7 @@ class YearInReviewScreen extends StatefulWidget with WatchItStatefulWidgetMixin 
   final int year;
 
   static Future<void> open(BuildContext context, {required int year, required YearInReviewSource source}) {
-    AnalyticsProvider().logEvent('yearInReviewOpen', parameters: {'source': source.name});
+    getIt<AnalyticsService>().logEvent('yearInReviewOpen', parameters: {'source': source.name});
     return Navigator.of(context, rootNavigator: true).push(
       CupertinoPageRoute(fullscreenDialog: true, builder: (_) => YearInReviewScreen(year: year)),
     );
@@ -137,7 +137,7 @@ class _YearInReviewScreenState extends State<YearInReviewScreen> with SingleTick
 
   Future<void> _share(Color background) async {
     try {
-      AnalyticsProvider().logEvent('yearInReviewShare');
+      getIt<AnalyticsService>().logEvent('yearInReviewShare');
       await YearInReviewShare.shareCard(_cardKey, background: background, year: widget.year);
     } catch (error, stack) {
       LogService.captureError(error, stack: stack);

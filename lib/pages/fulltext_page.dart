@@ -7,7 +7,8 @@ import 'package:fyx/components/list_header.dart';
 import 'package:fyx/components/pull_to_refresh_list.dart';
 import 'package:fyx/components/search/search_help_notfound.dart';
 import 'package:fyx/components/search/search_help_posts.dart';
-import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/shared/services/analytics/analytics_service.dart';
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/theme/L.dart';
 
@@ -35,7 +36,7 @@ class _FulltextPageState extends State<FulltextPage> {
 
   @override
   void initState() {
-    AnalyticsProvider().setScreen('Search', 'Search');
+    getIt<AnalyticsService>().setScreen('Search', 'Search');
     super.initState();
   }
 

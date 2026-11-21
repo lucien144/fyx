@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fyx/FyxApp.dart';
-import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/shared/services/analytics/analytics_service.dart';
 import 'package:fyx/controllers/ApiProvider.dart';
 import 'package:fyx/controllers/IApiProvider.dart';
 import 'package:fyx/controllers/log_service.dart';
@@ -341,8 +341,8 @@ class ApiController {
     if (getIt.isRegistered<PremiumViewModel>()) {
       getIt<PremiumViewModel>().clear();
     }
-    if (AnalyticsProvider.isInitialized) {
-      AnalyticsProvider().reset();
+    if (getIt.isRegistered<AnalyticsService>()) {
+      getIt<AnalyticsService>().reset();
     }
     if (removeAuthrorization) {
       provider.logout();

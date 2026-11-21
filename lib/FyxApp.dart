@@ -8,9 +8,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fyx/SkinnedApp.dart';
-import 'package:fyx/controllers/AnalyticsProvider.dart';
-import 'package:fyx/controllers/analytics_user_properties.dart';
-import 'package:fyx/controllers/mixpanel_analytics_provider.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/controllers/drafts_service.dart';
@@ -41,6 +38,10 @@ import 'package:fyx/pages/settings_design_screen.dart';
 import 'package:fyx/pages/settings_screen.dart';
 import 'package:fyx/features/mail/presentation/mailbox_tab.dart';
 import 'package:fyx/features/premium/presentation/viewmodel/premium_viewmodel.dart';
+import 'package:fyx/shared/services/analytics/analytics_service.dart';
+import 'package:fyx/shared/services/analytics/analytics_user_properties.dart';
+import 'package:fyx/shared/services/analytics/firebase_analytics_destination.dart';
+import 'package:fyx/shared/services/analytics/mixpanel_analytics_destination.dart';
 import 'package:fyx/shared/services/service_locator.dart' as DI;
 import 'package:fyx/theme/T.dart';
 import 'package:fyx/theme/skin/Skin.dart';
@@ -164,7 +165,7 @@ class FyxApp extends StatefulWidget {
 
     final premium = DI.getIt<PremiumViewModel>();
     // Premium is part of the user properties, so resend them once it loads or changes.
-    premium.addListener(() => trackUserProperties(MainRepository().settings, premium.state));
+    premium.addListener(() => DI.getIt<AnalyticsService>().trackUserProperties(MainRepository().settings, premium.state));
     premium.init(); // loads cache; refreshes in background when stale
 
     DI.userstatsRepo.trackDailyUsage();
@@ -173,16 +174,16 @@ class FyxApp extends StatefulWidget {
   }
 
   static Future<void> _initAnalytics() async {
-    final providers = <IAnalyticsProvider>[FirebaseAnalyticsProvider(analytics)];
+    final destinations = <IAnalyticsDestination>[FirebaseAnalyticsDestination(analytics)];
     final mixpanelToken = dotenv.env['MIXPANEL_TOKEN'] ?? '';
     if (FyxApp.isProduction && mixpanelToken.isNotEmpty) {
       try {
-        providers.add(await MixpanelAnalyticsProvider.create(mixpanelToken));
+        destinations.add(await MixpanelAnalyticsDestination.create(mixpanelToken));
       } catch (error, stack) {
         LogService.captureError(error, stack: stack);
       }
     }
-    AnalyticsProvider.init(providers);
+    DI.registerAnalytics(destinations);
   }
 
   static Route routes(RouteSettings settings) {

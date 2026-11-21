@@ -7,7 +7,8 @@ import 'package:fyx/features/premium/presentation/widgets/premium_feature.dart';
 import 'package:fyx/components/pull_to_refresh_list.dart';
 import 'package:fyx/components/search/search_help_notfound.dart';
 import 'package:fyx/components/search/search_help_posts.dart';
-import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/shared/services/analytics/analytics_service.dart';
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
@@ -41,7 +42,7 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   void initState() {
-    AnalyticsProvider().setScreen('Search', 'Search');
+    getIt<AnalyticsService>().setScreen('Search', 'Search');
     super.initState();
   }
 

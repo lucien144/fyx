@@ -6,7 +6,7 @@ import 'package:fyx/components/bottom_sheets/context_menu/item.dart';
 import 'package:fyx/components/bottom_sheets/post_rating_sheet.dart';
 import 'package:fyx/components/feedback_indicator.dart';
 import 'package:fyx/features/post/presentation/post_replies_sheet.dart';
-import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/shared/services/analytics/analytics_service.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/features/message/domain/entities/attachment.dart';
 import 'package:fyx/features/message/domain/message_settings.dart';
@@ -142,7 +142,7 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
             T.success(L.TOAST_COPIED, bg: colors!.success);
             Navigator.pop(context);
           });
-          AnalyticsProvider().logEvent('copyPostBody');
+          getIt<AnalyticsService>().logEvent('copyPostBody');
         }),
         if (isPost)
           gridItem('Poslat zprávu', MdiIcons.emailFastOutline, onTap: () {
@@ -205,7 +205,7 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
                   setState(() => _reminderIndicator = false);
                   Navigator.pop(context);
                 });
-                AnalyticsProvider().logEvent(post.hasReminder ? 'reminder_remove' : 'reminder_add');
+                getIt<AnalyticsService>().logEvent(post.hasReminder ? 'reminder_remove' : 'reminder_add');
               })),
         if (isPost && post.replies.length > 0)
           gridItem(
@@ -224,14 +224,14 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
           gridItem('Filtrovat\n@${post.nick}', MdiIcons.accountFilterOutline, onTap: () {
             Navigator.of(context).pop();
             Navigator.of(context).pushNamed('/discussion', arguments: DiscussionPageArguments(post.idKlub, filterByUser: post.nick));
-            AnalyticsProvider().logEvent('filter_user_posts');
+            getIt<AnalyticsService>().logEvent('filter_user_posts');
           }),
         if (isPost)
           gridItem('Vyhledat příspěvky\n@${post.nick}', MdiIcons.accountSearchOutline, onTap: () {
             Navigator.of(context).pop();
             var arguments = SearchPageArguments(searchTerm: '@${post.nick}', focus: false);
             Navigator.of(context, rootNavigator: true).pushNamed('/search', arguments: arguments);
-            AnalyticsProvider().logEvent('filter_user_discussions');
+            getIt<AnalyticsService>().logEvent('filter_user_discussions');
           }),
         gridItem(L.POST_SHEET_COPY_LINK, MdiIcons.link, onTap: () {
           var data = ClipboardData(text: widget.item.link);
@@ -239,7 +239,7 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
             T.success(L.TOAST_COPIED, bg: colors!.success);
             Navigator.pop(context);
           });
-          AnalyticsProvider().logEvent('copyLink');
+          getIt<AnalyticsService>().logEvent('copyLink');
         }),
         gridItem(L.POST_SHEET_SHARE, MdiIcons.shareVariant, onTap: () {
           String body = widget.item.content.strippedContent;
@@ -253,7 +253,7 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
           final RenderBox box = context.findRenderObject() as RenderBox;
           Share.share(body, subject: isPost ? post.nick : mail.participant, sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
           Navigator.pop(context);
-          AnalyticsProvider().logEvent('shareSheet');
+          getIt<AnalyticsService>().logEvent('shareSheet');
         }),
         gridItem('Více', MdiIcons.skullOutline, danger: true, onTap: () {
           showCupertinoModalBottomSheet(
@@ -304,13 +304,13 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
                                 T.success(L.TOAST_USER_BLOCKED, bg: colors!.success);
                                 int counter = 0;
                                 Navigator.popUntil(context, (route) => counter++ == 2);
-                                AnalyticsProvider().logEvent('blockUser');
+                                getIt<AnalyticsService>().logEvent('blockUser');
                               })),
                     gridItem(L.POST_SHEET_HIDE, MdiIcons.eyeOff, danger: true, onTap: () {
                       widget.flagPostCallback(widget.item.id);
                       T.success(L.TOAST_POST_HIDDEN, bg: colors!.success);
                       Navigator.pop(context);
-                      AnalyticsProvider().logEvent('hidePost');
+                      getIt<AnalyticsService>().logEvent('hidePost');
                     }),
                     gridItem(_reportIndicator ? L.POST_SHEET_FLAG_SAVING : L.POST_SHEET_FLAG, MdiIcons.alertDecagram, danger: true, onTap: () async {
                       try {
@@ -322,7 +322,7 @@ class _PostContextMenuState extends ConsumerState<PostContextMenu<IPost>> {
                       } finally {
                         setState(() => _reportIndicator = false);
                         Navigator.pop(context);
-                        AnalyticsProvider().logEvent('flagContent');
+                        getIt<AnalyticsService>().logEvent('flagContent');
                       }
                     }),
                   ]),

@@ -2,7 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_it/flutter_it.dart';
 import 'package:fyx/components/avatar.dart';
-import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/shared/services/analytics/analytics_service.dart';
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/features/premium/presentation/viewmodel/premium_viewmodel.dart';
 import 'package:fyx/features/userstats/presentation/user_stats_modal.dart';
 import 'package:fyx/features/userstats/presentation/widgets/year_in_review/year_in_review_menu_item.dart';
@@ -195,7 +196,7 @@ class _BottomTabBarState extends State<BottomTabBar> {
                       behavior: HitTestBehavior.opaque,
                       onTap: () {
                         T.prefillGithubIssue(appContext: MainRepository(), user: MainRepository().credentials!.nickname);
-                        AnalyticsProvider().logEvent('reportBug');
+                        getIt<AnalyticsService>().logEvent('reportBug');
                       },
                       child: Column(
                         children: [
@@ -217,7 +218,7 @@ class _BottomTabBarState extends State<BottomTabBar> {
                           backgroundColor: colors.barBackground,
                           barrierColor: colors.dark.withOpacity(0.5),
                         );
-                        AnalyticsProvider().logEvent('userStats');
+                        getIt<AnalyticsService>().logEvent('userStats');
                       },
                       child: Column(
                         children: [

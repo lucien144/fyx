@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/shared/services/analytics/analytics_service.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/features/premium/presentation/viewmodel/premium_viewmodel.dart';
 import 'package:fyx/model/Credentials.dart';
@@ -36,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
       }
     });
 
-    AnalyticsProvider().setScreen('Login', 'LoginPage');
+    getIt<AnalyticsService>().setScreen('Login', 'LoginPage');
   }
 
   @override

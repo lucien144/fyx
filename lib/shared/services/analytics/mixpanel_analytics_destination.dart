@@ -1,21 +1,21 @@
-import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/shared/services/analytics/analytics_service.dart';
 import 'package:mixpanel_flutter/mixpanel_flutter.dart';
 
 /// Sends analytics to Mixpanel (EU data residency).
 ///
 /// Settings are both People properties and super properties, so every event
 /// can be segmented by them.
-class MixpanelAnalyticsProvider implements IAnalyticsProvider {
+class MixpanelAnalyticsDestination implements IAnalyticsDestination {
   static const euServerUrl = 'https://api-eu.mixpanel.com';
   static const screenViewEvent = 'Screen View';
 
   final Mixpanel _mixpanel;
 
-  MixpanelAnalyticsProvider._(this._mixpanel);
+  MixpanelAnalyticsDestination._(this._mixpanel);
 
-  static Future<MixpanelAnalyticsProvider> create(String token) async {
+  static Future<MixpanelAnalyticsDestination> create(String token) async {
     final mixpanel = await Mixpanel.init(token, trackAutomaticEvents: true, serverURL: euServerUrl);
-    return MixpanelAnalyticsProvider._(mixpanel);
+    return MixpanelAnalyticsDestination._(mixpanel);
   }
 
   @override

@@ -4,7 +4,7 @@ import 'package:flutter_it/flutter_it.dart';
 import 'package:fyx/features/mail/presentation/widgets/mail_list_item.dart';
 import 'package:fyx/components/post/syntax_highlighter.dart';
 import 'package:fyx/components/pull_to_refresh_list.dart';
-import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/shared/services/analytics/analytics_service.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/features/mail/presentation/viewmodel/mail_viewmodel.dart';
 import 'package:fyx/features/message/domain/entities/attachment.dart';
@@ -44,7 +44,7 @@ class _MailboxTabState extends State<MailboxTab> {
 
   @override
   void initState() {
-    AnalyticsProvider().setScreen('Mailbox', 'MailboxTab');
+    getIt<AnalyticsService>().setScreen('Mailbox', 'MailboxTab');
     super.initState();
   }
 
@@ -229,7 +229,7 @@ class _MailboxTabState extends State<MailboxTab> {
                       onTap: () {
                         viewModel.setNsfw(!isNsfw);
                         setState(() => _popupMenu = false);
-                        AnalyticsProvider().logEvent('toggleNsfwMail');
+                        getIt<AnalyticsService>().logEvent('toggleNsfwMail');
                       },
                       child: Row(
                         children: [

@@ -4,7 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_it/flutter_it.dart';
-import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/shared/services/analytics/analytics_service.dart';
 import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/features/gallery/presentation/viewmodel/gallery_viewmodel.dart';
 import 'package:fyx/features/gallery/presentation/widgets/context_menu_button.dart';
@@ -51,7 +51,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
       }
     });
 
-    AnalyticsProvider().setScreen('Gallery', 'GalleryPage');
+    getIt<AnalyticsService>().setScreen('Gallery', 'GalleryPage');
     userstatsRepo.upsertGlobalStat(GlobalStat(year: DateTime.now().year, statType: GlobalStatType.galleryOpens.value, number: 1));
   }
 

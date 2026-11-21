@@ -4,7 +4,8 @@ import 'package:fyx/components/avatar.dart' as component;
 import 'package:fyx/components/content_box_layout.dart';
 import 'package:fyx/components/post/post_thumbs.dart';
 import 'package:fyx/components/pull_to_refresh_list.dart';
-import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/shared/services/analytics/analytics_service.dart';
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/libs/resume_from_background_observer.dart';
 import 'package:fyx/model/Settings.dart';
@@ -34,7 +35,7 @@ class _NoticesPageState extends State<NoticesPage> with ResumeFromBackgroundObse
   @override
   void initState() {
     super.initState();
-    AnalyticsProvider().setScreen('Notices', 'NoticesPage');
+    getIt<AnalyticsService>().setScreen('Notices', 'NoticesPage');
   }
 
   @override

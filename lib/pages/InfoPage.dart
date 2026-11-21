@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/shared/services/analytics/analytics_service.dart';
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/theme/L.dart';
 import 'package:fyx/theme/T.dart';
@@ -36,7 +37,7 @@ class _InfoPageState extends State<InfoPage> {
 
     if (_response == null) {
       _response = _client.get(Uri.parse(settings.url));
-      AnalyticsProvider().setScreen(settings.title, 'InfoPage');
+      getIt<AnalyticsService>().setScreen(settings.title, 'InfoPage');
     }
 
     return CupertinoPageScaffold(

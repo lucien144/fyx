@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:fyx/features/premium/presentation/widgets/premium_feature.dart';
-import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/shared/services/analytics/analytics_service.dart';
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/Settings.dart';
 import 'package:fyx/model/enums/SkinEnum.dart';
@@ -28,7 +29,7 @@ class _SettingsDesignScreenState extends State<SettingsDesignScreen> {
     super.initState();
 
     _theme = MainRepository().settings.theme;
-    AnalyticsProvider().setScreen('Settings / Design', 'SettingsDesignScreen');
+    getIt<AnalyticsService>().setScreen('Settings / Design', 'SettingsDesignScreen');
   }
 
   SettingsTile _themeFactory(String label, ThemeEnum theme) {

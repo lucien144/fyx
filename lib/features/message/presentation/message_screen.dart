@@ -8,7 +8,7 @@ import 'package:flutter_it/flutter_it.dart';
 import 'package:fyx/components/bottom_sheets/context_menu/grid.dart';
 import 'package:fyx/components/bottom_sheets/context_menu/item.dart';
 import 'package:fyx/features/premium/presentation/widgets/premium_feature.dart';
-import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/shared/services/analytics/analytics_service.dart';
 import 'package:fyx/controllers/log_service.dart';
 import 'package:fyx/features/message/domain/entities/attachment.dart';
 import 'package:fyx/features/message/presentation/viewmodel/message_viewmodel.dart';
@@ -114,7 +114,7 @@ class _MessageScreenState extends State<MessageScreen> {
       }
     });
 
-    AnalyticsProvider().setScreen('New Message', 'NewMessagePage');
+    getIt<AnalyticsService>().setScreen('New Message', 'NewMessagePage');
     super.initState();
   }
 

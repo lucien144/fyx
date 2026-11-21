@@ -10,7 +10,7 @@ import 'package:fyx/components/post/post_list_item.dart';
 import 'package:fyx/components/post/syntax_highlighter.dart';
 import 'package:fyx/features/premium/presentation/widgets/premium_feature.dart';
 import 'package:fyx/components/pull_to_refresh_list.dart';
-import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/shared/services/analytics/analytics_service.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/controllers/drafts_service.dart';
@@ -101,7 +101,7 @@ class _DiscussionPageState extends ConsumerState<DiscussionPage> {
   @override
   void initState() {
     super.initState();
-    AnalyticsProvider().setScreen('Discussion', 'DiscussionPage');
+    DI.getIt<AnalyticsService>().setScreen('Discussion', 'DiscussionPage');
   }
 
   @override

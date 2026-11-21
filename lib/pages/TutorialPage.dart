@@ -2,7 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/shared/services/analytics/analytics_service.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/features/premium/presentation/viewmodel/premium_viewmodel.dart';
 import 'package:fyx/model/MainRepository.dart';
@@ -35,7 +35,7 @@ class _TutorialPageState extends State<TutorialPage> {
   @override
   void initState() {
     super.initState();
-    AnalyticsProvider().setScreen('Tutorial', 'TutorialPage');
+    getIt<AnalyticsService>().setScreen('Tutorial', 'TutorialPage');
   }
 
   void buildSlider() {
@@ -47,7 +47,7 @@ class _TutorialPageState extends State<TutorialPage> {
             L.TUTORIAL_SUCCESS,
             L.TUTORIAL_WELCOME,
             slideButton(L.GENERAL_BEGIN, onTap: () {
-              AnalyticsProvider().logTutorialBegin();
+              getIt<AnalyticsService>().logTutorialBegin();
               _carouselController.nextPage(duration: Duration(milliseconds: 800), curve: Curves.fastOutSlowIn);
             })),
         this.slideToken('1/6'),

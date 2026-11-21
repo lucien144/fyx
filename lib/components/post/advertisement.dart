@@ -5,7 +5,7 @@ import 'package:fyx/components/bottom_sheets/context_menu/item.dart';
 import 'package:fyx/components/post/post_avatar.dart';
 import 'package:fyx/components/post/post_hero_attachment.dart';
 import 'package:fyx/components/post/post_html.dart';
-import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/shared/services/analytics/analytics_service.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/features/message/domain/entities/attachment.dart';
 import 'package:fyx/features/message/domain/message_settings.dart';
@@ -139,7 +139,7 @@ class Advertisement extends StatelessWidget {
                       Navigator.of(context).pop();
                       Navigator.of(context)
                           .pushNamed('/discussion', arguments: DiscussionPageArguments(content.discussionId, filterByUser: this.username));
-                      AnalyticsProvider().logEvent('filter_user_posts / ad');
+                      getIt<AnalyticsService>().logEvent('filter_user_posts / ad');
                     }),
                 ContextMenuItem(
                     label: 'Vyhledat příspěvky\n@${this.username}',
@@ -148,7 +148,7 @@ class Advertisement extends StatelessWidget {
                       Navigator.of(context).pop();
                       var arguments = SearchPageArguments(searchTerm: '@${this.username}', focus: false);
                       Navigator.of(context, rootNavigator: true).pushNamed('/search', arguments: arguments);
-                      AnalyticsProvider().logEvent('filter_user_discussions / ad');
+                      getIt<AnalyticsService>().logEvent('filter_user_discussions / ad');
                     }),
                 ContextMenuItem(
                     label: L.POST_SHEET_COPY_LINK,
@@ -159,7 +159,7 @@ class Advertisement extends StatelessWidget {
                         T.success(L.TOAST_COPIED, bg: colors.success);
                         Navigator.pop(context);
                       });
-                      AnalyticsProvider().logEvent('copyLink / ad');
+                      getIt<AnalyticsService>().logEvent('copyLink / ad');
                     }),
                 ContextMenuItem(
                     label: L.POST_SHEET_SHARE,
@@ -168,7 +168,7 @@ class Advertisement extends StatelessWidget {
                       final RenderBox box = context.findRenderObject() as RenderBox;
                       Share.share(content.link, subject: heading, sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
                       Navigator.pop(context);
-                      AnalyticsProvider().logEvent('shareSheet / ad');
+                      getIt<AnalyticsService>().logEvent('shareSheet / ad');
                     })
               ])),
       child: Column(

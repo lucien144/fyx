@@ -10,8 +10,8 @@ import 'package:fyx/components/bottom_sheets/app_icon_bottom_sheet.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/features/premium/presentation/widgets/premium_feature.dart';
 
-import 'package:fyx/controllers/AnalyticsProvider.dart';
-import 'package:fyx/controllers/analytics_user_properties.dart';
+import 'package:fyx/shared/services/analytics/analytics_service.dart';
+import 'package:fyx/shared/services/analytics/analytics_user_properties.dart';
 import 'package:fyx/features/premium/presentation/viewmodel/premium_viewmodel.dart';
 import 'package:fyx/controllers/ApiController.dart';
 import 'package:fyx/controllers/drafts_service.dart';
@@ -79,13 +79,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _quickRating = MainRepository().settings.quickRating;
     _useFyxImageCache = MainRepository().settings.useFyxImageCache;
     _cacheSize = _getCacheSize();
-    AnalyticsProvider().setScreen('Settings', 'SettingsPage');
+    getIt<AnalyticsService>().setScreen('Settings', 'SettingsPage');
   }
 
   @override
   void dispose() {
     // Covers the design sub-screen too, it is opened from here.
-    trackUserProperties(MainRepository().settings, getIt<PremiumViewModel>().state);
+    getIt<AnalyticsService>().trackUserProperties(MainRepository().settings, getIt<PremiumViewModel>().state);
     super.dispose();
   }
 
@@ -169,7 +169,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (!mounted) return;
     setState(() {});
     T.success('👍 Vzhled resetován.', bg: colors.success);
-    AnalyticsProvider().logEvent('resetAppearance');
+    getIt<AnalyticsService>().logEvent('resetAppearance');
   }
 
   Future<void> _resetAppearance() async {
@@ -436,7 +436,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         getIt<MailViewModel>().setNsfw(false);
                         DraftsService().flush();
                         T.success(L.SETTINGS_CACHE_RESET, bg: colors.success);
-                        AnalyticsProvider().logEvent('resetBlockedContent');
+                        getIt<AnalyticsService>().logEvent('resetBlockedContent');
                       },
                       description: Text(
                           'Zmenšovat obrázky - zmenšuje obrázky před stažením a předchází tak pádům aplikavce. V určitých případech ale může snižovat FPS.')),
@@ -488,7 +488,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               _emptyingCache = false;
                               _cacheSize = _getCacheSize();
                             });
-                            AnalyticsProvider().logEvent('emptyCache');
+                            getIt<AnalyticsService>().logEvent('emptyCache');
                           }
                         })
                   ];
@@ -537,7 +537,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   title: Text(L.SETTINGS_BUGREPORT),
                   onPressed: (_) {
                     T.prefillGithubIssue(appContext: MainRepository(), user: MainRepository().credentials!.nickname);
-                    AnalyticsProvider().logEvent('reportBug');
+                    getIt<AnalyticsService>().logEvent('reportBug');
                   },
                 ),
                 SettingsTile.navigation(
@@ -545,7 +545,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   title: Text(L.TERMS),
                   onPressed: (_) {
                     T.openLink('https://nyx.cz/terms', mode: _linksMode);
-                    AnalyticsProvider().logEvent('openTerms');
+                    getIt<AnalyticsService>().logEvent('openTerms');
                   },
                 ),
                 SettingsTile.navigation(
@@ -559,7 +559,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       backgroundColor: colors.barBackground,
                       barrierColor: colors.dark.withOpacity(0.5),
                     );
-                    AnalyticsProvider().logEvent('openWhatsNew');
+                    getIt<AnalyticsService>().logEvent('openWhatsNew');
                   },
                 )
               ]),
@@ -574,7 +574,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     onPressed: (_) {
                       ApiController().logout();
                       Navigator.of(context, rootNavigator: true).pushNamed('/login');
-                      AnalyticsProvider().logEvent('logout');
+                      getIt<AnalyticsService>().logEvent('logout');
                     },
                   ),
                   if (FyxApp.isDev)

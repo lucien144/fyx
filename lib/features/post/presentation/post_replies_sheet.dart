@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_it/flutter_it.dart';
 import 'package:fyx/components/post/post_list_item.dart';
-import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/shared/services/analytics/analytics_service.dart';
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/features/post/presentation/viewmodel/post_replies_state.dart';
 import 'package:fyx/features/post/presentation/viewmodel/post_replies_viewmodel.dart';
 import 'package:fyx/model/Discussion.dart';
@@ -17,7 +18,7 @@ class PostRepliesSheet extends WatchingStatefulWidget {
   const PostRepliesSheet({super.key, required this.post, this.discussion});
 
   static Future<void> show(BuildContext context, {required Post post, Discussion? discussion}) {
-    AnalyticsProvider().logEvent('show_post_replies');
+    getIt<AnalyticsService>().logEvent('show_post_replies');
     return showCupertinoModalBottomSheet(
       context: context,
       builder: (_) => PostRepliesSheet(post: post, discussion: discussion),

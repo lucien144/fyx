@@ -1,6 +1,6 @@
-import 'package:fyx/controllers/AnalyticsProvider.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/features/premium/presentation/viewmodel/premium_state.dart';
+import 'package:fyx/shared/services/analytics/analytics_service.dart';
 
 /// User settings sent as analytics user properties. Counts only, never the
 /// content (who is blocked, which discussions are NSFW, ...).
@@ -32,7 +32,9 @@ Map<String, Object> analyticsUserProperties(SettingsProvider settings, PremiumSt
   };
 }
 
-/// Sends the current settings; no-op when they did not change since the last call.
-Future<void> trackUserProperties(SettingsProvider settings, PremiumState premium) {
-  return AnalyticsProvider().setUserProperties(analyticsUserProperties(settings, premium));
+extension AnalyticsUserProperties on AnalyticsService {
+  /// Sends the current settings; no-op when they did not change since the last call.
+  Future<void> trackUserProperties(SettingsProvider settings, PremiumState premium) {
+    return setUserProperties(analyticsUserProperties(settings, premium));
+  }
 }

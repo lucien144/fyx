@@ -2,7 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyx/components/list_header.dart';
 import 'package:fyx/features/premium/presentation/widgets/premium_feature.dart';
-import 'package:fyx/controllers/AnalyticsProvider.dart';
+import 'package:fyx/shared/services/analytics/analytics_service.dart';
+import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/controllers/SettingsProvider.dart';
 import 'package:fyx/model/MainRepository.dart';
 import 'package:fyx/model/enums/premium_feature_enum.dart';
@@ -183,7 +184,7 @@ class SearchPostsHelp extends StatelessWidget {
                   onTap: () {
                     final arguments = SearchPageArguments(searchTerm: term, focus: false);
                     Navigator.of(context, rootNavigator: true).pushNamed('/search', arguments: arguments);
-                    AnalyticsProvider().logEvent('filter_saved_search');
+                    getIt<AnalyticsService>().logEvent('filter_saved_search');
                   }),
             ),
             Container(
