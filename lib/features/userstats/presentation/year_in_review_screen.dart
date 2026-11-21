@@ -66,6 +66,8 @@ class _YearInReviewScreenState extends State<YearInReviewScreen> with SingleTick
   bool _isHeld = false;
   bool _isInBackground = false;
   int? _shownIndex;
+  int _furthestIndex = 0;
+  final _openedAt = DateTime.now();
   double _dragDistance = 0;
 
   @override
@@ -78,6 +80,7 @@ class _YearInReviewScreenState extends State<YearInReviewScreen> with SingleTick
     _viewModel.addListener(_syncTimer);
     WidgetsBinding.instance.addObserver(this);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+    getIt<AnalyticsService>().setScreen('YearInReview', 'YearInReviewScreen');
   }
 
   @override
@@ -90,6 +93,7 @@ class _YearInReviewScreenState extends State<YearInReviewScreen> with SingleTick
 
   @override
   void dispose() {
+    _logClose();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: SystemUiOverlay.values);
     WidgetsBinding.instance.removeObserver(this);
     _viewModel.removeListener(_syncTimer);
@@ -109,12 +113,26 @@ class _YearInReviewScreenState extends State<YearInReviewScreen> with SingleTick
     if (state.status != YearInReviewStatus.ready) return;
     if (_shownIndex == state.index) return;
     _shownIndex = state.index;
+    if (state.index > _furthestIndex) _furthestIndex = state.index;
     if (state.isLast) {
       _timer.value = 1;
     } else {
       _timer.value = 0;
       _resume();
     }
+  }
+
+  /// How far the story got; slide numbers are 1-based. Skipped when nothing loaded.
+  void _logClose() {
+    final state = _viewModel.state;
+    if (state.status != YearInReviewStatus.ready || state.slides.isEmpty) return;
+    getIt<AnalyticsService>().logEvent('yearInReviewClose', parameters: {
+      'slide': state.index + 1,
+      'furthest': _furthestIndex + 1,
+      'slides': state.slides.length,
+      'completed': _furthestIndex >= state.slides.length - 1 ? 1 : 0,
+      'seconds': DateTime.now().difference(_openedAt).inSeconds,
+    });
   }
 
   void _resume() {

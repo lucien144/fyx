@@ -10,6 +10,7 @@ import 'package:fyx/features/userstats/domain/repositories/userstats_repository.
 import 'package:fyx/features/userstats/presentation/viewmodel/year_in_review_viewmodel.dart';
 import 'package:fyx/features/userstats/presentation/year_in_review_screen.dart';
 import 'package:fyx/model/enums/SkinEnum.dart';
+import 'package:fyx/shared/services/analytics/analytics_service.dart';
 import 'package:fyx/shared/services/service_locator.dart';
 import 'package:fyx/theme/skin/Skin.dart';
 import 'package:fyx/theme/skin/skins/FyxSkin.dart';
@@ -65,7 +66,25 @@ class _FakeRepository implements UserstatsRepository {
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
 
+class _RecordingAnalytics implements IAnalyticsDestination {
+  final List<String> screens = [];
+  final Map<String, Map<String, Object>?> events = {};
+
+  @override
+  Future<void> setScreen(String screenName, String screenClass) async => screens.add(screenName);
+  @override
+  Future<void> logEvent(String name, {Map<String, Object>? parameters}) async => events[name] = parameters;
+  @override
+  Future<void> setUser(String userId) async {}
+  @override
+  Future<void> setUserProperties(Map<String, Object> properties) async {}
+  @override
+  Future<void> reset() async {}
+}
+
 void main() {
+  late _RecordingAnalytics analytics;
+
   // Real fonts, so that text is measured the way it is on a device.
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
@@ -81,6 +100,8 @@ void main() {
   });
 
   setUp(() {
+    analytics = _RecordingAnalytics();
+    getIt.registerSingleton<AnalyticsService>(AnalyticsService([analytics]));
     // December of the running year, so the current-streak card is shown too.
     getIt.registerSingleton<YearInReviewViewModel>(YearInReviewViewModel(
       _FakeRepository(),
@@ -171,5 +192,35 @@ void main() {
     expect(viewModel.state.index, 1);
 
     await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('reports the screen and how far the story got when closed', (tester) async {
+    await tester.pumpWidget(app());
+    await tester.pump();
+    final viewModel = getIt<YearInReviewViewModel>();
+    expect(analytics.screens, ['YearInReview']);
+
+    viewModel.next();
+    await tester.pump();
+    viewModel.next();
+    await tester.pump();
+    viewModel.previous();
+    await tester.pump();
+    await tester.pumpWidget(const SizedBox());
+
+    expect(analytics.events['yearInReviewClose'], {'slide': 2, 'furthest': 3, 'slides': 9, 'completed': 0, 'seconds': isA<int>()});
+  });
+
+  testWidgets('reaching the last slide counts as completed', (tester) async {
+    await tester.pumpWidget(app());
+    await tester.pump();
+    final viewModel = getIt<YearInReviewViewModel>();
+    while (!viewModel.state.isLast) {
+      viewModel.next();
+      await tester.pump();
+    }
+    await tester.pumpWidget(const SizedBox());
+
+    expect(analytics.events['yearInReviewClose']?['completed'], 1);
   });
 }
